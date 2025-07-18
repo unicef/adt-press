@@ -46,7 +46,7 @@ uv pip install -e ".[dev]"
 Run the main script with the default configuration:
 
 ```bash
-python adt-press.py
+python adt-press.py pdf_path=/path/to/your/document.pdf
 ```
 
 ### Configuration
