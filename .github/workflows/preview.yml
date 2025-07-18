@@ -54,12 +54,8 @@ jobs:
         run: |
           echo "Preview site deployed to: ${{ steps.deployment.outputs.page_url }}"
 
-      - uses: LouisBrunner/checks-action@v2.0.0
-        if: always()
+      - uses: mshick/add-pr-comment@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Deployment Preview
-          conclusion: ${{ job.status }}
-          details_url: ${{ steps.deployment.outputs.page_url }}
-          output: |
-            {"summary":"${{ steps.deployment.outputs.page_url }}"}
+          message: |
+            **Preview Successful**
+            Preview site deployed to: ${{ steps.deployment.outputs.page_url }}
