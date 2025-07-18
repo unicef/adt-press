@@ -19,7 +19,7 @@ jobs:
 
       - name: Run PDF-to-site tool
         run: |
-          python adt-press.py
+          python adt-press.py pdf_path=./asssets/momo.pdf
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
