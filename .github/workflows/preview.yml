@@ -39,27 +39,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
         with:
-          name: adt-press-preview-${{ github.event.number }}
-          path: 'output'
-          retention-days: 7
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          artifact-name: adt-press-preview-${{ github.event.number }}
-
-      - name: Output URL
-        run: |
-          echo "Preview site deployed to: ${{ steps.deployment.outputs.page_url }}"
-
-      - uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            Preview site deployed to: ${{ steps.deployment.outputs.page_url }}
+          source-dir: ./output
