@@ -1,4 +1,0 @@
-crop:
-  name: image_crop
-  template_path: prompts/image_crop.jinja2
-  model: gpt-4o-2024-08-06
