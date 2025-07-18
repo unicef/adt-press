@@ -52,3 +52,10 @@ jobs:
       - name: Output URL
         run: |
           echo "Preview site deployed to: ${{ steps.deployment.outputs.page_url }}"
+
+      - name: Generate Link
+        id: generate_link
+        run: |
+          link="${{ steps.deployment.outputs.page_url }}"
+          comment="[Preview Site](${{ steps.deployment.outputs.page_url }})"
+          echo "::set-output name=comment::$comment"
