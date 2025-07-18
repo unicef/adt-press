@@ -17,5 +17,6 @@ def report_pages(template_config: TemplateConfig, pdf_pages: list[Page]) -> str:
 
 
 @cache(behavior="recompute")
-def report_index(report_images: str, report_pages: str) -> str:
-    return "complete"
+def report_index(template_config: TemplateConfig, report_images: str, report_pages: str) -> str:
+    return render_template(template_config, "index.html", dict())
+
