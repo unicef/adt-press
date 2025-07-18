@@ -8,15 +8,17 @@ class TemplateConfig(BaseModel):
     output_dir: str
     template_dir: str
 
+
 def basename(text):
     return os.path.basename(text)
+
 
 # given the passed in dict and template, render using jinja2
 def render_template(config: TemplateConfig, template_path: str, context: dict) -> str:
     from jinja2 import Environment, FileSystemLoader
 
     env = Environment(loader=FileSystemLoader(config.template_dir))
-    env.filters['basename'] = basename
+    env.filters["basename"] = basename
     template = env.get_template(template_path)
 
     # write the output to a file named after the template

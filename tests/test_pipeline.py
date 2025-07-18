@@ -1,7 +1,7 @@
-import pytest
 
 def add(one, two):
     return one + two
+
 
 def test_add():
     assert add(1, 2) == 3

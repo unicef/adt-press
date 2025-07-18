@@ -1,5 +1,4 @@
 import hydra
-from hydra.core.hydra_config import HydraConfig
 import litellm
 from hamilton import driver, registry
 from omegaconf import DictConfig
@@ -32,7 +31,8 @@ def main(config: DictConfig) -> None:
 
     dr.execute(["report_index"], overrides={"config": config})
 
-    dr.cache.view_run(output_file_path=f"{config["output_dir"]}/run.png")
+    dr.cache.view_run(output_file_path=f"{config['output_dir']}/run.png")
+
 
 if __name__ == "__main__":
     main()
