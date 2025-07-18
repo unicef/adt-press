@@ -4,7 +4,7 @@
 <div class="space-y-4">
     {% for page in pages %}
     <div class="flex items-start bg-white shadow rounded p-2">
-        <a href="../{{ page.image_upath }}"><img src="../{{ page.image_upath }}" class="w-36 h-auto" alt="Page {{ page.page_index }}"></a>
+        <a href="{{ page.image_upath | basename }}"><img src="{{ page.image_upath | basename }}" class="w-36 h-auto" alt="Page {{ page.page_index }}"></a>
         <div class="ml-2 text-gray-600">
             <p>Page: {{ page.page_index }}</p>
         </div>

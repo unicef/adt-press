@@ -1,13 +1,7 @@
-name: Generate Preview
+name: Deploy Sample
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - closed
-
+  push:
     branches:
       - main
 
@@ -49,5 +43,5 @@ jobs:
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./output
-          umbrella-dir: pr-preview
-          action: auto
+          clean-exclude: pr-preview
+          force: false
