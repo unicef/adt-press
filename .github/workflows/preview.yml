@@ -45,7 +45,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          name: adt-press-preview-${{ github.event.number }}
           path: 'output'
+          retention-days: 7
 
       - name: Deploy to GitHub Pages
         id: deployment
@@ -58,5 +60,4 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **Preview Successful**
             Preview site deployed to: ${{ steps.deployment.outputs.page_url }}
