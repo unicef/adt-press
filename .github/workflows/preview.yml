@@ -10,6 +10,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  checks: write
 
 concurrency:
   group: "pages"
@@ -53,9 +54,12 @@ jobs:
         run: |
           echo "Preview site deployed to: ${{ steps.deployment.outputs.page_url }}"
 
-      - name: Generate Link
-        id: generate_link
-        run: |
-          link="${{ steps.deployment.outputs.page_url }}"
-          comment="[Preview Site](${{ steps.deployment.outputs.page_url }})"
-          echo "::set-output name=comment::$comment"
+      - uses: LouisBrunner/checks-action@v2.0.0
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Deployment Preview
+          conclusion: ${{ job.status }}
+          details_url: ${{ steps.deployment.outputs.page_url }}
+          output: |
+            {"summary":"${{ steps.deployment.outputs.page_url }}"}
