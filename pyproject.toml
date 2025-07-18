@@ -29,3 +29,8 @@ dependencies = [
     "sf-hamilton-ui>=0.0.17",
     "universal-pathlib>=0.2.6",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
