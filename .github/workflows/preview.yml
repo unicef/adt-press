@@ -19,7 +19,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./asssets/momo.pdf
+          uv run adt-press.py pdf_path=./assets/momo.pdf
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
