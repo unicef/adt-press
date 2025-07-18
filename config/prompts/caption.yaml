@@ -1,0 +1,10 @@
+caption:
+  name: image_caption
+  template_path: prompts/image_caption.jinja2
+  model: gpt-4o-2024-08-06
+  examples:
+    - language: Spanish
+      page_image: assets/prompts/caption/cuaderno5_13.png
+      image: assets/prompts/caption/cuaderno5_img-13-2.png
+      reasoning: I noted the relevant sections in the contextual image, focusing on descriptions of environments like polar regions. The image shows a polar scene with prominent ice features. I should provide some context for the purpose of why the image is here.
+      caption: Un entorno polar donde se aprecian icebergs, agua y nieve.

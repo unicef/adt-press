@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Extracted Pages{% endblock %}
+{% block content %}
+<div class="space-y-4">
+    {% for page in pages %}
+    <div class="flex items-start bg-white shadow rounded p-2">
+        <a href="../{{ page.image_upath }}"><img src="../{{ page.image_upath }}" class="w-36 h-auto" alt="Page {{ page.page_index }}"></a>
+        <div class="ml-2 text-gray-600">
+            <p>Page: {{ page.page_index }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

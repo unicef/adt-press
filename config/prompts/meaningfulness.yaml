@@ -1,0 +1,4 @@
+meaningfulness:
+  name: image_meaningfulness
+  template_path: prompts/image_meaningfulness.jinja2
+  model: gpt-4o-2024-08-06

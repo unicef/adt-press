@@ -205,3 +205,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# never check in our output directory
+output/
+outputs/
+.hamilton_cache/

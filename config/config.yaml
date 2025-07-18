@@ -1,0 +1,23 @@
+pdf_path: "/tmp/momo.pdf"
+template_dir: "templates"
+output_dir: "output"
+
+clear_cache: false
+
+page_range:
+  start: 0
+  end: 4
+
+image_filters:
+  size:
+    max_side: 1500
+    min_side: 200
+
+  blank:
+    threshold: 2
+
+defaults:
+ - prompts/caption
+ - prompts/crop
+ - prompts/meaningfulness
+ - override hydra/help: help

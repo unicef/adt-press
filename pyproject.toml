@@ -1,0 +1,31 @@
+[project]
+name = "adt-press"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "banks>=2.1.3",
+    "fsspec>=2025.5.1",
+    "google-genai>=1.25.0",
+    "graphviz>=0.21",
+    "hydra-core>=1.3.2",
+    "instructor>=1.9.2",
+    "jinja2>=3.1.6",
+    "jsonref>=1.1.0",
+    "langfuse>=2,<3",
+    "litellm>=1.74.3",
+    "matplotlib>=3.10.3",
+    "numpy>=2.3.1",
+    "openai>=1.95.1",
+    "opencv-python>=4.11.0.86",
+    "pillow>=11.3.0",
+    "pydantic>=2.11.7",
+    "pymupdf>=1.26.3",
+    "pyyaml>=6.0.2",
+    "ruff>=0.12.3",
+    "sf-hamilton>=1.88.0",
+    "sf-hamilton-sdk>=0.8.0",
+    "sf-hamilton-ui>=0.0.17",
+    "universal-pathlib>=0.2.6",
+]
