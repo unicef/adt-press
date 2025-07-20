@@ -1,4 +1,4 @@
-pdf_path: "/tmp/momo.pdf"
+pdf_path: "assets/momo.pdf"
 template_dir: "templates"
 output_dir: "output"
 
