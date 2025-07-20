@@ -5,28 +5,29 @@ from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.web import TemplateConfig
 
+from omegaconf import OmegaConf
 
-def config() -> dict:
-    return {}
+def config() -> OmegaConf:
+    return OmegaConf.create({})
 
 
 def template_config(output_dir_config: str, template_dir_config: str) -> TemplateConfig:
     return TemplateConfig(output_dir=output_dir_config, template_dir=template_dir_config)
 
 
-def pdf_path_config(config: dict) -> str:
+def pdf_path_config(config: OmegaConf) -> str:
     return config["pdf_path"]
 
 
-def output_language_config(config: dict) -> str:
+def output_language_config(config: OmegaConf) -> str:
     return config.get("output_language", "en")
 
 
-def output_dir_config(config: dict) -> str:
+def output_dir_config(config: OmegaConf) -> str:
     return config["output_dir"]
 
 
-def template_dir_config(config: dict) -> str:
+def template_dir_config(config: OmegaConf) -> str:
     return config["template_dir"]
 
 
@@ -40,26 +41,26 @@ class PageRangeConfig(BaseModel):
     end: int = 0
 
 
-def page_range_config(config: dict) -> PageRangeConfig:
+def page_range_config(config: OmegaConf) -> PageRangeConfig:
     return PageRangeConfig.model_validate(config.get("page_range", {}))
 
 
 @cache(behavior="recompute")
-def caption_prompt_config(config: dict) -> PromptConfig:
+def caption_prompt_config(config: OmegaConf) -> PromptConfig:
     return PromptConfig.model_validate(config["prompts"]["caption"])
 
 
 @cache(behavior="recompute")
-def crop_prompt_config(config: dict) -> PromptConfig:
+def crop_prompt_config(config: OmegaConf) -> PromptConfig:
     return PromptConfig.model_validate(config["prompts"]["crop"])
 
 
 @cache(behavior="recompute")
-def meaningfulness_prompt_config(config: dict) -> PromptConfig:
+def meaningfulness_prompt_config(config: OmegaConf) -> PromptConfig:
     return PromptConfig.model_validate(config["prompts"]["meaningfulness"])
 
 
-def image_config(config: dict) -> dict:
+def image_config(config: OmegaConf) -> dict:
     return config.get("image_filters", {})
 
 

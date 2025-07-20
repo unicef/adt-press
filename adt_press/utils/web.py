@@ -26,7 +26,4 @@ def render_template(config: TemplateConfig, template_path: str, context: dict) -
     with open(output_path, "w") as f:
         f.write(template.render(context))
 
-    logger = logging.getLogger(__name__)
-    logger.info(f"Rendered template {template_path} to {output_path}")
-
     return str(output_path)

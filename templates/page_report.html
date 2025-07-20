@@ -1,12 +1,97 @@
 {% extends "base.html" %}
 {% block title %}Extracted Pages{% endblock %}
 {% block content %}
-<div class="space-y-4">
+<div class="space-y-8">
     {% for page in pages %}
-    <div class="flex items-start bg-white shadow rounded p-2">
-        <a href="{{ page.image_upath | basename }}"><img src="{{ page.image_upath | basename }}" class="w-36 h-auto" alt="Page {{ page.page_index }}"></a>
-        <div class="ml-2 text-gray-600">
-            <p>Page: {{ page.page_index }}</p>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Header with Page Number -->
+        <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
+            <h2 class="text-xl font-bold">Page {{ page.page_index }}</h2>
+            <div class="text-sm">
+                {% if page.images %}
+                    <span class="bg-gray-800 px-2 py-1 rounded">{{ page.images|length }} image{{ 's' if page.images|length != 1 else '' }}</span>
+                {% else %}
+                    <span class="bg-gray-800 px-2 py-1 rounded">no images</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Page Content Section -->
+        <div class="flex flex-wrap p-4 border-b border-gray-200">
+            <!-- Main Page Image -->
+            <div class="w-full md:w-1/3">
+                <div class="m-2 bg-gray-100 rounded overflow-hidden">
+                    <!-- Tab-style header -->
+                    <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                        Full Page
+                    </div>
+                    <div class="p-3">
+                        <a href="{{ page.image_upath | basename }}" class="block">
+                            <img src="{{ page.image_upath | basename }}" class="max-w-full h-auto mx-auto" alt="Page {{ page.page_index }}">
+                        </a>
+                    </div>
+                    <div class="flex p-2">
+                        <span class="w-1/3 font-medium text-gray-700">Path:</span>
+                        <span class="w-2/3 text-gray-600 text-sm">{{ page.image_upath }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extracted Images Thumbnails -->
+            {% if page.images %}
+            <div class="w-full md:w-2/3">
+                <div class="m-2 bg-gray-100 rounded overflow-hidden">
+                    <!-- Tab-style header -->
+                    <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                        Extracted Images ({{ page.images|length }})
+                    </div>
+                    <div class="p-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {% for image in page.images %}
+                            <div class="bg-white rounded border border-gray-200 hover:shadow-md transition-shadow">
+                                <a href="{{ image.upath | basename }}" class="block">
+                                    <img src="{{ image.upath | basename }}" class="w-full" alt="Image {{ image.image_id }}">
+                                </a>
+                                <div class="p-2">
+                                    <div class="text-xs text-gray-500 text-center">{{ image.image_id }}</div>
+                                    <div class="text-xs text-gray-400 text-center">{{ image.width }} × {{ image.height }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="w-full md:w-2/3">
+                <div class="m-2 bg-gray-100 rounded overflow-hidden">
+                    <!-- Tab-style header -->
+                    <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                        Extracted Images
+                    </div>
+                    <div class="p-6 text-center text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>No images extracted from this page</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Page Summary -->
+        <div class="p-4 bg-gray-50">
+            <div class="flex items-center justify-between text-sm text-gray-600">
+                <span>Page {{ page.page_index }}</span>
+                <span>
+                    {% if page.images %}
+                        Contains {{ page.images|length }} extracted image{{ 's' if page.images|length != 1 else '' }}
+                    {% else %}
+                        No extractable images found
+                    {% endif %}
+                </span>
+            </div>
         </div>
     </div>
     {% endfor %}

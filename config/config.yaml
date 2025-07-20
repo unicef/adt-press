@@ -3,6 +3,7 @@ template_dir: "templates"
 output_dir: "output"
 
 clear_cache: false
+print_available_models: false
 
 page_range:
   start: 0
@@ -37,6 +38,3 @@ prompts:
     name: image_meaningfulness
     template_path: prompts/image_meaningfulness.jinja2
     model: gpt-4o-2024-08-06   
-
-defaults:
- - override hydra/help: help

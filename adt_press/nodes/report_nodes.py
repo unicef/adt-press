@@ -4,6 +4,9 @@ from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.image import Image
 from adt_press.utils.pdf import Page
 from adt_press.utils.web import render_template
+from omegaconf import OmegaConf
+
+import yaml
 
 
 @cache(behavior="recompute")
@@ -17,5 +20,9 @@ def report_pages(template_config: TemplateConfig, pdf_pages: list[Page]) -> str:
 
 
 @cache(behavior="recompute")
-def report_index(template_config: TemplateConfig, report_images: str, report_pages: str) -> str:
+def report_config(template_config: TemplateConfig, config: OmegaConf) -> str:
+    return render_template(template_config, "config.html", dict(config=OmegaConf.to_yaml(config)))
+
+@cache(behavior="recompute")
+def report_index(template_config: TemplateConfig, report_images: str, report_pages: str, report_config: str) -> str:
     return render_template(template_config, "index.html", dict())

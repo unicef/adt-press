@@ -23,10 +23,12 @@ dependencies = [
     "pydantic>=2.11.7",
     "pymupdf>=1.26.3",
     "pyyaml>=6.0.2",
+    "rich>=14.0.0",
     "ruff>=0.12.3",
     "sf-hamilton>=1.88.0",
     "sf-hamilton-sdk>=0.8.0",
     "sf-hamilton-ui>=0.0.17",
+    "structlog>=25.4.0",
     "universal-pathlib>=0.2.6",
 ]
 

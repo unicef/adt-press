@@ -82,7 +82,6 @@ def pdf_blank_filter_results(
 def pdf_image_captions(
     output_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page]
 ) -> list[ImageCaption]:
-    print(caption_prompt_config.model_dump())
     captions = []
     for page in pdf_pages:
         for image in page.images:

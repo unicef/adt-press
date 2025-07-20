@@ -1,6 +1,5 @@
 import instructor
 
-# from openai import OpenAI
 from banks import Prompt
 from litellm import completion
 
