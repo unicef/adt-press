@@ -1,8 +1,12 @@
+[![Ruff](https://github.com/incrementventures/adt-press/actions/workflows/lint.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/lint.yml)
+[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/python-app.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/python-app.yml)
+
+
 # ADT Press
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
-The the (sample report)[https://incrementventures.github.io/adt-press/] to better understand the process and output.
+The (sample report)[https://incrementventures.github.io/adt-press/] to better understand the process and output.
 
 ## Features
 
