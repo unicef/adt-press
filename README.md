@@ -1,5 +1,6 @@
 [![Ruff](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml)
-[![Unit Tests](https://img.shields.io/github/actions/workflow/status/incrementventures/adt-press/test.yml?label=Unit+Tests)](https://github.com/incrementventures/adt-press/actions/workflows/test.yml)
+[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/test.yml)
+[![Deploy Sample](https://github.com/incrementventures/adt-press/actions/workflows/deploy.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/deploy.yml)
 
 
 # ADT Press
