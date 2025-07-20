@@ -35,7 +35,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/momo.pdf page_range.end=2
+          uv run adt-press.py pdf_path=./assets/momo.pdf page_range.end=5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
