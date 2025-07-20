@@ -1,4 +1,4 @@
-name: Format and Lint
+name: Ruff
 
 on:
   push:

@@ -1,5 +1,5 @@
-[![Ruff](https://github.com/incrementventures/adt-press/actions/workflows/lint.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/lint.yml)
-[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/python-app.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/python-app.yml)
+[![Ruff](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml)
+[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/test.yml)
 
 
 # ADT Press
