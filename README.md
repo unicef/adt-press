@@ -33,9 +33,9 @@ This project uses `uv` for dependency management. If you don't have `uv` install
 Clone the repository and install dependencies:
 
 ```bash
-% git clone git@github.com:incrementventures/adt-press.git
-% cd adt-press
-% uv sync
+git clone git@github.com:incrementventures/adt-press.git
+cd adt-press
+uv sync
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ Clone the repository and install dependencies:
 Run the main script with the default configuration:
 
 ```bash
-% uv run adt-press.py pdf_path=/path/to/your/document.pdf
+uv run adt-press.py pdf_path=/path/to/your/document.pdf
 ```
 
 ### Configuration
@@ -55,7 +55,7 @@ The application uses OmegaConf for configuration management. The default configu
 To override configuration values from the command line:
 
 ```bash
-% uv run adt-press.py pdf_path=/path/to/your/document.pdf page_range.start=0 page_range.end=5
+uv run adt-press.py pdf_path=/path/to/your/document.pdf page_range.start=0 page_range.end=5
 ```
 
 ### Key Configuration Parameters
@@ -84,13 +84,13 @@ This project uses Ruff for code formatting and linting. The configuration is spe
 To check code style:
 
 ```bash
-% ruff check --select I --fix
+uv run ruff check --select I --fix
 ```
 
 To format code:
 
 ```bash
-% ruff format
+uv run ruff format
 ```
 
 ### Testing
@@ -98,7 +98,7 @@ To format code:
 Run tests with pytest:
 
 ```bash
-% uv run pytest
+uv run pytest
 ```
 
 ### Project Structure
