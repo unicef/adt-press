@@ -1,6 +1,9 @@
 from omegaconf import OmegaConf
 import litellm
 from hamilton import driver, registry, telemetry
+
+registry.disable_autoload()
+
 from hamilton.lifecycle import NodeExecutionHook
 from typing import Dict, Any
 
@@ -8,7 +11,6 @@ from adt_press.nodes import config_nodes, pdf_nodes, report_nodes
 import structlog
 
 telemetry.disable_telemetry()
-registry.disable_autoload()
 
 log = structlog.get_logger()
 

@@ -7,7 +7,7 @@
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
-The (sample report)[https://incrementventures.github.io/adt-press/] to better understand the process and output.
+The [sample report](https://incrementventures.github.io/adt-press/) can help in better understanding the process and outputs.
 
 ## Features
 
@@ -33,17 +33,9 @@ This project uses `uv` for dependency management. If you don't have `uv` install
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/incrementventures/adt-press.git
+git clone git@github.com:incrementventures/adt-press.git
 cd adt-press
-uv venv
-source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
-uv pip install -e .
-```
-
-To install development dependencies:
-
-```bash
-uv pip install -e ".[dev]"
+uv sync
 ```
 
 ## Usage
@@ -53,7 +45,7 @@ uv pip install -e ".[dev]"
 Run the main script with the default configuration:
 
 ```bash
-python adt-press.py pdf_path=/path/to/your/document.pdf
+uv run adt-press.py pdf_path=/path/to/your/document.pdf
 ```
 
 ### Configuration
