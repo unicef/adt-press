@@ -2,6 +2,8 @@
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
+The the (sample report)[https://incrementventures.github.io/adt-press/] to better understand the process and output.
+
 ## Features
 
 - PDF document processing and image extraction
