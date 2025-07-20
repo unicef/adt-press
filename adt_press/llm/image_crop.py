@@ -1,12 +1,11 @@
 import instructor
 from banks import Prompt
-
 from fsspec import open
 from litellm import completion
+from pydantic import BaseModel
 
 from adt_press.utils.image import CropCoordinates, Image
 from adt_press.utils.pdf import Page
-from pydantic import BaseModel
 
 from .prompt import PromptConfig
 

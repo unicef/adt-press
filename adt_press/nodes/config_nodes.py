@@ -1,11 +1,10 @@
 from hamilton.function_modifiers import cache
+from omegaconf import OmegaConf
 from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.web import TemplateConfig
-
-from omegaconf import OmegaConf
 
 
 def config() -> OmegaConf:

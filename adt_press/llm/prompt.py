@@ -1,4 +1,5 @@
 from typing import Self
+
 from pydantic import BaseModel, Field, model_validator
 
 from adt_press.utils.file import calculate_file_hash

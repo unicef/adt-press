@@ -1,10 +1,10 @@
 from hamilton.function_modifiers import cache
+from omegaconf import OmegaConf
 
 from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.image import Image
 from adt_press.utils.pdf import Page
 from adt_press.utils.web import render_template
-from omegaconf import OmegaConf
 
 
 @cache(behavior="recompute")

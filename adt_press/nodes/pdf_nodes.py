@@ -1,16 +1,16 @@
 from fsspec import open
 from upath import UPath
 
-from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
+from adt_press.llm.prompt import PromptConfig
 from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig, PageRangeConfig
 from adt_press.utils.image import (
     Image,
     ImageCaption,
-    ImageMeaningfulness,
     ImageCrop,
+    ImageMeaningfulness,
     ProcessedImage,
     crop_image,
     image_bytes,

@@ -84,13 +84,13 @@ This project uses Ruff for code formatting and linting. The configuration is spe
 To check code style:
 
 ```bash
-ruff check .
+ruff check --select I --fix
 ```
 
 To format code:
 
 ```bash
-ruff format .
+ruff format
 ```
 
 ### Testing
