@@ -19,7 +19,6 @@ image_filters:
 
 prompts:
   caption:
-    name: image_caption
     template_path: prompts/image_caption.jinja2
     model: gpt-4o-2024-08-06
     examples:
@@ -30,11 +29,9 @@ prompts:
         caption: Un entorno polar donde se aprecian icebergs, agua y nieve.
 
   crop:
-    name: image_crop
     template_path: prompts/image_crop.jinja2
     model: gpt-4o-2024-08-06
 
   meaningfulness:
-    name: image_meaningfulness
     template_path: prompts/image_meaningfulness.jinja2
     model: gpt-4o-2024-08-06   

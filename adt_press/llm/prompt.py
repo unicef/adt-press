@@ -5,7 +5,6 @@ from adt_press.utils.file import calculate_file_hash
 
 
 class PromptConfig(BaseModel):
-    name: str
     model: str
     template_path: str
     template_hash: str = Field(default=None, exclude=True)

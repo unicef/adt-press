@@ -7,6 +7,7 @@ from adt_press.utils.web import TemplateConfig
 
 from omegaconf import OmegaConf
 
+
 def config() -> OmegaConf:
     return OmegaConf.create({})
 

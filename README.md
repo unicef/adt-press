@@ -51,7 +51,7 @@ python adt-press.py pdf_path=/path/to/your/document.pdf
 
 ### Configuration
 
-The application uses Hydra for configuration management. The default configuration file is located at `config/config.yaml`.
+The application uses OmegaConf for configuration management. The default configuration file is located at `config/config.yaml`.
 
 To override configuration values from the command line:
 
