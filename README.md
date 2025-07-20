@@ -84,7 +84,7 @@ This project uses Ruff for code formatting and linting. The configuration is spe
 To check code style:
 
 ```bash
-uv run ruff check --select I --fix
+uv run ruff check --fix
 ```
 
 To format code:

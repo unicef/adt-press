@@ -1,5 +1,3 @@
-from fsspec import open
-from upath import UPath
 
 from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import get_image_crop_coordinates
@@ -15,7 +13,6 @@ from adt_press.utils.image import (
     crop_image,
     image_bytes,
     is_blank_image,
-    matplotlib_chart,
     write_image,
 )
 from adt_press.utils.pdf import Page, pages_for_pdf
@@ -32,21 +29,6 @@ def pdf_raster_images(pdf_pages: list[Page]) -> list[Image]:
     for page in pdf_pages:
         pdf_raster_images.extend(page.images)
     return pdf_raster_images
-
-
-def pdf_image_charts(pdf_raster_images: list[Image]) -> list[Image]:
-    image_charts = []
-    for img in pdf_raster_images:
-        chart_bytes = matplotlib_chart(image_bytes(img.upath))
-
-        # build a new path for the chart image based on our img upath
-        chart_upath = UPath(img.upath).parent / f"{img.image_id}_chart.png"
-        with open(chart_upath, "wb") as f:
-            f.write(chart_bytes)
-
-        img.chart_upath = str(chart_upath)
-        image_charts.append(img)
-    return image_charts
 
 
 def pdf_size_filter_results(

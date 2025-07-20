@@ -1,16 +1,14 @@
-import litellm
-from hamilton import driver, registry, telemetry
-from omegaconf import OmegaConf
-
-registry.disable_autoload()
-
 from typing import Any, Dict
 
+import litellm
 import structlog
+from hamilton import driver, registry, telemetry
 from hamilton.lifecycle import NodeExecutionHook
+from omegaconf import OmegaConf
 
 from adt_press.nodes import config_nodes, pdf_nodes, report_nodes
 
+registry.disable_autoload()
 telemetry.disable_telemetry()
 
 log = structlog.get_logger()
