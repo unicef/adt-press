@@ -1,5 +1,5 @@
 [![Ruff](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml)
-[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/test.yml)
+[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/test.yml?label=Unit+Tests)
 
 
 # ADT Press
