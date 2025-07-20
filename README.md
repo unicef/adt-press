@@ -84,13 +84,13 @@ This project uses Ruff for code formatting and linting. The configuration is spe
 To check code style:
 
 ```bash
-ruff check --select I --fix
+% ruff check --select I --fix
 ```
 
 To format code:
 
 ```bash
-ruff format
+% ruff format
 ```
 
 ### Testing
@@ -98,7 +98,7 @@ ruff format
 Run tests with pytest:
 
 ```bash
-python -m pytest tests/
+% uv run pytest
 ```
 
 ### Project Structure
