@@ -116,8 +116,8 @@ def pdf_processed_images(
     pdf_image_captions: list[ImageCaption],
     pdf_image_crops: list[ImageCrop],
     pdf_image_meaningfulness: list[ImageMeaningfulness],
-) -> list[Image]:
-    processed_images = []
+) -> list[ProcessedImage]:
+    processed_images = list()
     for img, size_failures, blank_failures, caption, crop, meaningfulness in zip(
         pdf_raster_images,
         pdf_size_filter_results,
@@ -133,4 +133,4 @@ def pdf_processed_images(
         image_args["failed_filters"] = [*size_failures, *blank_failures]
         processed_images.append(ProcessedImage(**image_args))
 
-    return list(processed_images)
+    return processed_images
