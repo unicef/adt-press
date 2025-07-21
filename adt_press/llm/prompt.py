@@ -10,6 +10,7 @@ class PromptConfig(BaseModel):
     template_path: str
     template_hash: str = Field(default=None, exclude=True)
     examples: list[dict] = []
+    rate_limit: int = 300
 
     @model_validator(mode="after")
     def set_template_hash(self) -> Self:

@@ -3,7 +3,7 @@ from banks import Prompt
 
 # from openai import OpenAI
 from fsspec import open
-from litellm import completion
+from litellm import acompletion
 from pydantic import BaseModel
 
 from adt_press.utils.image import Image, ImageMeaningfulness
@@ -16,7 +16,7 @@ class MeaningfulnessResponse(BaseModel):
     meaningfulness: ImageMeaningfulness
 
 
-def get_image_meaningfulness(config: PromptConfig, page: Page, image: Image) -> ImageMeaningfulness:
+async def get_image_meaningfulness(config: PromptConfig, page: Page, image: Image) -> ImageMeaningfulness:
     template_path = config.template_path
     with open(template_path, "r") as template_file:
         template_content = template_file.read()
@@ -28,8 +28,8 @@ def get_image_meaningfulness(config: PromptConfig, page: Page, image: Image) -> 
     )
 
     prompt = Prompt(template_content)
-    client = instructor.from_litellm(completion)
-    response = client.chat.completions.create(
+    client = instructor.from_litellm(acompletion)
+    response = await client.chat.completions.create(
         model=config.model,
         response_model=MeaningfulnessResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],

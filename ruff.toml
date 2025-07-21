@@ -1,2 +1,8 @@
-line-length = 120
+# modern screens
+line-length = 140
+
+# show changes
 show-fixes = true
+
+# sort imports
+lint.extend-select = ["I"]
