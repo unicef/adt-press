@@ -69,7 +69,7 @@ class ImageSizeFilterConfig(BaseModel):
     min_side: int = 50
 
 
-def image_size_filter_config(image_config: dict) -> ImageSizeFilterConfig:
+def image_size_filter_config(image_config: DictConfig) -> ImageSizeFilterConfig:
     return ImageSizeFilterConfig.model_validate(image_config.get("size", {}))
 
 
@@ -77,5 +77,5 @@ class BlankImageFilterConfig(BaseModel):
     threshold: int = 2
 
 
-def blank_image_filter_config(image_config: dict) -> BlankImageFilterConfig:
+def blank_image_filter_config(image_config: DictConfig) -> BlankImageFilterConfig:
     return BlankImageFilterConfig.model_validate(image_config.get("blank", {}))
