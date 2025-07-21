@@ -133,4 +133,4 @@ def pdf_processed_images(
         image_args["failed_filters"] = [*size_failures, *blank_failures]
         processed_images.append(ProcessedImage(**image_args))
 
-    return processed_images
+    return list(processed_images)

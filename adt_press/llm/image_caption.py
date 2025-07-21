@@ -10,7 +10,7 @@ from adt_press.utils.pdf import Page
 from .prompt import PromptConfig
 
 
-class ImageCaptionResponse(BaseModel):
+class CaptionResponse(BaseModel):
     caption: ImageCaption
 
 
@@ -31,9 +31,9 @@ def get_image_caption(config: PromptConfig, page: Page, image: Image, language_c
 
     prompt = Prompt(template_content)
     client = instructor.from_litellm(completion)
-    response = client.chat.completions.create(
+    response: CaptionResponse = client.chat.completions.create(
         model=config.model,
-        response_model=ImageCaptionResponse,
+        response_model=CaptionResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=3,
     )
