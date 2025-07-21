@@ -1,13 +1,13 @@
-[![Ruff](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/ruff.yml)
-[![Unit Tests](https://github.com/incrementventures/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/test.yml)
-[![Deploy Sample](https://github.com/incrementventures/adt-press/actions/workflows/deploy.yml/badge.svg)](https://github.com/incrementventures/adt-press/actions/workflows/deploy.yml)
+[![Ruff](https://github.com/unicef/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/ruff.yml)
+[![Unit Tests](https://github.com/unicef/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/test.yml)
+[![Deploy Sample](https://github.com/unicef/adt-press/actions/workflows/deploy.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/deploy.yml)
 
 
 # ADT Press
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
-The [sample report](https://incrementventures.github.io/adt-press/) can help in better understanding the process and outputs.
+The [sample report](https://unicef.github.io/adt-press/) can help in better understanding the process and outputs.
 
 ## Features
 
@@ -33,7 +33,7 @@ This project uses `uv` for dependency management. If you don't have `uv` install
 Clone the repository and install dependencies:
 
 ```bash
-git clone git@github.com:incrementventures/adt-press.git
+git clone git@github.com:unicef/adt-press.git
 cd adt-press
 uv sync
 ```
