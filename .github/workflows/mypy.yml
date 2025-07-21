@@ -27,4 +27,4 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Run mypy
-        run: uv run mypy adt_press.py
+        run: uv run mypy adt-press.py
