@@ -1,5 +1,7 @@
 import asyncio
+
 from asynciolimiter import Limiter
+
 
 def run_async_task(task):
     """
@@ -11,6 +13,7 @@ def run_async_task(task):
     finally:
         loop.close()
     return results
+
 
 def gather_with_limit(fs, rate_limit):
     """Gather async tasks with a rate limit."""

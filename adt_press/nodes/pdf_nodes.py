@@ -1,6 +1,3 @@
-import asyncio
-
-from asynciolimiter import Limiter
 from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
@@ -18,7 +15,7 @@ from adt_press.utils.image import (
     write_image,
 )
 from adt_press.utils.pdf import Page, pages_for_pdf
-from adt_press.utils.sync import run_async_task, gather_with_limit
+from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 def pdf_pages(output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
@@ -96,12 +93,10 @@ def pdf_image_crops(crop_prompt_config: PromptConfig, pdf_pages: list[Page]) -> 
             f"cropped_{coord.top_left_x}_{coord.top_left_y}_{coord.bottom_right_x}_{coord.bottom_right_y}",
         )
 
-        return (
-            ImageCrop(
-                image_id=img.image_id,
-                crop_coordinates=coord,
-                upath=str(cropped_path),
-            )
+        return ImageCrop(
+            image_id=img.image_id,
+            crop_coordinates=coord,
+            upath=str(cropped_path),
         )
 
     async def generate_crops():
