@@ -9,4 +9,4 @@ __pycache__/
 .git
 .gitignore
 tests/
-README.md
+# Removed exclusion of README.md
