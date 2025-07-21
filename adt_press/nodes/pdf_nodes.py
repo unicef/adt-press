@@ -93,11 +93,7 @@ def pdf_image_crops(crop_prompt_config: PromptConfig, pdf_pages: list[Page]) -> 
             f"cropped_{coord.top_left_x}_{coord.top_left_y}_{coord.bottom_right_x}_{coord.bottom_right_y}",
         )
 
-        return ImageCrop(
-            image_id=img.image_id,
-            crop_coordinates=coord,
-            upath=str(cropped_path),
-        )
+        return ImageCrop(image_id=img.image_id, crop_coordinates=coord, upath=str(cropped_path))
 
     async def generate_crops():
         crops = []
