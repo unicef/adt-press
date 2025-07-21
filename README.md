@@ -158,7 +158,7 @@ The folder `.devcontainer` needs to be in the root of your project, containing a
     // Sets the run context to one level up instead of the .devcontainer folder.
     "context": "..",
     // Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-    "dockerfile": "..\\Dockerfile"
+    "dockerfile": "../Dockerfile"
   }
 }
 ```
