@@ -106,7 +106,7 @@ def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshol
                 union(i, j)
 
     # Group drawings based on their root parent
-    groups = {}  # type: ignore
+    groups: dict[int, list] = {}
     for i in range(n):
         root = find(i)
         if root not in groups:
