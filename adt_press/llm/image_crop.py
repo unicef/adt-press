@@ -27,7 +27,7 @@ async def get_image_crop_coordinates(config: PromptConfig, page: Page, image: Im
 
     prompt = Prompt(template_content)
     client = instructor.from_litellm(acompletion)
-    response = await client.chat.completions.create(
+    response: CropResponse = await client.chat.completions.create(
         model=config.model,
         response_model=CropResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],

@@ -29,7 +29,7 @@ async def get_image_meaningfulness(config: PromptConfig, page: Page, image: Imag
 
     prompt = Prompt(template_content)
     client = instructor.from_litellm(acompletion)
-    response = await client.chat.completions.create(
+    response: MeaningfulnessResponse = await client.chat.completions.create(
         model=config.model,
         response_model=MeaningfulnessResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],

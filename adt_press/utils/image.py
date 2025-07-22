@@ -69,7 +69,7 @@ def image_bytes(image_path: str) -> bytes:
     """Returns the bytes of an image given its path."""
 
     with open(image_path, "rb") as f:
-        return f.read()
+        return bytes(f.read())
 
 
 def is_blank_image(image_bytes: bytes, threshold: int) -> bool:
@@ -89,7 +89,7 @@ def is_blank_image(image_bytes: bytes, threshold: int) -> bool:
     # Compute the standard deviation of the pixel values
     std_dev = np.std(image)
     # Check if the standard deviation is below the threshold
-    return std_dev < threshold
+    return bool(std_dev < threshold)
 
 
 def matplotlib_chart(img_bytes: bytes) -> bytes:
@@ -125,7 +125,7 @@ def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
     return buffer.getvalue()
 
 
-def write_image(output_path: str, image_bytes: bytes, suffix: str = "") -> None:
+def write_image(output_path: str, image_bytes: bytes, suffix: str = "") -> str:
     """Writes the image bytes to the specified output path, optionally appending a suffix to the filename."""
 
     # if we have a suffix, add it in after removing the extension

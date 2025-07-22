@@ -23,6 +23,7 @@ The [sample report](https://unicef.github.io/adt-press/) can help in better unde
 
 - Python 3.13 or higher
 - UV package manager (recommended)
+- **You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work.**
 
 ## Installation
 
@@ -112,3 +113,66 @@ uv run pytest
 - `prompts/`: LLM prompt templates
 - `templates/`: HTML templates
 - `tests/`: Test files
+
+## Docker
+
+Build the image:
+
+```bash
+docker build -t adt-press .
+```
+
+Run the container:
+
+```bash
+docker run --rm adt-press
+```
+
+To run a specific command inside the container (for example, to execute `uv run adt-press.py` with a PDF file):
+
+```bash
+docker run --rm adt-press uv run adt-press.py pdf_path=/data/yourfile.pdf
+```
+
+Replace `/data/yourfile.pdf` with the path to your PDF file inside the container.
+
+---
+
+#### VS Code: "Reopen in Container"
+
+If you use Visual Studio Code, you can take advantage of the **"Reopen in Container"** feature for a full-featured development environment inside Docker.  
+This allows you to edit, run, and debug your code directly within the container.
+
+To use this, add a `.devcontainer` configuration to your project and select "Reopen in Container" from the VS Code command palette.  
+You will need to have the **Dev Containers** extension installed in VS Code to use this feature.
+
+---
+
+**Note:**  
+The folder `.devcontainer` needs to be in the root of your project, containing a `devcontainer.json` file with the following content:
+
+```json
+{
+  "name": "ADT Press",
+  "build": {
+    // Sets the run context to one level up instead of the .devcontainer folder.
+    "context": "..",
+    // Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+    "dockerfile": "../Dockerfile"
+  }
+}
+```
+
+---
+
+**Environment Variable Required**
+
+> **Note:**  
+> You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work.
+>
+> - When running the Dockerized version, you need to set the `OPENAI_API_KEY` variable every time you run the container.  
+>   For example:
+>   ```bash
+>   docker run --rm -e OPENAI_API_KEY=your-key-here adt-press
+>   ```
+> - When using VS Code "Reopen in Container", you can add the variable to your `.env` file or set it in the container terminal before running your scripts.
