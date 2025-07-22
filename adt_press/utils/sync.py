@@ -6,7 +6,7 @@ from asynciolimiter import Limiter
 T = TypeVar("T")
 
 
-def run_async_task(task: Callable[[], Coroutine[Any, T, Never]]) -> T:
+def run_async_task(task: Callable[[], Coroutine[Any, Any, T]]) -> T:
     """
     Run an async task in a synchronous context."""
     return asyncio.run(task())
