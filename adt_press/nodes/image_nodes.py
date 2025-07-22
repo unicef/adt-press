@@ -20,13 +20,6 @@ from adt_press.utils.pdf import Page
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
-def pdf_images(pdf_pages: list[Page]) -> list[Image]:
-    pdf_images = []
-    for page in pdf_pages:
-        pdf_images.extend(page.images)
-    return pdf_images
-
-
 def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config: ImageSizeFilterConfig) -> dict[str, ImageFilterFailure]:
     failures = {}
     for img in pdf_images:
