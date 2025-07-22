@@ -4,7 +4,7 @@ import litellm
 import structlog
 from hamilton import driver, registry, telemetry
 from hamilton.lifecycle import NodeExecutionHook
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 
 from adt_press.nodes import config_nodes, pdf_nodes, report_nodes
 
@@ -55,7 +55,7 @@ class NodeHook(NodeExecutionHook):
 def main() -> None:
     cli_config = OmegaConf.from_cli()
     file_config = OmegaConf.load("config/config.yaml")
-    config = OmegaConf.merge(file_config, cli_config)
+    config = DictConfig(OmegaConf.merge(file_config, cli_config))
     print(OmegaConf.to_yaml(config))
 
     cache_args = {"recompute": True} if config.get("clear_cache", False) else {}

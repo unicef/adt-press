@@ -8,7 +8,7 @@ from adt_press.utils.file import calculate_file_hash
 class PromptConfig(BaseModel):
     model: str
     template_path: str
-    template_hash: str = Field(default=None, exclude=True)
+    template_hash: str | None = Field(default=None, exclude=True)
     examples: list[dict] = []
 
     @model_validator(mode="after")

@@ -116,7 +116,7 @@ def pdf_processed_images(
     pdf_image_captions: list[ImageCaption],
     pdf_image_crops: list[ImageCrop],
     pdf_image_meaningfulness: list[ImageMeaningfulness],
-) -> list[Image]:
+) -> list[ProcessedImage]:
     processed_images = []
     for img, size_failures, blank_failures, caption, crop, meaningfulness in zip(
         pdf_raster_images,
