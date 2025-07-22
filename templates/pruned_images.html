@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Extracted Images{% endblock %}
+{% block title %}Pruned Images{% endblock %}
 {% block content %}
 <div class="space-y-8">
     {% for img in images %}
@@ -19,7 +19,7 @@
                 <div class="m-2 bg-gray-100 rounded overflow-hidden">
                     <!-- Tab-style header -->
                     <div class="bg-gray-700 text-white px-4 py-2 font-medium">
-                        Original
+                        Image
                     </div>
                     <div class="p-3">
                         <a href="{{ img.upath | basename }}" class="block">
@@ -36,24 +36,22 @@
                     </div>                
                 </div>
             </div>
-        </div>
-
-        <!-- Image Details -->
-        <div class="p-4">
-            <!-- Failed Filters Section -->
-            {% if img.failed_filters %}
-            <div class="mt-2">
-                <h3 class="text-sm font-medium text-gray-700 mb-1">Failed Filters:</h3>
-                <div>
+            <div class="w-full md:w-1/2">
+                <div class="m-2 bg-gray-100 rounded overflow-hidden">
+                    <!-- Tab-style header -->
+                    <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                        Failed Filters
+                    </div>
+                    <div class="p-2">
                     {% for filter in img.failed_filters %}
                     <div class="flex mb-1">
-                        <div class="px-2 py-1 bg-red-100 text-red-800 rounded text-sm w-24 inline-block text-center">{{ filter.filter }}</div>
+                        <div class="px-2 py-1 bg-red-100 text-red-800 rounded text-sm w-32 inline-block text-center self-start">{{ filter.filter }}</div>
                         <div class="ml-2">{{filter.reasoning}}</div>
                     </div>
                     {% endfor %}
+                    </div>
                 </div>
             </div>
-            {% endif %}
         </div>
     </div>
     {% endfor %}
