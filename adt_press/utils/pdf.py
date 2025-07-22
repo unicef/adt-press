@@ -35,9 +35,10 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         write_image(page_image_upath, page_image.tobytes(output="png"))
 
         page = Page(page_index=page_index, image_upath=page_image_upath)
+        image_index = 0
 
         # extract all raster images
-        for image_index, img in enumerate(fitz_page.get_images(full=True)):
+        for img in fitz_page.get_images(full=True):
             pix = fitz.Pixmap(doc, img[0])
             pix_rgb = fitz.Pixmap(fitz.csRGB, pix)
             img_id = f"img_p{page_index}_r{image_index}"
@@ -61,6 +62,8 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
                     height=pix_rgb.height,
                 )
             )
+
+            image_index += 1
 
         # also extract vector drawings
         drawings = fitz_page.get_drawings()
