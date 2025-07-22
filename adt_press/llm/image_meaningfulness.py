@@ -13,7 +13,8 @@ from .prompt import PromptConfig
 
 
 class MeaningfulnessResponse(BaseModel):
-    meaningfulness: ImageMeaningfulness
+    is_meaningful: bool
+    reasoning: str
 
 
 async def get_image_meaningfulness(config: PromptConfig, page: Page, image: Image) -> ImageMeaningfulness:
@@ -36,4 +37,8 @@ async def get_image_meaningfulness(config: PromptConfig, page: Page, image: Imag
         max_retries=3,
     )
 
-    return response.meaningfulness
+    return ImageMeaningfulness(
+        image_id=image.image_id,
+        is_meaningful=response.is_meaningful,
+        reasoning=response.reasoning,
+    )

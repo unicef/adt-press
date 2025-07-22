@@ -1,21 +1,15 @@
 import asyncio
-from typing import Awaitable, Callable, List, Never, TypeVar
+from typing import Any, Awaitable, Callable, Coroutine, List, Never, TypeVar
 
 from asynciolimiter import Limiter
 
 T = TypeVar("T")
 
 
-def run_async_task(task: Callable[[], Awaitable[T]]) -> T:
+def run_async_task(task: Callable[[], Coroutine[Any, T, Never]]) -> T:
     """
     Run an async task in a synchronous context."""
-    loop = asyncio.new_event_loop()
-    try:
-        asyncio.set_event_loop(loop)
-        results = loop.run_until_complete(task())
-    finally:
-        loop.close()
-    return results
+    return asyncio.run(task())
 
 
 def gather_with_limit(fs: List[Awaitable[Never]], rate_limit: int) -> Awaitable[List[T]]:

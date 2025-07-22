@@ -33,6 +33,12 @@ class Image(BaseModel):
     height: int
 
 
+class ImageFilterFailure(BaseModel):
+    image_id: str
+    filter: str
+    reasoning: str | None
+
+
 class ImageCaption(BaseModel):
     image_id: str
     caption: str
@@ -40,6 +46,7 @@ class ImageCaption(BaseModel):
 
 
 class ImageMeaningfulness(BaseModel):
+    image_id: str
     is_meaningful: bool
     reasoning: str
 
@@ -57,11 +64,14 @@ class ImageCrop(BaseModel):
     upath: str
 
 
+class PrunedImage(Image):
+    failed_filters: list[ImageFilterFailure] = []
+
+
 class ProcessedImage(Image):
     caption: ImageCaption
     crop: ImageCrop
     meaningfulness: ImageMeaningfulness
-    failed_filters: list[str] = []
 
 
 @cache

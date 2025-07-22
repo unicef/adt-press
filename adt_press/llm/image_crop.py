@@ -11,7 +11,10 @@ from .prompt import PromptConfig
 
 
 class CropResponse(BaseModel):
-    crop_coordinates: CropCoordinates
+    top_left_x: int
+    top_left_y: int
+    bottom_right_x: int
+    bottom_right_y: int
 
 
 async def get_image_crop_coordinates(config: PromptConfig, page: Page, image: Image) -> CropCoordinates:
@@ -34,4 +37,9 @@ async def get_image_crop_coordinates(config: PromptConfig, page: Page, image: Im
         max_retries=3,
     )
 
-    return response.crop_coordinates
+    return CropCoordinates(
+        top_left_x=response.top_left_x,
+        top_left_y=response.top_left_y,
+        bottom_right_x=response.bottom_right_x,
+        bottom_right_y=response.bottom_right_y,
+    )
