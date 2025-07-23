@@ -50,7 +50,7 @@
                             {% for image in page.images %}
                             <div class="bg-white rounded border border-gray-200 hover:shadow-md transition-shadow">
                                 <a href="{{ image.upath | basename }}" class="block">
-                                    <img src="{{ image.upath | basename }}" class="w-full" alt="Image {{ image.image_id }}">
+                                    <img src="{{ image.upath | basename }}" class="w-full border" alt="Image {{ image.image_id }}">
                                 </a>
                                 <div class="p-2">
                                     <div class="text-xs text-gray-500 text-center">{{ image.image_id }}</div>

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Pruned Images{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    {% for img in images %}
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Header with ID -->
+        <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
+            <h2 class="text-xl font-bold">Image {{ img.image_id }}</h2>
+            <div class="text-sm">
+                <span class="bg-gray-800 px-2 py-1 rounded">page {{ img.page }}</span>
+                <span class="bg-gray-800 px-2 py-1 rounded ml-2">index {{ img.index }}</span>
+            </div>
+        </div>
+
+        <!-- Images Section -->
+        <div class="flex flex-wrap p-2 border-b border-gray-200">
+            <div class="w-full md:w-1/2">
+                <div class="m-2 bg-gray-100 rounded overflow-hidden">
+                    <!-- Tab-style header -->
+                    <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                        Image
+                    </div>
+                    <div class="p-3">
+                        <a href="{{ img.upath | basename }}" class="block">
+                            <img src="{{ img.upath | basename }}" class="max-w-full h-auto mx-auto" alt="Image {{ img.image_id }}">
+                        </a>
+                    </div>
+                    <div class="flex border-b border-gray-300 p-2">
+                        <span class="w-1/3 font-medium text-gray-700">Dimensions:</span>
+                        <span class="w-2/3 text-gray-600">{{ img.width }} × {{ img.height }}</span>
+                    </div>
+                    <div class="flex p-2">
+                        <span class="w-1/3 font-medium text-gray-700">Path:</span>
+                        <span class="w-2/3 text-gray-600">{{ img.upath }}</span>
+                    </div>                
+                </div>
+            </div>
+            <div class="w-full md:w-1/2">
+                <div class="m-2 bg-gray-100 rounded overflow-hidden">
+                    <!-- Tab-style header -->
+                    <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                        Failed Filters
+                    </div>
+                    <div class="p-2">
+                    {% for filter in img.failed_filters %}
+                    <div class="flex mb-1">
+                        <div class="px-2 py-1 bg-red-100 text-red-800 rounded text-sm w-32 inline-block text-center self-start">{{ filter.filter }}</div>
+                        <div class="ml-2">{{filter.reasoning}}</div>
+                    </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

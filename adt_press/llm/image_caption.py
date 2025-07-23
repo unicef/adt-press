@@ -11,7 +11,8 @@ from .prompt import PromptConfig
 
 
 class CaptionResponse(BaseModel):
-    caption: ImageCaption
+    caption: str
+    reasoning: str
 
 
 async def get_image_caption(config: PromptConfig, page: Page, image: Image, language_code: str) -> ImageCaption:
@@ -38,4 +39,8 @@ async def get_image_caption(config: PromptConfig, page: Page, image: Image, lang
         max_retries=3,
     )
 
-    return response.caption
+    return ImageCaption(
+        image_id=image.image_id,
+        caption=response.caption,
+        reasoning=response.reasoning,
+    )

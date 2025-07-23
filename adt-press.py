@@ -6,17 +6,19 @@ from hamilton import driver, registry, telemetry
 from hamilton.lifecycle import NodeExecutionHook
 from omegaconf import DictConfig, OmegaConf
 
-from adt_press.nodes import config_nodes, pdf_nodes, report_nodes
+from adt_press.nodes import config_nodes, image_nodes, pdf_nodes, report_nodes
 
 registry.disable_autoload()
 telemetry.disable_telemetry()
 
 log = structlog.get_logger()
 
+
 modules = [
     config_nodes,
-    pdf_nodes,
+    image_nodes,
     report_nodes,
+    pdf_nodes,
 ]
 
 
