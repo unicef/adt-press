@@ -73,7 +73,6 @@ class ProcessedImage(Image):
     meaningfulness: ImageMeaningfulness
 
 
-
 def image_bytes(image_path: str) -> bytes:
     """Returns the bytes of an image given its path."""
 

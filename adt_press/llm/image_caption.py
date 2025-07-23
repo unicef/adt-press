@@ -3,12 +3,13 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
+from adt_press.utils.file import cached_read_template
 from adt_press.utils.image import Image, ImageCaption
 from adt_press.utils.languages import LANGUAGE_MAP
 from adt_press.utils.pdf import Page
 
 from .prompt import PromptConfig
-from adt_press.utils.file import cached_read_file, cached_read_template
+
 
 class CaptionResponse(BaseModel):
     caption: str

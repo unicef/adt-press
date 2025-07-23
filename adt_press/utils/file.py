@@ -1,7 +1,8 @@
 import hashlib
+from functools import cache
 
 from fsspec import open
-from functools import cache
+
 
 def write_file(output_path: str, bs: bytes, suffix: str = "") -> str:
     """Writes bytes to the specified output path, optionally appending a suffix to the filename."""
@@ -15,22 +16,26 @@ def write_file(output_path: str, bs: bytes, suffix: str = "") -> str:
 
     return output_path
 
+
 def read_file(file_path: str) -> bytes:
     """Read the content of a file."""
     with open(file_path, "rb") as file:
-        return file.read()
+        return bytes(file.read())
+
 
 @cache
 def cached_read_file(file_path: str) -> bytes:
     """Read the content of a file, caching the result."""
     with open(file_path, "rb") as file:
-        return file.read()
-    
+        return bytes(file.read())
+
+
 @cache
 def cached_read_template(file_path: str) -> str:
     """Read the content of a file, caching the result."""
     with open(file_path, "r") as file:
-        return file.read()
+        return str(file.read())
+
 
 def calculate_file_hash(file_path: str) -> str:
     """Calculate the hash of a file."""

@@ -1,17 +1,20 @@
-from typing import Self
-import PIL
-import instructor
 import io
+from typing import Self
+
+import instructor
+import PIL
 from banks import Prompt
 from litellm import acompletion
-from matplotlib import patches, pyplot as plt
+from matplotlib import patches
+from matplotlib import pyplot as plt
 from pydantic import BaseModel, Field, model_validator
 
+from adt_press.utils.file import cached_read_file, cached_read_template, calculate_file_hash, write_file
 from adt_press.utils.image import CropCoordinates, Image
 from adt_press.utils.pdf import Page
-from adt_press.utils.file import cached_read_file, cached_read_template, calculate_file_hash, read_file, write_file
 
 from .prompt import PromptConfig
+
 
 class CropPromptConfig(PromptConfig):
     recrop_template_path: str | None = None
@@ -23,6 +26,7 @@ class CropPromptConfig(PromptConfig):
         if self.recrop_template_path:
             self.recrop_template_hash = calculate_file_hash(self.recrop_template_path)
         return self
+
 
 class CropResponse(BaseModel):
     top_left_x: int
@@ -40,7 +44,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
 
     prompt = Prompt(cached_read_template(config.template_path))
     messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
-    
+
     client = instructor.from_litellm(acompletion)
     response: CropResponse = await client.chat.completions.create(
         model=config.model,
@@ -65,7 +69,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
             )
             recrop_messages = [m.model_dump(exclude_none=True) for m in recrop_prompt.chat_messages(context)]
             messages = messages + recrop_messages
-            response: CropResponse = await client.chat.completions.create(
+            response = await client.chat.completions.create(
                 model=config.model,
                 response_model=CropResponse,
                 messages=messages,
@@ -91,14 +95,12 @@ def generate_cropped_image(image_bytes: bytes, coords: CropResponse) -> bytes:
         coords.bottom_right_x,
         coords.bottom_right_y,
     )
-    rect = patches.Rectangle(
-        (x, y), x2 - x, y2 - y, linewidth=1, edgecolor="r", facecolor="r", alpha=0.2
-    )
+    rect = patches.Rectangle((x, y), x2 - x, y2 - y, linewidth=1, edgecolor="r", facecolor="r", alpha=0.2)
     ax.add_patch(rect)
-    
+
     # Plot the top-left and bottom-right coordinates
-    #ax.annotate(f"({x}, {y})", (x, y), color="blue", fontsize=6, ha="right")
-    #ax.annotate(f"({x2}, {y2})", (x2, y2), color="blue", fontsize=6, ha="left")
+    # ax.annotate(f"({x}, {y})", (x, y), color="blue", fontsize=6, ha="right")
+    # ax.annotate(f"({x2}, {y2})", (x2, y2), color="blue", fontsize=6, ha="left")
     buf = io.BytesIO()
     plt.savefig(buf, format="png", bbox_inches="tight")
     plt.close()
