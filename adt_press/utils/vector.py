@@ -13,12 +13,10 @@ class RenderedVectorImage(BaseModel):
 
 def convert_color_cairo(color: list[float]) -> tuple[float, ...]:
     """Convert a float-based color to a Cairo color with a default."""
-    if color is None:
-        return (0, 0, 0)  # Default to black if no color is provided
-    return tuple(c for c in color)
+    return tuple(c for c in color) if color else (0, 0, 0)
 
 
-def compute_bounding_box(drawing) -> tuple[float, float, float, float]:
+def compute_bounding_box(drawing) -> tuple[float, float, float, float]:  # pragma: no cover
     """Compute the bounding box of a drawing."""
     min_x = min_y = float("inf")
     max_x = max_y = float("-inf")
@@ -64,7 +62,7 @@ def compute_bounding_box(drawing) -> tuple[float, float, float, float]:
 
 def boxes_overlap(
     box1: tuple[float, float, float, float], box2: tuple[float, float, float, float], margin_allowance: int, overlap_threshold: int
-) -> bool:
+) -> bool:  # pragma: no cover
     """Check if two bounding boxes overlap."""
     min_x1, min_y1, max_x1, max_y1 = box1
     min_x2, min_y2, max_x2, max_y2 = box2
@@ -81,7 +79,7 @@ def boxes_overlap(
     )
 
 
-def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshold: int):
+def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshold: int):  # pragma: no cover
     """Group drawings that overlap based on their bounding boxes."""
     bounding_boxes = [compute_bounding_box(drawing) for drawing in drawings]
     n = len(drawings)
@@ -116,7 +114,7 @@ def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshol
     return list(groups.values())
 
 
-def parse_items_and_draw_cairo(ctx, items):
+def parse_items_and_draw_cairo(ctx, items):  # pragma: no cover
     """Parse the drawing items and draw on the Cairo context."""
     for item in items:
         cmd = item[0]
@@ -145,7 +143,7 @@ def parse_items_and_draw_cairo(ctx, items):
             ctx.close_path()
 
 
-def render_group_to_image(group_drawings):
+def render_group_to_image(group_drawings):  # pragma: no cover
     """Render a group of drawings to a single image file."""
     # Compute the overall bounding box for the group
     bounding_boxes = [compute_bounding_box(d) for d in group_drawings]

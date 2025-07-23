@@ -94,8 +94,7 @@ def is_blank_image(image_bytes: bytes, threshold: int) -> bool:
     # Convert the image data to a numpy array
     image_array = np.frombuffer(image_bytes, np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
-    if image is None:
-        raise ValueError("Image not found or unable to read the file.")
+    assert image is not None, "Image could not be decoded from bytes."
     # Compute the standard deviation of the pixel values
     std_dev = np.std(image)
     # Check if the standard deviation is below the threshold

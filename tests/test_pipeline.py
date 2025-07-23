@@ -24,6 +24,7 @@ class PipelineTest(unittest.TestCase):
                 "output_dir": temp_dir,
                 "page_range": dict(start=0, end=5),
                 "clear_cache": "true",
+                "print_available_models": "true",
             }
 
             config = DictConfig(OmegaConf.merge(file_config, test_config))
