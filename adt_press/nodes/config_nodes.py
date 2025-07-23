@@ -7,8 +7,7 @@ from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.web import TemplateConfig
 
 
-# pragma: no cover
-def config() -> DictConfig:
+def config() -> DictConfig:  # pragma: no cover
     assert False, "This function should not be called directly. Use the config from the pipeline instead."
 
 
