@@ -23,14 +23,6 @@ jobs:
       - name: Build Docker image
         run: docker build -t adt-press .
 
-      - name: Test dependencies inside Docker
-        env:
-          OPENAI_API_KEY: dummy-key
-        run: |
-          docker run --rm -e OPENAI_API_KEY=$OPENAI_API_KEY adt-press uv run python --version
-          # Optionally, run your test suite:
-          # docker run --rm -e OPENAI_API_KEY=$OPENAI_API_KEY adt-press uv run pytest
-
       - name: Check Python dependencies in Docker
         env:
           OPENAI_API_KEY: dummy-key
