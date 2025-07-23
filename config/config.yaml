@@ -31,6 +31,8 @@ prompts:
   crop:
     template_path: prompts/image_crop.jinja2
     model: gpt-4o-2024-08-06
+    recrop_template_path: prompts/image_recrop.jinja2
+    recrops: 1
 
   meaningfulness:
     template_path: prompts/image_meaningfulness.jinja2

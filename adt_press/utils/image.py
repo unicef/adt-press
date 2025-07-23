@@ -1,6 +1,5 @@
 import io
 import warnings
-from functools import cache
 
 import cv2
 import fitz
@@ -74,7 +73,7 @@ class ProcessedImage(Image):
     meaningfulness: ImageMeaningfulness
 
 
-@cache
+
 def image_bytes(image_path: str) -> bytes:
     """Returns the bytes of an image given its path."""
 
@@ -133,16 +132,3 @@ def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
     cropped_image.save(buffer, format="png")
     buffer.seek(0)
     return buffer.getvalue()
-
-
-def write_image(output_path: str, image_bytes: bytes, suffix: str = "") -> str:
-    """Writes the image bytes to the specified output path, optionally appending a suffix to the filename."""
-
-    # if we have a suffix, add it in after removing the extension
-    if suffix != "":
-        output_path = output_path.rsplit(".", 1)[0] + f"_{suffix}." + output_path.rsplit(".", 1)[1]
-
-    with open(output_path, "wb") as f:
-        f.write(image_bytes)
-
-    return output_path
