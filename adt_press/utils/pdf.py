@@ -5,6 +5,7 @@ from fsspec import open
 from pydantic import BaseModel
 
 from adt_press.utils.image import Image, matplotlib_chart, write_image
+from adt_press.utils.vector import render_drawings
 
 
 class Page(BaseModel):
@@ -34,11 +35,13 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         write_image(page_image_upath, page_image.tobytes(output="png"))
 
         page = Page(page_index=page_index, image_upath=page_image_upath)
+        image_index = 0
 
-        for image_index, img in enumerate(fitz_page.get_images(full=True)):
+        # extract all raster images
+        for img in fitz_page.get_images(full=True):
             pix = fitz.Pixmap(doc, img[0])
             pix_rgb = fitz.Pixmap(fitz.csRGB, pix)
-            img_id = f"img_p{page_index}_i{image_index}"
+            img_id = f"img_p{page_index}_r{image_index}"
             img_bytes = pix_rgb.tobytes(output="png")
 
             # write image out
@@ -59,6 +62,29 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
                     height=pix_rgb.height,
                 )
             )
+
+            image_index += 1
+
+        # also extract vector drawings
+        drawings = fitz_page.get_drawings()
+        vector_images = render_drawings(drawings, margin_allowance=2, overlap_threshold=400)
+        for img in vector_images:
+            img_id = f"img_p{page_index}_v{image_index}"
+            vector_upath = output_dir + os.sep + f"{img_id}.png"
+            image_upath = write_image(vector_upath, img.image)
+            chart_upath = write_image(image_upath, matplotlib_chart(img.image), "chart")
+            page.images.append(
+                Image(
+                    image_id=img_id,
+                    page=page_index,
+                    index=image_index,
+                    upath=str(image_upath),
+                    chart_upath=str(chart_upath),
+                    width=img.width,
+                    height=img.height,
+                )
+            )
+            image_index += 1
 
         pages.append(page)
 

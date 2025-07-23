@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: write
   pages: write
@@ -27,6 +26,9 @@ jobs:
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
 
+      - name: Install dependencies
+        run: sudo apt install libcairo2-dev pkg-config python3-dev
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
@@ -38,7 +40,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/momo.pdf page_range.end=5
+          uv run adt-press.py pdf_path=./assets/momo.pdf
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
