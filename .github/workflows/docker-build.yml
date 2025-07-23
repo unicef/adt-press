@@ -1,0 +1,30 @@
+name: Build and Test Docker Image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t adt-press .
+
+      - name: Test dependencies inside Docker
+        run: |
+          docker run --rm -e OPENAI_API_KEY adt-press uv run adt-press.py pdf_path=./assets/momo.pdf page_range.end=5
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

@@ -7,6 +7,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     graphviz \
     libgl1 \
+    gcc \
     libcairo2-dev \
     pkg-config \
     python3-dev \
