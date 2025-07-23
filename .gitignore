@@ -210,3 +210,4 @@ __marimo__/
 output/
 outputs/
 .hamilton_cache/
+.DS_Store/
