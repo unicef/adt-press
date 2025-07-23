@@ -1,5 +1,5 @@
 from hamilton.function_modifiers import cache
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
@@ -7,8 +7,8 @@ from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.web import TemplateConfig
 
 
-def config() -> DictConfig:
-    return OmegaConf.create({})
+def config() -> DictConfig:  # pragma: no cover
+    assert False, "This function should not be called directly. Use the config from the pipeline instead."
 
 
 def template_config(output_dir_config: str, template_dir_config: str) -> TemplateConfig:

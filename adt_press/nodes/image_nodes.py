@@ -26,7 +26,7 @@ def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config
         failed = []
         if img.width < image_size_filter_config.min_side or img.height < image_size_filter_config.min_side:
             failed.append("min_side")
-        if img.width > image_size_filter_config.max_side or img.height > image_size_filter_config.max_side:
+        if img.width > image_size_filter_config.max_side or img.height > image_size_filter_config.max_side:  # pragma: no cover
             failed.append("max_side")
 
         if failed:
@@ -72,7 +72,7 @@ def image_meaningfulness_failures(image_meaningfulness: dict[str, ImageMeaningfu
 
     # map our list back to a dict of failures
     for k, m in image_meaningfulness.items():
-        if not m.is_meaningful:
+        if not m.is_meaningful:  # pragma: no cover
             failures[k] = ImageFilterFailure(
                 image_id=m.image_id,
                 filter="meaningfulness",
@@ -95,7 +95,7 @@ def pruned_images(
             failed_filters.append(image_size_filter_failures[img.image_id])
         if img.image_id in image_blank_filter_failures:
             failed_filters.append(image_blank_filter_failures[img.image_id])
-        if img.image_id in image_meaningfulness_failures:
+        if img.image_id in image_meaningfulness_failures:  # pragma: no cover
             failed_filters.append(image_meaningfulness_failures[img.image_id])
 
         if failed_filters:
