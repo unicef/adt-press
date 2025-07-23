@@ -36,7 +36,7 @@ jobs:
     - name: Run tests
       run: uv run coverage run -m pytest
       env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     - name: Generate coverage report
       run: uv run coverage report -m
