@@ -35,7 +35,7 @@ jobs:
         env:
           OPENAI_API_KEY: dummy-key
         run: |
-          docker run --rm -e OPENAI_API_KEY=$OPENAI_API_KEY adt-press uv run python -c "import asynciolimiter, banks, fsspec, google.genai, graphviz, hydra, instructor, jinja2, jsonref, langfuse, litellm, matplotlib, numpy, openai, cv2, PIL, pydantic, fitz, yaml, rich, ruff, hamilton, structlog, universal_pathlib; print('All dependencies imported successfully')"
+          docker run --rm -e OPENAI_API_KEY=$OPENAI_API_KEY adt-press uv run python -c "import asynciolimiter, banks, fsspec, google.genai, graphviz, hydra, instructor, jinja2, jsonref, langfuse, litellm, matplotlib, numpy, openai, cv2, PIL, pydantic, fitz, yaml, rich, ruff, hamilton, structlog, unpath; print('All dependencies imported successfully')"
 
       - name: Run tests in Docker
         env:
