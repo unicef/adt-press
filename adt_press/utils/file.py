@@ -26,8 +26,7 @@ def read_file(file_path: str) -> bytes:
 @cache
 def cached_read_file(file_path: str) -> bytes:
     """Read the content of a file, caching the result."""
-    with open(file_path, "rb") as file:
-        return bytes(file.read())
+    return read_file(file_path)
 
 
 @cache
