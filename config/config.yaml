@@ -12,7 +12,7 @@ page_range:
 image_filters:
   size:
     max_side: 1500
-    min_side: 200
+    min_side: 150
 
   blank:
     threshold: 2

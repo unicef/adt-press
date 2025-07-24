@@ -34,6 +34,7 @@ class ExtractedTextType(str, enum.Enum):
 
 
 class TextData(BaseModel):
+    text_id: str
     text: str
     type: ExtractedTextType
 
