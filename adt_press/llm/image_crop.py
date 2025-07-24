@@ -2,7 +2,6 @@ import io
 from typing import Self
 
 import instructor
-import PIL
 from banks import Prompt
 from litellm import acompletion
 from matplotlib import patches
@@ -10,7 +9,7 @@ from matplotlib import pyplot as plt
 from pydantic import BaseModel, Field, model_validator
 
 from adt_press.utils.file import cached_read_file, cached_read_template, calculate_file_hash, write_file
-from adt_press.utils.image import CropCoordinates, Image
+from adt_press.utils.image import CropCoordinates, Image, visualize_crop_extents
 from adt_press.utils.pdf import Page
 
 from .prompt import PromptConfig
@@ -60,7 +59,8 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
 
         # and we want to recrop the image
         while recrop < config.recrops:
-            cropped = generate_cropped_image(cached_read_file(image.upath), response)
+            cropped = visualize_crop_extents(cached_read_file(image.upath), response.top_left_x, response.top_left_y,
+                                             response.bottom_right_x, response.bottom_right_y)
             cropped_upath = write_file(image.upath, cropped, "recrop")
 
             context = dict(
@@ -85,24 +85,4 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
     )
 
 
-def generate_cropped_image(image_bytes: bytes, coords: CropResponse) -> bytes:
-    im = PIL.Image.open(io.BytesIO(image_bytes))
-    _, ax = plt.subplots(figsize=(12, 8), dpi=200)
-    ax.imshow(im)
-    x, y, x2, y2 = (
-        coords.top_left_x,
-        coords.top_left_y,
-        coords.bottom_right_x,
-        coords.bottom_right_y,
-    )
-    rect = patches.Rectangle((x, y), x2 - x, y2 - y, linewidth=1, edgecolor="r", facecolor="r", alpha=0.2)
-    ax.add_patch(rect)
 
-    # Plot the top-left and bottom-right coordinates
-    # ax.annotate(f"({x}, {y})", (x, y), color="blue", fontsize=6, ha="right")
-    # ax.annotate(f"({x2}, {y2})", (x2, y2), color="blue", fontsize=6, ha="left")
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight")
-    plt.close()
-    buf.seek(0)
-    return buf.read()

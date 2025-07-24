@@ -6,6 +6,7 @@ import fitz
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import PIL.ImageDraw
 from fsspec import open
 from pydantic import BaseModel
 
@@ -131,3 +132,18 @@ def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
     cropped_image.save(buffer, format="png")
     buffer.seek(0)
     return buffer.getvalue()
+
+def visualize_crop_extents(image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y) -> bytes:
+    """
+    Draws a transparent rectangle on the image to visualize the crop coordinates.
+    """
+    im = PIL.Image.open(io.BytesIO(image_bytes))
+    draw = PIL.ImageDraw.Draw(im)
+
+    # Draw a semi-transparent rectangle
+    draw.rectangle([top_left_x, top_left_y, bottom_right_x, bottom_right_y], outline="red", width=2)
+
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    buf.seek(0)
+    return buf.read()
