@@ -9,7 +9,7 @@ from adt_press.utils.pdf import Page, PageText, TextData
 
 
 class TextResponse(BaseModel):
-    reasonning: str
+    reasoning: str
     data: list[TextData]
 
 
