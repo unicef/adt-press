@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Extracted Images{% endblock %}
+{% block title %}Processed Images{% endblock %}
 {% block content %}
 <div class="space-y-8">
     {% for img in images %}
@@ -23,7 +23,7 @@
                     </div>
                     <div class="p-3">
                         <a href="{{ img.upath | basename }}" class="block">
-                            <img src="{{ img.upath | basename }}" class="max-w-full h-auto mx-auto" alt="Image {{ img.image_id }}">
+                            <img src="{{ img.upath | basename }}" class="max-w-full h-auto mx-auto" style="max-width: 300px; max-height: 200px;" alt="Image {{ img.image_id }}">
                         </a>
                     </div>
                     <div class="flex border-b border-gray-300 p-2">
@@ -44,7 +44,7 @@
                     </div>
                     <div class="p-3">
                         <a href="{{ img.crop.upath | basename }}" class="block">
-                            <img src="{{ img.crop.upath | basename }}" class="max-w-full h-auto mx-auto" alt="Cropped Image {{ img.image_id }}">
+                            <img src="{{ img.crop.upath | basename }}" class="max-w-full h-auto mx-auto" style="max-width: 300px; max-height: 200px;" alt="Cropped Image {{ img.image_id }}">
                         </a>
                     </div>
                     <div class="flex border-b border-gray-200 p-2">
