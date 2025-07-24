@@ -133,6 +133,7 @@ def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
+
 def visualize_crop_extents(image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y) -> bytes:
     """
     Draws a transparent rectangle on the image to visualize the crop coordinates.

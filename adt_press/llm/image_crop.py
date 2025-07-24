@@ -1,11 +1,8 @@
-import io
 from typing import Self
 
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from matplotlib import patches
-from matplotlib import pyplot as plt
 from pydantic import BaseModel, Field, model_validator
 
 from adt_press.utils.file import cached_read_file, cached_read_template, calculate_file_hash, write_file
@@ -59,8 +56,9 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
 
         # and we want to recrop the image
         while recrop < config.recrops:
-            cropped = visualize_crop_extents(cached_read_file(image.upath), response.top_left_x, response.top_left_y,
-                                             response.bottom_right_x, response.bottom_right_y)
+            cropped = visualize_crop_extents(
+                cached_read_file(image.upath), response.top_left_x, response.top_left_y, response.bottom_right_x, response.bottom_right_y
+            )
             cropped_upath = write_file(image.upath, cropped, "recrop")
 
             context = dict(
@@ -83,6 +81,3 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
         bottom_right_x=response.bottom_right_x,
         bottom_right_y=response.bottom_right_y,
     )
-
-
-
