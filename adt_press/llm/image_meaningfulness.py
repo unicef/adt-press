@@ -28,7 +28,7 @@ async def get_image_meaningfulness(config: PromptConfig, page: Page, image: Imag
         model=config.model,
         response_model=MeaningfulnessResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
-        max_retries=3,
+        max_retries=config.max_retries,
     )
 
     return ImageMeaningfulness(

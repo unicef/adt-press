@@ -18,6 +18,13 @@ class PipelineTest(unittest.TestCase):
         files = list(Path(self.temp_dir).glob(pattern))
         self.assertEqual(len(files), expected_count, msg)
 
+    def assertFileContains(self, name: str, content: str, msg: str = ""):
+        file_path = Path(self.temp_dir) / name
+        self.assertTrue(file_path.exists(), f"File {name} does not exist.")
+        with open(file_path, "r") as f:
+            file_content = f.read()
+        self.assertIn(content, file_content, msg)
+
     def test_pipeline_integration_first_five_pages(self):
         """Test the entire pipeline with first 6 pages using default config values."""
 
@@ -62,5 +69,7 @@ class PipelineTest(unittest.TestCase):
             self.assertFileCount("img_p*_r*_crop*.png", 2, "Unexpected number of cropped images created")
             self.assertFileCount("img_p*_r*_recrop.png", 2, "Unexpected number of recropped images created")
             self.assertFileCount("img_p*_chart.png", 38, "Unexpected number of chart images created")
+
+            self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Page report did not contain expected text")
 
             # TODO: Add more specific assertions about the content of the output files

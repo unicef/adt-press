@@ -1,3 +1,4 @@
+import enum
 import os
 
 import fitz  # PyMuPDF
@@ -9,11 +10,45 @@ from adt_press.utils.image import Image, matplotlib_chart
 from adt_press.utils.vector import render_drawings
 
 
+class ExtractedTextType(str, enum.Enum):
+    book_title = "book_title"
+    book_subtitle = "book_subtitle"
+    book_author = "book_author"
+    chapter_title = "chapter_title"
+    section_heading = "section_heading"
+    section_text = "section_text"
+    boxed_text = "boxed_text"
+    hint = "hint"
+    instruction_text = "instruction_text"
+    activity_number = "activity_number"
+    activity_option = "activity_option"
+    activity_input_placeholder_text = "activity_input_placeholder_text"
+    image_label = "image_label"
+    image_caption = "image_caption"
+    image_overlay = "image_overlay"
+    math = "math"
+    standalone_text = "standalone_text"
+    page_number = "page_number"
+    footer_text = "footer_text"
+    other = "other"
+
+
+class TextData(BaseModel):
+    text: str
+    type: ExtractedTextType
+
+
+class PageText(BaseModel):
+    page_index: int
+    text: list[TextData]
+    reasoning: str = ""
+
+
 class Page(BaseModel):
     page_index: int
     image_upath: str
-
-    images: list[Image] = []
+    text: str
+    images: list[Image]
 
 
 # We need to set this zoom for PyMuPDF or the image is pixelated.
@@ -35,7 +70,7 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         page_image_upath = output_dir + os.sep + f"img_p{page_index}.png"
         write_file(page_image_upath, page_image.tobytes(output="png"))
 
-        page = Page(page_index=page_index, image_upath=page_image_upath)
+        images = []
         image_index = 0
 
         # extract all raster images
@@ -52,7 +87,7 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
             # also write out our chart image
             chart_upath = write_file(image_upath, matplotlib_chart(img_bytes), "chart")
 
-            page.images.append(
+            images.append(
                 Image(
                     image_id=img_id,
                     page=page_index,
@@ -74,7 +109,7 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
             vector_upath = output_dir + os.sep + f"{img_id}.png"
             image_upath = write_file(vector_upath, img.image)
             chart_upath = write_file(image_upath, matplotlib_chart(img.image), "chart")
-            page.images.append(
+            images.append(
                 Image(
                     image_id=img_id,
                     page=page_index,
@@ -87,6 +122,13 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
             )
             image_index += 1
 
-        pages.append(page)
+        pages.append(
+            Page(
+                page_index=page_index,
+                image_upath=page_image_upath,
+                text=fitz_page.get_text(),
+                images=images,
+            )
+        )
 
     return pages

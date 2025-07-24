@@ -3,15 +3,21 @@
 {% block content %}
 <div class="space-y-8">
     {% for page in pages %}
+    {% set page_text = texts[loop.index0] if texts and loop.index0 < texts|length %}
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <!-- Header with Page Number -->
         <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
             <h2 class="text-xl font-bold">Page {{ page.page_index }}</h2>
-            <div class="text-sm">
+            <div class="text-sm flex gap-2">
                 {% if page.images %}
                     <span class="bg-gray-800 px-2 py-1 rounded">{{ page.images|length }} image{{ 's' if page.images|length != 1 else '' }}</span>
                 {% else %}
                     <span class="bg-gray-800 px-2 py-1 rounded">no images</span>
+                {% endif %}
+                {% if page_text and page_text.text %}
+                    <span class="bg-gray-800 px-2 py-1 rounded">{{ page_text.text|length }} text{{ 's' if page_text.text|length != 1 else '' }}</span>
+                {% else %}
+                    <span class="bg-gray-800 px-2 py-1 rounded">no texts</span>
                 {% endif %}
             </div>
         </div>
@@ -80,17 +86,84 @@
             {% endif %}
         </div>
 
+        <!-- Extracted Text Section -->
+        <div class="p-4 border-b border-gray-200">
+            <div class="bg-gray-100 rounded overflow-hidden">
+                <!-- Tab-style header -->
+                <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                    Extracted Texts ({{ page_text.text|length }})
+                </div>
+                <div class="p-4">
+                    {% if page_text and page_text.text %}
+                        <div class="space-y-3">
+                            <!-- Original Page Text -->
+                            {% if page.text %}
+                                <div class="mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Original Page Text:</h4>
+                                    <div class="bg-white p-3 rounded border text-sm text-gray-600">
+                                        {{ page.text }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Structured Text Data -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-700 mb-2">Extracted Text Data:</h4>
+                                <div class="space-y-2">
+                                    {% for text_item in page_text.text %}
+                                        <div class="bg-white p-3 rounded border">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex-1">
+                                                    <div class="text-sm text-gray-800">{{ text_item.text }}</div>
+                                                </div>
+                                                <span class="ml-3 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ text_item.type.replace('ExtractedTextType.', '') }}</span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            {% if page_text.reasoning %}
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Extraction Reasoning:</h4>
+                                    <div class="bg-gray-50 p-3 rounded border text-sm text-gray-600 italic">
+                                        {{ page_text.reasoning }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-gray-500 py-6">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p>No text data extracted from this page</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <!-- Page Summary -->
         <div class="p-4 bg-gray-50">
             <div class="flex items-center justify-between text-sm text-gray-600">
                 <span>Page {{ page.page_index }}</span>
-                <span>
-                    {% if page.images %}
-                        Contains {{ page.images|length }} extracted image{{ 's' if page.images|length != 1 else '' }}
-                    {% else %}
-                        No extractable images found
-                    {% endif %}
-                </span>
+                <div class="flex gap-4">
+                    <span>
+                        {% if page.images %}
+                            Contains {{ page.images|length }} extracted image{{ 's' if page.images|length != 1 else '' }}
+                        {% else %}
+                            No extractable images found
+                        {% endif %}
+                    </span>
+                    <span>
+                        {% if page_text and page_text.text %}
+                            Contains {{ page_text.text|length }} extracted text{{ 's' if page_text.text|length != 1 else '' }}
+                        {% else %}
+                            No extractable text found
+                        {% endif %}
+                    </span>
+                </div>
             </div>
         </div>
     </div>

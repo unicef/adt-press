@@ -3,7 +3,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.image import ProcessedImage, PrunedImage
-from adt_press.utils.pdf import Page
+from adt_press.utils.pdf import Page, PageText
 from adt_press.utils.web import render_template
 
 
@@ -18,8 +18,8 @@ def report_pruned_images(template_config: TemplateConfig, pruned_images: list[Pr
 
 
 @cache(behavior="recompute")
-def report_pages(template_config: TemplateConfig, pdf_pages: list[Page]) -> str:
-    return render_template(template_config, "page_report.html", dict(pages=pdf_pages))
+def report_pages(template_config: TemplateConfig, pdf_pages: list[Page], pdf_text: list[PageText]) -> str:
+    return render_template(template_config, "page_report.html", dict(pages=pdf_pages, texts=pdf_text))
 
 
 @cache(behavior="recompute")
