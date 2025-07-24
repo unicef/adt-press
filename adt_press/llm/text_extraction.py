@@ -31,5 +31,5 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageText:
     return PageText(
         page_index=page.page_index,
         text=response.data,
-        reasoning=response.reasonning,
+        reasoning=response.reasoning,
     )
