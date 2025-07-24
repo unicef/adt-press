@@ -1,8 +1,9 @@
 from adt_press.llm.image_caption import get_image_caption
-from adt_press.llm.image_crop import get_image_crop_coordinates
+from adt_press.llm.image_crop import CropPromptConfig, get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
 from adt_press.llm.prompt import PromptConfig
 from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
+from adt_press.utils.file import write_file
 from adt_press.utils.image import (
     Image,
     ImageCaption,
@@ -14,7 +15,6 @@ from adt_press.utils.image import (
     crop_image,
     image_bytes,
     is_blank_image,
-    write_image,
 )
 from adt_press.utils.pdf import Page
 from adt_press.utils.sync import gather_with_limit, run_async_task
@@ -127,7 +127,7 @@ def image_captions(
     return {c.image_id: c for c in run_async_task(generate_captions)}
 
 
-def image_crops(crop_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
+def image_crops(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
     async def generate_crop(page: Page, img: Image) -> ImageCrop:
         coord = await get_image_crop_coordinates(crop_prompt_config, page, img)
 
@@ -135,7 +135,7 @@ def image_crops(crop_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_
         cropped = crop_image(image_bytes(img.upath), coord)
 
         # add the coordinates to the image path so that we don't cache different crops of the same image
-        cropped_path = write_image(
+        cropped_path = write_file(
             img.upath,
             cropped,
             f"cropped_{coord.top_left_x}_{coord.top_left_y}_{coord.bottom_right_x}_{coord.bottom_right_y}",

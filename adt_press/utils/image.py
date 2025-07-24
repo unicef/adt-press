@@ -1,12 +1,12 @@
 import io
 import warnings
-from functools import cache
 
 import cv2
 import fitz
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import PIL.ImageDraw
 from fsspec import open
 from pydantic import BaseModel
 
@@ -74,7 +74,6 @@ class ProcessedImage(Image):
     meaningfulness: ImageMeaningfulness
 
 
-@cache
 def image_bytes(image_path: str) -> bytes:
     """Returns the bytes of an image given its path."""
 
@@ -134,14 +133,17 @@ def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
     return buffer.getvalue()
 
 
-def write_image(output_path: str, image_bytes: bytes, suffix: str = "") -> str:
-    """Writes the image bytes to the specified output path, optionally appending a suffix to the filename."""
+def visualize_crop_extents(image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y) -> bytes:
+    """
+    Draws a transparent rectangle on the image to visualize the crop coordinates.
+    """
+    im = PIL.Image.open(io.BytesIO(image_bytes))
+    draw = PIL.ImageDraw.Draw(im)
 
-    # if we have a suffix, add it in after removing the extension
-    if suffix != "":
-        output_path = output_path.rsplit(".", 1)[0] + f"_{suffix}." + output_path.rsplit(".", 1)[1]
+    # Draw a semi-transparent rectangle
+    draw.rectangle([top_left_x, top_left_y, bottom_right_x, bottom_right_y], outline="red", width=2)
 
-    with open(output_path, "wb") as f:
-        f.write(image_bytes)
-
-    return output_path
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    buf.seek(0)
+    return buf.read()

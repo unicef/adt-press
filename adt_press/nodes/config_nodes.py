@@ -2,6 +2,7 @@ from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
 from pydantic import BaseModel
 
+from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.web import TemplateConfig
@@ -51,8 +52,8 @@ def caption_prompt_config(config: DictConfig) -> PromptConfig:
 
 
 @cache(behavior="recompute")
-def crop_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(config["prompts"]["crop"])
+def crop_prompt_config(config: DictConfig) -> CropPromptConfig:
+    return CropPromptConfig.model_validate(config["prompts"]["crop"])
 
 
 @cache(behavior="recompute")

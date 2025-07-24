@@ -1,0 +1,11 @@
+{% chat role="assistant" %}
+top_left_x: {{ crop_coordinates.top_left_x }}
+top_left_y: {{ crop_coordinates.top_left_y }}
+bottom_right_x: {{ crop_coordinates.bottom_right_x }}
+bottom_right_y: {{ crop_coordinates.bottom_right_y }}
+{% endchat %}
+
+{% chat role="user" %}
+The crop coordinates still don't look great. Here's the image chart again with a red box indicating the coordinates you gave me. Please fix this and give me better crop coordinates.
+{{ cropped_upath | image }}
+{% endchat %}

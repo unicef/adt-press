@@ -3,6 +3,7 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
+from adt_press.utils.file import cached_read_template
 from adt_press.utils.image import Image, ImageCaption
 from adt_press.utils.languages import LANGUAGE_MAP
 from adt_press.utils.pdf import Page
@@ -18,10 +19,6 @@ class CaptionResponse(BaseModel):
 async def get_image_caption(config: PromptConfig, page: Page, image: Image, language_code: str) -> ImageCaption:
     language = LANGUAGE_MAP[language_code]
 
-    template_path = config.template_path
-    with open(template_path, "r") as template_file:
-        template_content = template_file.read()
-
     context = dict(
         language_code=language_code,
         language=language,
@@ -30,7 +27,7 @@ async def get_image_caption(config: PromptConfig, page: Page, image: Image, lang
         examples=config.examples,
     )
 
-    prompt = Prompt(template_content)
+    prompt = Prompt(cached_read_template(config.template_path))
     client = instructor.from_litellm(acompletion)
     response: CaptionResponse = await client.chat.completions.create(
         model=config.model,
