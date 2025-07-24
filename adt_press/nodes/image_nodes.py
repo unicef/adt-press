@@ -31,7 +31,9 @@ def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config
 
         if failed:
             failures[img.image_id] = ImageFilterFailure(
-                image_id=img.image_id, filter="size", reasoning=", ".join(failed),
+                image_id=img.image_id,
+                filter="size",
+                reasoning=", ".join(failed),
             )
     return failures
 
