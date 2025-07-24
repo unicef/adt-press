@@ -54,11 +54,11 @@
                     <div class="p-3">
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             {% for image in page.images %}
-                            <div class="bg-white rounded border border-gray-200 hover:shadow-md transition-shadow">
-                                <a href="{{ image.upath | basename }}" class="block">
-                                    <img src="{{ image.upath | basename }}" class="w-full border" alt="Image {{ image.image_id }}">
+                            <div class="bg-white rounded border border-gray-200 hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full">
+                                <a href="{{ image.upath | basename }}" class="block flex justify-center items-center p-2 flex-grow">
+                                    <img src="{{ image.upath | basename }}" class="max-w-full h-auto border" style="max-width: min(200px, 100%); max-height: 160px;" alt="Image {{ image.image_id }}">
                                 </a>
-                                <div class="p-2">
+                                <div class="p-2 mt-auto">
                                     <div class="text-xs text-gray-500 text-center">{{ image.image_id }}</div>
                                     <div class="text-xs text-gray-400 text-center">{{ image.width }} × {{ image.height }}</div>
                                 </div>
