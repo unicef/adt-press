@@ -5,11 +5,13 @@ from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_template
-from adt_press.utils.pdf import Page, PageText, ExtractedTextType, TextData
+from adt_press.utils.pdf import ExtractedTextType, Page, PageText, TextData
+
 
 class Data(BaseModel):
     text: str
     type: ExtractedTextType
+
 
 class TextResponse(BaseModel):
     reasoning: str
