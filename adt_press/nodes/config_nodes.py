@@ -61,6 +61,11 @@ def meaningfulness_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(config["prompts"]["meaningfulness"])
 
 
+@cache(behavior="recompute")
+def text_extraction_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(config["prompts"]["text_extraction"])
+
+
 def image_config(config: DictConfig) -> DictConfig:
     return DictConfig(config.get("image_filters", {}))
 

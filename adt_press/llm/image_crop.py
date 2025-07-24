@@ -46,7 +46,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
         model=config.model,
         response_model=CropResponse,
         messages=messages,
-        max_retries=3,
+        max_retries=config.max_retries,
     )
 
     # if we have a recrop template
@@ -71,7 +71,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
                 model=config.model,
                 response_model=CropResponse,
                 messages=messages,
-                max_retries=3,
+                max_retries=config.max_retries,
             )
             recrop += 1
 
