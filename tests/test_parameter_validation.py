@@ -39,6 +39,34 @@ class TestParameterValidation(unittest.TestCase):
                 self.assertIn("Key 'min_side' is not in struct", error_msg)
                 self.assertIn("image_filters.min_side", error_msg)
 
+    def test_main_succeeds_on_valid_parameters(self):
+        """Test that main() succeeds when called with valid parameters."""
+        # Load the main function directly from adt-press.py file
+        spec = importlib.util.spec_from_file_location(
+            "adt_press_main", 
+            "/home/runner/work/adt-press/adt-press/adt-press.py"
+        )
+        adt_press_main = importlib.util.module_from_spec(spec)
+        
+        # Mock run_pipeline before loading the module to avoid dependency issues
+        with patch.dict('sys.modules', {'adt_press.pipeline': sys.modules.get('unittest.mock', None)}):
+            # Create a mock for run_pipeline
+            import unittest.mock
+            mock_module = unittest.mock.MagicMock()
+            mock_module.run_pipeline = unittest.mock.MagicMock()
+            sys.modules['adt_press.pipeline'] = mock_module
+            
+            # Now load the module
+            spec.loader.exec_module(adt_press_main)
+            
+            # Test with valid parameter that should succeed
+            with patch.object(sys, 'argv', ['adt-press.py', 'image_filters.size.min_side=300']):
+                # This should not raise any exceptions
+                adt_press_main.main()
+                
+                # Verify that run_pipeline was called, indicating main() completed successfully
+                mock_module.run_pipeline.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
