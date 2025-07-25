@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_template
-from adt_press.utils.pdf import ExtractedTextType, Page, PageTexts, PageText
+from adt_press.utils.pdf import ExtractedTextType, Page, PageText, PageTexts
 
 
 class Data(BaseModel):

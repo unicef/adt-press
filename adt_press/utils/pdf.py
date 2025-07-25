@@ -32,6 +32,7 @@ class ExtractedTextType(str, enum.Enum):
     footer_text = "footer_text"
     other = "other"
 
+
 class SectionType(str, enum.Enum):
     front_cover = "front_cover"
     inside_cover = "inside_cover"
@@ -55,15 +56,18 @@ class SectionType(str, enum.Enum):
     activity_other = "activity_other"
     other = "other"
 
+
 class PageSection(BaseModel):
     section_id: str
     section_type: SectionType
     part_ids: list[str] = []
 
+
 class PageSections(BaseModel):
     page_id: str
     sections: list[PageSection]
     reasoning: str
+
 
 class PageText(BaseModel):
     text_id: str

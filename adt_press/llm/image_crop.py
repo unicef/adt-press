@@ -3,7 +3,6 @@ from typing import Self
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from omegaconf import OmegaConf
 from pydantic import BaseModel, Field, model_validator
 
 from adt_press.utils.file import cached_read_file, cached_read_template, calculate_file_hash, write_file

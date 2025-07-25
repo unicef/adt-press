@@ -24,10 +24,17 @@ def pdf_texts(pdf_pages: list[Page], text_extraction_prompt_config: PromptConfig
 
     return {p.page_id: p for p in run_async_task(extract_text)}
 
+
 def pdf_texts_by_id(pdf_texts: dict[str, PageTexts]) -> dict[str, PageText]:
     return {t.text_id: t for page_texts in pdf_texts.values() for t in page_texts.text}
 
-def pdf_sections(pdf_pages: list[Page], processed_images_by_page: dict[str, list[ProcessedImage]], pdf_texts: dict[str, PageTexts], page_sectioning_prompt_config: PromptConfig) -> dict[str, PageSections]:
+
+def pdf_sections(
+    pdf_pages: list[Page],
+    processed_images_by_page: dict[str, list[ProcessedImage]],
+    pdf_texts: dict[str, PageTexts],
+    page_sectioning_prompt_config: PromptConfig,
+) -> dict[str, PageSections]:
     page_sections = {}
 
     async def section_pages():
@@ -48,6 +55,7 @@ def pdf_sections(pdf_pages: list[Page], processed_images_by_page: dict[str, list
     for p in sections:
         page_sections[p.page_id] = p
     return page_sections
+
 
 def pdf_pages(output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
     return pages_for_pdf(output_dir_config, pdf_path_config, page_range_config.start, page_range_config.end)

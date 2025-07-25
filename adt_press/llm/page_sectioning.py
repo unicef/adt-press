@@ -1,14 +1,12 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from omegaconf import OmegaConf
 from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
-from adt_press.utils.config import conf_to_object
 from adt_press.utils.file import cached_read_template
 from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import ExtractedTextType, Page, PageSection, PageSections, PageTexts, SectionType, PageText
+from adt_press.utils.pdf import Page, PageSection, PageSections, PageTexts, SectionType
 
 
 class Section(BaseModel):
@@ -16,9 +14,11 @@ class Section(BaseModel):
     id: str
     section_type: SectionType
 
+
 class SectionResponse(BaseModel):
     reasoning: str
     data: list[Section]
+
 
 async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], page_text: PageTexts) -> PageSections:
     context = dict(
@@ -39,7 +39,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
 
     # convert our array to the more logical list of page sections
     sections = []
-    section_by_id = {}
+    section_by_id: dict[str, PageSection] = {}
     for s in response.data:
         section = section_by_id.get(s.section_id)
         if not section:
@@ -49,7 +49,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
             )
             section_by_id[s.section_id] = section
             sections.append(section)
-        
+
         section.part_ids.append(s.id)
 
     return PageSections(

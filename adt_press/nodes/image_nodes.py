@@ -158,7 +158,7 @@ def image_crops(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pru
 
 
 def processed_images_by_page(pdf_pages: list[Page], processed_images: list[ProcessedImage]) -> dict[str, list[ProcessedImage]]:
-    by_page = {}
+    by_page: dict[str, list[ProcessedImage]] = {}
     for page in pdf_pages:
         by_page[page.page_id] = []
 
@@ -166,6 +166,7 @@ def processed_images_by_page(pdf_pages: list[Page], processed_images: list[Proce
         by_page[img.page_id].append(img)
 
     return by_page
+
 
 def processed_images_by_id(processed_images: list[ProcessedImage]) -> dict[str, ProcessedImage]:
     return {img.image_id: img for img in processed_images}

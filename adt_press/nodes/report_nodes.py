@@ -18,8 +18,19 @@ def report_pruned_images(template_config: TemplateConfig, pruned_images: list[Pr
 
 
 @cache(behavior="recompute")
-def report_pages(template_config: TemplateConfig, pdf_pages: list[Page], pdf_texts: dict[str, PageTexts], pdf_sections: dict[str, PageSections], pdf_texts_by_id: dict[str, PageText], processed_images_by_id: dict[str, ProcessedImage]) -> str:
-    return render_template(template_config, "page_report.html", dict(pages=pdf_pages, texts=pdf_texts, sections=pdf_sections, texts_by_id=pdf_texts_by_id, images_by_id=processed_images_by_id))
+def report_pages(
+    template_config: TemplateConfig,
+    pdf_pages: list[Page],
+    pdf_texts: dict[str, PageTexts],
+    pdf_sections: dict[str, PageSections],
+    pdf_texts_by_id: dict[str, PageText],
+    processed_images_by_id: dict[str, ProcessedImage],
+) -> str:
+    return render_template(
+        template_config,
+        "page_report.html",
+        dict(pages=pdf_pages, texts=pdf_texts, sections=pdf_sections, texts_by_id=pdf_texts_by_id, images_by_id=processed_images_by_id),
+    )
 
 
 @cache(behavior="recompute")

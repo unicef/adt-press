@@ -66,6 +66,7 @@ def meaningfulness_prompt_config(config: DictConfig) -> PromptConfig:
 def text_extraction_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["text_extraction"]))
 
+
 @cache(behavior="recompute")
 def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["page_sectioning"]))
