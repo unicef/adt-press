@@ -1,8 +1,8 @@
 import importlib.util
 import os
-from pathlib import Path
 import sys
 import unittest
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from omegaconf.errors import ConfigKeyError
