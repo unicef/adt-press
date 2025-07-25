@@ -1,4 +1,6 @@
 import importlib.util
+import os
+from pathlib import Path
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
@@ -12,7 +14,8 @@ class TestParameterValidation(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures before each test method."""
         # Load the main function directly from adt-press.py file
-        spec = importlib.util.spec_from_file_location("adt_press_main", "/home/runner/work/adt-press/adt-press/adt-press.py")
+        main_path = str(Path(os.path.abspath(__file__)).parent.parent) + os.sep + "adt-press.py"
+        spec = importlib.util.spec_from_file_location("adt_press_main", main_path)
         self.adt_press_main = importlib.util.module_from_spec(spec)
 
         # Create a mock for run_pipeline

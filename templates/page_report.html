@@ -114,9 +114,7 @@
                                         </div>
                                         <!-- Original Text Content -->
                                         <div class="p-3">
-                                            <div class="text-sm text-gray-900">
-                                                {{ page.text }}
-                                            </div>
+                                            <div class="text-sm text-gray-900">{{ page.text }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -137,9 +135,7 @@
                                         <div class="p-3 space-y-2">
                                             {% for text_item in page_text.text %}
                                             <div class="flex items-start justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
-                                                <div class="text-sm text-gray-900 flex-1 pr-4">
-                                                    {{ text_item.text }}
-                                                </div>
+                                                <div class="text-sm text-gray-900 flex-1 pr-4">{{ text_item.text }}</div>
                                                 <div class="flex items-center gap-2 flex-shrink-0">
                                                     <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text_item.text_id }}</span>
                                                     <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ text_item.type.replace('ExtractedTextType.', '') }}</span>
