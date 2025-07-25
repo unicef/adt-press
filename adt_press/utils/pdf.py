@@ -32,21 +32,54 @@ class ExtractedTextType(str, enum.Enum):
     footer_text = "footer_text"
     other = "other"
 
+class SectionType(str, enum.Enum):
+    front_cover = "front_cover"
+    inside_cover = "inside_cover"
+    back_cover = "back_cover"
+    separator = "separator"
+    credits = "credits"
+    foreword = "foreword"
+    table_of_contents = "table_of_contents"
+    boxed_text = "boxed_text"
+    text_only = "text_only"
+    text_and_images = "text_and_images"
+    activity_matching = "activity_matching"
+    activity_fill_in_a_table = "activity_fill_in_a_table"
+    activity_multiple_choice = "activity_multiple_choice"
+    activity_true_false = "activity_true_false"
+    activity_open_ended_answer = "activity_open_ended_answer"
+    activity_fill_in_the_blank = "activity_fill_in_the_blank"
+    activity_labeling = "activity_labeling"
+    activity_multiselect = "activity_multiselect"
+    activity_sorting = "activity_sorting"
+    activity_other = "activity_other"
+    other = "other"
 
-class TextData(BaseModel):
+class PageSection(BaseModel):
+    section_id: str
+    section_type: SectionType
+    part_ids: list[str] = []
+
+class PageSections(BaseModel):
+    page_id: str
+    sections: list[PageSection]
+    reasoning: str
+
+class PageText(BaseModel):
     text_id: str
     text: str
     type: ExtractedTextType
 
 
-class PageText(BaseModel):
-    page_index: int
-    text: list[TextData]
+class PageTexts(BaseModel):
+    page_id: str
+    text: list[PageText]
     reasoning: str = ""
 
 
 class Page(BaseModel):
-    page_index: int
+    page_id: str
+    page_number: int
     image_upath: str
     text: str
     images: list[Image]
@@ -68,7 +101,10 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
     for page_index in range(start_page, end_page):
         fitz_page = doc[page_index]
         page_image = fitz_page.get_pixmap(matrix=FITZ_MAT)
-        page_image_upath = output_dir + os.sep + f"img_p{page_index}.png"
+        page_number = page_index + 1
+        page_id = f"p{page_number}"
+
+        page_image_upath = output_dir + os.sep + f"img_{page_id}.png"
         write_file(page_image_upath, page_image.tobytes(output="png"))
 
         images = []
@@ -78,7 +114,7 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         for img in fitz_page.get_images(full=True):
             pix = fitz.Pixmap(doc, img[0])
             pix_rgb = fitz.Pixmap(fitz.csRGB, pix)
-            img_id = f"img_p{page_index}_r{image_index}"
+            img_id = f"img_{page_id}_r{image_index}"
             img_bytes = pix_rgb.tobytes(output="png")
 
             # write image out
@@ -91,7 +127,7 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
             images.append(
                 Image(
                     image_id=img_id,
-                    page=page_index,
+                    page_id=page_id,
                     index=image_index,
                     upath=str(image_upath),
                     chart_upath=str(chart_upath),
@@ -106,14 +142,14 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         drawings = fitz_page.get_drawings()
         vector_images = render_drawings(drawings, margin_allowance=2, overlap_threshold=400)
         for img in vector_images:
-            img_id = f"img_p{page_index}_v{image_index}"
+            img_id = f"img_{page_id}_v{image_index}"
             vector_upath = output_dir + os.sep + f"{img_id}.png"
             image_upath = write_file(vector_upath, img.image)
             chart_upath = write_file(image_upath, matplotlib_chart(img.image), "chart")
             images.append(
                 Image(
                     image_id=img_id,
-                    page=page_index,
+                    page_id=page_id,
                     index=image_index,
                     upath=str(image_upath),
                     chart_upath=str(chart_upath),
@@ -125,7 +161,8 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
 
         pages.append(
             Page(
-                page_index=page_index,
+                page_id=page_id,
+                page_number=page_number,
                 image_upath=page_image_upath,
                 text=fitz_page.get_text(),
                 images=images,

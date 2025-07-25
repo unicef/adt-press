@@ -1,6 +1,7 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
+from omegaconf import OmegaConf
 from pydantic import BaseModel
 
 from adt_press.utils.file import cached_read_template
