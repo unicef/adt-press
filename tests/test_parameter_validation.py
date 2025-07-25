@@ -51,7 +51,3 @@ class TestParameterValidation(unittest.TestCase):
 
             # Verify that run_pipeline was called, indicating main() completed successfully
             self.mock_module.run_pipeline.assert_called_once()
-
-
-if __name__ == "__main__":
-    unittest.main()
