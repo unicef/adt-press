@@ -30,7 +30,7 @@ Please provide a simplified ELI5 explanation in this language: {{ example.langua
 {% endchat %}
 
 {% chat role="assistant" %}
-{{ example.eli5_response }}
+{{ example.response }}
 {% endchat %}
 {% endfor %}
 
@@ -39,12 +39,12 @@ This is the base64 image of the entire page from the textbook for context only.
 {{ page.image_upath | image }}
 
 The section's text to use for the simplified ELI5 explanation:
-{% for text in section_texts %}
+{% for text in texts %}
 {{ text }}
 {% endfor %}
 
 These are the section's images to take into account in the simplified ELI5 explanation:
-{% for image in section_images %}
+{% for image in images %}
 {{ image.upath | image }}
 {% endfor %}
 

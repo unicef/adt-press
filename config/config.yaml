@@ -488,16 +488,16 @@ prompts:
     template_path: prompts/section_explanation.jinja2
     model: gpt-4o-2024-08-06
     examples:
-      - page_image_upath: assets/prompts/eil5/avoid_adding_opinions_1/cuaderno5_41.png
-        section_text:
+      - page_image_upath: assets/prompts/explanations/avoid_adding_opinions_1/cuaderno5_41.png
+        texts:
           - "«Antiprincesas» latinoamericanas rompen los estereotipos de los cuentos de hadas"
           - "Dos editoriales argentinas acaban de publicar la colección infantil Antiprincesas, que tiene como protagonistas a mujeres que lucharon por lo que querían."
           - "Lejos de los cuentos de hadas en los que princesas bellísimas esperan ser salvadas por su príncipe azul, esta colección busca romper estereotipos."
           - "A diferencia de las clásicas historias infantiles, que son ficción, estas antiprincesas no son de fantasía: son algunas de las mujeres más destacadas de la cultura y la historia latinoamericanas."
         language: Spanish
         response: Las 'Antiprincesas' son libros sobre mujeres reales en América Latina que fueron fuertes y valientes. A diferencia de los cuentos de hadas donde las princesas esperan ser salvadas, estas historias muestran a mujeres que hicieron su propio camino en el mundo. Estas son historias verdaderas sobre mujeres importantes de la historia.
-      - page_image_upath: assets/prompts/eil5/avoid_answering_questions_1/livinguruguay1_10.png
-        section_text:
+      - page_image_upath: assets/prompts/explanations/avoid_answering_questions_1/livinguruguay1_10.png
+        texts:
           - "Challenge! Match the questions with the answers."
           - "A"
           - "What's your name?"
