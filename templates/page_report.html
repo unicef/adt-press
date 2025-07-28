@@ -212,17 +212,16 @@
                                                     </div>
                                                 </div>
                                                 {% endfor %}
-                                            </div>                            <div>
-                            {% with explanation=explanations[section.section_id] %}
-                                {% if explanation %}
-                                    <div class="border-t bg-gray-50 p-3 text-sm text-gray-600">
-                                        <span class="float-right ml-2 px-2 py-1 bg-gray-600 text-white text-xs font-semibold rounded">explanation</span>
-                                        {{ explanation.explanation }}
-                                        <div class="clear-both"></div>
-                                    </div>
-                                {% endif %}
-                            {% endwith %}
-                            </div>
+                                            </div>                            
+                                            {% with explanation=explanations[section.section_id] %}
+                                            {% if explanation %}
+                                            <div class="border-t bg-gray-50 p-3 text-sm text-gray-600">
+                                                <span class="float-right ml-2 px-2 py-1 bg-gray-600 text-white text-xs font-semibold rounded">explanation</span>
+                                                {{ explanation.explanation }}
+                                                <div class="clear-both"></div>
+                                            </div>
+                                            {% endif %}
+                                            {% endwith %}   
                                         </div>
                                     {% endfor %}
                                 </div>
