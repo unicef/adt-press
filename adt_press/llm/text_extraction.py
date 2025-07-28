@@ -5,15 +5,20 @@ from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_template
-from adt_press.utils.pdf import Page, PageText, TextData
+from adt_press.utils.pdf import ExtractedTextType, Page, PageText, PageTexts
+
+
+class Data(BaseModel):
+    text: str
+    type: ExtractedTextType
 
 
 class TextResponse(BaseModel):
     reasoning: str
-    data: list[TextData]
+    data: list[Data]
 
 
-async def get_page_text(config: PromptConfig, page: Page) -> PageText:
+async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
     context = dict(
         page=page,
         examples=config.examples,
@@ -28,8 +33,8 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageText:
         max_retries=config.max_retries,
     )
 
-    return PageText(
-        page_index=page.page_index,
-        text=response.data,
+    return PageTexts(
+        page_id=page.page_id,
+        text=[PageText(text_id=f"txt_p{page.page_number}_t{i}", text=d.text, type=d.type) for i, d in enumerate(response.data)],
         reasoning=response.reasoning,
     )

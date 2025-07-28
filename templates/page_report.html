@@ -3,16 +3,22 @@
 {% block content %}
 <div class="space-y-8">
     {% for page in pages %}
-    {% set page_text = texts[loop.index0] if texts and loop.index0 < texts|length %}
+    {% set page_text = texts[page.page_id] if texts %}
+    {% set page_sections = sections[page.page_id] if sections %}
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <!-- Header with Page Number -->
         <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-bold">Page {{ page.page_index }}</h2>
+            <h2 class="text-xl font-bold">Page {{ page.page_number }}</h2>
             <div class="text-sm flex gap-2">
                 {% if page.images %}
                     <span class="bg-gray-800 px-2 py-1 rounded">{{ page.images|length }} image{{ 's' if page.images|length != 1 else '' }}</span>
                 {% else %}
                     <span class="bg-gray-800 px-2 py-1 rounded">no images</span>
+                {% endif %}
+                {% if page_sections and page_sections.sections %}
+                    <span class="bg-gray-800 px-2 py-1 rounded">{{ page_sections.sections|length }} section{{ 's' if page_sections.sections|length != 1 else '' }}</span>
+                {% else %}
+                    <span class="bg-gray-800 px-2 py-1 rounded">no sections</span>
                 {% endif %}
                 {% if page_text and page_text.text %}
                     <span class="bg-gray-800 px-2 py-1 rounded">{{ page_text.text|length }} text{{ 's' if page_text.text|length != 1 else '' }}</span>
@@ -54,11 +60,13 @@
                     <div class="p-3">
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             {% for image in page.images %}
-                            <div class="bg-white rounded border border-gray-200 hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full">
-                                <a href="{{ image.upath | basename }}" class="block flex justify-center items-center p-2 flex-grow">
-                                    <img src="{{ image.upath | basename }}" class="max-w-full h-auto border" style="max-width: min(200px, 100%); max-height: 160px;" alt="Image {{ image.image_id }}">
-                                </a>
-                                <div class="p-2 mt-auto">
+                            <div class="bg-white rounded border border-gray-200 hover:shadow-md transition-shadow overflow-hidden flex flex-col h-48">
+                                <div class="flex justify-center items-center h-40 overflow-hidden">
+                                    <a href="{{ image.upath | basename }}" class="block h-full w-full flex justify-center items-center py-3 px-2">
+                                        <img src="{{ image.upath | basename }}" class="border object-contain" style="max-width: 100%; max-height: 130px;" alt="Image {{ image.image_id }}">
+                                    </a>
+                                </div>
+                                <div class="p-2 flex-shrink-0">
                                     <div class="text-xs text-gray-500 text-center">{{ image.image_id }}</div>
                                     <div class="text-xs text-gray-400 text-center">{{ image.width }} × {{ image.height }}</div>
                                 </div>
@@ -91,7 +99,7 @@
             <div class="bg-gray-100 rounded overflow-hidden">
                 <!-- Tab-style header -->
                 <div class="bg-gray-700 text-white px-4 py-2 font-medium">
-                    Extracted Texts ({{ page_text.text|length }})
+                    Extracted Texts ({{ page_text.text|length if page_text and page_text.text else 0 }})
                 </div>
                 <div class="p-4">
                     {% if page_text and page_text.text %}
@@ -99,33 +107,48 @@
                             <!-- Original Page Text -->
                             {% if page.text %}
                                 <div class="mb-4">
-                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Original Page Text:</h4>
-                                    <div class="bg-white p-3 rounded border text-sm text-gray-600">
-                                        {{ page.text }}
+                                    <div class="bg-white rounded border">
+                                        <!-- Original Text Tab Header -->
+                                        <div class="bg-purple-700 text-white px-3 py-2 text-sm font-medium rounded-t flex items-center justify-between">
+                                            <span>Original Page Text</span>
+                                        </div>
+                                        <!-- Original Text Content -->
+                                        <div class="p-3">
+                                            <div class="text-sm text-gray-900">{{ page.text }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             {% endif %}
                             
                             <!-- Structured Text Data -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">Extracted Text Data:</h4>
-                                <div class="space-y-2">
-                                    {% for text_item in page_text.text %}
-                                        <div class="bg-white p-3 rounded border">
-                                            <div class="flex items-start justify-between">
-                                                <div class="flex-1">
-                                                    <div class="text-sm text-gray-800">{{ text_item.text }}</div>
-                                                </div>
-                                                <span class="ml-3 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ text_item.type.replace('ExtractedTextType.', '') }}</span>
+                                <div class="space-y-4">
+                                    <div class="bg-white rounded border">
+                                        <!-- Text Tab Header -->
+                                        <div class="bg-green-700 text-white px-3 py-2 text-sm font-medium rounded-t flex items-center justify-between">
+                                            <span>Text Parts</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 text-xs bg-green-900 text-white rounded">{{ page_text.text|length }} items</span>
                                             </div>
                                         </div>
-                                    {% endfor %}
+                                        <!-- Text Parts -->
+                                        <div class="p-3 space-y-2">
+                                            {% for text_item in page_text.text %}
+                                            <div class="flex items-start justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                                                <div class="text-sm text-gray-900 flex-1 pr-4">{{ text_item.text }}</div>
+                                                <div class="flex items-center gap-2 flex-shrink-0">
+                                                    <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text_item.text_id }}</span>
+                                                    <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ text_item.type.replace('ExtractedTextType.', '') }}</span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
                             {% if page_text.reasoning %}
                                 <div>
-                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Extraction Reasoning:</h4>
                                     <div class="bg-gray-50 p-3 rounded border text-sm text-gray-600 italic">
                                         {{ page_text.reasoning }}
                                     </div>
@@ -144,16 +167,92 @@
             </div>
         </div>
 
+
+        <!-- Extracted Sections Section -->
+        {% set page_sections = sections[page.page_id] if sections %}
+        <div class="p-4 border-b border-gray-200">
+            <div class="bg-gray-100 rounded overflow-hidden">
+                <!-- Tab-style header -->
+                <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+                    Extracted Sections ({% if page_sections and page_sections.sections %}{{ page_sections.sections|length }}{% else %}0{% endif %})
+                </div>
+                <div class="p-4">
+                    {% if page_sections and page_sections.sections %}
+                        <div class="space-y-3">
+                            <!-- Structured Sections Data -->
+                            <div>
+                                <div class="space-y-4">
+                                    {% for section in page_sections.sections %}
+                                        <div class="bg-white rounded border">
+                                            <!-- Section Tab Header -->
+                                            <div class="bg-blue-700 text-white px-3 py-2 text-sm font-medium rounded-t flex items-center justify-between">
+                                                <span>Section</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_id }}</span>
+                                                    <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_type.replace('ExtractedSectionType.', '') }}</span>
+                                                </div>
+                                            </div>
+                                            <!-- Section Parts -->
+                                            <div class="p-3 space-y-2">
+                                                {% for part_id in section.part_ids %}
+                                                <div class="flex items-start justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                                                    <div class="text-sm text-gray-900 flex-1 pr-4">
+                                                        {% if texts_by_id[part_id] %}
+                                                        {{ texts_by_id[part_id].text }}
+                                                        {% elif images_by_id[part_id] %}
+                                                        <img src="{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded" alt="Image {{ part_id }}">
+                                                        {% else %}
+                                                        {{ part_id }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="flex-shrink-0">
+                                                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ part_id }}</span>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            {% if page_sections.reasoning %}
+                                <div>
+                                    <div class="bg-gray-50 p-3 rounded border text-sm text-gray-600 italic">
+                                        {{ page_sections.reasoning }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-gray-500 py-6">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                            <p>No section data extracted from this page</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <!-- Page Summary -->
         <div class="p-4 bg-gray-50">
             <div class="flex items-center justify-between text-sm text-gray-600">
-                <span>Page {{ page.page_index }}</span>
+                <span>Page {{ page.page_number }}</span>
                 <div class="flex gap-4">
                     <span>
                         {% if page.images %}
                             Contains {{ page.images|length }} extracted image{{ 's' if page.images|length != 1 else '' }}
                         {% else %}
                             No extractable images found
+                        {% endif %}
+                    </span>
+                    <span>
+                        {% if page_sections and page_sections.sections %}
+                            Contains {{ page_sections.sections|length }} extracted section{{ 's' if page_sections.sections|length != 1 else '' }}
+                        {% else %}
+                            No extractable sections found
                         {% endif %}
                     </span>
                     <span>

@@ -26,7 +26,7 @@ class Image(BaseModel):
     upath: str
     chart_upath: str
 
-    page: int
+    page_id: str
     index: int
 
     width: int

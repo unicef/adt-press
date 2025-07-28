@@ -7,10 +7,6 @@ from omegaconf import DictConfig, OmegaConf
 from adt_press.pipeline import run_pipeline
 
 
-def test_pass():
-    assert True
-
-
 class PipelineTest(unittest.TestCase):
     temp_dir: str
 
@@ -70,6 +66,7 @@ class PipelineTest(unittest.TestCase):
             self.assertFileCount("img_p*_r*_recrop.png", 2, "Unexpected number of recropped images created")
             self.assertFileCount("img_p*_chart.png", 38, "Unexpected number of chart images created")
 
-            self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Page report did not contain expected text")
+            self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Title not found in page report")
+            self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
 
             # TODO: Add more specific assertions about the content of the output files

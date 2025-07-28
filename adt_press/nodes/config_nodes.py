@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.llm.prompt import PromptConfig
+from adt_press.utils.config import conf_to_object
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.web import TemplateConfig
 
@@ -48,22 +49,27 @@ def page_range_config(config: DictConfig) -> PageRangeConfig:
 
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(config["prompts"]["caption"])
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["caption"]))
 
 
 @cache(behavior="recompute")
 def crop_prompt_config(config: DictConfig) -> CropPromptConfig:
-    return CropPromptConfig.model_validate(config["prompts"]["crop"])
+    return CropPromptConfig.model_validate(conf_to_object(config["prompts"]["crop"]))
 
 
 @cache(behavior="recompute")
 def meaningfulness_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(config["prompts"]["meaningfulness"])
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["meaningfulness"]))
 
 
 @cache(behavior="recompute")
 def text_extraction_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(config["prompts"]["text_extraction"])
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["text_extraction"]))
+
+
+@cache(behavior="recompute")
+def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["page_sectioning"]))
 
 
 def image_config(config: DictConfig) -> DictConfig:
