@@ -134,7 +134,7 @@
                                         <!-- Text Parts -->
                                         <div class="p-3 space-y-2">
                                             {% for text_item in page_text.text %}
-                                            <div class="flex items-start justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                                            <div class="flex items-start justify-between {% if not loop.last %}border-b border-gray-100 pb-2{% endif %}">
                                                 <div class="text-sm text-gray-900 flex-1 pr-4">{{ text_item.text }}</div>
                                                 <div class="flex items-center gap-2 flex-shrink-0">
                                                     <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text_item.text_id }}</span>
@@ -149,8 +149,10 @@
                             
                             {% if page_text.reasoning %}
                                 <div>
-                                    <div class="bg-gray-50 p-3 rounded border text-sm text-gray-600 italic">
+                                    <div class="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-blue-700 italic">
+                                        <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
                                         {{ page_text.reasoning }}
+                                        <div class="clear-both"></div>
                                     </div>
                                 </div>
                             {% endif %}
@@ -195,7 +197,7 @@
                                             <!-- Section Parts -->
                                             <div class="p-3 space-y-2">
                                                 {% for part_id in section.part_ids %}
-                                                <div class="flex items-start justify-between border-b border-gray-100 pb-2 last:border-b-0 last:pb-0">
+                                                <div class="flex items-start justify-between {% if not loop.last %}border-b border-gray-100 pb-2{% endif %}">
                                                     <div class="text-sm text-gray-900 flex-1 pr-4">
                                                         {% if texts_by_id[part_id] %}
                                                         {{ texts_by_id[part_id].text }}
@@ -210,7 +212,17 @@
                                                     </div>
                                                 </div>
                                                 {% endfor %}
-                                            </div>
+                                            </div>                            <div>
+                            {% with explanation=explanations[section.section_id] %}
+                                {% if explanation %}
+                                    <div class="border-t bg-gray-50 p-3 text-sm text-gray-600">
+                                        <span class="float-right ml-2 px-2 py-1 bg-gray-600 text-white text-xs font-semibold rounded">explanation</span>
+                                        {{ explanation.explanation }}
+                                        <div class="clear-both"></div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            </div>
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -218,8 +230,10 @@
                             
                             {% if page_sections.reasoning %}
                                 <div>
-                                    <div class="bg-gray-50 p-3 rounded border text-sm text-gray-600 italic">
+                                    <div class="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-blue-700 italic">
+                                        <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
                                         {{ page_sections.reasoning }}
+                                        <div class="clear-both"></div>
                                     </div>
                                 </div>
                             {% endif %}

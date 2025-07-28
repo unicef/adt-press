@@ -72,6 +72,11 @@ def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["page_sectioning"]))
 
 
+@cache(behavior="recompute")
+def section_explanation_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_explanation"]))
+
+
 def image_config(config: DictConfig) -> DictConfig:
     return DictConfig(config.get("image_filters", {}))
 

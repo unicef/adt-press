@@ -57,6 +57,12 @@ class SectionType(str, enum.Enum):
     other = "other"
 
 
+class SectionExplanation(BaseModel):
+    section_id: str
+    reasoning: str
+    explanation: str
+
+
 class PageSection(BaseModel):
     section_id: str
     section_type: SectionType

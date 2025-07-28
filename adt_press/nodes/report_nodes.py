@@ -3,7 +3,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.image import ProcessedImage, PrunedImage
-from adt_press.utils.pdf import Page, PageSections, PageText, PageTexts
+from adt_press.utils.pdf import Page, PageSections, PageText, PageTexts, SectionExplanation
 from adt_press.utils.web import render_template
 
 
@@ -22,14 +22,22 @@ def report_pages(
     template_config: TemplateConfig,
     pdf_pages: list[Page],
     pdf_texts: dict[str, PageTexts],
-    pdf_sections: dict[str, PageSections],
+    sections_by_page_id: dict[str, PageSections],
     pdf_texts_by_id: dict[str, PageText],
     processed_images_by_id: dict[str, ProcessedImage],
+    explanations_by_section_id: dict[str, SectionExplanation],
 ) -> str:
     return render_template(
         template_config,
         "page_report.html",
-        dict(pages=pdf_pages, texts=pdf_texts, sections=pdf_sections, texts_by_id=pdf_texts_by_id, images_by_id=processed_images_by_id),
+        dict(
+            pages=pdf_pages,
+            texts=pdf_texts,
+            sections=sections_by_page_id,
+            texts_by_id=pdf_texts_by_id,
+            images_by_id=processed_images_by_id,
+            explanations=explanations_by_section_id,
+        ),
     )
 
 

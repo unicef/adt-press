@@ -483,3 +483,41 @@ prompts:
           - section_id: 0
             section_type: activity_fill_in_the_blank
             id: text-39-31
+
+  section_explanation:
+    template_path: prompts/section_explanation.jinja2
+    model: gpt-4o-2024-08-06
+    examples:
+      - page_image_upath: assets/prompts/eil5/avoid_adding_opinions_1/cuaderno5_41.png
+        section_text:
+          - "«Antiprincesas» latinoamericanas rompen los estereotipos de los cuentos de hadas"
+          - "Dos editoriales argentinas acaban de publicar la colección infantil Antiprincesas, que tiene como protagonistas a mujeres que lucharon por lo que querían."
+          - "Lejos de los cuentos de hadas en los que princesas bellísimas esperan ser salvadas por su príncipe azul, esta colección busca romper estereotipos."
+          - "A diferencia de las clásicas historias infantiles, que son ficción, estas antiprincesas no son de fantasía: son algunas de las mujeres más destacadas de la cultura y la historia latinoamericanas."
+        language: Spanish
+        response: Las 'Antiprincesas' son libros sobre mujeres reales en América Latina que fueron fuertes y valientes. A diferencia de los cuentos de hadas donde las princesas esperan ser salvadas, estas historias muestran a mujeres que hicieron su propio camino en el mundo. Estas son historias verdaderas sobre mujeres importantes de la historia.
+      - page_image_upath: assets/prompts/eil5/avoid_answering_questions_1/livinguruguay1_10.png
+        section_text:
+          - "Challenge! Match the questions with the answers."
+          - "A"
+          - "What's your name?"
+          - "B" 
+          - "Who is he?"
+          - "C"
+          - "What's the weather like?"
+          - "D"
+          - "How are you?"
+          - "E"
+          - "What day is it today?" 
+          - "1"
+          - "I am fine, thank you!"
+          - "2"
+          - "It's Monday."
+          - "3"
+          - "My name is Peter."
+          - "4"
+          - "It's cloudy and rainy."
+          - "5"
+          - "That is John."
+        language: English
+        response: This is a matching game with questions and answers. You'll see some questions like 'What's your name?' and answers like 'My name is Peter.' The goal is to put the right answer with each question. This helps us practice and get better at saying things in English, like asking about the weather or how someone's feeling. If you match them all, great job!
