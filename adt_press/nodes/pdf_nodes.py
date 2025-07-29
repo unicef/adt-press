@@ -3,7 +3,7 @@ from adt_press.llm.text_extraction import get_page_text
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.nodes.config_nodes import PageRangeConfig
 from adt_press.utils.image import Image
-from adt_press.utils.pdf import Page, PageText, PageTexts, TranslatedText, pages_for_pdf
+from adt_press.utils.pdf import OutputText, Page, PageText, PageTexts, pages_for_pdf
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -29,14 +29,22 @@ def pdf_texts_by_id(pdf_texts: dict[str, PageTexts]) -> dict[str, PageText]:
     return {t.text_id: t for page_texts in pdf_texts.values() for t in page_texts.text}
 
 
-def translated_pdf_texts_by_id(
+def output_pdf_texts_by_id(
     text_translation_prompt_config: PromptConfig, pdf_texts: dict[str, PageTexts], input_language_config: str, output_language_config: str
-) -> dict[str, TranslatedText]:
+) -> dict[str, OutputText]:
+    texts_by_id = {}
+
     # noop if input and output languages are the same
     if input_language_config == output_language_config:
-        return {}
-
-    texts_by_id = {}
+        for page_texts in pdf_texts.values():
+            for text in page_texts.text:
+                texts_by_id[text.text_id] = OutputText(
+                    text_id=text.text_id,
+                    text=text.text,
+                    language_code=input_language_config,
+                    reasoning="",
+                )
+        return texts_by_id
 
     async def translate_texts():
         tasks = []

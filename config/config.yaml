@@ -528,3 +528,7 @@ prompts:
   text_translation:
     template_path: prompts/text_translation.jinja2
     model: gpt-4o-2024-08-06
+
+  section_glossary:
+    template_path: prompts/section_glossary.jinja2
+    model: gpt-4o-2024-08-06

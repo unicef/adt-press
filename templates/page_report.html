@@ -144,8 +144,8 @@
                                             <!-- Translation (only if languages are different) -->
                                             {% if input_language != output_language %}
                                             <div class="col-span-4 px-3 py-2 text-sm {% if not loop.last %}border-b{% endif %} border-gray-100">
-                                                {% with translation = translated_texts[text_item.text_id] %}
-                                                <div class="text-amber-800 italic">{{ translation.text }}</div>
+                                                {% with output = output_texts[text_item.text_id] %}
+                                                <div class="text-amber-800 italic">{{ output.text }}</div>
                                                 {% endwith %}
                                             </div>
                                             {% endif %}
@@ -161,6 +161,9 @@
                                 </div>
                             </div>
                             
+                            
+
+
                             {% if page_text.reasoning %}
                                 <div>
                                     <div class="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-blue-700 italic">
@@ -231,8 +234,8 @@
                                                 {% if input_language != output_language %}
                                                 <div class="col-span-4 px-3 py-2 text-sm {% if not loop.last %}border-b{% endif %} border-gray-100">
                                                     {% if part_id in texts_by_id %}
-                                                    {% with translation = translated_texts[part_id] %}
-                                                    <div class="text-amber-800 italic">{{ translation.text }}</div>
+                                                    {% with output = output_texts[part_id] %}
+                                                    <div class="text-amber-800 italic">{{ output.text }}</div>
                                                     {% endwith %}
                                                     {% endif %}
                                                 </div>
@@ -259,6 +262,51 @@
                                             </div>
                                             {% endif %}
                                             {% endwith %}   
+                                            
+                                            <!-- Glossary Section -->
+                                            {% with glossary=section_glossaries[section.section_id] %}
+                                            {% if glossary %}
+                                            <div class="border-t bg-yellow-50 overflow-hidden">
+                                                <!-- Glossary Header -->
+                                                <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ glossary.items|length if glossary.items else 0 }} terms</span>
+                                                    Glossary
+                                                    <div class="clear-both"></div>
+                                                </div>
+                                                <!-- Glossary Content -->
+                                                <div class="p-3">
+                                                    {% if glossary.items %}
+                                                    <div class="grid grid-cols-1 gap-3">
+                                                        {% for item in glossary.items %}
+                                                        <div class="bg-white rounded border border-yellow-200 overflow-hidden">
+                                                            <div class="grid grid-cols-1 md:grid-cols-3">
+                                                                <!-- Term Column -->
+                                                                <div class="bg-yellow-100 px-3 py-2 border-b md:border-b-0 md:border-r border-yellow-200">
+                                                                    <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %}{{ emoji }}{% endfor %}</div>
+                                                                    <div class="text-xs text-gray-600 mt-1">
+                                                                        {% for variant in item.variants %}
+                                                                        <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Definition Column -->
+                                                                <div class="col-span-2 px-3 py-2">
+                                                                    <div class="text-sm text-gray-800">{{ item.definition }}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                    <div class="mt-3 p-3 bg-yellow-100 border border-yellow-200 rounded text-sm text-yellow-800 italic">
+                                                        <span class="float-right ml-2 px-2 py-1 bg-yellow-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                        {{ glossary.reasoning }}
+                                                        <div class="clear-both"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endwith %}
                                         </div>
                                     {% endfor %}
                                 </div>
