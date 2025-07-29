@@ -329,29 +329,6 @@
         <div class="p-4 bg-gray-50">
             <div class="flex items-center justify-between text-sm text-gray-600">
                 <span>Page {{ page.page_number }}</span>
-                <div class="flex gap-4">
-                    <span>
-                        {% if page.images %}
-                            Contains {{ page.images|length }} extracted image{{ 's' if page.images|length != 1 else '' }}
-                        {% else %}
-                            No extractable images found
-                        {% endif %}
-                    </span>
-                    <span>
-                        {% if page_sections and page_sections.sections %}
-                            Contains {{ page_sections.sections|length }} extracted section{{ 's' if page_sections.sections|length != 1 else '' }}
-                        {% else %}
-                            No extractable sections found
-                        {% endif %}
-                    </span>
-                    <span>
-                        {% if page_text and page_text.text %}
-                            Contains {{ page_text.text|length }} extracted text{{ 's' if page_text.text|length != 1 else '' }}
-                        {% else %}
-                            No extractable text found
-                        {% endif %}
-                    </span>
-                </div>
             </div>
         </div>
     </div>
