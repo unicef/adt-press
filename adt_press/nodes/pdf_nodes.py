@@ -1,9 +1,9 @@
-from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.text_extraction import get_page_text
+from adt_press.llm.text_translation import get_text_translation
 from adt_press.nodes.config_nodes import PageRangeConfig
-from adt_press.utils.image import Image, ProcessedImage
-from adt_press.utils.pdf import Page, PageSections, PageText, PageTexts, pages_for_pdf
+from adt_press.utils.image import Image
+from adt_press.utils.pdf import Page, PageText, PageTexts, TranslatedText, pages_for_pdf
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -29,32 +29,34 @@ def pdf_texts_by_id(pdf_texts: dict[str, PageTexts]) -> dict[str, PageText]:
     return {t.text_id: t for page_texts in pdf_texts.values() for t in page_texts.text}
 
 
-def pdf_sections(
-    pdf_pages: list[Page],
-    processed_images_by_page: dict[str, list[ProcessedImage]],
-    pdf_texts: dict[str, PageTexts],
-    page_sectioning_prompt_config: PromptConfig,
-) -> dict[str, PageSections]:
-    page_sections = {}
+def translated_pdf_texts_by_id(
+    text_translation_prompt_config: PromptConfig, pdf_texts: dict[str, PageTexts], input_language_config: str, output_language_config: str
+) -> dict[str, TranslatedText]:
+    # noop if input and output languages are the same
+    if input_language_config == output_language_config:
+        return {}
 
-    async def section_pages():
-        sections = []
-        for page in pdf_pages:
-            page_images = processed_images_by_page[page.page_id]
-            page_texts = pdf_texts[page.page_id]
+    texts_by_id = {}
 
-            # if we didn't extract any good images or text, we skip sectioning this page
-            if not page_images and not page_texts.text:
-                page_sections[page.page_id] = PageSections(page_id=page.page_id, sections=[], reasoning="No images or text to section")
-            else:
-                sections.append(get_page_sections(page_sectioning_prompt_config, page, page_images, page_texts))
+    async def translate_texts():
+        tasks = []
+        for page_texts in pdf_texts.values():
+            for text in page_texts.text:
+                tasks.append(
+                    get_text_translation(
+                        text_translation_prompt_config,
+                        text,
+                        input_language_config,
+                        output_language_config,
+                    )
+                )
 
-        return await gather_with_limit(sections, page_sectioning_prompt_config.rate_limit)
+        return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
 
-    sections = run_async_task(section_pages)
-    for p in sections:
-        page_sections[p.page_id] = p
-    return page_sections
+    texts = run_async_task(translate_texts)
+    for t in texts:
+        texts_by_id[t.text_id] = t
+    return texts_by_id
 
 
 def pdf_pages(output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:

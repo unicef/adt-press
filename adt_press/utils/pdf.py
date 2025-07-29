@@ -95,6 +95,13 @@ class Page(BaseModel):
     images: list[Image]
 
 
+class TranslatedText(BaseModel):
+    text_id: str
+    language_code: str
+    text: str
+    reasoning: str
+
+
 # We need to set this zoom for PyMuPDF or the image is pixelated.
 FITZ_ZOOM = 2
 FITZ_MAT = fitz.Matrix(FITZ_ZOOM, FITZ_ZOOM)

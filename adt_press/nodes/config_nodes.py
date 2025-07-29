@@ -21,6 +21,10 @@ def pdf_path_config(config: DictConfig) -> str:
     return str(config["pdf_path"])
 
 
+def input_language_config(config: DictConfig) -> str:
+    return str(config.get("input_language", "en"))
+
+
 def output_language_config(config: DictConfig) -> str:
     return str(config.get("output_language", "en"))
 
@@ -75,6 +79,11 @@ def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
 @cache(behavior="recompute")
 def section_explanation_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_explanation"]))
+
+
+@cache(behavior="recompute")
+def text_translation_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["text_translation"]))
 
 
 def image_config(config: DictConfig) -> DictConfig:

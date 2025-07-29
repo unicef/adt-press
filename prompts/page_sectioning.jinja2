@@ -5,21 +5,18 @@ Inputs:
 - You are provided with a page from a pdf textbook, use this ONLY as a reference to help you understand how to section the text and images and how to section the text and images and assign a section type.
 - it's extracted text and image data from a single page.
 The text context you will be provided follows this format:
-{% raw %}
 [
     {
         "id": text-<int>,
         "text": <text of any language>
     }
 ]
-{% endraw %}
 
 Outputs:
 I want you to section the text and images into logical sections that belong together. The image-ids and text-ids can and should be repeated across section ids if it makes sense.
 For example, if a text-id corresponds to instructions that apply for the whole page across sections, it must be repeated across sections.
 
 Section the text and images and provide a json output of this format:
-{% raw %}
 {
     "data": [
         {
@@ -29,7 +26,6 @@ Section the text and images and provide a json output of this format:
         }
     ]
 }
-{% endraw %}
 
 `id` MUST be the text id or image id.
 
