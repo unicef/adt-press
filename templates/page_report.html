@@ -157,22 +157,16 @@
                                             </div>
                                             {% endfor %}
                                         </div>
+                                        {% if page_text.reasoning %}
+                                        <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-800 italic">
+                                            <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                            {{ page_text.reasoning }}
+                                            <div class="clear-both"></div>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                            
-                            
-
-
-                            {% if page_text.reasoning %}
-                                <div>
-                                    <div class="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-blue-700 italic">
-                                        <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
-                                        {{ page_text.reasoning }}
-                                        <div class="clear-both"></div>
-                                    </div>
-                                </div>
-                            {% endif %}
                         </div>
                     {% else %}
                         <div class="text-center text-gray-500 py-6">
@@ -255,7 +249,7 @@
                                             </div>                            
                                             {% if page_sections.reasoning %}
                                             <div>
-                                                <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-700 italic">
+                                                <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-800 italic">
                                                     <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
                                                     {{ page_sections.reasoning }}
                                                     <div class="clear-both"></div>
@@ -286,11 +280,11 @@
                                                 {% if glossary.items %}
                                                 <div class="grid grid-cols-1">
                                                     {% for item in glossary.items %}
-                                                    <div class="bg-white border-b border-yellow-200 overflow-hidden">
+                                                    <div class="bg-white border-b border-gray-100 overflow-hidden">
                                                         <div class="grid grid-cols-1 md:grid-cols-3">
                                                             <!-- Term Column -->
-                                                            <div class="px-3 py-2 border-b md:border-b-0 border-yellow-200">
-                                                                <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %}{{ emoji }}{% endfor %}</div>
+                                                            <div class="px-3 py-2">
+                                                                <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %} {{ emoji }}{% endfor %}</div>
                                                                 <div class="text-xs text-gray-600 mt-1">
                                                                     {% for variant in item.variants %}
                                                                     <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
@@ -306,8 +300,8 @@
                                                     {% endfor %}
                                                 </div>
                                                 {% endif %}
-                                                <div class="p-3 bg-yellow-100 border-yellow-200 text-sm text-yellow-800 italic">
-                                                    <span class="float-right ml-2 px-2 py-1 bg-yellow-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
                                                     {{ glossary.reasoning }}
                                                     <div class="clear-both"></div>
                                                 </div>
