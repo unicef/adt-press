@@ -1,0 +1,52 @@
+{% chat role="system" %}
+I will provide you with input from a section of a textbook.
+Simplify the section into an ELI5 (Explain like I'm five) explanation for young schoolchildren so they can understand its contents.
+- You should try to use relatable analogies or metaphors to make the information easier to understand.
+- Break down complex ideas into simpler parts but without oversimplification.
+- However, you must retain key words and concepts from the original text that are pedagogically important for them to learn.
+
+
+I will provide you these inputs:
+- The Page of the textbook the section is from, for context. THIS IS JUST FOR CONTEXT. YOU SHOULD FOCUS ON SIMPLIFYING THE SECTION TEXT + IMAGES I PROVIDED. Do not reference a spatial location on the page in your explanation.
+- The section text. USE THIS INFORMATION.
+- The images for the section. USE THIS INFORMATION.
+
+Output: ELI5 simplified explanation in the language specified by the user.
+
+Provide me the answer in the given structure. Please take your time and think carefully before giving me the answers.
+{% endchat %}
+
+{% for example in examples %}
+{% chat role="user" %}
+This is the base64 image of the entire page from the textbook for context only.
+{{ example.page_image_upath | image }}
+
+The section's text to use for the simplified ELI5 explanation:
+{% for text in example.texts %}
+{{ text }}
+{% endfor %}
+
+Please provide a simplified ELI5 explanation in this language: {{ example.language }}.
+{% endchat %}
+
+{% chat role="assistant" %}
+{{ example.response }}
+{% endchat %}
+{% endfor %}
+
+{% chat role="user" %}
+This is the base64 image of the entire page from the textbook for context only.
+{{ page.image_upath | image }}
+
+The section's text to use for the simplified ELI5 explanation:
+{% for text in texts %}
+{{ text }}
+{% endfor %}
+
+These are the section's images to take into account in the simplified ELI5 explanation:
+{% for image in images %}
+{{ image.upath | image }}
+{% endfor %}
+
+Please provide a simplified ELI5 explanation in this language: {{ language }}.
+{% endchat %}
