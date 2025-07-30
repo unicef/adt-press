@@ -144,8 +144,8 @@
                                             <!-- Translation (only if languages are different) -->
                                             {% if input_language != output_language %}
                                             <div class="col-span-4 px-3 py-2 text-sm {% if not loop.last %}border-b{% endif %} border-gray-100">
-                                                {% with translation = translated_texts[text_item.text_id] %}
-                                                <div class="text-amber-800 italic">{{ translation.text }}</div>
+                                                {% with output = output_texts[text_item.text_id] %}
+                                                <div class="text-amber-800 italic">{{ output.text }}</div>
                                                 {% endwith %}
                                             </div>
                                             {% endif %}
@@ -157,19 +157,16 @@
                                             </div>
                                             {% endfor %}
                                         </div>
+                                        {% if page_text.reasoning %}
+                                        <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-800 italic">
+                                            <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                            {{ page_text.reasoning }}
+                                            <div class="clear-both"></div>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                            
-                            {% if page_text.reasoning %}
-                                <div>
-                                    <div class="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-blue-700 italic">
-                                        <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
-                                        {{ page_text.reasoning }}
-                                        <div class="clear-both"></div>
-                                    </div>
-                                </div>
-                            {% endif %}
                         </div>
                     {% else %}
                         <div class="text-center text-gray-500 py-6">
@@ -231,8 +228,8 @@
                                                 {% if input_language != output_language %}
                                                 <div class="col-span-4 px-3 py-2 text-sm {% if not loop.last %}border-b{% endif %} border-gray-100">
                                                     {% if part_id in texts_by_id %}
-                                                    {% with translation = translated_texts[part_id] %}
-                                                    <div class="text-amber-800 italic">{{ translation.text }}</div>
+                                                    {% with output = output_texts[part_id] %}
+                                                    <div class="text-amber-800 italic">{{ output.text }}</div>
                                                     {% endwith %}
                                                     {% endif %}
                                                 </div>
@@ -250,6 +247,15 @@
                                                 {% endfor %}
                                                 
                                             </div>                            
+                                            {% if page_sections.reasoning %}
+                                            <div>
+                                                <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                    {{ page_sections.reasoning }}
+                                                    <div class="clear-both"></div>
+                                                </div>
+                                            </div>
+                                            {% endif %}                                            
                                             {% with explanation=explanations[section.section_id] %}
                                             {% if explanation %}
                                             <div class="border-t bg-gray-50 p-3 text-sm text-gray-600">
@@ -259,20 +265,53 @@
                                             </div>
                                             {% endif %}
                                             {% endwith %}   
+                                            
+                                            <!-- Glossary Section -->
+                                            {% with glossary=section_glossaries[section.section_id] %}
+                                            {% if glossary %}
+                                            <div class="border-t bg-yellow-50 overflow-hidden">
+                                                <!-- Glossary Header -->
+                                                <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ glossary.items|length if glossary.items else 0 }} terms</span>
+                                                    Glossary
+                                                    <div class="clear-both"></div>
+                                                </div>
+                                                <!-- Glossary Content -->
+                                                {% if glossary.items %}
+                                                <div class="grid grid-cols-1">
+                                                    {% for item in glossary.items %}
+                                                    <div class="bg-white border-b border-gray-100 overflow-hidden">
+                                                        <div class="grid grid-cols-1 md:grid-cols-3">
+                                                            <!-- Term Column -->
+                                                            <div class="px-3 py-2">
+                                                                <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %} {{ emoji }}{% endfor %}</div>
+                                                                <div class="text-xs text-gray-600 mt-1">
+                                                                    {% for variant in item.variants %}
+                                                                    <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                            <!-- Definition Column -->
+                                                            <div class="col-span-2 px-3 py-2">
+                                                                <div class="text-sm text-gray-800">{{ item.definition }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                    {{ glossary.reasoning }}
+                                                    <div class="clear-both"></div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endwith %}
                                         </div>
                                     {% endfor %}
                                 </div>
                             </div>
-                            
-                            {% if page_sections.reasoning %}
-                                <div>
-                                    <div class="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-blue-700 italic">
-                                        <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
-                                        {{ page_sections.reasoning }}
-                                        <div class="clear-both"></div>
-                                    </div>
-                                </div>
-                            {% endif %}
                         </div>
                     {% else %}
                         <div class="text-center text-gray-500 py-6">
@@ -290,29 +329,6 @@
         <div class="p-4 bg-gray-50">
             <div class="flex items-center justify-between text-sm text-gray-600">
                 <span>Page {{ page.page_number }}</span>
-                <div class="flex gap-4">
-                    <span>
-                        {% if page.images %}
-                            Contains {{ page.images|length }} extracted image{{ 's' if page.images|length != 1 else '' }}
-                        {% else %}
-                            No extractable images found
-                        {% endif %}
-                    </span>
-                    <span>
-                        {% if page_sections and page_sections.sections %}
-                            Contains {{ page_sections.sections|length }} extracted section{{ 's' if page_sections.sections|length != 1 else '' }}
-                        {% else %}
-                            No extractable sections found
-                        {% endif %}
-                    </span>
-                    <span>
-                        {% if page_text and page_text.text %}
-                            Contains {{ page_text.text|length }} extracted text{{ 's' if page_text.text|length != 1 else '' }}
-                        {% else %}
-                            No extractable text found
-                        {% endif %}
-                    </span>
-                </div>
             </div>
         </div>
     </div>

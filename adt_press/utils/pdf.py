@@ -69,6 +69,19 @@ class PageSection(BaseModel):
     part_ids: list[str] = []
 
 
+class GlossaryItem(BaseModel):
+    word: str
+    variants: list[str]
+    definition: str
+    emojis: list[str]
+
+
+class SectionGlossary(BaseModel):
+    section_id: str
+    items: list[GlossaryItem]
+    reasoning: str
+
+
 class PageSections(BaseModel):
     page_id: str
     sections: list[PageSection]
@@ -95,7 +108,7 @@ class Page(BaseModel):
     images: list[Image]
 
 
-class TranslatedText(BaseModel):
+class OutputText(BaseModel):
     text_id: str
     language_code: str
     text: str

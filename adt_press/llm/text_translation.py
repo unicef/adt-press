@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_template
 from adt_press.utils.languages import LANGUAGE_MAP
-from adt_press.utils.pdf import PageText, TranslatedText
+from adt_press.utils.pdf import OutputText, PageText
 
 
 class TranslationResponse(BaseModel):
@@ -14,7 +14,7 @@ class TranslationResponse(BaseModel):
     data: str
 
 
-async def get_text_translation(config: PromptConfig, text: PageText, base_language_code: str, target_language_code: str) -> TranslatedText:
+async def get_text_translation(config: PromptConfig, text: PageText, base_language_code: str, target_language_code: str) -> OutputText:
     base_language = LANGUAGE_MAP[base_language_code]
     target_language = LANGUAGE_MAP[target_language_code]
 
@@ -34,4 +34,4 @@ async def get_text_translation(config: PromptConfig, text: PageText, base_langua
         max_retries=config.max_retries,
     )
 
-    return TranslatedText(text_id=text.text_id, text=response.data, reasoning=response.reasoning, language_code=target_language_code)
+    return OutputText(text_id=text.text_id, text=response.data, reasoning=response.reasoning, language_code=target_language_code)

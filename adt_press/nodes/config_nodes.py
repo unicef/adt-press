@@ -86,6 +86,11 @@ def text_translation_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["text_translation"]))
 
 
+@cache(behavior="recompute")
+def section_glossary_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_glossary"]))
+
+
 def image_config(config: DictConfig) -> DictConfig:
     return DictConfig(config.get("image_filters", {}))
 
