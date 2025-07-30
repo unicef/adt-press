@@ -1,4 +1,7 @@
 pdf_path: "assets/momo.pdf"
+input_language: "en"
+output_language: "fr"
+
 template_dir: "templates"
 output_dir: "output"
 
@@ -521,3 +524,7 @@ prompts:
           - "That is John."
         language: English
         response: This is a matching game with questions and answers. You'll see some questions like 'What's your name?' and answers like 'My name is Peter.' The goal is to put the right answer with each question. This helps us practice and get better at saying things in English, like asking about the weather or how someone's feeling. If you match them all, great job!
+
+  text_translation:
+    template_path: prompts/text_translation.jinja2
+    model: gpt-4o-2024-08-06
