@@ -91,6 +91,11 @@ def section_glossary_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_glossary"]))
 
 
+@cache(behavior="recompute")
+def section_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_easy_read"]))
+
+
 def image_config(config: DictConfig) -> DictConfig:
     return DictConfig(config.get("image_filters", {}))
 

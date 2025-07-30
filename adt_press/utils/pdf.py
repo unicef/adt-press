@@ -83,6 +83,12 @@ class SectionGlossary(BaseModel):
     reasoning: str
 
 
+class SectionEasyRead(BaseModel):
+    section_id: str
+    text: str
+    reasoning: str
+
+
 class PageSections(BaseModel):
     page_id: str
     sections: list[PageSection]
@@ -99,7 +105,7 @@ class PageText(BaseModel):
 class PageTexts(BaseModel):
     page_id: str
     texts: list[PageText]
-    reasoning: str = ""
+    reasoning: str
 
 
 class Page(BaseModel):

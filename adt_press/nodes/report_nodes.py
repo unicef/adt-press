@@ -4,7 +4,7 @@ from omegaconf import DictConfig, OmegaConf
 from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.image import ProcessedImage, PrunedImage
 from adt_press.utils.languages import LANGUAGE_MAP
-from adt_press.utils.pdf import OutputText, Page, PageSections, PageText, PageTexts, SectionExplanation, SectionGlossary
+from adt_press.utils.pdf import OutputText, Page, PageSections, PageText, PageTexts, SectionEasyRead, SectionExplanation, SectionGlossary
 from adt_press.utils.web import render_template
 
 
@@ -29,6 +29,7 @@ def report_pages(
     explanations_by_section_id: dict[str, SectionExplanation],
     output_pdf_texts_by_id: dict[str, OutputText],
     section_glossaries_by_id: dict[str, SectionGlossary],
+    section_easy_reads_by_id: dict[str, SectionEasyRead],
     input_language_config: str,
     output_language_config: str,
 ) -> str:
@@ -47,6 +48,7 @@ def report_pages(
             explanations=explanations_by_section_id,
             output_texts=output_pdf_texts_by_id,
             section_glossaries=section_glossaries_by_id,
+            section_easy_reads=section_easy_reads_by_id,
             input_language=input_language,
             output_language=output_language,
         ),

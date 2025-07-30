@@ -160,13 +160,11 @@
                                             </div>
                                             {% endfor %}
                                         </div>
-                                        {% if page_text.reasoning %}
                                         <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-800 italic">
                                             <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
                                             {{ page_text.reasoning }}
                                             <div class="clear-both"></div>
-                                        </div>
-                                        {% endif %}
+                                        </div>                                        
                                     </div>
                                 </div>
                             </div>
@@ -262,15 +260,48 @@
                                                 </div>
                                             </div>
                                             {% endif %}                                            
+                                            
+                                            <!-- Explanation Section -->
                                             {% with explanation=explanations[section.section_id] %}
                                             {% if explanation %}
-                                            <div class="border-t bg-gray-50 p-3 text-sm text-gray-600">
-                                                <span class="float-right ml-2 px-2 py-1 bg-gray-600 text-white text-xs font-semibold rounded">explanation</span>
-                                                {{ explanation.explanation }}
-                                                <div class="clear-both"></div>
+                                            <div class="border-t bg-gray-50 overflow-hidden">
+                                                <!-- Explanation Header -->
+                                                <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                                                    Explanation
+                                                </div>
+                                                <!-- Explanation Content -->
+                                                <div class="p-3">
+                                                    <div class="text-sm text-gray-800">{{ explanation.explanation }}</div>
+                                                </div>
+                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                    {{ explanation.reasoning }}
+                                                    <div class="clear-both"></div>
+                                                </div>
                                             </div>
                                             {% endif %}
                                             {% endwith %}   
+                                            
+                                            <!-- Easy Read Section -->
+                                            {% with easy_read=section_easy_reads[section.section_id] %}
+                                            {% if easy_read %}
+                                            <div class="border-t bg-green-50 overflow-hidden">
+                                                <!-- Easy Read Header -->
+                                                <div class="bg-green-600 text-white px-3 py-2 text-sm font-medium">
+                                                    Easy Read
+                                                </div>
+                                                <!-- Easy Read Content -->
+                                                <div class="p-3">
+                                                    <div class="text-sm text-gray-800">{{ easy_read.text }}</div>
+                                                </div>
+                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                    {{ easy_read.reasoning }}
+                                                    <div class="clear-both"></div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endwith %}
                                             
                                             <!-- Glossary Section -->
                                             {% with glossary=section_glossaries[section.section_id] %}

@@ -543,3 +543,7 @@ prompts:
   section_glossary:
     template_path: prompts/section_glossary.jinja2
     model: gpt-4o-2024-08-06
+
+  section_easy_read:
+    template_path: prompts/section_easy_read.jinja2
+    model: gpt-4o-2024-08-06
