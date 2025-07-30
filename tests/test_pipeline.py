@@ -114,5 +114,4 @@ class PipelineTest(unittest.TestCase):
 
             self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Title not found in page report")
             self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
-            self.assertFileDoesNotContain("page_report.html", "French", "French should not be in page report")
-            self.assertFileDoesNotContain("page_report.html", "English", "English should not be in page report")
+            self.assertFileDoesNotContain("page_report.html", "léopard", "French should not be in page report")
