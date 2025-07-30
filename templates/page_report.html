@@ -21,7 +21,7 @@
                     <span class="bg-gray-800 px-2 py-1 rounded">no sections</span>
                 {% endif %}
                 {% if page_text and page_text.text %}
-                    <span class="bg-gray-800 px-2 py-1 rounded">{{ page_text.text|length }} text{{ 's' if page_text.text|length != 1 else '' }}</span>
+                    <span class="bg-gray-800 px-2 py-1 rounded">{{ page_text.texts|length }} text{{ 's' if page_text.texts|length != 1 else '' }}</span>
                 {% else %}
                     <span class="bg-gray-800 px-2 py-1 rounded">no texts</span>
                 {% endif %}
@@ -99,10 +99,10 @@
             <div class="bg-gray-100 rounded overflow-hidden">
                 <!-- Tab-style header -->
                 <div class="bg-gray-700 text-white px-4 py-2 font-medium">
-                    Extracted Texts ({{ page_text.text|length if page_text and page_text.text else 0 }})
+                    Extracted Texts ({{ page_text.texts|length if page_text }})
                 </div>
                 <div class="p-4">
-                    {% if page_text and page_text.text %}
+                    {% if page_text and page_text.texts %}
                         <div class="space-y-3">
                             <!-- Original Page Text -->
                             {% if page.text %}
@@ -132,11 +132,11 @@
                                             <div class="col-span-4 bg-green-700 text-white px-3 py-2 text-sm font-medium">{{ output_language }}</div>
                                             {% endif %}
                                             <div class="col-span-4 bg-green-700 text-white px-3 py-2 text-sm text-right">
-                                                <span class="px-2 py-1 text-xs bg-green-900 text-white rounded">{{ page_text.text|length }} items</span>
+                                                <span class="px-2 py-1 text-xs bg-green-900 text-white rounded">{{ page_text.texts|length }} items</span>
                                             </div>
                                             
                                             <!-- Content Rows -->
-                                            {% for text_item in page_text.text %}
+                                            {% for text_item in page_text.texts %}
                                             <!-- Text Content -->
                                             <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">{{ text_item.text }}</div>
                                             
@@ -154,6 +154,9 @@
                                             <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
                                                 <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text_item.text_id }}</span>
                                                 <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ text_item.type.replace('ExtractedTextType.', '') }}</span>
+                                                {% if text_item.is_pruned %}
+                                                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">pruned</span>
+                                                {% endif %}
                                             </div>
                                             {% endfor %}
                                         </div>
@@ -207,6 +210,9 @@
                                                 <div class="col-span-4 bg-blue-700 text-white px-3 py-2 text-sm text-right">
                                                     <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_id }}</span>
                                                     <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_type.replace('ExtractedSectionType.', '') }}</span>
+                                                    {% if section.is_pruned %}
+                                                    <span class="px-2 py-1 text-xs bg-red-900 text-white rounded">pruned</span>
+                                                    {% endif %}
                                                 </div>
                                                 
                                                 <!-- Content Rows -->

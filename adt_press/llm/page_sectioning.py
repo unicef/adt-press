@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_template
 from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import Page, PageSection, PageSections, PageTexts, SectionType
+from adt_press.utils.pdf import Page, PageSection, PageSections, PageText, SectionType
 
 
 class Section(BaseModel):
@@ -20,11 +20,11 @@ class SectionResponse(BaseModel):
     data: list[Section]
 
 
-async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], page_text: PageTexts) -> PageSections:
+async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], texts: list[PageText]) -> PageSections:
     context = dict(
         page=page,
         images=[i.model_dump() for i in images],
-        texts=[t.model_dump() for t in page_text.text],
+        texts=[t.model_dump() for t in texts],
         examples=config.examples,
     )
 

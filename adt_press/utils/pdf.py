@@ -67,6 +67,7 @@ class PageSection(BaseModel):
     section_id: str
     section_type: SectionType
     part_ids: list[str] = []
+    is_pruned: bool = False
 
 
 class GlossaryItem(BaseModel):
@@ -92,11 +93,12 @@ class PageText(BaseModel):
     text_id: str
     text: str
     type: ExtractedTextType
+    is_pruned: bool = False
 
 
 class PageTexts(BaseModel):
     page_id: str
-    text: list[PageText]
+    texts: list[PageText]
     reasoning: str = ""
 
 

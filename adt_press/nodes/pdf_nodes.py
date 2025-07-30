@@ -25,19 +25,40 @@ def pdf_texts(pdf_pages: list[Page], text_extraction_prompt_config: PromptConfig
     return {p.page_id: p for p in run_async_task(extract_text)}
 
 
-def pdf_texts_by_id(pdf_texts: dict[str, PageTexts]) -> dict[str, PageText]:
-    return {t.text_id: t for page_texts in pdf_texts.values() for t in page_texts.text}
+def filtered_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str, PageTexts]) -> dict[str, PageTexts]:
+    filtered_texts = {}
+    for page_id, page_texts in pdf_texts.items():
+        filtered_texts[page_id] = PageTexts(
+            page_id=page_id,
+            texts=[
+                PageText(
+                    text_id=t.text_id,
+                    text=t.text,
+                    type=t.type,
+                    is_pruned=t.type in pruned_text_types_config,
+                )
+                for t in page_texts.texts
+            ],
+        )
+    return filtered_texts
+
+
+def filtered_pdf_texts_by_id(filtered_pdf_texts: dict[str, PageTexts]) -> dict[str, PageText]:
+    return {t.text_id: t for page_texts in filtered_pdf_texts.values() for t in page_texts.texts}
 
 
 def output_pdf_texts_by_id(
-    text_translation_prompt_config: PromptConfig, pdf_texts: dict[str, PageTexts], input_language_config: str, output_language_config: str
+    text_translation_prompt_config: PromptConfig,
+    filtered_pdf_texts: dict[str, PageTexts],
+    input_language_config: str,
+    output_language_config: str,
 ) -> dict[str, OutputText]:
     texts_by_id = {}
 
     # noop if input and output languages are the same
     if input_language_config == output_language_config:
-        for page_texts in pdf_texts.values():
-            for text in page_texts.text:
+        for page_texts in filtered_pdf_texts.values():
+            for text in page_texts.texts:
                 texts_by_id[text.text_id] = OutputText(
                     text_id=text.text_id,
                     text=text.text,
@@ -48,8 +69,8 @@ def output_pdf_texts_by_id(
 
     async def translate_texts():
         tasks = []
-        for page_texts in pdf_texts.values():
-            for text in page_texts.text:
+        for page_texts in filtered_pdf_texts.values():
+            for text in page_texts.texts:
                 tasks.append(
                     get_text_translation(
                         text_translation_prompt_config,

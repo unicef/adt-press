@@ -3,14 +3,14 @@ from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
 from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import OutputText, Page, PageSections, PageText, PageTexts, SectionExplanation, SectionGlossary
+from adt_press.utils.pdf import OutputText, Page, PageSection, PageSections, PageText, PageTexts, SectionExplanation, SectionGlossary
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 def sections_by_page_id(
     pdf_pages: list[Page],
     processed_images_by_page: dict[str, list[ProcessedImage]],
-    pdf_texts: dict[str, PageTexts],
+    filtered_pdf_texts: dict[str, PageTexts],
     page_sectioning_prompt_config: PromptConfig,
 ) -> dict[str, PageSections]:
     page_sections = {}
@@ -19,10 +19,10 @@ def sections_by_page_id(
         sections = []
         for page in pdf_pages:
             page_images = processed_images_by_page[page.page_id]
-            page_texts = pdf_texts[page.page_id]
+            page_texts = [t for t in filtered_pdf_texts[page.page_id].texts if not t.is_pruned]
 
             # if we didn't extract any good images or text, we skip sectioning this page
-            if not page_images and not page_texts.text:
+            if not page_images and not page_texts:
                 page_sections[page.page_id] = PageSections(page_id=page.page_id, sections=[], reasoning="No images or text to section")
             else:
                 sections.append(get_page_sections(page_sectioning_prompt_config, page, page_images, page_texts))
@@ -35,24 +35,45 @@ def sections_by_page_id(
     return page_sections
 
 
+def filtered_sections_by_page_id(
+    pruned_section_types_config: list[str], sections_by_page_id: dict[str, PageSections]
+) -> dict[str, PageSections]:
+    filtered_sections = {}
+    for page_id, page_sections in sections_by_page_id.items():
+        filtered_sections[page_id] = PageSections(
+            page_id=page_id,
+            sections=[
+                PageSection(
+                    section_id=section.section_id,
+                    section_type=section.section_type,
+                    part_ids=section.part_ids,
+                    is_pruned=section.section_type in pruned_section_types_config,
+                )
+                for section in page_sections.sections
+            ],
+            reasoning=page_sections.reasoning,
+        )
+    return filtered_sections
+
+
 def explanations_by_section_id(
     output_language_config: str,
     pdf_pages: list[Page],
-    sections_by_page_id: dict[str, PageSections],
-    pdf_texts_by_id: dict[str, PageText],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    filtered_pdf_texts_by_id: dict[str, PageText],
     processed_images_by_id: dict[str, ProcessedImage],
     section_explanation_prompt_config: PromptConfig,
 ) -> dict[str, SectionExplanation]:
     async def explain_sections():
         explanations = []
         for page in pdf_pages:
-            page_sections = sections_by_page_id[page.page_id]
-            for section in page_sections.sections:
+            page_sections = filtered_sections_by_page_id[page.page_id]
+            for section in filter(lambda s: not s.is_pruned, page_sections.sections):
                 texts = []
                 images: list[ProcessedImage] = []
 
                 for part_id in section.part_ids:
-                    text = pdf_texts_by_id.get(part_id)
+                    text = filtered_pdf_texts_by_id.get(part_id)
                     texts.extend([text.text] if text else [])
                     image = processed_images_by_id.get(part_id)
                     images.extend([image] if image else [])
@@ -74,13 +95,13 @@ def explanations_by_section_id(
 def section_glossaries_by_id(
     output_language_config: str,
     section_glossary_prompt_config: PromptConfig,
-    sections_by_page_id: dict[str, PageSections],
+    filtered_sections_by_page_id: dict[str, PageSections],
     output_pdf_texts_by_id: dict[str, OutputText],
 ) -> dict[str, SectionGlossary]:
     async def get_glossaries():
         tasks = []
-        for page_sections in sections_by_page_id.values():
-            for section in page_sections.sections:
+        for page_sections in filtered_sections_by_page_id.values():
+            for section in filter(lambda s: not s.is_pruned, page_sections.sections):
                 texts = [output_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
                 tasks.append(get_section_glossary(output_language_config, section_glossary_prompt_config, section, texts))
 
