@@ -20,6 +20,17 @@ image_filters:
   blank:
     threshold: 2
 
+text_filters:
+  pruned_text_types:
+    - footer_text
+    - page_number
+    - other
+
+section_filters:
+  pruned_section_types:
+    - back_cover
+    - credits
+
 prompts:
   text_extraction:
     template_path: prompts/text_extraction.jinja2

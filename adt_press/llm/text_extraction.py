@@ -35,6 +35,6 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
 
     return PageTexts(
         page_id=page.page_id,
-        text=[PageText(text_id=f"txt_p{page.page_number}_t{i}", text=d.text, type=d.type) for i, d in enumerate(response.data)],
+        texts=[PageText(text_id=f"txt_p{page.page_number}_t{i}", text=d.text, type=d.type) for i, d in enumerate(response.data)],
         reasoning=response.reasoning,
     )

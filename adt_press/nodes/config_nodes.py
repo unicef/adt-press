@@ -110,3 +110,11 @@ class BlankImageFilterConfig(BaseModel):
 
 def blank_image_filter_config(image_config: DictConfig) -> BlankImageFilterConfig:
     return BlankImageFilterConfig.model_validate(image_config.get("blank", {}))
+
+
+def pruned_text_types_config(config: DictConfig) -> list[str]:
+    return list[str](config.get("text_filters", {}).get("pruned_text_types", []))
+
+
+def pruned_section_types_config(config: DictConfig) -> list[str]:
+    return list[str](config.get("section_filters", {}).get("pruned_section_types", []))
