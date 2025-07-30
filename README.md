@@ -17,23 +17,23 @@
 | adt\_press/llm/text\_extraction.py      |       19 |        0 |     100% |           |
 | adt\_press/llm/text\_translation.py     |       19 |        0 |     100% |           |
 | adt\_press/nodes/\_\_init\_\_.py        |        0 |        0 |     100% |           |
-| adt\_press/nodes/config\_nodes.py       |       63 |        0 |     100% |           |
+| adt\_press/nodes/config\_nodes.py       |       67 |        0 |     100% |           |
 | adt\_press/nodes/image\_nodes.py        |       94 |        0 |     100% |           |
-| adt\_press/nodes/pdf\_nodes.py          |       40 |        0 |     100% |           |
+| adt\_press/nodes/pdf\_nodes.py          |       45 |        0 |     100% |           |
 | adt\_press/nodes/report\_nodes.py       |       24 |        0 |     100% |           |
-| adt\_press/nodes/section\_nodes.py      |       52 |        0 |     100% |           |
+| adt\_press/nodes/section\_nodes.py      |       57 |        0 |     100% |           |
 | adt\_press/pipeline.py                  |       25 |        0 |     100% |           |
 | adt\_press/utils/\_\_init\_\_.py        |        0 |        0 |     100% |           |
 | adt\_press/utils/file.py                |       24 |        0 |     100% |           |
 | adt\_press/utils/image.py               |       88 |        0 |     100% |           |
 | adt\_press/utils/languages.py           |        3 |        0 |     100% |           |
-| adt\_press/utils/pdf.py                 |      129 |        0 |     100% |           |
+| adt\_press/utils/pdf.py                 |      131 |        0 |     100% |           |
 | adt\_press/utils/sync.py                |        9 |        0 |     100% |           |
 | adt\_press/utils/vector.py              |       14 |        0 |     100% |           |
 | adt\_press/utils/web.py                 |       16 |        0 |     100% |           |
 | tests/test\_parameter\_validation.py    |       30 |        0 |     100% |           |
 | tests/test\_pipeline.py                 |       67 |        0 |     100% |           |
-|                               **TOTAL** |  **886** |    **0** | **100%** |           |
+|                               **TOTAL** |  **902** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
