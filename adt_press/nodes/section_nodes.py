@@ -1,9 +1,20 @@
 from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.prompt import PromptConfig
+from adt_press.llm.section_easy_read import get_section_easy_read
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
 from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import OutputText, Page, PageSection, PageSections, PageText, PageTexts, SectionExplanation, SectionGlossary
+from adt_press.utils.pdf import (
+    OutputText,
+    Page,
+    PageSection,
+    PageSections,
+    PageText,
+    PageTexts,
+    SectionEasyRead,
+    SectionExplanation,
+    SectionGlossary,
+)
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -109,3 +120,22 @@ def section_glossaries_by_id(
 
     results = run_async_task(get_glossaries)
     return {glossary.section_id: glossary for glossary in results}
+
+
+def section_easy_reads_by_id(
+    output_language_config: str,
+    section_easy_read_prompt_config: PromptConfig,
+    filtered_sections_by_page_id: dict[str, PageSections],
+    output_pdf_texts_by_id: dict[str, OutputText],
+) -> dict[str, SectionEasyRead]:
+    async def get_easy_reads():
+        tasks = []
+        for page_sections in filtered_sections_by_page_id.values():
+            for section in filter(lambda s: not s.is_pruned, page_sections.sections):
+                texts = [output_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
+                tasks.append(get_section_easy_read(output_language_config, section_easy_read_prompt_config, section, texts))
+
+        return await gather_with_limit(tasks, section_easy_read_prompt_config.rate_limit)
+
+    results = run_async_task(get_easy_reads)
+    return {easy_read.section_id: easy_read for easy_read in results}

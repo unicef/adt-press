@@ -30,6 +30,7 @@ def filtered_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str,
     for page_id, page_texts in pdf_texts.items():
         filtered_texts[page_id] = PageTexts(
             page_id=page_id,
+            reasoning=page_texts.reasoning,
             texts=[
                 PageText(
                     text_id=t.text_id,
