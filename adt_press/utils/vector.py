@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 class RenderedVectorImage(BaseModel):
     image: bytes
-    width: int
-    height: int
+    width: float
+    height: float
 
 
 def convert_color_cairo(color: list[float]) -> tuple[float, ...]:
@@ -152,22 +152,26 @@ def render_group_to_image(group_drawings):  # pragma: no cover
     max_x = max(box[2] for box in bounding_boxes)
     max_y = max(box[3] for box in bounding_boxes)
 
-    width = int(math.ceil(max_x - min_x))
-    height = int(math.ceil(max_y - min_y))
+    width_pt = max_x - min_x  # Width in points
+    height_pt = max_y - min_y  # Height in points
+
+    # Convert points to pixels for Cairo rendering (assuming 72 DPI)
+    width_px = int(math.ceil(width_pt))
+    height_px = int(math.ceil(height_pt))
 
     # Ensure minimum dimensions
-    if width <= 0:
-        width = 10
-    if height <= 0:
-        height = 10
+    if width_px <= 0:
+        width_px = 10
+    if height_px <= 0:
+        height_px = 10
 
     # Create a Cairo surface and context for the group
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width_px, height_px)
     ctx = cairo.Context(surface)
 
     # Fill the background with white
     ctx.set_source_rgb(1, 1, 1)  # White
-    ctx.rectangle(0, 0, width, height)
+    ctx.rectangle(0, 0, width_px, height_px)
     ctx.fill()
 
     # Translate the context so that the group's top-left corner is at (0, 0)
@@ -205,7 +209,11 @@ def render_group_to_image(group_drawings):  # pragma: no cover
     buffer = io.BytesIO()
     surface.write_to_png(buffer)
     buffer.seek(0)
-    return RenderedVectorImage(image=buffer.getvalue(), width=width, height=height)
+    return RenderedVectorImage(
+        image=buffer.getvalue(),
+        width=width_pt,  # Store in points
+        height=height_pt,  # Store in points
+    )
 
 
 def render_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> list[RenderedVectorImage]:

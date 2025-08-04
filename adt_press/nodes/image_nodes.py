@@ -25,9 +25,9 @@ def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config
     for img in pdf_images:
         failed = []
         if img.width < image_size_filter_config.min_side or img.height < image_size_filter_config.min_side:
-            failed.append(f"side < {image_size_filter_config.min_side} pixels")
-        if img.width > image_size_filter_config.max_side or img.height > image_size_filter_config.max_side:  # pragma: no cover
-            failed.append(f"side > {image_size_filter_config.max_side} pixels")
+            failed.append(f"side < {image_size_filter_config.min_side} points")
+        if img.width > image_size_filter_config.max_side or img.height > image_size_filter_config.max_side:
+            failed.append(f"side > {image_size_filter_config.max_side} points")
 
         if failed:
             failures[img.image_id] = ImageFilterFailure(

@@ -101,8 +101,8 @@ def image_config(config: DictConfig) -> DictConfig:
 
 
 class ImageSizeFilterConfig(BaseModel):
-    max_side: int = 500
-    min_side: int = 50
+    max_side: float = 500.0
+    min_side: float = 50.0
 
 
 def image_size_filter_config(image_config: DictConfig) -> ImageSizeFilterConfig:

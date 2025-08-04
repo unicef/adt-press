@@ -29,8 +29,8 @@ class Image(BaseModel):
     page_id: str
     index: int
 
-    width: int
-    height: int
+    width: float  # Changed to float for points
+    height: float  # Changed to float for points
 
 
 class ImageFilterFailure(BaseModel):

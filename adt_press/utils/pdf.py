@@ -162,6 +162,10 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
             # also write out our chart image
             chart_upath = write_file(image_upath, matplotlib_chart(img_bytes), "chart")
 
+            # Convert pixel dimensions to points (assuming standard 72 DPI)
+            width_pt = pix_rgb.width * 72 / 72  # If you know the actual DPI, use it here
+            height_pt = pix_rgb.height * 72 / 72
+
             images.append(
                 Image(
                     image_id=img_id,
@@ -169,8 +173,8 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
                     index=image_index,
                     upath=str(image_upath),
                     chart_upath=str(chart_upath),
-                    width=pix_rgb.width,
-                    height=pix_rgb.height,
+                    width=width_pt,  # Now in points
+                    height=height_pt,  # Now in points
                 )
             )
 
@@ -191,8 +195,8 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
                     index=image_index,
                     upath=str(image_upath),
                     chart_upath=str(chart_upath),
-                    width=img.width,
-                    height=img.height,
+                    width=img.width,  # Already in points
+                    height=img.height,  # Already in points
                 )
             )
             image_index += 1
