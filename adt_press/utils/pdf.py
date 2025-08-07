@@ -1,16 +1,13 @@
-import enum
 import os
 
 import fitz  # PyMuPDF
 from fsspec import open
-from pydantic import BaseModel
 
 from adt_press.data.image import Image
 from adt_press.data.pdf import Page
 from adt_press.utils.file import write_file
 from adt_press.utils.image import matplotlib_chart
 from adt_press.utils.vector import render_drawings
-
 
 # We need to set this zoom for PyMuPDF or the image is pixelated.
 FITZ_ZOOM = 2

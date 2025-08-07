@@ -1,3 +1,4 @@
+from adt_press.data.image import ProcessedImage
 from adt_press.data.pdf import Page
 from adt_press.data.section import PageSection, PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
 from adt_press.data.text import OutputText, PageText, PageTexts
@@ -6,7 +7,6 @@ from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.section_easy_read import get_section_easy_read
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
-from adt_press.data.image import ProcessedImage
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 

@@ -1,4 +1,3 @@
-
 import enum
 
 from pydantic import BaseModel
@@ -26,6 +25,7 @@ class ExtractedTextType(str, enum.Enum):
     footer_text = "footer_text"
     other = "other"
 
+
 class PageText(BaseModel):
     text_id: str
     text: str
@@ -37,6 +37,7 @@ class PageTexts(BaseModel):
     page_id: str
     texts: list[PageText]
     reasoning: str
+
 
 class OutputText(BaseModel):
     text_id: str

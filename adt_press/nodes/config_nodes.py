@@ -40,6 +40,7 @@ def template_dir_config(config: DictConfig) -> str:
 def pdf_title_config(config: DictConfig) -> str:
     return str(config["pdf_title"])
 
+
 @cache(behavior="recompute")
 def pdf_hash_config(pdf_path_config: str) -> str:
     return calculate_file_hash(pdf_path_config)
@@ -106,7 +107,7 @@ def web_generation_prompt_config(config: DictConfig) -> PromptConfig:
 
 @cache(behavior="recompute")
 def web_generation_examples_config(config: DictConfig) -> list[str]:
-    return config.get("web_generation_examples", [])
+    return list[str](config.get("web_generation_examples", []))
 
 
 def image_config(config: DictConfig) -> DictConfig:

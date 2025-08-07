@@ -8,7 +8,6 @@ import numpy as np
 import PIL
 import PIL.ImageDraw
 from fsspec import open
-from pydantic import BaseModel
 
 from adt_press.data.image import CropCoordinates
 

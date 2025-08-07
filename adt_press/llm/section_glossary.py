@@ -9,7 +9,6 @@ from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
-
 class GlossaryResponse(BaseModel):
     data: list[GlossaryItem]
     reasoning: str

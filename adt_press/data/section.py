@@ -26,16 +26,19 @@ class SectionType(str, enum.Enum):
     activity_other = "activity_other"
     other = "other"
 
+
 class PageSection(BaseModel):
     section_id: str
     section_type: SectionType
     part_ids: list[str] = []
     is_pruned: bool = False
 
+
 class SectionExplanation(BaseModel):
     section_id: str
     reasoning: str
     explanation: str
+
 
 class GlossaryItem(BaseModel):
     word: str
@@ -54,6 +57,7 @@ class SectionEasyRead(BaseModel):
     section_id: str
     text: str
     reasoning: str
+
 
 class PageSections(BaseModel):
     page_id: str

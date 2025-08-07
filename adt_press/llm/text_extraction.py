@@ -9,7 +9,6 @@ from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_text_file
 
 
-
 class Data(BaseModel):
     text: str
     type: ExtractedTextType

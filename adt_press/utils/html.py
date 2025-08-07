@@ -1,7 +1,6 @@
-from bs4 import BeautifulSoup
-
 import os
 
+from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
 from adt_press.data.image import ProcessedImage
@@ -35,7 +34,6 @@ def replace_texts(html_content: str, text_replacements: dict[str, str]) -> str:
             tag.string = text_replacements[tag["data-id"]]
 
     return str(soup)
-
 
 
 class TemplateConfig(BaseModel):
