@@ -3,7 +3,7 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
-from adt_press.data.text import OutputText, PageText
+from adt_press.data.text import OutputText
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -14,14 +14,16 @@ class TranslationResponse(BaseModel):
     data: str
 
 
-async def get_text_translation(config: PromptConfig, text: PageText, base_language_code: str, target_language_code: str) -> OutputText:
+async def get_text_translation(
+    config: PromptConfig, text_id: str, text: str, base_language_code: str, target_language_code: str
+) -> OutputText:
     base_language = LANGUAGE_MAP[base_language_code]
     target_language = LANGUAGE_MAP[target_language_code]
 
     context = dict(
         base_language=base_language,
         target_language=target_language,
-        text=text.text,
+        text=text,
         examples=config.examples,
     )
 
@@ -34,4 +36,4 @@ async def get_text_translation(config: PromptConfig, text: PageText, base_langua
         max_retries=config.max_retries,
     )
 
-    return OutputText(text_id=text.text_id, text=response.data, reasoning=response.reasoning, language_code=target_language_code)
+    return OutputText(text_id=text_id, text=response.data, reasoning=response.reasoning, language_code=target_language_code)

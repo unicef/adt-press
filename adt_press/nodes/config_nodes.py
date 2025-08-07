@@ -25,8 +25,12 @@ def input_language_config(config: DictConfig) -> str:
     return str(config.get("input_language", "en"))
 
 
-def output_language_config(config: DictConfig) -> str:
-    return str(config.get("output_language", "en"))
+def plate_language_config(config: DictConfig) -> str:
+    return str(config.get("plate_language", "en"))
+
+
+def output_languages_config(config: DictConfig) -> list[str]:
+    return list[str](config["output_languages"])
 
 
 def output_dir_config(config: DictConfig) -> str:

@@ -1,7 +1,8 @@
 pdf_title: Momo and the Leopards
 pdf_path: "assets/momo.pdf"
 input_language: "en"
-output_language: "es"
+plate_language: "en"
+output_languages: ["en", "es", "fr"]
 
 template_dir: "templates"
 output_dir: "output"

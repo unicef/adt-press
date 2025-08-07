@@ -5,10 +5,8 @@ import shutil
 import yaml
 from hamilton.function_modifiers import cache
 
-from adt_press.data.image import ProcessedImage
 from adt_press.data.pdf import Page
-from adt_press.data.section import PageSection, PageSections
-from adt_press.data.text import OutputText, PageText
+from adt_press.data.plate import Plate, PlateImage, PlateText
 from adt_press.data.web import WebPage
 from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.web_generation import generate_web_page
@@ -44,33 +42,30 @@ def web_generation_examples(web_generation_examples_config: list[str]) -> list[d
 
 
 def web_pages(
-    output_language_config: str,
+    plate_language_config: str,
     pdf_pages: list[Page],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    filtered_pdf_texts_by_id: dict[str, PageText],
-    processed_images_by_id: dict[str, ProcessedImage],
+    plate: Plate,
     web_generation_prompt_config: PromptConfig,
     web_generation_examples: list[dict],
 ) -> list[WebPage]:
+    images_by_id = {img.image_id: img for img in plate.images}
+    texts_by_id = {txt.text_id: txt for txt in plate.texts}
+
     async def generate_pages():
         web_pages = []
-        for page in pdf_pages:
-            page_sections = filtered_sections_by_page_id[page.page_id]
-            for section in filter(lambda s: not s.is_pruned, page_sections.sections):
-                texts = []
-                images: list[ProcessedImage] = []
+        for section in plate.sections:
+            texts: list[PlateText] = []
+            images: list[PlateImage] = []
 
-                for part_id in section.part_ids:
-                    text = filtered_pdf_texts_by_id.get(part_id)
-                    texts.extend([text] if text else [])
-                    image = processed_images_by_id.get(part_id)
-                    images.extend([image] if image else [])
+            for part_id in section.part_ids:
+                text = texts_by_id.get(part_id)
+                texts.extend([text] if text else [])
+                image = images_by_id.get(part_id)
+                images.extend([image] if image else [])
 
-                web_pages.append(
-                    generate_web_page(
-                        web_generation_prompt_config, web_generation_examples, page, section, texts, images, output_language_config
-                    )
-                )
+            web_pages.append(
+                generate_web_page(web_generation_prompt_config, web_generation_examples, section, texts, images, plate_language_config)
+            )
 
         return await gather_with_limit(web_pages, web_generation_prompt_config.rate_limit)
 
@@ -82,12 +77,13 @@ def package_adt_web(
     template_config: TemplateConfig,
     output_dir_config: str,
     pdf_title_config: str,
-    output_language_config: str,
-    filtered_sections_by_section_id: dict[str, PageSection],
-    processed_images_by_id: dict[str, ProcessedImage],
-    output_pdf_texts_by_id: dict[str, OutputText],
+    plate_language_config: str,
+    plate: Plate,
+    plate_translations: dict[str, dict[str, str]],
     web_pages: list[WebPage],
 ) -> str:
+    default_language = list(plate_translations.keys())[0]
+
     adt_dir = os.path.join(output_dir_config, "adt")
     # clear the output adt directory
     if os.path.exists(adt_dir):
@@ -102,22 +98,25 @@ def package_adt_web(
     os.makedirs(content_dir, exist_ok=True)
 
     all_texts = {}
+    plate_images = {img.image_id: img for img in plate.images}
+    plate_texts = {txt.text_id: txt for txt in plate.texts}
+    sections_by_id = {section.section_id: section for section in plate.sections}
 
     for webpage_index, webpage in enumerate(web_pages):
-        section = filtered_sections_by_section_id[webpage.section_id]
+        section = sections_by_id[webpage.section_id]
 
         # copy the images to the output directory
         images = {}
         for image_id in webpage.image_ids:
-            image = processed_images_by_id[image_id]
+            image = plate_images[image_id]
             images[image_id] = image
-            shutil.copy(image.crop.upath, os.path.join(image_dir, f"{image_id}.png"))
+            shutil.copy(image.upath, os.path.join(image_dir, f"{image_id}.png"))
 
         # build our map of texts
         texts = {}
         for text_id in webpage.text_ids:
-            texts[text_id] = output_pdf_texts_by_id[text_id].text
-            all_texts[text_id] = output_pdf_texts_by_id[text_id].text
+            texts[text_id] = plate_texts[text_id].text
+            all_texts[text_id] = plate_texts[text_id].text
 
         content = webpage.content
         content = replace_images(content, images)
@@ -126,32 +125,31 @@ def package_adt_web(
         render_template(
             template_config,
             "webpage.html",
-            dict(content=content, webpage=webpage, section=section, language=output_language_config, webpage_number=webpage_index + 1),
+            dict(content=content, webpage=webpage, section=section, language=plate_language_config, webpage_number=webpage_index + 1),
             output_name=f"adt/{webpage.section_id}.html",
         )
 
     # create our navigation directory
     nav_dir = os.path.join(adt_dir, "content", "navigation")
     os.makedirs(nav_dir, exist_ok=True)
-    render_template(
-        template_config, "nav.html", dict(webpages=web_pages, texts=output_pdf_texts_by_id), output_name="adt/content/navigation/nav.html"
-    )
+    render_template(template_config, "nav.html", dict(webpages=web_pages, texts=plate_texts), output_name="adt/content/navigation/nav.html")
 
-    # create our locale dir
-    locale_dir = os.path.join(adt_dir, "content", "i18n", output_language_config)
-    os.makedirs(locale_dir, exist_ok=True)
+    for language, translations in plate_translations.items():
+        # create our language directory
+        locale_dir = os.path.join(adt_dir, "content", "i18n", language)
+        os.makedirs(locale_dir, exist_ok=True)
 
-    # write our translated texts
-    with open(os.path.join(locale_dir, "texts.json"), "w") as f:
-        json.dump(all_texts, f, indent=2)
+        # write our translated texts
+        with open(os.path.join(locale_dir, "texts.json"), "w") as f:
+            json.dump(translations, f, indent=2)
 
-    # TODO: replace with TTS
-    with open(os.path.join(locale_dir, "audios.json"), "w") as f:
-        json.dump({}, f, indent=2)
+        # TODO: replace with TTS
+        with open(os.path.join(locale_dir, "audios.json"), "w") as f:
+            json.dump({}, f, indent=2)
 
-    # TODO: replace with real sign videos
-    with open(os.path.join(locale_dir, "videos.json"), "w") as f:
-        json.dump({}, f, indent=2)
+        # TODO: replace with real sign videos
+        with open(os.path.join(locale_dir, "videos.json"), "w") as f:
+            json.dump({}, f, indent=2)
 
     # copy our assets to the output directory
     assets_dir = os.path.join("assets", "web", "assets")
@@ -161,7 +159,7 @@ def package_adt_web(
     render_template(
         template_config,
         "config.json",
-        dict(languages=[output_language_config], default_language=output_language_config, book_title=pdf_title_config),
+        dict(languages=list(plate_translations.keys()), default_language=default_language, book_title=pdf_title_config),
         output_name="adt/assets/config.json",
     )
 

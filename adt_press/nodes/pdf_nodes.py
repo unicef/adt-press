@@ -39,8 +39,8 @@ def filtered_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str,
                 PageText(
                     text_id=t.text_id,
                     text=t.text,
-                    type=t.type,
-                    is_pruned=t.type in pruned_text_types_config,
+                    text_type=t.text_type,
+                    is_pruned=t.text_type in pruned_text_types_config,
                 )
                 for t in page_texts.texts
             ],
@@ -56,12 +56,12 @@ def output_pdf_texts_by_id(
     text_translation_prompt_config: PromptConfig,
     filtered_pdf_texts: dict[str, PageTexts],
     input_language_config: str,
-    output_language_config: str,
+    plate_language_config: str,
 ) -> dict[str, OutputText]:
     texts_by_id = {}
 
     # noop if input and output languages are the same
-    if input_language_config == output_language_config:
+    if input_language_config == plate_language_config:
         for page_texts in filtered_pdf_texts.values():
             for text in page_texts.texts:
                 texts_by_id[text.text_id] = OutputText(
@@ -79,9 +79,10 @@ def output_pdf_texts_by_id(
                 tasks.append(
                     get_text_translation(
                         text_translation_prompt_config,
-                        text,
+                        text.text_id,
+                        text.text,
                         input_language_config,
-                        output_language_config,
+                        plate_language_config,
                     )
                 )
 

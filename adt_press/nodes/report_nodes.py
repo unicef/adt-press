@@ -3,6 +3,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from adt_press.data.image import ProcessedImage, PrunedImage
 from adt_press.data.pdf import Page
+from adt_press.data.plate import Plate
 from adt_press.data.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
 from adt_press.data.text import OutputText, PageText, PageTexts
 from adt_press.nodes.config_nodes import TemplateConfig
@@ -33,10 +34,10 @@ def report_pages(
     section_glossaries_by_id: dict[str, SectionGlossary],
     section_easy_reads_by_id: dict[str, SectionEasyRead],
     input_language_config: str,
-    output_language_config: str,
+    plate_language_config: str,
 ) -> str:
     input_language = LANGUAGE_MAP[input_language_config]
-    output_language = LANGUAGE_MAP[output_language_config]
+    output_language = LANGUAGE_MAP[plate_language_config]
 
     return render_template(
         template_config,
@@ -58,6 +59,14 @@ def report_pages(
 
 
 @cache(behavior="recompute")
+def plate_report(template_config: TemplateConfig, plate: Plate) -> str:
+    texts_by_id = {t.text_id: t for t in plate.texts}
+    images_by_id = {i.image_id: i for i in plate.images}
+
+    return render_template(template_config, "plate_report.html", dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id))
+
+
+@cache(behavior="recompute")
 def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
     return render_template(template_config, "config.html", dict(config=OmegaConf.to_yaml(config)))
 
@@ -70,6 +79,7 @@ def report_index(
     report_pages: str,
     report_config: str,
     package_adt_web: str,
+    plate_report: str,
 ) -> str:
     return render_template(
         template_config,

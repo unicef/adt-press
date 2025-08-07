@@ -3,10 +3,7 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
-from adt_press.data.image import ProcessedImage
-from adt_press.data.pdf import Page
-from adt_press.data.section import PageSection
-from adt_press.data.text import PageText
+from adt_press.data.plate import PlateImage, PlateSection, PlateText
 from adt_press.data.web import WebPage
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_text_file
@@ -21,16 +18,14 @@ class GenerationResponse(BaseModel):
 async def generate_web_page(
     config: PromptConfig,
     examples: list[dict],
-    page: Page,
-    section: PageSection,
-    texts: list[PageText],
-    images: list[ProcessedImage],
+    section: PlateSection,
+    texts: list[PlateText],
+    images: list[PlateImage],
     language_code: str,
 ) -> WebPage:
     language = LANGUAGE_MAP[language_code]
 
     context = dict(
-        page=page,
         section=section,
         texts=[t.model_dump() for t in texts],
         images=[i.model_dump() for i in images],

@@ -3,7 +3,7 @@ import enum
 from pydantic import BaseModel
 
 
-class ExtractedTextType(str, enum.Enum):
+class TextType(str, enum.Enum):
     book_title = "book_title"
     book_subtitle = "book_subtitle"
     book_author = "book_author"
@@ -29,7 +29,7 @@ class ExtractedTextType(str, enum.Enum):
 class PageText(BaseModel):
     text_id: str
     text: str
-    type: ExtractedTextType
+    text_type: TextType
     is_pruned: bool = False
 
 

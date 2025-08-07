@@ -17,6 +17,13 @@ def write_file(output_path: str, bs: bytes, suffix: str = "") -> str:
     return output_path
 
 
+def write_text_file(output_path: str, content: str):
+    with open(output_path, "w") as f:
+        f.write(content)
+
+    return output_path
+
+
 def read_file(file_path: str) -> bytes:
     """Read the content of a file."""
     with open(file_path, "rb") as file:

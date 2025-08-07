@@ -94,13 +94,13 @@ text: {{ part.text }}
 
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ page.image_upath | image }}
+{{ section.page_image_upath | image }}
 
 The section type for this section is: {{section.section_type.name }}.
 
 {% for image in images %}
 ID of the following image is: {{image.image_id}}.
-{{ image.crop.upath | image }}
+{{ image.upath | image }}
 {% endfor %}
 
 The follow are text for the section to use for web asset generation. You may use it verbatim or modify it as needed.

@@ -3,10 +3,10 @@ import os
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
-from adt_press.data.image import ProcessedImage
+from adt_press.data.plate import PlateImage
 
 
-def replace_images(html_content: str, image_replacements: dict[str, ProcessedImage]) -> str:
+def replace_images(html_content: str, image_replacements: dict[str, PlateImage]) -> str:
     """
     Replace all images with ids that match the keys in image_replacements with their corresponding paths.
     """
@@ -16,8 +16,8 @@ def replace_images(html_content: str, image_replacements: dict[str, ProcessedIma
         if tag.get("data-id") in image_replacements:
             img = image_replacements[tag["data-id"]]
             tag["src"] = f"./images/{img.image_id}.png"
-            tag["alt"] = img.caption.caption
-            tag["aria-label"] = img.caption.caption
+            tag["alt"] = img.caption
+            tag["aria-label"] = img.caption
 
     return str(soup)
 
