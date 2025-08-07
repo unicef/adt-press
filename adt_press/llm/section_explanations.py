@@ -3,11 +3,13 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
+from adt_press.data.pdf import Page
+from adt_press.data.section import PageSection, SectionExplanation
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.image import ProcessedImage
+from adt_press.data.image import ProcessedImage
 from adt_press.utils.languages import LANGUAGE_MAP
-from adt_press.utils.pdf import Page, PageSection, SectionExplanation
+
 
 
 class ExplanationResponse(BaseModel):

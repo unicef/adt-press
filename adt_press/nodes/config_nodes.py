@@ -6,7 +6,7 @@ from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.config import conf_to_object
 from adt_press.utils.file import calculate_file_hash
-from adt_press.utils.web import TemplateConfig
+from adt_press.utils.html import TemplateConfig
 
 
 def config() -> DictConfig:  # pragma: no cover
@@ -36,6 +36,9 @@ def output_dir_config(config: DictConfig) -> str:
 def template_dir_config(config: DictConfig) -> str:
     return str(config["template_dir"])
 
+
+def pdf_title_config(config: DictConfig) -> str:
+    return str(config["pdf_title"])
 
 @cache(behavior="recompute")
 def pdf_hash_config(pdf_path_config: str) -> str:

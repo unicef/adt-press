@@ -5,14 +5,17 @@ import shutil
 import yaml
 from hamilton.function_modifiers import cache
 
+from adt_press.data.pdf import Page
+from adt_press.data.section import PageSection, PageSections
+from adt_press.data.text import OutputText, PageText
+from adt_press.data.web import WebPage
 from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.web_generation import generate_web_page
 from adt_press.utils.file import read_text_file
 from adt_press.utils.html import replace_images, replace_texts
-from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import OutputText, Page, PageSection, PageSections, PageText, WebPage
+from adt_press.data.image import ProcessedImage
 from adt_press.utils.sync import gather_with_limit, run_async_task
-from adt_press.utils.web import TemplateConfig, render_template
+from adt_press.utils.html import TemplateConfig, render_template
 
 
 @cache(behavior="recompute")
@@ -79,7 +82,7 @@ def web_pages(
 def package_adt_web(
     template_config: TemplateConfig,
     output_dir_config: str,
-    pdf_pages: list[Page],
+    pdf_title_config: str,
     output_language_config: str,
     filtered_sections_by_section_id: dict[str, PageSection],
     processed_images_by_id: dict[str, ProcessedImage],
@@ -156,7 +159,7 @@ def package_adt_web(
     shutil.copytree(assets_dir, os.path.join(adt_dir, "assets"), dirs_exist_ok=True)
 
     # write our config file
-    render_template(template_config, "config.json", {}, output_name="adt/assets/config.json")
+    render_template(template_config, "config.json", dict(languages=[output_language_config], default_language=output_language_config, book_title=pdf_title_config), output_name="adt/assets/config.json")
 
     # copy tailwind in
     tailwind_path = os.path.join("assets", "web", "assets", "tailwind_output.css")

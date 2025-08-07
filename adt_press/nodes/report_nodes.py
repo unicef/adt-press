@@ -1,20 +1,13 @@
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig, OmegaConf
 
+from adt_press.data.image import ProcessedImage, PrunedImage
+from adt_press.data.pdf import Page
+from adt_press.data.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.data.text import OutputText, PageText, PageTexts
 from adt_press.nodes.config_nodes import TemplateConfig
-from adt_press.utils.image import ProcessedImage, PrunedImage
 from adt_press.utils.languages import LANGUAGE_MAP
-from adt_press.utils.pdf import (
-    OutputText,
-    Page,
-    PageSections,
-    PageText,
-    PageTexts,
-    SectionEasyRead,
-    SectionExplanation,
-    SectionGlossary,
-)
-from adt_press.utils.web import render_template
+from adt_press.utils.html import render_template
 
 
 @cache(behavior="recompute")

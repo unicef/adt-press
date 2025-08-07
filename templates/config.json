@@ -1,16 +1,16 @@
 {
-  "title": "Momo and the Leopards",
+  "title": "{{ book_title }}",
   "languages": {
     "available": [
-      "fr"
+      {% for lang in languages %}"{{ lang }}"{% if not loop.last %}, {% endif %}{% endfor %}
     ],
-    "default": "fr"
+    "default": "{{ default_language }}"
   },
   "features": {
     "signLanguage": false,
     "easyRead": false,
     "glossary": false,
-    "eli5": false,
+    "eli5": true,
     "readAloud": false,
     "autoplay": false,
     "describeImages": false,

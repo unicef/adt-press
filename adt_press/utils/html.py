@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 
-from adt_press.utils.image import ProcessedImage
+import os
+
+from pydantic import BaseModel
+
+from adt_press.data.image import ProcessedImage
 
 
 def replace_images(html_content: str, image_replacements: dict[str, ProcessedImage]) -> str:
@@ -31,3 +35,30 @@ def replace_texts(html_content: str, text_replacements: dict[str, str]) -> str:
             tag.string = text_replacements[tag["data-id"]]
 
     return str(soup)
+
+
+
+class TemplateConfig(BaseModel):
+    output_dir: str
+    template_dir: str
+
+
+def basename(text):
+    return os.path.basename(text)
+
+
+# given the passed in dict and template, render using jinja2
+def render_template(config: TemplateConfig, template_path: str, context: dict, output_name=None) -> str:
+    from jinja2 import Environment, FileSystemLoader
+
+    env = Environment(loader=FileSystemLoader(config.template_dir))
+    env.filters["basename"] = basename
+    template = env.get_template(template_path)
+
+    # write the output to a file named after the template
+    output_name = output_name if output_name else template_path
+    output_path = config.output_dir + os.sep + output_name
+    with open(output_path, "w") as f:
+        f.write(template.render(context))
+
+    return str(output_path)
