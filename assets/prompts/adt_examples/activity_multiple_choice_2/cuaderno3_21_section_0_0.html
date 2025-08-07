@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="c3_21_1" name="page-section-id" />
+    <title>Esta es Elena</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-21-1" />
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="bg-gray-100 lg:p-5 md:p-5 sm:p-0 mb-12 font-sans text-lg">
+
+    <!-- The main interface components -->
+
+    <!-- Contains the bottom bar, next back buttons, submit button, right sidebar, ai language, eli5 and tts toggles -->
+    <div id="interface-container"></div>
+
+    <!-- Contains the left nav bar, html page list -->
+    <div id="nav-container"></div>
+
+    <!-- The main content container -->
+    <div class="container interactive content border-t-4 border-blue-700 mx-auto bg-white mt-auto max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6"
+        id="content">
+        <h1 class="text-3xl font-bold text-left mb-4" data-id="text-21-0" tab-index="0">Actividad de Elena</h1>
+
+        <p class="text-lg mb-4 instruction"><i class="fas fa-pen-to-square text-blue-700 mr-2"></i><span
+                data-id="text-21-2">
+                Lee el texto de cada libreta donde se presenta un
+                episodio del cuento.
+            </span><br>
+            Elige el enunciado de la derecha que lo resume mejor.</p>
+
+        <!-- THERE MUST ALWAYS BE A SECTION TAG -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" role="activity"
+            data-section-type="activity_multiple_choice">
+            <div class="notebook bg-stone-200 p-4 border border-gray-300 rounded mb-4">
+                <p data-id="text-21-4">Una niña, llamada Elena, a quien le encantaba jugar carreras, fue llevada por sus
+                    padres a la casa de su abuelo. Ella estaba muy disgustada.</p>
+            </div>
+            <div class="space-y-2">
+                <label class="activity-option flex items-center">
+                    <input type="radio" name="summary" value="summary1"
+                        aria-label="Opción de opción múltiple 1: La llegada de Elena a casa del abuelo"
+                        data-activity-item="item-1" data-id="text-21-5" class="sr-only">
+                    <span
+                        class="w-full button rounded-lg p-4 text-left bg-gray-200 border border-gray-300 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 block">La
+                        llegada de Elena a casa del abuelo..</span>
+                </label>
+                <label class="activity-option flex items-center">
+                    <input type="radio" name="summary" value="summary2"
+                        aria-label="Opción de opción múltiple 2: El viaje de Elena con sus padres"
+                        data-activity-item="item-2" data-id="text-21-6" class="sr-only">
+                    <span
+                        class="w-full button rounded-lg p-4 text-left bg-gray-200 border border-gray-300 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 block">El
+                        viaje de Elena con sus padres.</span>
+                </label>
+                <label class="activity-option flex items-center">
+                    <input type="radio" name="summary" value="summary3"
+                        aria-label="Opción de opción múltiple 3: El disfraz de Elena" data-activity-item="item-3"
+                        data-id="text-21-7" class="sr-only">
+                    <span
+                        class="w-full button rounded-lg p-4 text-left bg-gray-200 border border-gray-300 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 block">El
+                        disfraz de Elena.</span>
+                </label>
+
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>

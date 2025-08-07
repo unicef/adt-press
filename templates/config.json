@@ -1,0 +1,28 @@
+{
+  "title": "Momo and the Leopards",
+  "languages": {
+    "available": [
+      "fr"
+    ],
+    "default": "fr"
+  },
+  "features": {
+    "signLanguage": false,
+    "easyRead": false,
+    "glossary": false,
+    "eli5": false,
+    "readAloud": false,
+    "autoplay": false,
+    "describeImages": false,
+    "notepad": false,
+    "state": true,
+    "characterDisplay": true,
+    "highlight": false
+  },
+  "analytics": {
+    "enabled": false,
+    "siteId": 0,
+    "trackerUrl": "https://unisitetracker.unicef.io/matomo.php",
+    "srcUrl": "https://unisitetracker.unicef.io/matomo.js"
+  }
+}

@@ -13,7 +13,7 @@ def basename(text):
 
 
 # given the passed in dict and template, render using jinja2
-def render_template(config: TemplateConfig, template_path: str, context: dict) -> str:
+def render_template(config: TemplateConfig, template_path: str, context: dict, output_name=None) -> str:
     from jinja2 import Environment, FileSystemLoader
 
     env = Environment(loader=FileSystemLoader(config.template_dir))
@@ -21,7 +21,8 @@ def render_template(config: TemplateConfig, template_path: str, context: dict) -
     template = env.get_template(template_path)
 
     # write the output to a file named after the template
-    output_path = config.output_dir + os.sep + template_path
+    output_name = output_name if output_name else template_path
+    output_path = config.output_dir + os.sep + output_name
     with open(output_path, "w") as f:
         f.write(template.render(context))
 

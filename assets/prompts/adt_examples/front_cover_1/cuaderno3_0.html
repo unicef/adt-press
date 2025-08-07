@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!-- CAN BE EDITED -->
+    <title>Cuaderno Para Leer Y Escribir</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-0-0" />
+    <!-- DO NOT EDIT OR REMOVE the <script> tags -->
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="bg-amber-500 font-sans">
+    <!-- IMPORTANT - DO NOT INSERT interface.html or nav.html on the front-cover  -->
+    <!-- Main Container -->
+    <div class="container max-w-lg p-8 bg-white shadow-lg rounded-lg text-center" data-aria-id="aria-0-0-0"
+        id="content">
+        <section role="article" data-section-type="front_cover"
+            class="max-w-4xl mx-auto bg-amber-500 gap-10 p-6 sm:p-12 flex flex-col sm:flex-row items-center justify-between">
+            <!-- Title Section -->
+            <div class="w-full sm:w-3/5 ">
+                <div class="text-center bg-amber-600 rounded-full p-10">
+                    <h1 class="text-4xl sm:text-5xl font-bold text-white" data-id="text-0-0">Cuaderno para leer y
+                        escribir</h1>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mt-4" data-id="text-0-1">En tercero</h2>
+                    <p class="text-lg text-white mt-2" data-id="text-0-2">Educación Inicial y Primaria </p>
+                </div>
+
+                <div class="bg-white/90 shadow-lg border-2 border-amber-700 rounded-md p-5 mt-9">
+                    <label for="language" class="block text-gray-700 font-medium mb-2"
+                        data-id="language-toggle">Selecciona un lenguaje:</label>
+                    <select id="language-dropdown" data-id="language-dropdown"
+                        class="block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-5">
+                        <option value="es">Español</option>
+                        <option value="en">Inglés</option>
+                    </select>
+                    <div class="md:flex justify-between">
+                        <label for="toggleReadAloud" class="flex items-center cursor-pointer mb-4 md:mb-0">
+                            <!-- Toggle -->
+                            <div class="relative">
+                                <!-- Input -->
+                                <input type="checkbox" id="toggleReadAloud" class="sr-only">
+                                <!-- Slider -->
+                                <div class="block bg-gray-400 w-12 h-7 rounded-full transition"></div>
+                                <!-- Circle -->
+                                <div
+                                    class="dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition transform">
+                                </div>
+                            </div>
+                            <!-- Label -->
+                            <div class="ml-3 text-gray-700 font-medium" data-id="activate-readaloud">
+                                Activar Read-Aloud
+                            </div>
+                        </label>
+                        <label for="toggleReadAloud" class="flex items-center cursor-pointer">
+                            <!-- Toggle -->
+                            <div class="relative">
+                                <!-- Input -->
+                                <input type="checkbox" id="toggleReadAloud" class="sr-only">
+                                <!-- Slider -->
+                                <div class="block bg-gray-400 w-12 h-7 rounded-full transition"></div>
+                                <!-- Circle -->
+                                <div
+                                    class="dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition transform">
+                                </div>
+                            </div>
+                            <!-- Label -->
+                            <div class="ml-3 text-gray-700 font-medium" data-id="activate-explainme">
+                                Activar ExplainMe
+                            </div>
+                        </label>
+                    </div>
+                    <div class="mt-4 pt-4 flex justify-center border-t-2">
+                        <button
+                            class="text-xl shadow-md rounded-full bg-amber-600 hover:bg-amber-800 transition text-white font-medium mx-auto px-4 py-2"
+                            data-id="start-button">Ingresar</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Character Image -->
+            <div class="w-full sm:w-2/5 mb-8 sm:mb-0">
+                <img data-id="img-0-0" src="images/img-0-0.png" alt="Personaje de ciervo con bufanda"
+                    aria-label="Personaje de ciervo con bufanda" class="mx-auto transform -scale-x-100">
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer Logos -->
+    <div
+        class="fixed bottom-0 left-0 w-full mt-8 flex flex-col sm:flex-row justify-center text-center items-center p-5 gap-6  sm:px-12 bg-white  border-t-4 border-amber-600">
+        <img src="images/logo_anep.png" alt="Logo ANEP" class="h-8" data-id="img-0-1">
+        <img src="images/logo_ceibal.png" alt="Logo CEIBAL" class="h-8" data-id="img-0-2">
+        <img src="images/logo_unicef.png" alt="Logo UNICEF" class="h-8" data-id="img-0-3">
+    </div>
+    <style>
+        input:checked+.block {
+            background-color: #d97706;
+            /* Indigo-600 */
+        }
+
+        input:checked+.block+.dot {
+            transform: translateX(1.3rem);
+            /* Move the dot */
+        }
+    </style>
+</body>
+
+</html>

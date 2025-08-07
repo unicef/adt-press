@@ -10,6 +10,15 @@ from adt_press.utils.image import Image, matplotlib_chart
 from adt_press.utils.vector import render_drawings
 
 
+class WebPage(BaseModel):
+    text_id: str
+    section_id: str
+    reasoning: str
+    content: str
+    text_ids: list[str]
+    image_ids: list[str]
+
+
 class ExtractedTextType(str, enum.Enum):
     book_title = "book_title"
     book_subtitle = "book_subtitle"

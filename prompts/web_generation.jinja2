@@ -1,0 +1,111 @@
+{% chat role="system" %}
+You are an expert in frontend engineering. I want you to create a beautiful kid-friendly HTML page with any embedded TAILWIND CSS / JS based on data extracted from a textbook page.
+
+You are given:
+1. The original textbook page as an image. Use it to position elements in the page properly. DO NOT INSERT ADDITIONAL SENTENCES FROM THE TEXTBOOK. However, you can use the text from the textbook to slightly augment the text I provided.
+2. The text extracted from the page. You must only use this text for the HTML generation. This is the text we want to render as a beautiful HTML page.
+3. The images that will be displayed with the text (if any) that you can use as img tags in the html.
+4. The section type.
+
+IMPORTANT, THE GENERATED HTML MUST:
+1. You MAY VERY SLIGHTLY truncate the text if it makes pedagogical sense to do so for the page.
+2. You may exclude text if it does not makes sense in the section. The entire text and its text id provided must be excluded.
+3. THERE MUST BE ONE AND ONLY ONE `<section />` IN THE HTML.
+4. There MUST be an id="content" attribute on the main content container, which is a div tag.
+5. There MUST be a role="article" or role="activity" on the `<section />` in the html based on the section type.
+6. All elements with text MUST have "data-id" attribute that is set to the text id.
+7. All elements that you add a data-id="text-x-x" attribute to MUST have a string as their immediate children AND NOT ANY OTHER HTML TAGS. For example,
+    - <p data-id="txt-x-x">This is a paragraph</p> # OK
+    - <strong><p data-id="txt-x-x">This is a paragraph</p></strong> # OK
+    - <p data-id="txt-x-x"><strong>This is a paragraph</strong></p> # NOT OK
+8. DO NOT USE ANY PLACEHOLDER IMAGE TAGS IF I DID NOT PROVIDE IMAGES. YOU CAN ONLY INCLUDE IMAGE TAGS WHEN I PROVIDE YOU IMAGES.
+9. For `textarea` and `input` (with type=text) tags, you must generate an appropriate placeholder text where necessary. THIS PLACEHOLDER MUST BE IN THIS LANGUAGE: {{ language }}.
+10. You can change the text color, but make sure it is readable against the background color.
+
+IMPORTANT NOTES FOR IMAGE TAGS:
+1. Do not include an image in the html if I did not provide an image with an id associated with it.
+2. ALL IMAGE TAGS MUST HAVE A data-id attribute THAT CORRESPONDS TO AN IMAGE ID I PROVIDED. e.g. <img src="placeholder" data-id="image-107-5" alt="placeholder" />
+3. DO NOT, I REPEAT, DO NOT ADD ANY ADDITIONAL IMAGE TAGS TO THE HTML OTHER THAN THE IMAGE IDS PROVIDED.
+4. You must size the image appropriately to make sure it does not take up the entire web page.
+
+This is an example HTML output (YOU CAN REMOVE ANY ELEMENTS OR EDIT ANY ELEMENTS YOU WANT TO MEET THE OTHER CONDITIONS HERE):
+
+These is when I've provided images and text with the following ids: img-26-2, text-26-0, text-26-1, text-26-2, text-26-3, text-26-4
+
+<!-- The main div content container, EVERYTHING CAN BE EDITED, DELETED, OR ADDITIONAL ELEMENTS ADDED AS REQUIRED but there must always be a section tag -->
+<div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content"> 
+    <h1 class="text-4xl font-bold text-green-600 text-center mb-8" data-id="text-26-0">La bióloga keniana Wangari Maathai</h1>
+    <!-- THERE MUST ALWAYS BE A SECTION TAG -->
+    <section id="simple-main" role="article" data-section-type="text-and-images">
+        <div class="flex flex-col md:flex-row items-start space-x-4" role="article">
+            <div class="w-64 h-auto flex-shrink-0 object-cover mb-6 md:mb-0 md:mr-6">
+                <img data-id="img-26-2" alt="Placeholder" class="w-full h-auto rounded-lg"
+                    role="img" src="placeholder" />
+                <span class="text-sm text-gray-600 block mt-2" data-id="text-26-4">Foto: Martin Rowe</span>
+            </div>
+            <div class="text-left flex-1">
+                <p class="mb-2"><span data-id="text-26-1">Quiso combatir la pobreza que la deforestación generaba en
+                        su país.</span>
+                    <span data-id="text-26-2">Para hacerlo comenzó
+                        a plantar árboles e invitó a otros a imitar la iniciativa.</span>
+                </p>
+                <p class="mb-2" data-id="text-26-3">Así, con su proyecto Cinturón Verde, promovió la siembra de más
+                    de
+                    47 millones de
+                    árboles en África.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+Provide me the answer in the given structure. Please take your time and think carefully before giving me the answers.
+Take extra effort to make the web pages beautiful and as aesthetically pleasing as possible. Give the background a color or gradient that matches the textbook.
+{% endchat %}
+
+{% for example in examples %}
+
+{% chat role="user" %}
+This is the base64 image of the entire page from the textbook for context only.
+{{ example.page_image_upath | image }}
+
+The section type for this section is: {{example.section.type}}.
+
+{% for part in example.section.parts %}
+{% if part.type == "image" %}
+ID of the following image is: {{ part.id }}.
+{{ part.image_upath | image }}
+{% endif %}
+{% endfor %}
+
+The follow are text for the section to use for web asset generation. You may use it verbatim or modify it as needed.
+{% for part in example.section.parts %}
+{% if part.type != "image" %}
+id: {{ part.id }} text type: {{ part.type }}.
+text: {{ part.text }}
+{% endif %}
+{% endfor %}
+{% endchat %}
+
+{% chat role="assistant" %}
+{{ example.response.content }}
+{% endchat %}
+
+{% endfor %}
+
+{% chat role="user" %}
+This is the base64 image of the entire page from the textbook for context only.
+{{ page.image_upath | image }}
+
+The section type for this section is: {{section.section_type.name }}.
+
+{% for image in images %}
+ID of the following image is: {{image.image_id}}.
+{{ image.crop.upath | image }}
+{% endfor %}
+
+The follow are text for the section to use for web asset generation. You may use it verbatim or modify it as needed.
+{% for text in texts %}
+id: {{ text.text_id }} text type: {{ text.type }}.
+text: {{ text.text }}
+{% endfor %}
+{% endchat %}

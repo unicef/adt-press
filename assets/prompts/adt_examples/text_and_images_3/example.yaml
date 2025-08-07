@@ -1,0 +1,46 @@
+name: text_and_images_3
+page_image_path: cuaderno3_34.png
+section:
+  type: text_and_images
+  parts:
+    - id: text-34-0
+      type: section_heading
+      text: La Sopa de Piedras
+    - id: text-34-1
+      type: section_text
+      text: |
+        Pedro Malasartes era un caminante pícaro y muy astuto. Un día se puso a escuchar una conversación entre varios hombres que estaban sentados en la plaza del pueblo. Hablaban de una campesina avara que vivía en una chacra cerca del río. Cada uno contaba una historia peor que otra.
+    - id: text-34-2
+      type: section_text
+      text: |
+        —La anciana es una tacaña. No da comida ni para los perros que cuidan su casa —contaba uno.
+    - id: text-34-3
+      type: section_text
+      text: |
+        —Cuando llega alguien a almorzar, cuenta los porotos antes de ponerlos en el plato —decía otro.
+    - id: text-34-4
+      type: section_text
+      text: |
+        Pedro Malasartes escuchaba y pensaba. Entonces entró a la ronda de conversación:
+    - id: text-34-5
+      type: section_text
+      text: |
+        —¿Quieren apostar a que ella me dará un montón de cosas y con muchas ganas?
+    - id: text-34-6
+      type: section_text
+      text: |
+        —¡Estás loco! —dijeron todos—. ¡Aquella avara no da ni una sonrisa!
+    - id: text-34-7
+      type: section_text
+      text: |
+        —Bueno, apuesto que a mí sí me va a dar —insistió Pedro—. ¿Cuánto quieren apostar?
+    - id: text-34-8
+      type: section_text
+      text: |
+        El grupo apostó mucho, porque la conocía muy bien.
+    - id: c3_34_0
+      type: image
+      image_path: c3_34_0.png
+
+response:
+  html_path: cuaderno3_34_section_0.html

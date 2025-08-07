@@ -4,7 +4,16 @@ from omegaconf import DictConfig, OmegaConf
 from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.image import ProcessedImage, PrunedImage
 from adt_press.utils.languages import LANGUAGE_MAP
-from adt_press.utils.pdf import OutputText, Page, PageSections, PageText, PageTexts, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.utils.pdf import (
+    OutputText,
+    Page,
+    PageSections,
+    PageText,
+    PageTexts,
+    SectionEasyRead,
+    SectionExplanation,
+    SectionGlossary,
+)
 from adt_press.utils.web import render_template
 
 
@@ -62,6 +71,21 @@ def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
 
 @cache(behavior="recompute")
 def report_index(
-    template_config: TemplateConfig, report_processed_images: str, report_pruned_images: str, report_pages: str, report_config: str
+    template_config: TemplateConfig,
+    report_processed_images: str,
+    report_pruned_images: str,
+    report_pages: str,
+    report_config: str,
+    package_adt_web: str,
 ) -> str:
-    return render_template(template_config, "index.html", dict())
+    return render_template(
+        template_config,
+        "index.html",
+        dict(
+            report_processed_images=report_processed_images,
+            report_pruned_images=report_pruned_images,
+            report_pages=report_pages,
+            report_config=report_config,
+            package_adt_web=package_adt_web,
+        ),
+    )

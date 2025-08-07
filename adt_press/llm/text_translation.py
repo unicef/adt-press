@@ -4,7 +4,7 @@ from litellm import acompletion
 from pydantic import BaseModel
 
 from adt_press.llm.prompt import PromptConfig
-from adt_press.utils.file import cached_read_template
+from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 from adt_press.utils.pdf import OutputText, PageText
 
@@ -25,7 +25,7 @@ async def get_text_translation(config: PromptConfig, text: PageText, base_langua
         examples=config.examples,
     )
 
-    prompt = Prompt(cached_read_template(config.template_path))
+    prompt = Prompt(cached_read_text_file(config.template_path))
     client = instructor.from_litellm(acompletion)
     response: TranslationResponse = await client.chat.completions.create(
         model=config.model,

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!-- CAN BE EDITED -->
+    <title>#Living Uruguay1</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-0-0" />
+    <!-- DO NOT EDIT OR REMOVE the <script> tags -->
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="bg-rose-400 font-sans">
+    <!-- IMPORTANT - DO NOT INSERT interface.html or nav.html on the front-cover  -->
+    <!-- Main Container -->
+    <main>
+        <section role="article" data-section-type="front_cover"
+            class="max-w-4xl mx-auto bg-rose-400 gap-10 p-6 sm:p-12 flex flex-col sm:flex-row items-center justify-between">
+            <!-- Title Section -->
+            <div class="w-full sm:w-3/5 ">
+                <div class="text-center bg-rose-600 rounded-full p-10">
+                    <h1 class="text-4xl sm:text-5xl font-bold text-white" data-id="text-0-0">#Living Uruguay1</h1>
+                    <h2 class="text-3xl sm:text-xl font-bold text-white mt-4" data-id="text-0-1">1st Grade English Book
+                    </h2>
+                </div>
+
+                <div class="bg-white/90 shadow-lg border-2 border-rose-700 rounded-md p-5 mt-9">
+                    <label for="language" class="block text-gray-700 font-medium mb-2">Selecciona un lenguaje:</label>
+                    <select id="language-dropdown" data-id="language-dropdown"
+                        class="block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-5">
+                        <option value="es">Español</option>
+                        <option value="en">Inglés</option>
+                    </select>
+                    <div class="md:flex justify-between">
+                        <label for="toggleEasy" class="flex items-center cursor-pointer mb-4 md:mb-0">
+                            <!-- Toggle -->
+                            <div class="relative">
+                                <!-- Input -->
+                                <input type="checkbox" id="toggleEasy" class="sr-only">
+                                <!-- Slider -->
+                                <div class="block bg-gray-400 w-12 h-7 rounded-full transition"></div>
+                                <!-- Circle -->
+                                <div
+                                    class="dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition transform">
+                                </div>
+                            </div>
+                            <!-- Label -->
+                            <div class="ml-3 text-gray-700 font-medium" data-id="activate-readaloud">
+                                Activar Read-aloud
+                            </div>
+                        </label>
+                        <label for="toggleExplain" class="flex items-center cursor-pointer">
+                            <!-- Toggle -->
+                            <div class="relative">
+                                <!-- Input -->
+                                <input type="checkbox" id="toggleExplain" class="sr-only">
+                                <!-- Slider -->
+                                <div class="block bg-gray-400 w-12 h-7 rounded-full transition"></div>
+                                <!-- Circle -->
+                                <div
+                                    class="dot absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition transform">
+                                </div>
+                            </div>
+                            <!-- Label -->
+                            <div class="ml-3 text-gray-700 font-medium" data-id="activate-explainme">
+                                Activar ExplainMe
+                            </div>
+                        </label>
+                    </div>
+                    <div class="mt-4 pt-4 flex justify-center border-t-2">
+                        <button
+                            class="text-xl shadow-md rounded-full bg-rose-600 hover:bg-rose-800 transition text-white font-medium mx-auto px-4 py-2">Ingresar</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Character Image -->
+            <div class="w-full sm:w-2/5 mb-8 sm:mb-0">
+                <img data-id="img-0-0" src="images/img-0-0.png"
+                    alt="Image featuring a cartoon character on a photo of Uruguay."
+                    aria-label="Illustrated map of Uruguay featuring cartoon characters and photos of various landmarks."
+                    class="mx-auto transform">
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Logos -->
+    <div
+        class="fixed bottom-0 left-0 w-full mt-8 flex flex-col sm:flex-row justify-center text-center items-center p-5 gap-6  sm:px-12 bg-white  border-t-4 border-rose-600">
+        <img src="images/logo_anep.png" alt="Logo ANEP" class="h-8" data-id="img-0-1">
+        <img src="images/logo_consejo_secundaria.png" alt="Logo Consejo de educación secundaria" class="h-8"
+            data-id="img-0-2">
+        <img src="images/logo_consejo_tecnico.png" alt="Logo consejo de educación técnico profesional" class="h-8"
+            data-id="img-0-3">
+        <img src="images/logo_ceibal.png" alt="Logo CEIBAL" class="h-8" data-id="img-0-4">
+        <img src="images/logo_unicef.png" alt="Logo UNICEF" class="h-8" data-id="img-0-5">
+    </div>
+    <style>
+        input:checked+.block {
+            background-color: #e11d48;
+            /* Indigo-600 */
+        }
+
+        input:checked+.block+.dot {
+            transform: translateX(1.3rem);
+            /* Move the dot */
+        }
+    </style>
+</body>
+
+</html>

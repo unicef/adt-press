@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!-- CAN BE EDITED -->
+    <title>Actividad de clasificación</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-28-0" />
+    <!-- DO NOT EDIT OR REMOVE the <script> tags -->
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta content="27_1" name="page-section-id" />
+</head>
+
+<body class="bg-gray-100 lg:p-5 md:p-5 sm:p-0 mb-12 font-sans text-lg">
+
+    <!-- The main interface components -->
+    <!-- DO NOT EDIT Contains the bottom bar, next back buttons, submit button, right sidebar, ai language, eli5 and tts toggles -->
+    <div id="interface-container"></div>
+
+    <!-- DO NOT EDIT Contains the left nav bar, html page list -->
+    <div id="nav-container"></div>
+
+    <!-- The main content container, EVERYTHING CAN BE EDITED, DELETED, OR ADDITIONAL ELEMENTS ADDED AS REQUIRED but there must always be a section tag -->
+    <div class="container content mx-auto bg-white mt-auto max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6"
+        id="content">
+        <h1 class="text-2xl font-bold text-left mb-4" data-id="text-28-2">Fuentes de luz</h1>
+
+        <!-- THERE MUST ALWAYS BE A SECTION TAG -->
+        <section id="light-sources" aria-labelledby="light-sources-heading" role="activity"
+            data-section-type="activity_sorting">
+            <div>
+                <p class="text-xl font-bold mb-4" data-id="text-28-0">Relee el artículo «La luz y la sombra».</p>
+                <p class="mb-4"><i class="fas fa-pen-to-square text-blue-700 mr-2"></i><span
+                        data-id="text-28-1">Completa el cuadro con las palabras de la lista.</span></p>
+                <div class="flex flex-wrap gap-2 justify-center mb-4">
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-5"
+                        data-activity-item="item-1" draggable="true">sol</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-6"
+                        data-activity-item="item-2" draggable="true">estrellas</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-7"
+                        data-activity-item="item-3" draggable="true">vela</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-8"
+                        data-activity-item="item-4" draggable="true">linterna</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-9"
+                        data-activity-item="item-5" draggable="true">fuego</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-10"
+                        data-activity-item="item-6" draggable="true">luciérnagas</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-11"
+                        data-activity-item="item-7" draggable="true">rayos</div>
+                    <div class="bg-yellow-100 p-2 m-1 rounded word-card border-2" data-id="text-28-12"
+                        data-activity-item="item-8" draggable="true">lámpara eléctrica</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="category p-4 border border-gray-300 rounded min-h-52" id="natural"
+                    data-activity-category="natural-category" aria-labelledby="natural-category-label">
+                    <h3 class="text-lg font-bold mb-2" id="natural-category-label" data-id="text-28-3">Natural</h3>
+                    <ul class="flex flex-wrap gap-2 word-list"></ul>
+                </div>
+                <div class="category p-4 border border-gray-300 rounded min-h-52" id="artificial"
+                    data-activity-category="artificial-category" aria-labelledby="artificial-category-label">
+                    <h3 class="text-lg font-bold mb-2" id="artificial-category-label" data-id="text-28-4">Artificial
+                    </h3>
+                    <ul class="flex flex-wrap gap-2 word-list"></ul>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <!-- <button class="bg-red-500 text-white p-2 rounded m-2" onclick="resetActivity()" aria-label="Retry sorting words">Retry</button>-->
+            </div>
+            <div class="mt-4 text-center">
+                <p id="feedback" role="button" class="text-lg" aria-live="polite" data-id="afitb_0_0"></p>
+            </div>
+        </section>
+        </main>
+</body>
+
+</html>

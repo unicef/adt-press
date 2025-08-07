@@ -29,11 +29,15 @@ def cached_read_file(file_path: str) -> bytes:
     return read_file(file_path)
 
 
-@cache
-def cached_read_template(file_path: str) -> str:
-    """Read the content of a file, caching the result."""
+def read_text_file(file_path: str) -> str:
+    """Read the content of a text file."""
     with open(file_path, "r") as file:
         return str(file.read())
+
+
+@cache
+def cached_read_text_file(file_path: str) -> str:
+    return read_text_file(file_path)
 
 
 def calculate_file_hash(file_path: str) -> str:
