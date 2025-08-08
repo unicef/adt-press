@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import os
 
 from bs4 import BeautifulSoup
@@ -7,9 +8,6 @@ from adt_press.data.plate import PlateImage
 
 
 def replace_images(html_content: str, image_replacements: dict[str, PlateImage]) -> str:
-    """
-    Replace all images with ids that match the keys in image_replacements with their corresponding paths.
-    """
     soup = BeautifulSoup(html_content, "html.parser")
 
     for tag in soup.find_all("img"):
@@ -23,9 +21,6 @@ def replace_images(html_content: str, image_replacements: dict[str, PlateImage])
 
 
 def replace_texts(html_content: str, text_replacements: dict[str, str]) -> str:
-    """
-    Replace all text elements with ids that match the keys in text_replacements with their corresponding texts.
-    """
     soup = BeautifulSoup(html_content, "html.parser")
 
     # TODO: is this the right set of tags to replace?

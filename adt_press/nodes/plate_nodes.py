@@ -58,8 +58,8 @@ def generated_plate(
         title=pdf_title_config,
         language_code=plate_language_config,
         sections=plate_sections,
-        images=images.values(),
-        texts=texts.values(),
+        images=list(images.values()),
+        texts=list(texts.values()),
     )
 
 

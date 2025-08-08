@@ -32,6 +32,7 @@ dependencies = [
     "sf-hamilton-sdk>=0.8.0",
     "sf-hamilton-ui>=0.0.17",
     "structlog>=25.4.0",
+    "types-pyyaml>=6.0.12.20250516",
     "universal-pathlib>=0.2.6",
 ]
 
