@@ -63,9 +63,10 @@ def generated_plate(
     )
 
 
-def plate_path(output_dir_config: str, generated_plate: Plate) -> str:
+def plate_path(output_dir_config: str, generated_plate: Plate, custom_plate_path_config: str) -> str:
     plate_json = generated_plate.model_dump_json(indent=2)
-    return write_text_file(f"{output_dir_config}/plate.json", plate_json)
+    path = write_text_file(f"{output_dir_config}/plate.json", plate_json)
+    return path if not custom_plate_path_config else custom_plate_path_config
 
 
 @cache(behavior="recompute")

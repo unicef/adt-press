@@ -10,6 +10,8 @@ output_dir: "output"
 clear_cache: false
 print_available_models: false
 
+custom_plate_path: ""
+
 page_range:
   start: 0
   end: 0

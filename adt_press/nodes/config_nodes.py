@@ -21,6 +21,10 @@ def pdf_path_config(config: DictConfig) -> str:
     return str(config["pdf_path"])
 
 
+def custom_plate_path_config(config: DictConfig) -> str:
+    return str(config.get("custom_plate_path", ""))
+
+
 def input_language_config(config: DictConfig) -> str:
     return str(config.get("input_language", "en"))
 
