@@ -82,7 +82,7 @@ class PipelineTest(unittest.TestCase):
             self.assertFileContains("page_report.html", "French", "Output language not found in page report")
             self.assertFileContains("page_report.html", "English", "Input language not found in page report")
             self.assertFileContains("page_report.html", "léopard", "Translated text not found in page report")
-            self.assertFileContains("page_report.html", "🐒", "No monkey glossary item found in report")
+            self.assertFileContains("page_report.html", "Glossary", "No glossary section found in report")
             self.assertFileContains("page_report.html", "Easy Read", "No easy read section found in report")
 
     def test_pipeline_integration_no_translation(self):
