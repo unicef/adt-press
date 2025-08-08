@@ -94,10 +94,10 @@ def package_adt_web(
     default_language = list(plate_translations.keys())[0]
 
     adt_dir = os.path.join(output_dir_config, "adt")
-    
+
     # clear the output adt directory
     if os.path.exists(adt_dir):
-        shutil.rmtree(adt_dir) # pragma: no cover
+        shutil.rmtree(adt_dir)  # pragma: no cover
 
     os.makedirs(adt_dir)
 
