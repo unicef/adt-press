@@ -8,7 +8,7 @@
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
-The [sample report](https://unicef.github.io/adt-press/) can help in better understanding the process and outputs.
+The [sample report](https://unicef.github.io/adt-press/) can help in better understanding the process and outputs or you can view the final [ADT (Accessible Digital Textbook)](https://unicef.github.io/adt-press/adt/sec_p1_s0.html).
 
 ## Features
 
