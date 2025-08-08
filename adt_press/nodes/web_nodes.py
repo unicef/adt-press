@@ -5,7 +5,6 @@ import shutil
 import yaml
 from hamilton.function_modifiers import cache
 
-from adt_press.data.pdf import Page
 from adt_press.data.plate import Plate, PlateImage, PlateText
 from adt_press.data.web import WebPage
 from adt_press.llm.prompt import PromptConfig
@@ -43,7 +42,6 @@ def web_generation_examples(web_generation_examples_config: list[str]) -> list[d
 
 def web_pages(
     plate_language_config: str,
-    pdf_pages: list[Page],
     plate: Plate,
     web_generation_prompt_config: PromptConfig,
     web_generation_examples: list[dict],
@@ -69,7 +67,18 @@ def web_pages(
 
         return await gather_with_limit(web_pages, web_generation_prompt_config.rate_limit)
 
-    return run_async_task(generate_pages)
+    pages = run_async_task(generate_pages)
+
+    image_urls = {
+        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption=img.caption)
+        for img in plate.images
+    }
+
+    # for each page, remap images
+    for page in pages:
+        page.content = replace_images(page.content, image_urls)
+
+    return pages
 
 
 @cache(behavior="recompute")
@@ -109,7 +118,7 @@ def package_adt_web(
         images = {}
         for image_id in webpage.image_ids:
             image = plate_images[image_id]
-            images[image_id] = image
+            images[image_id] = PlateImage(image_id=image.image_id, upath=f"images/{image_id}.png", caption=image.caption)
             shutil.copy(image.upath, os.path.join(image_dir, f"{image_id}.png"))
 
         # build our map of texts

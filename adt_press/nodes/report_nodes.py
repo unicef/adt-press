@@ -6,6 +6,7 @@ from adt_press.data.pdf import Page
 from adt_press.data.plate import Plate
 from adt_press.data.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
 from adt_press.data.text import OutputText, PageText, PageTexts
+from adt_press.data.web import WebPage
 from adt_press.nodes.config_nodes import TemplateConfig
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -87,6 +88,20 @@ def translation_report(
 
 
 @cache(behavior="recompute")
+def web_report(
+    template_config: TemplateConfig,
+    web_pages: list[WebPage],
+) -> str:
+    return render_template(
+        template_config,
+        "web_report.html",
+        dict(
+            web_pages=web_pages,
+        ),
+    )
+
+
+@cache(behavior="recompute")
 def report_index(
     template_config: TemplateConfig,
     report_processed_images: str,
@@ -95,6 +110,7 @@ def report_index(
     report_config: str,
     package_adt_web: str,
     plate_report: str,
+    web_report: str,
     translation_report: str,
 ) -> str:
     return render_template(
