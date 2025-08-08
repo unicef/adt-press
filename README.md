@@ -26,10 +26,10 @@
 | adt\_press/llm/text\_translation.py     |       19 |        0 |    100% |           |
 | adt\_press/llm/web\_generation.py       |       20 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py        |        0 |        0 |    100% |           |
-| adt\_press/nodes/config\_nodes.py       |       80 |        0 |    100% |           |
+| adt\_press/nodes/config\_nodes.py       |       82 |        0 |    100% |           |
 | adt\_press/nodes/image\_nodes.py        |       95 |        0 |    100% |           |
 | adt\_press/nodes/pdf\_nodes.py          |       49 |        0 |    100% |           |
-| adt\_press/nodes/plate\_nodes.py        |       56 |        0 |    100% |           |
+| adt\_press/nodes/plate\_nodes.py        |       57 |        0 |    100% |           |
 | adt\_press/nodes/report\_nodes.py       |       39 |        0 |    100% |           |
 | adt\_press/nodes/section\_nodes.py      |       72 |        1 |     99% |        42 |
 | adt\_press/nodes/web\_nodes.py          |       94 |        1 |     99% |        99 |
@@ -44,7 +44,7 @@
 | adt\_press/utils/vector.py              |       14 |        0 |    100% |           |
 | tests/test\_parameter\_validation.py    |       30 |        0 |    100% |           |
 | tests/test\_pipeline.py                 |       68 |        0 |    100% |           |
-|                               **TOTAL** | **1210** |    **2** | **99%** |           |
+|                               **TOTAL** | **1213** |    **2** | **99%** |           |
 
 
 ## Setup coverage badge
