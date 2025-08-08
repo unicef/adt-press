@@ -72,6 +72,21 @@ def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
 
 
 @cache(behavior="recompute")
+def translation_report(
+    template_config: TemplateConfig, output_languages_config: list[str], plate: Plate, plate_translations: dict[str, dict[str, str]]
+) -> str:
+    return render_template(
+        template_config,
+        "translation_report.html",
+        dict(
+            plate=plate,
+            output_languages=output_languages_config,
+            translations=plate_translations,
+        ),
+    )
+
+
+@cache(behavior="recompute")
 def report_index(
     template_config: TemplateConfig,
     report_processed_images: str,
@@ -80,6 +95,7 @@ def report_index(
     report_config: str,
     package_adt_web: str,
     plate_report: str,
+    translation_report: str,
 ) -> str:
     return render_template(
         template_config,

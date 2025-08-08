@@ -94,8 +94,11 @@ def plate_translations(
     async def translate_texts():
         tasks = []
         for output_language in output_languages_config:
-            plate_translations[output_language] = {}
+            if output_language == plate_language_config:
+                plate_translations[output_language] = {t.text_id: t.text for t in plate_texts}
+                continue
 
+            plate_translations[output_language] = {}
             for text in plate_texts:
                 tasks.append(
                     get_text_translation(
