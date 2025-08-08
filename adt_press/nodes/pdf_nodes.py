@@ -1,11 +1,11 @@
 import os
 
-from adt_press.data.image import Image
-from adt_press.data.pdf import Page
-from adt_press.data.text import OutputText, PageText, PageTexts
-from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.llm.text_translation import get_text_translation
+from adt_press.models.config import PromptConfig
+from adt_press.models.image import Image
+from adt_press.models.pdf import Page
+from adt_press.models.text import OutputText, PageText, PageTexts
 from adt_press.nodes.config_nodes import PageRangeConfig
 from adt_press.utils.pdf import pages_for_pdf
 from adt_press.utils.sync import gather_with_limit, run_async_task

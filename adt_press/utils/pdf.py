@@ -3,8 +3,8 @@ import os
 import fitz  # PyMuPDF
 from fsspec import open
 
-from adt_press.data.image import Image
-from adt_press.data.pdf import Page
+from adt_press.models.image import Image
+from adt_press.models.pdf import Page
 from adt_press.utils.file import write_file
 from adt_press.utils.image import matplotlib_chart
 from adt_press.utils.vector import render_drawings

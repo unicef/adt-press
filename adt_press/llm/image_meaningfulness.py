@@ -3,11 +3,10 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
-from adt_press.data.image import Image, ImageMeaningfulness
-from adt_press.data.pdf import Page
+from adt_press.models.config import PromptConfig
+from adt_press.models.image import Image, ImageMeaningfulness
+from adt_press.models.pdf import Page
 from adt_press.utils.file import cached_read_text_file
-
-from .prompt import PromptConfig
 
 
 class MeaningfulnessResponse(BaseModel):

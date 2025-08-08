@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from adt_press.data.image import Image
+from adt_press.models.image import Image
 
 
 class Page(BaseModel):

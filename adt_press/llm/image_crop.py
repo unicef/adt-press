@@ -1,28 +1,13 @@
-from typing import Self
-
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel
 
-from adt_press.data.image import CropCoordinates, Image
-from adt_press.data.pdf import Page
-from adt_press.utils.file import cached_read_file, cached_read_text_file, calculate_file_hash, write_file
+from adt_press.models.config import CropPromptConfig
+from adt_press.models.image import CropCoordinates, Image
+from adt_press.models.pdf import Page
+from adt_press.utils.file import cached_read_file, cached_read_text_file, write_file
 from adt_press.utils.image import visualize_crop_extents
-
-from .prompt import PromptConfig
-
-
-class CropPromptConfig(PromptConfig):
-    recrop_template_path: str | None = None
-    recrop_template_hash: str | None = Field(default=None, exclude=True)
-    recrops: int = 0
-
-    @model_validator(mode="after")
-    def set_recrop_template_hash(self) -> Self:
-        if self.recrop_template_path:
-            self.recrop_template_hash = calculate_file_hash(self.recrop_template_path)
-        return self
 
 
 class CropResponse(BaseModel):

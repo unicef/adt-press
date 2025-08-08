@@ -1,8 +1,8 @@
-from adt_press.data.image import Image, ImageCaption, ImageCrop, ImageFilterFailure, ImageMeaningfulness, ProcessedImage, PrunedImage
 from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import CropPromptConfig, get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
-from adt_press.llm.prompt import PromptConfig
+from adt_press.models.config import PromptConfig
+from adt_press.models.image import Image, ImageCaption, ImageCrop, ImageFilterFailure, ImageMeaningfulness, ProcessedImage, PrunedImage
 from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
 from adt_press.utils.file import write_file
 from adt_press.utils.image import crop_image, image_bytes, is_blank_image

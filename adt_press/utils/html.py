@@ -2,9 +2,9 @@
 import os
 
 from bs4 import BeautifulSoup
-from pydantic import BaseModel
 
-from adt_press.data.plate import PlateImage
+from adt_press.models.config import TemplateConfig
+from adt_press.models.plate import PlateImage
 
 
 def replace_images(html_content: str, image_replacements: dict[str, PlateImage]) -> str:
@@ -29,11 +29,6 @@ def replace_texts(html_content: str, text_replacements: dict[str, str]) -> str:
             tag.string = text_replacements[tag["data-id"]]
 
     return str(soup)
-
-
-class TemplateConfig(BaseModel):
-    output_dir: str
-    template_dir: str
 
 
 def basename(text):

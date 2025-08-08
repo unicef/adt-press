@@ -1,13 +1,13 @@
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig, OmegaConf
 
-from adt_press.data.image import ProcessedImage, PrunedImage
-from adt_press.data.pdf import Page
-from adt_press.data.plate import Plate
-from adt_press.data.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
-from adt_press.data.text import OutputText, PageText, PageTexts
-from adt_press.data.web import WebPage
-from adt_press.nodes.config_nodes import TemplateConfig
+from adt_press.models.config import TemplateConfig
+from adt_press.models.image import ProcessedImage, PrunedImage
+from adt_press.models.pdf import Page
+from adt_press.models.plate import Plate
+from adt_press.models.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.models.text import OutputText, PageText, PageTexts
+from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import LANGUAGE_MAP
 

@@ -5,12 +5,12 @@ import shutil
 import yaml
 from hamilton.function_modifiers import cache
 
-from adt_press.data.plate import Plate, PlateImage, PlateText
-from adt_press.data.web import WebPage
-from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.web_generation import generate_web_page
+from adt_press.models.config import PromptConfig, TemplateConfig
+from adt_press.models.plate import Plate, PlateImage, PlateText
+from adt_press.models.web import WebPage
 from adt_press.utils.file import read_text_file
-from adt_press.utils.html import TemplateConfig, render_template, replace_images, replace_texts
+from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
