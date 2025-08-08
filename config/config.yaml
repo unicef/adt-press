@@ -1,6 +1,6 @@
-pdf_path: "assets/momo.pdf"
-input_language: "en"
-output_language: "fr"
+pdf_path: "assets/cuaderno3.pdf"
+input_language: "es"
+output_language: "en"
 
 template_dir: "templates"
 output_dir: "output"
@@ -9,8 +9,8 @@ clear_cache: false
 print_available_models: false
 
 page_range:
-  start: 0
-  end: 0
+  start: 10
+  end: 20
 
 image_filters:
   size:

@@ -24,9 +24,12 @@ def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config
     failures = {}
     for img in pdf_images:
         failed = []
-        if img.width < image_size_filter_config.min_side or img.height < image_size_filter_config.min_side:
+        width_points = img.width_points
+        height_points = img.height_points
+        
+        if width_points < image_size_filter_config.min_side or height_points < image_size_filter_config.min_side:
             failed.append(f"side < {image_size_filter_config.min_side} points")
-        if img.width > image_size_filter_config.max_side or img.height > image_size_filter_config.max_side:
+        if width_points > image_size_filter_config.max_side or height_points > image_size_filter_config.max_side:
             failed.append(f"side > {image_size_filter_config.max_side} points")
 
         if failed:

@@ -6,7 +6,7 @@ from fsspec import open
 from pydantic import BaseModel
 
 from adt_press.utils.file import write_file
-from adt_press.utils.image import Image, matplotlib_chart
+from adt_press.utils.image import Image, matplotlib_chart, extract_vector_groups, create_composite_image, get_group_bbox, get_group_size_points
 from adt_press.utils.vector import render_drawings
 
 
@@ -148,12 +148,24 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         images = []
         image_index = 0
 
-        # extract all raster images
+        # Extract raster images with bbox information
         for img in fitz_page.get_images(full=True):
             pix = fitz.Pixmap(doc, img[0])
             pix_rgb = fitz.Pixmap(fitz.csRGB, pix)
             img_id = f"img_{page_id}_r{image_index}"
             img_bytes = pix_rgb.tobytes(output="png")
+
+            # Try to get the actual bounding box of the image on the page
+            try:
+                img_bbox = fitz_page.get_image_bbox(img[0])
+                width_pt = img_bbox.width
+                height_pt = img_bbox.height
+                bbox_points = (img_bbox.x0, img_bbox.y0, img_bbox.x1, img_bbox.y1)
+            except (ValueError, RuntimeError):
+                # Fallback to pixel-based dimensions if bbox fails
+                width_pt = pix_rgb.width * 72 / 72  # Assuming 72 DPI
+                height_pt = pix_rgb.height * 72 / 72
+                bbox_points = None
 
             # write image out
             image_upath = output_dir + os.sep + f"{img_id}.png"
@@ -162,10 +174,6 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
             # also write out our chart image
             chart_upath = write_file(image_upath, matplotlib_chart(img_bytes), "chart")
 
-            # Convert pixel dimensions to points (assuming standard 72 DPI)
-            width_pt = pix_rgb.width * 72 / 72  # If you know the actual DPI, use it here
-            height_pt = pix_rgb.height * 72 / 72
-
             images.append(
                 Image(
                     image_id=img_id,
@@ -173,33 +181,96 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
                     index=image_index,
                     upath=str(image_upath),
                     chart_upath=str(chart_upath),
-                    width=width_pt,  # Now in points
-                    height=height_pt,  # Now in points
+                    width=width_pt,  # Width in points
+                    height=height_pt,  # Height in points
+                    bbox_points=bbox_points,
                 )
             )
 
             image_index += 1
 
-        # also extract vector drawings
-        drawings = fitz_page.get_drawings()
-        vector_images = render_drawings(drawings, margin_allowance=2, overlap_threshold=400)
-        for img in vector_images:
-            img_id = f"img_{page_id}_v{image_index}"
-            vector_upath = output_dir + os.sep + f"{img_id}.png"
-            image_upath = write_file(vector_upath, img.image)
-            chart_upath = write_file(image_upath, matplotlib_chart(img.image), "chart")
-            images.append(
-                Image(
-                    image_id=img_id,
-                    page_id=page_id,
-                    index=image_index,
-                    upath=str(image_upath),
-                    chart_upath=str(chart_upath),
-                    width=img.width,  # Already in points
-                    height=img.height,  # Already in points
+        # Extract and group vector elements with enhanced grouping
+        try:
+            vector_groups = extract_vector_groups(fitz_page, proximity_threshold=30.0)
+            
+            # Filter groups by size (in points) to avoid processing tiny elements
+            significant_groups = [
+                group for group in vector_groups 
+                if get_group_size_points(group)[0] > 20 and get_group_size_points(group)[1] > 20  # Minimum 20x20 points
+            ]
+            
+            for group in significant_groups:
+                if len(group) > 1:  # Composite image from multiple elements
+                    overall_bbox = get_group_bbox(group)
+                    img_data = create_composite_image(fitz_page, group)
+                    img_id = f"img_{page_id}_v{image_index}"
+                    
+                    image_upath = output_dir + os.sep + f"{img_id}.png"
+                    write_file(image_upath, img_data)
+                    chart_upath = write_file(image_upath, matplotlib_chart(img_data), "chart")
+                    
+                    images.append(
+                        Image(
+                            image_id=img_id,
+                            page_id=page_id,
+                            index=image_index,
+                            upath=str(image_upath),
+                            chart_upath=str(chart_upath),
+                            width=overall_bbox.width,
+                            height=overall_bbox.height,
+                            is_composite=True,
+                            component_count=len(group),
+                            bbox_points=(overall_bbox.x0, overall_bbox.y0, overall_bbox.x1, overall_bbox.y1)
+                        )
+                    )
+                    image_index += 1
+                elif len(group) == 1 and group[0].element_type == 'path':
+                    # Single vector element - use existing vector rendering logic
+                    element = group[0]
+                    img_id = f"img_{page_id}_v{image_index}"
+                    
+                    # Render single drawing using existing logic
+                    vector_images = render_drawings([element.content], margin_allowance=2, overlap_threshold=400)
+                    for img in vector_images:
+                        vector_upath = output_dir + os.sep + f"{img_id}.png"
+                        image_upath = write_file(vector_upath, img.image)
+                        chart_upath = write_file(image_upath, matplotlib_chart(img.image), "chart")
+                        
+                        images.append(
+                            Image(
+                                image_id=img_id,
+                                page_id=page_id,
+                                index=image_index,
+                                upath=str(image_upath),
+                                chart_upath=str(chart_upath),
+                                width=img.width,  # Already in points
+                                height=img.height,  # Already in points
+                                bbox_points=(element.bbox.x0, element.bbox.y0, element.bbox.x1, element.bbox.y1),
+                            )
+                        )
+                    image_index += 1
+        except Exception as e:
+            # Fallback to original vector extraction if new grouping fails
+            print(f"Warning: Enhanced vector grouping failed ({e}), falling back to original method")
+            drawings = fitz_page.get_drawings()
+            vector_images = render_drawings(drawings, margin_allowance=2, overlap_threshold=400)
+            for img in vector_images:
+                img_id = f"img_{page_id}_v{image_index}"
+                vector_upath = output_dir + os.sep + f"{img_id}.png"
+                image_upath = write_file(vector_upath, img.image)
+                chart_upath = write_file(image_upath, matplotlib_chart(img.image), "chart")
+                images.append(
+                    Image(
+                        image_id=img_id,
+                        page_id=page_id,
+                        index=image_index,
+                        upath=str(image_upath),
+                        chart_upath=str(chart_upath),
+                        width=img.width,  # Already in points
+                        height=img.height,  # Already in points
+                    )
                 )
-            )
-            image_index += 1
+                image_index += 1
 
         pages.append(
             Page(
