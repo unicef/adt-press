@@ -67,7 +67,7 @@ def web_pages(
 
         return await gather_with_limit(web_pages, web_generation_prompt_config.rate_limit)
 
-    pages = run_async_task(generate_pages)
+    pages: list[WebPage] = run_async_task(generate_pages)
 
     image_urls = {
         img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption=img.caption)
