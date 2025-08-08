@@ -1,0 +1,30 @@
+name: text_and_images_1
+page_image_path: cuaderno5_26.png
+section:
+  type: text_and_images
+  parts:
+    - id: img-26-2
+      type: image
+      image_path: 26_img-26-2.png
+    - id: text-26-5
+      type: section_heading
+      text: Comprometidos con el medio ambiente
+    - id: text-26-0
+      type: section_heading
+      text: La bióloga keniana Wangari Maathai
+    - id: text-26-1
+      type: image_label
+      text: quiso combatir la pobreza que la deforestación generaba en su país
+    - id: text-26-2
+      type: image_label
+      text: Para hacerlo comenzó a plantar árboles e invitó a otros a imitar la iniciativa.
+    - id: text-26-3
+      type: image_label
+      text: |
+        Así, con su proyecto Cinturón Verde, promovió la siembra de más de 47 millones de árboles en África. En 2004 recibió el premio Nobel de la Paz por su defensa del desarrollo sostenible y del medio ambiente.
+    - id: text-26-4
+      type: image_label
+      text: "Foto: Martin Rowe"
+
+response:
+  html_path: cuaderno5_26.html

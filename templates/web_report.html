@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Generated Web Pages{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    {% for page in web_pages %}
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-4">
+        <!-- Header with Page Number -->
+        <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
+            <h2 class="text-xl font-bold">{{ page.section_id }}</h2>
+        </div>
+
+        <div class="p-4">
+            {{ page.content | safe }}
+        </div>
+
+        <div class="bg-blue-50 p-3 border-t border-blue-200 text-sm text-blue-800 italic">
+            <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+            {{ page.reasoning }}
+            <div class="clear-both"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

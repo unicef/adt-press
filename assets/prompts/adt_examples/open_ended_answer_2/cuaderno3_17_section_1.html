@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="3_17_3" name="page-section-id" />
+    <title>Esta es Elena</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-17-0" />
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="bg-gray-100 lg:p-5 md:p-5 sm:p-0 mb-12 font-sans text-lg">
+
+    <!-- The main interface components -->
+
+    <!-- Contains the bottom bar, next back buttons, submit button, right sidebar, ai language, eli5 and tts toggles -->
+    <div id="interface-container"></div>
+
+    <!-- Contains the left nav bar, html page list -->
+    <div id="nav-container"></div>
+
+    <!-- The main content container -->
+    <div class="container interactive content border-t-4 border-blue-700 mx-auto bg-white mt-auto max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6"
+        id="content">
+        <h1 class="text-3xl font-bold text-left mb-4" data-id="text-17-0" tab-index="0">Esta es Elena.</h1>
+        <!-- THERE MUST ALWAYS BE A SECTION TAG -->
+        <section class="space-y-4" role="activity" data-section-type="activity_open_ended_answer">
+            <p class="mb-4"><i class="fas fa-pen-to-square text-blue-700 mr-2"></i><span data-id="text-17-7">Escribe un
+                    retrato de Elena utilizando la información del esquema y otros datos del cuento.</span></p>
+            <p class="mb-4" data-id="text-17-8">Elena es una niña que vive con su familia.</p>
+            <p><span data-id="text-17-9">Tiene</span>
+                <textarea data-id="text-17-34" class="w-full p-2 border border-gray-300 rounded h-20 resize-none"
+                    placeholder="Descripción de lo que tiene Elena"></textarea>
+            </p>
+            <p><span data-id="text-17-10">Usa</span>
+                <textarea data-id="text-17-35" class="w-full p-2 border border-gray-300 rounded h-20 resize-none"
+                    placeholder="Descripción de lo que usa Elena"></textarea>
+            </p>
+            <p><span data-id="text-17-11">Cuando corre</span>
+                <textarea data-id="text-17-36" class="w-full p-2 border border-gray-300 rounded h-20 resize-none"
+                    placeholder="Descripción de lo que pasa cuando corre Elena"></textarea>
+            </p>
+            <p><span data-id="text-17-12">Le gusta</span>
+                <textarea data-id="text-17-37" class="w-full p-2 border border-gray-300 rounded h-20 resize-none"
+                    placeholder="Descripción de lo que le gusta a Elena"></textarea>
+            </p>
+        </section>
+        </main>
+</body>

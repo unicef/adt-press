@@ -3,10 +3,12 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
+from adt_press.data.image import ProcessedImage
+from adt_press.data.pdf import Page
+from adt_press.data.section import PageSection, PageSections, SectionType
+from adt_press.data.text import PageText
 from adt_press.llm.prompt import PromptConfig
-from adt_press.utils.file import cached_read_template
-from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import Page, PageSection, PageSections, PageText, SectionType
+from adt_press.utils.file import cached_read_text_file
 
 
 class Section(BaseModel):
@@ -28,7 +30,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
         examples=config.examples,
     )
 
-    prompt = Prompt(cached_read_template(config.template_path))
+    prompt = Prompt(cached_read_text_file(config.template_path))
     client = instructor.from_litellm(acompletion)
     response: SectionResponse = await client.chat.completions.create(
         model=config.model,

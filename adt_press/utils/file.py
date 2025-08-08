@@ -17,6 +17,13 @@ def write_file(output_path: str, bs: bytes, suffix: str = "") -> str:
     return output_path
 
 
+def write_text_file(output_path: str, content: str) -> str:
+    with open(output_path, "w") as f:
+        f.write(content)
+
+    return output_path
+
+
 def read_file(file_path: str) -> bytes:
     """Read the content of a file."""
     with open(file_path, "rb") as file:
@@ -29,11 +36,15 @@ def cached_read_file(file_path: str) -> bytes:
     return read_file(file_path)
 
 
-@cache
-def cached_read_template(file_path: str) -> str:
-    """Read the content of a file, caching the result."""
+def read_text_file(file_path: str) -> str:
+    """Read the content of a text file."""
     with open(file_path, "r") as file:
         return str(file.read())
+
+
+@cache
+def cached_read_text_file(file_path: str) -> str:
+    return read_text_file(file_path)
 
 
 def calculate_file_hash(file_path: str) -> str:

@@ -1,21 +1,11 @@
+from adt_press.data.image import Image, ImageCaption, ImageCrop, ImageFilterFailure, ImageMeaningfulness, ProcessedImage, PrunedImage
 from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import CropPromptConfig, get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
 from adt_press.llm.prompt import PromptConfig
 from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
 from adt_press.utils.file import write_file
-from adt_press.utils.image import (
-    Image,
-    ImageCaption,
-    ImageCrop,
-    ImageFilterFailure,
-    ImageMeaningfulness,
-    ProcessedImage,
-    PrunedImage,
-    crop_image,
-    image_bytes,
-    is_blank_image,
-)
+from adt_press.utils.image import crop_image, image_bytes, is_blank_image
 from adt_press.utils.pdf import Page
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
@@ -115,14 +105,14 @@ def filtered_images(pdf_images: list[Image], pruned_image_ids: set[str]) -> list
 
 
 def image_captions(
-    output_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
+    plate_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
 ) -> dict[str, ImageCaption]:
     async def generate_captions():
         captions = []
         for page in pdf_pages:
             for image in page.images:
                 if image.image_id not in pruned_image_ids:
-                    captions.append(get_image_caption(caption_prompt_config, page, image, output_language_config))
+                    captions.append(get_image_caption(caption_prompt_config, page, image, plate_language_config))
 
         return await gather_with_limit(captions, caption_prompt_config.rate_limit)
 

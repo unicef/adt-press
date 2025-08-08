@@ -22,8 +22,8 @@
                         Original
                     </div>
                     <div class="p-3">
-                        <a href="{{ img.upath | basename }}" class="block">
-                            <img src="{{ img.upath | basename }}" class="max-w-full h-auto mx-auto" style="max-width: 300px; max-height: 200px;" alt="Image {{ img.image_id }}">
+                        <a href="./images/{{ img.upath | basename }}" class="block">
+                            <img src="./images/{{ img.upath | basename }}" class="max-w-full h-auto mx-auto" style="max-width: 300px; max-height: 200px;" alt="Image {{ img.image_id }}">
                         </a>
                     </div>
                     <div class="flex border-b border-gray-300 p-2">
@@ -43,8 +43,8 @@
                         Cropped
                     </div>
                     <div class="p-3">
-                        <a href="{{ img.crop.upath | basename }}" class="block">
-                            <img src="{{ img.crop.upath | basename }}" class="max-w-full h-auto mx-auto" style="max-width: 300px; max-height: 200px;" alt="Cropped Image {{ img.image_id }}">
+                        <a href="./images/{{ img.crop.upath | basename }}" class="block">
+                            <img src="./images/{{ img.crop.upath | basename }}" class="max-w-full h-auto mx-auto" style="max-width: 300px; max-height: 200px;" alt="Cropped Image {{ img.image_id }}">
                         </a>
                     </div>
                     <div class="flex border-b border-gray-200 p-2">

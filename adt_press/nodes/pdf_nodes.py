@@ -1,9 +1,13 @@
+import os
+
+from adt_press.data.image import Image
+from adt_press.data.pdf import Page
+from adt_press.data.text import OutputText, PageText, PageTexts
 from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.nodes.config_nodes import PageRangeConfig
-from adt_press.utils.image import Image
-from adt_press.utils.pdf import OutputText, Page, PageText, PageTexts, pages_for_pdf
+from adt_press.utils.pdf import pages_for_pdf
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -35,8 +39,8 @@ def filtered_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str,
                 PageText(
                     text_id=t.text_id,
                     text=t.text,
-                    type=t.type,
-                    is_pruned=t.type in pruned_text_types_config,
+                    text_type=t.text_type,
+                    is_pruned=t.text_type in pruned_text_types_config,
                 )
                 for t in page_texts.texts
             ],
@@ -52,12 +56,12 @@ def output_pdf_texts_by_id(
     text_translation_prompt_config: PromptConfig,
     filtered_pdf_texts: dict[str, PageTexts],
     input_language_config: str,
-    output_language_config: str,
+    plate_language_config: str,
 ) -> dict[str, OutputText]:
     texts_by_id = {}
 
     # noop if input and output languages are the same
-    if input_language_config == output_language_config:
+    if input_language_config == plate_language_config:
         for page_texts in filtered_pdf_texts.values():
             for text in page_texts.texts:
                 texts_by_id[text.text_id] = OutputText(
@@ -75,9 +79,10 @@ def output_pdf_texts_by_id(
                 tasks.append(
                     get_text_translation(
                         text_translation_prompt_config,
-                        text,
+                        text.text_id,
+                        text.text,
                         input_language_config,
-                        output_language_config,
+                        plate_language_config,
                     )
                 )
 
@@ -90,4 +95,5 @@ def output_pdf_texts_by_id(
 
 
 def pdf_pages(output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
-    return pages_for_pdf(output_dir_config, pdf_path_config, page_range_config.start, page_range_config.end)
+    image_dir = os.path.join(output_dir_config, "images")
+    return pages_for_pdf(image_dir, pdf_path_config, page_range_config.start, page_range_config.end)

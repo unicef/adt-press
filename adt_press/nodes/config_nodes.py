@@ -6,7 +6,7 @@ from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.llm.prompt import PromptConfig
 from adt_press.utils.config import conf_to_object
 from adt_press.utils.file import calculate_file_hash
-from adt_press.utils.web import TemplateConfig
+from adt_press.utils.html import TemplateConfig
 
 
 def config() -> DictConfig:  # pragma: no cover
@@ -25,8 +25,12 @@ def input_language_config(config: DictConfig) -> str:
     return str(config.get("input_language", "en"))
 
 
-def output_language_config(config: DictConfig) -> str:
-    return str(config.get("output_language", "en"))
+def plate_language_config(config: DictConfig) -> str:
+    return str(config.get("plate_language", "en"))
+
+
+def output_languages_config(config: DictConfig) -> list[str]:
+    return list[str](config["output_languages"])
 
 
 def output_dir_config(config: DictConfig) -> str:
@@ -35,6 +39,10 @@ def output_dir_config(config: DictConfig) -> str:
 
 def template_dir_config(config: DictConfig) -> str:
     return str(config["template_dir"])
+
+
+def pdf_title_config(config: DictConfig) -> str:
+    return str(config["pdf_title"])
 
 
 @cache(behavior="recompute")
@@ -94,6 +102,16 @@ def section_glossary_prompt_config(config: DictConfig) -> PromptConfig:
 @cache(behavior="recompute")
 def section_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_easy_read"]))
+
+
+@cache(behavior="recompute")
+def web_generation_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(conf_to_object(config["prompts"]["web_generation"]))
+
+
+@cache(behavior="recompute")
+def web_generation_examples_config(config: DictConfig) -> list[str]:
+    return list[str](config.get("web_generation_examples", []))
 
 
 def image_config(config: DictConfig) -> DictConfig:

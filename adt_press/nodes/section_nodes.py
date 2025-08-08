@@ -1,20 +1,12 @@
+from adt_press.data.image import ProcessedImage
+from adt_press.data.pdf import Page
+from adt_press.data.section import PageSection, PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.data.text import OutputText, PageText, PageTexts
 from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.section_easy_read import get_section_easy_read
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
-from adt_press.utils.image import ProcessedImage
-from adt_press.utils.pdf import (
-    OutputText,
-    Page,
-    PageSection,
-    PageSections,
-    PageText,
-    PageTexts,
-    SectionEasyRead,
-    SectionExplanation,
-    SectionGlossary,
-)
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -46,6 +38,10 @@ def sections_by_page_id(
     return page_sections
 
 
+def filtered_sections_by_section_id(filtered_sections_by_page_id: dict[str, PageSections]) -> dict[str, PageSection]:
+    return {s.section_id: s for page_sections in filtered_sections_by_page_id.values() for s in page_sections.sections}
+
+
 def filtered_sections_by_page_id(
     pruned_section_types_config: list[str], sections_by_page_id: dict[str, PageSections]
 ) -> dict[str, PageSections]:
@@ -68,7 +64,7 @@ def filtered_sections_by_page_id(
 
 
 def explanations_by_section_id(
-    output_language_config: str,
+    plate_language_config: str,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     filtered_pdf_texts_by_id: dict[str, PageText],
@@ -90,7 +86,7 @@ def explanations_by_section_id(
                     images.extend([image] if image else [])
 
                 explanations.append(
-                    get_section_explanation(section_explanation_prompt_config, page, section, texts, images, output_language_config)
+                    get_section_explanation(section_explanation_prompt_config, page, section, texts, images, plate_language_config)
                 )
 
         return await gather_with_limit(explanations, section_explanation_prompt_config.rate_limit)
@@ -104,7 +100,7 @@ def explanations_by_section_id(
 
 
 def section_glossaries_by_id(
-    output_language_config: str,
+    plate_language_config: str,
     section_glossary_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
     output_pdf_texts_by_id: dict[str, OutputText],
@@ -114,7 +110,7 @@ def section_glossaries_by_id(
         for page_sections in filtered_sections_by_page_id.values():
             for section in filter(lambda s: not s.is_pruned, page_sections.sections):
                 texts = [output_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
-                tasks.append(get_section_glossary(output_language_config, section_glossary_prompt_config, section, texts))
+                tasks.append(get_section_glossary(plate_language_config, section_glossary_prompt_config, section, texts))
 
         return await gather_with_limit(tasks, section_glossary_prompt_config.rate_limit)
 
@@ -123,7 +119,7 @@ def section_glossaries_by_id(
 
 
 def section_easy_reads_by_id(
-    output_language_config: str,
+    plate_language_config: str,
     section_easy_read_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
     output_pdf_texts_by_id: dict[str, OutputText],
@@ -133,7 +129,7 @@ def section_easy_reads_by_id(
         for page_sections in filtered_sections_by_page_id.values():
             for section in filter(lambda s: not s.is_pruned, page_sections.sections):
                 texts = [output_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
-                tasks.append(get_section_easy_read(output_language_config, section_easy_read_prompt_config, section, texts))
+                tasks.append(get_section_easy_read(plate_language_config, section_easy_read_prompt_config, section, texts))
 
         return await gather_with_limit(tasks, section_easy_read_prompt_config.rate_limit)
 

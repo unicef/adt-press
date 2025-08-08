@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "asynciolimiter>=1.2.0",
     "banks>=2.1.3",
+    "bs4>=0.0.2",
     "fsspec>=2025.5.1",
     "google-genai>=1.25.0",
     "graphviz>=0.21",
@@ -31,6 +32,7 @@ dependencies = [
     "sf-hamilton-sdk>=0.8.0",
     "sf-hamilton-ui>=0.0.17",
     "structlog>=25.4.0",
+    "types-pyyaml>=6.0.12.20250516",
     "universal-pathlib>=0.2.6",
 ]
 

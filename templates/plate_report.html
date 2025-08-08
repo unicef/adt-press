@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Plate: {{ plate.title }} | {{ plate.language_code }}{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    {% for section in plate.sections %}
+    <div class="bg-white rounded border overflow-hidden">
+    <!-- Section Parts -->
+    <div class="grid grid-cols-8">
+        <!-- Header Row -->
+        <div class="col-span-4 bg-blue-700 text-white px-3 py-2 text-sm font-medium">Section</div>
+        <div class="col-span-4 bg-blue-700 text-white px-3 py-2 text-sm text-right">
+            <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_id }}</span>
+            <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_type.replace('ExtractedSectionType.', '') }}</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-8">
+        {% for part_id in section.part_ids %}
+        {% if texts_by_id[part_id] %}
+        <div class="col-span-6 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+            {{ texts_by_id[part_id].text }}
+        </div>
+        {% elif images_by_id[part_id] %}
+        <div class="col-span-1 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+            <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded" alt="Image {{ part_id }}">
+        </div>
+        <div class="col-span-5 px-3 py-2 flex items-center text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100 italic">
+            {{ images_by_id[part_id].caption }}
+        </div>
+        {% endif %}
+        <div class="col-span-2 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ part_id }}</span>
+        </div>            
+        {% endfor %}
+    </div>
+
+
+            <div class="border-t bg-green-50 overflow-hidden">
+                <div class="bg-green-600 text-white px-3 py-2 text-sm font-medium">
+                    Easy Read
+                </div>
+                <div class="p-3">
+                    <div class="text-sm text-gray-800">{{ section.easy_read }}</div>
+                </div>
+            </div>
+
+            <div class="border-t bg-gray-50 overflow-hidden">
+                <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                    Explanation
+                </div>
+                <div class="p-3">
+                    <div class="text-sm text-gray-800">{{ section.explanation }}</div>
+                </div>
+            </div>
+
+        <div class="border-t bg-yellow-50 overflow-hidden">
+            <!-- Glossary Header -->
+            <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">
+                <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ section.glossary|length if section.glossary else 0 }} terms</span>
+                Glossary
+                <div class="clear-both"></div>
+            </div>
+            <!-- Glossary Content -->
+            {% if section.glossary %}
+            <div class="grid grid-cols-1">
+                {% for item in section.glossary %}
+                <div class="bg-white border-b border-gray-100 overflow-hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3">
+                        <!-- Term Column -->
+                        <div class="px-3 py-2">
+                            <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %} {{ emoji }}{% endfor %}</div>
+                            <div class="text-xs text-gray-600 mt-1">
+                                {% for variant in item.variants %}
+                                <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <!-- Definition Column -->
+                        <div class="col-span-2 px-3 py-2">
+                            <div class="text-sm text-gray-800">{{ item.definition }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+{% endblock %}

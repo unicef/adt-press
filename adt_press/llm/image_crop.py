@@ -5,9 +5,10 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel, Field, model_validator
 
-from adt_press.utils.file import cached_read_file, cached_read_template, calculate_file_hash, write_file
-from adt_press.utils.image import CropCoordinates, Image, visualize_crop_extents
-from adt_press.utils.pdf import Page
+from adt_press.data.image import CropCoordinates, Image
+from adt_press.data.pdf import Page
+from adt_press.utils.file import cached_read_file, cached_read_text_file, calculate_file_hash, write_file
+from adt_press.utils.image import visualize_crop_extents
 
 from .prompt import PromptConfig
 
@@ -38,7 +39,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
         examples=config.examples,
     )
 
-    prompt = Prompt(cached_read_template(config.template_path))
+    prompt = Prompt(cached_read_text_file(config.template_path))
     messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
     client = instructor.from_litellm(acompletion)
@@ -51,7 +52,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
 
     # if we have a recrop template
     if config.recrop_template_path:
-        recrop_prompt = Prompt(cached_read_template(config.recrop_template_path))
+        recrop_prompt = Prompt(cached_read_text_file(config.recrop_template_path))
         recrop = 0
 
         # and we want to recrop the image

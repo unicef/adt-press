@@ -1,127 +1,13 @@
-import enum
 import os
 
 import fitz  # PyMuPDF
 from fsspec import open
-from pydantic import BaseModel
 
+from adt_press.data.image import Image
+from adt_press.data.pdf import Page
 from adt_press.utils.file import write_file
-from adt_press.utils.image import Image, matplotlib_chart
+from adt_press.utils.image import matplotlib_chart
 from adt_press.utils.vector import render_drawings
-
-
-class ExtractedTextType(str, enum.Enum):
-    book_title = "book_title"
-    book_subtitle = "book_subtitle"
-    book_author = "book_author"
-    chapter_title = "chapter_title"
-    section_heading = "section_heading"
-    section_text = "section_text"
-    boxed_text = "boxed_text"
-    hint = "hint"
-    instruction_text = "instruction_text"
-    activity_number = "activity_number"
-    activity_option = "activity_option"
-    activity_input_placeholder_text = "activity_input_placeholder_text"
-    image_label = "image_label"
-    image_caption = "image_caption"
-    image_overlay = "image_overlay"
-    math = "math"
-    standalone_text = "standalone_text"
-    page_number = "page_number"
-    footer_text = "footer_text"
-    other = "other"
-
-
-class SectionType(str, enum.Enum):
-    front_cover = "front_cover"
-    inside_cover = "inside_cover"
-    back_cover = "back_cover"
-    separator = "separator"
-    credits = "credits"
-    foreword = "foreword"
-    table_of_contents = "table_of_contents"
-    boxed_text = "boxed_text"
-    text_only = "text_only"
-    text_and_images = "text_and_images"
-    activity_matching = "activity_matching"
-    activity_fill_in_a_table = "activity_fill_in_a_table"
-    activity_multiple_choice = "activity_multiple_choice"
-    activity_true_false = "activity_true_false"
-    activity_open_ended_answer = "activity_open_ended_answer"
-    activity_fill_in_the_blank = "activity_fill_in_the_blank"
-    activity_labeling = "activity_labeling"
-    activity_multiselect = "activity_multiselect"
-    activity_sorting = "activity_sorting"
-    activity_other = "activity_other"
-    other = "other"
-
-
-class SectionExplanation(BaseModel):
-    section_id: str
-    reasoning: str
-    explanation: str
-
-
-class PageSection(BaseModel):
-    section_id: str
-    section_type: SectionType
-    part_ids: list[str] = []
-    is_pruned: bool = False
-
-
-class GlossaryItem(BaseModel):
-    word: str
-    variants: list[str]
-    definition: str
-    emojis: list[str]
-
-
-class SectionGlossary(BaseModel):
-    section_id: str
-    items: list[GlossaryItem]
-    reasoning: str
-
-
-class SectionEasyRead(BaseModel):
-    section_id: str
-    text: str
-    reasoning: str
-
-
-class PageSections(BaseModel):
-    page_id: str
-    sections: list[PageSection]
-    reasoning: str
-
-
-class PageText(BaseModel):
-    text_id: str
-    text: str
-    type: ExtractedTextType
-    is_pruned: bool = False
-
-
-class PageTexts(BaseModel):
-    page_id: str
-    texts: list[PageText]
-    reasoning: str
-
-
-class Page(BaseModel):
-    page_id: str
-    page_number: int
-    image_upath: str
-    text: str
-    images: list[Image]
-
-
-class OutputText(BaseModel):
-    text_id: str
-    language_code: str
-    text: str
-    reasoning: str
-
 
 # We need to set this zoom for PyMuPDF or the image is pixelated.
 FITZ_ZOOM = 2

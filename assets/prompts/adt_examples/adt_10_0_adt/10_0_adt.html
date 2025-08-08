@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>Conociendo a tus mejores amigos</title>
+  <!-- This should be edited to have the correct data-id for the title -->
+  <meta name="title-id" content="text-10-2" />
+  <link href="./content/tailwind_output.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <meta content="10_0" name="page-section-id" />
+</head>
+
+<body class="bg-gray-100 lg:p-5 p-3 mb-12 font-sans text-lg">
+  <div
+    class="container content mx-auto bg-white mt-auto p-5 rounded-lg border-gray-200 border lg:px-16 md:px-12 sm:px-6 sm:py-6 md:py-10 mb-5 border-t-8 border-t-blue-700 min-h-[calc(100vh-110px)]"
+    id="content">
+    <section aria-labelledby="friends-info" class="max-w-6xl mx-auto" data-id="sectioneli5-10-0"
+      data-section-type="activity_fill_in_a_table" role="activity">
+      <!-- Title and Image -->
+      <div class="flex items-center justify-center mb-4">
+        <h1 class="text-2xl font-bold mb-4 bg-green-200 -mr-4 p-4 pr-8 rounded-lg" data-id="text-10-0">
+          Me gustaría conocer a tus mejores amigos.
+        </h1>
+        <img alt="Un personaje de caricatura de un yacaré" class="rounded-full" src="./images/20_img-20-2.png" />
+      </div>
+      <!-- Instructions -->
+      <p class="text-lg mb-6 text-center">
+        <i class="fas fa-pen-to-square text-blue-700 mr-2"></i>
+        <span data-id="text-10-1">Piensa en uno de tus mejores amigos o amigas y completa su información.</span>
+      </p>
+      <!-- Image upload
+    <div class="p-4 rounded bg-gray-100 mx-auto mb-6 max-w-md flex flex-col justify-center mx-8">
+      <label class="block text-gray-600 font-semibold mb-1" for="friendImage">
+        Imagen (opcional):
+      </label>
+      <input 
+        type="file" 
+        id="friendImage" 
+        class="w-full"
+        accept="image/*"
+      />
+      <img id="imagePreview" src="#" alt="Vista previa" class="hidden mt-2 max-w-full h-auto rounded-lg" />
+    </div> -->
+      <!-- Friend Form - Fill in the blank style -->
+      <div class="activity-text">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <!-- Name -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-3" for="friendName">Se llama</label>
+            <input class="do-not-validate border border-gray-300 rounded p-2" data-aria-id="aria-10-0-0" id="friendName"
+              placeholder="___________" type="text" />
+          </div>
+          <!-- Nickname -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-4" for="nickname">Sus amigos lo/la
+              llaman</label>
+            <input class="do-not-validate border border-gray-300 rounded p-2" data-aria-id="aria-10-0-1" id="nickname"
+              placeholder="___________" type="text" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- Favorite Activity -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-5" for="favoriteActivity">Juega siempre
+              con</label>
+            <input class="border border-gray-300 rounded p-2 flex-grow" data-aria-id="aria-10-0-2" id="favoriteActivity"
+              placeholder="___________" type="text" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- Hair and Eyes -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold" data-id="text-10-6" for="hair">Tiene el cabello</label>
+            <input class="border border-gray-300 rounded p-2 w-24 sm:w-32" data-aria-id="aria-10-0-3" id="hair"
+              placeholder="_____" type="text" />
+            <label class="mx-2 font-bold whitespace-nowrap" data-id="text-10-7" for="eyes">y los ojos</label>
+            <input class="border border-gray-300 rounded p-2 w-24 sm:w-32" data-aria-id="aria-10-0-4" id="eyes"
+              placeholder="_____" type="text" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- Likes -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-8" for="likes">Lo que más le gusta
+              es</label>
+            <input class="border border-gray-300 rounded p-2" data-aria-id="aria-10-0-5" id="likes"
+              placeholder="___________" type="text" />
+          </div>
+          <!-- Dislikes -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-9" for="dislikes">Le desagrada</label>
+            <input class="border border-gray-300 rounded p-2" data-aria-id="aria-10-0-6" id="dislikes"
+              placeholder="___________" type="text" />
+          </div>
+          <!-- Happy Action -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-10" for="happyAction">Cuando está
+              feliz</label>
+            <input class="border border-gray-300 rounded p-2" data-aria-id="aria-10-0-7" id="happyAction"
+              placeholder="___________" type="text" />
+          </div>
+          <!-- Sad Action -->
+          <div class="p-4 rounded bg-gray-100 flex items-center">
+            <label class="mr-2 font-bold whitespace-nowrap" data-id="text-10-11" for="sadAction">Si está triste</label>
+            <input class="do-not-validate border border-gray-300 rounded p-2" data-aria-id="aria-10-0-8" id="sadAction"
+              placeholder="___________" type="text" />
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Preview/Portrait Section -->
+    <!-- <div class="bg-gray-100 p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-2 text-green-700">Retrato de tu amigo/a</h2>
+      <p id="portrait" class="text-gray-700 whitespace-pre-line"></p>
+    </div> -->
+  </div>
+  <!-- The main interface components -->
+  <!-- DO NOT EDIT Contains the bottom bar, next back buttons, submit button, right sidebar, ai language, eli5 and tts toggles -->
+  <div class="relative z-50" id="interface-container"></div>
+  <!-- DO NOT EDIT Contains the left nav bar, html page list -->
+  <div class="relative z-50" id="nav-container"></div>
+  <script src="./assets/modules/state.js" type="module"></script>
+  <script src="./assets/base.js" type="module"></script>
+  <!-- <script>
+    const imageInput = document.getElementById('friendImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const portrait = document.getElementById('portrait');
+
+    // Listen for file upload to show an image preview
+    imageInput.addEventListener('change', handleImageUpload);
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.classList.remove('hidden');
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+  </script> -->
+</body>
+
+</html>

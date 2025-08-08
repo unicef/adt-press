@@ -3,14 +3,15 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
+from adt_press.data.pdf import Page
+from adt_press.data.text import PageText, PageTexts, TextType
 from adt_press.llm.prompt import PromptConfig
-from adt_press.utils.file import cached_read_template
-from adt_press.utils.pdf import ExtractedTextType, Page, PageText, PageTexts
+from adt_press.utils.file import cached_read_text_file
 
 
 class Data(BaseModel):
     text: str
-    type: ExtractedTextType
+    type: TextType
 
 
 class TextResponse(BaseModel):
@@ -24,7 +25,7 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
         examples=config.examples,
     )
 
-    prompt = Prompt(cached_read_template(config.template_path))
+    prompt = Prompt(cached_read_text_file(config.template_path))
     client = instructor.from_litellm(acompletion)
     response: TextResponse = await client.chat.completions.create(
         model=config.model,
@@ -35,6 +36,6 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
 
     return PageTexts(
         page_id=page.page_id,
-        texts=[PageText(text_id=f"txt_p{page.page_number}_t{i}", text=d.text, type=d.type) for i, d in enumerate(response.data)],
+        texts=[PageText(text_id=f"txt_p{page.page_number}_t{i}", text=d.text, text_type=d.type) for i, d in enumerate(response.data)],
         reasoning=response.reasoning,
     )

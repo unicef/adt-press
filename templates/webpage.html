@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="{{ language }}">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>{{ webpage.title }}</title>
+    <meta name="title-id" content="{{ section.section_id }}" />
+    <meta name="page-section-id" content="{{ webpage_number }}" />
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="bg-blue-100 min-h-screen flex items-center justify-center">
+    {{ content | safe }}
+
+    <div class="relative z-50" id="interface-container"></div>
+    <div class="relative z-50" id="nav-container"></div>
+    <script src="./assets/modules/state.js" type="module"></script>
+    <script src="./assets/base.js" type="module"></script>
+</body>
+
+</html>

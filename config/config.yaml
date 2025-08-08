@@ -1,6 +1,8 @@
+pdf_title: Momo and the Leopards
 pdf_path: "assets/momo.pdf"
 input_language: "en"
-output_language: "fr"
+plate_language: "en"
+output_languages: ["en", "es", "fr"]
 
 template_dir: "templates"
 output_dir: "output"
@@ -547,3 +549,15 @@ prompts:
   section_easy_read:
     template_path: prompts/section_easy_read.jinja2
     model: gpt-4o-2024-08-06
+
+  web_generation:
+    model: gpt-4o-2024-08-06
+    template_path: prompts/web_generation.jinja2
+
+web_generation_examples:
+  - assets/prompts/adt_examples/text_only_1
+  - assets/prompts/adt_examples/text_and_images_1
+  - assets/prompts/adt_examples/text_and_images_2
+  - assets/prompts/adt_examples/text_and_images_3
+
+

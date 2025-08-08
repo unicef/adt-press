@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!-- CAN BE EDITED -->
+    <title>True or false activity</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-81-3" />
+    <!-- DO NOT EXIT the <head> tag -->
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <meta content="0_0" name="page-section-id" />
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body class="bg-gray-100 lg:p-5 md:p-5 sm:p-0 mb-12 font-sans text-lg">
+
+    <!-- The main interface components -->
+    <!-- DO NOT EDIT Contains the bottom bar, next back buttons, submit button, right sidebar, ai language, eli5 and tts toggles -->
+    <div id="interface-container"></div>
+
+    <!-- DO NOT EDIT Contains the left nav bar, html page list -->
+    <div id="nav-container"></div>
+
+    <!-- The main content container, EVERYTHING CAN BE EDITED, DELETED, OR ADDITIONAL ELEMENTS ADDED AS REQUIRED -->
+    <div class="container content mx-auto bg-white mt-auto max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6"
+        id="content">
+
+        <h1 class="text-xl font-bold mb-4" data-id="text-81-0">Now, Johnny is talking to Emma about the conversation he
+            had with Lua.</h1>
+
+        <p class="text-gray-700 mb-4"><i class="fas fa-pen-to-square mr-2 text-blue-700"></i><span
+                data-id="text-81-1">Read what Johnny says to Lua and check whether he is</span> <span
+                class="text-green-700 font-bold" data-id="text-81-2">right</span> <i class="fas fa-check"></i> or <span
+                class="text-red-700 font-bold" data-id="text-81-4">wrong</span> <i class="fas fa-times"></i>. <span
+                data-id="text-81-5">Correct the wrong information.</span></p>
+
+        <!-- Question 1 -->
+        <section class="mb-4 space-y-4" role="activity" data-section-type="activity_true_false">
+            <p class="w-full font-bold mb-4" data-id="text-81-7">1. Mr. Simon has short whiskers.</p>
+
+            <div class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mb-4">
+                <input type="radio" id="option-1" name="option" class="sr-only">
+                <label for="option-1"
+                    class="button rounded-lg p-4 text-center border border-gray-300 bg-gray-200 text-xl font-semibold hover:bg-gray-300"
+                    role="button" data-activity-item="item-1">Right <i class="fas fa-check text-white-700"></i></label>
+
+                <input type="radio" id="option-2" name="option" class="sr-only">
+                <label for="option-2"
+                    class="button rounded-lg p-4 text-center border border-gray-300 bg-gray-200 text-xl font-semibold hover:bg-gray-300"
+                    role="button" data-activity-item="item-2">Wrong <i class="fas fa-times text-white-700"></i></label>
+
+            </div>
+
+            <div class="flex space-x-4">
+                <input id="correction-input" type="text" class="border p-2 rounded ml-4 w-full hidden"
+                    placeholder="Correct the statement...">
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <div id="feedback" class="mt-4 text-lg hidden"></div>
+        </main>
+
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!-- CAN BE EDITED -->
+    <title>La sopa de piedra</title>
+    <!-- This should be edited to have the correct data-id for the title -->
+    <meta name="title-id" content="text-30-0" />
+    <!-- DO NOT EDIT OR REMOVE the <script> tags -->
+    <link href="./content/tailwind_output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <!-- Mathjax script to use for rendering math. -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta content="30_2" name="page-section-id" />
+</head>
+
+<body class="bg-gray-100 lg:p-5 md:p-5 sm:p-0 mb-12 font-sans text-lg">
+    <!-- The main interface components -->
+    <!-- DO NOT EDIT Contains the bottom bar, next back buttons, submit button, right sidebar, ai language, eli5 and tts toggles -->
+    <div id="interface-container"></div>
+    <!-- DO NOT EDIT Contains the left nav bar, html page list -->
+    <div id="nav-container"></div>
+    <!-- The main content container, EVERYTHING CAN BE EDITED, DELETED, OR ADDITIONAL ELEMENTS ADDED AS REQUIRED but there must always be a section tag -->
+    <div class="container content mx-auto bg-white mt-auto max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6"
+        id="content">
+        <h1 class="text-2xl font-bold text-left mb-4" data-id="text-30-16">Une cada una de estas palabras con su
+            dibujo.
+        </h1>
+        <!-- THERE MUST ALWAYS BE A SECTION TAG -->
+        <section aria-labelledby="main-heading" data-id="sectioneli5-30-2" data-section-type="activity_matching"
+            id="matching-main" role="activity">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                <div class="space-y-3">
+                    <div class="bg-yellow-100 p-3 rounded-md mb-2 shadow-sm activity-item" id="bimotor"
+                        data-id="text-30-17" data-activity-item="item-1" draggable="true">bimotor</div>
+                    <div class="bg-teal-100 p-3 rounded-md mb-2 shadow-sm activity-item" id="bibliobus"
+                        data-id="text-30-18" data-activity-item="item-2" draggable="true">bibliobús</div>
+                    <div class="bg-pink-100 p-3 rounded-md mb-2 shadow-sm activity-item" id="bilingue"
+                        data-id="text-30-19" data-activity-item="item-3" draggable="true">bilingüe</div>
+                    <div class="bg-orange-100 p-3 rounded-md mb-2 shadow-sm activity-item" id="biblioteca"
+                        data-id="text-30-20" data-activity-item="item-4" draggable="true">biblioteca</div>
+                    <div class="bg-blue-100 p-3 rounded-md mb-2 shadow-sm activity-item" id="bicolor"
+                        data-id="text-30-21" data-activity-item="item-5" draggable="true">bicolor</div>
+                    <div class="bg-green-100 p-3 rounded-md mb-2 shadow-sm activity-item" id="bibliomania"
+                        data-id="text-30-22" data-activity-item="item-6" draggable="true">bibliomanía</div>
+                </div>
+
+                <!-- Images with Dropzones Below -->
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-8">
+                    <div class="border border-gray-300 p-4 rounded-lg text-center dropzone" id="target1"
+                        aria-label="Drop zone for bicolor image">
+                        <img alt="Ilustración de una bandera con franjas horizontales en verde y rojo."
+                            aria-label="Ilustración de una bandera con franjas horizontales en verde y rojo."
+                            class="w-auto h-24" data-id="img-30-7" src="images/30_img-30-7.png" />
+                        <div class="border-t border-gray-200 mt-4 p-2" id="dropzone-1" role="region" aria-live="polite">
+                        </div>
+                    </div>
+                    <div class="border border-gray-300 p-4 rounded-lg text-center dropzone" id="target2"
+                        aria-label="Drop zone for bimotor image">
+                        <img alt="Un avión bimotor con dos hélices." aria-label="Un avión bimotor con dos hélices."
+                            class="w-auto h-24" data-id="img-30-8" src="images/30_img-30-8.png" />
+                        <div class="border-t border-gray-200 mt-4 p-2" id="dropzone-2" role="region" aria-live="polite">
+                        </div>
+                    </div>
+                    <div class="border border-gray-300 p-4 rounded-lg text-center dropzone" id="target3"
+                        aria-label="Drop zone for bilingue image">
+                        <img alt="Persona saludando con las palabras 'Hola' y 'Bonjour'."
+                            aria-label="Persona saludando con las palabras 'Hola' y 'Bonjour'." class="w-auto h-24"
+                            data-id="img-30-3" src="images/30_img-30-3.png" />
+                        <div class="border-t border-gray-200 mt-4 p-2" id="dropzone-3" role="region" aria-live="polite">
+                        </div>
+                    </div>
+                    <div class="border border-gray-300 p-4 rounded-lg text-center dropzone" id="target4"
+                        aria-label="Drop zone for bibliobus image">
+                        <img alt="Ilustración de un bibliobús, un autobús que funciona como biblioteca ambulante."
+                            aria-label="Ilustración de un bibliobús, un autobús que funciona como biblioteca ambulante."
+                            class="w-auto h-24" data-id="img-30-5" src="images/30_img-30-5.png" />
+                        <div class="border-t border-gray-200 mt-4 p-2" id="dropzone-4" role="region" aria-live="polite">
+                        </div>
+                    </div>
+                    <div class="border border-gray-300 p-4 rounded-lg text-center dropzone" id="target5"
+                        aria-label="Drop zone for biblioteca image">
+                        <img alt="Una estantería llena de libros." aria-label="Una estantería llena de libros."
+                            class="w-auto h-24" data-id="img-30-6" src="images/30_img-30-6.png" />
+                        <div class="border-t border-gray-200 mt-4 p-2" id="dropzone-5" role="region" aria-live="polite">
+                        </div>
+                    </div>
+                    <div class="border border-gray-300 p-4 rounded-lg text-center dropzone" id="target6"
+                        aria-label="Drop zone for bibliomania image">
+                        <img alt="Una persona mayor examinando un libro con una lupa."
+                            aria-label="Una persona mayor examinando un libro con una lupa." class="w-auto h-24"
+                            data-id="img-30-4" src="images/30_img-30-4.png" />
+                        <div class="border-t border-gray-200 mt-4 p-2" id="dropzone-6" role="region" aria-live="polite">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <p id="feedback" class="mt-4 text-xl font-semibold" aria-live="polite"></p>
+            </div>
+
+        </section>
+        </main>
+
+</body>
+
+</html>
