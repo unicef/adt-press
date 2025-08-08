@@ -38,10 +38,6 @@ def sections_by_page_id(
     return page_sections
 
 
-def filtered_sections_by_section_id(filtered_sections_by_page_id: dict[str, PageSections]) -> dict[str, PageSection]:
-    return {s.section_id: s for page_sections in filtered_sections_by_page_id.values() for s in page_sections.sections}
-
-
 def filtered_sections_by_page_id(
     pruned_section_types_config: list[str], sections_by_page_id: dict[str, PageSections]
 ) -> dict[str, PageSections]:
