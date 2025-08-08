@@ -115,7 +115,7 @@ class PipelineTest(unittest.TestCase):
                 "index.html",
                 "plate_report.html",
                 "web_report.html",
-                "translation_report.html",                
+                "translation_report.html",
             ]
 
             for file in output_files:
