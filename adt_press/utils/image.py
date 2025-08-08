@@ -9,7 +9,7 @@ import PIL
 import PIL.ImageDraw
 from fsspec import open
 
-from adt_press.data.image import CropCoordinates
+from adt_press.models.image import CropCoordinates
 
 plt.switch_backend("Agg")
 warnings.filterwarnings("ignore", category=RuntimeWarning)

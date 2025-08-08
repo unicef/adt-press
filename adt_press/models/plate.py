@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from adt_press.data.section import GlossaryItem, SectionType
+from adt_press.models.section import GlossaryItem, SectionType
 
 
 class PlateText(BaseModel):

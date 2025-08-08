@@ -3,7 +3,7 @@ from omegaconf import DictConfig
 from pydantic import BaseModel
 
 from adt_press.llm.image_crop import CropPromptConfig
-from adt_press.llm.prompt import PromptConfig
+from adt_press.models.config import PageRangeConfig, PromptConfig
 from adt_press.utils.config import conf_to_object
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
@@ -52,11 +52,6 @@ def pdf_title_config(config: DictConfig) -> str:
 @cache(behavior="recompute")
 def pdf_hash_config(pdf_path_config: str) -> str:
     return calculate_file_hash(pdf_path_config)
-
-
-class PageRangeConfig(BaseModel):
-    start: int = 0
-    end: int = 0
 
 
 def page_range_config(config: DictConfig) -> PageRangeConfig:

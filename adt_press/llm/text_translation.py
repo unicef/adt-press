@@ -3,8 +3,8 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
-from adt_press.data.text import OutputText
-from adt_press.llm.prompt import PromptConfig
+from adt_press.models.config import PromptConfig
+from adt_press.models.text import OutputText
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 

@@ -2,13 +2,13 @@ import json
 
 from hamilton.function_modifiers import cache
 
-from adt_press.data.image import ProcessedImage
-from adt_press.data.pdf import Page
-from adt_press.data.plate import Plate, PlateImage, PlateSection, PlateText
-from adt_press.data.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
-from adt_press.data.text import OutputText
-from adt_press.llm.prompt import PromptConfig
 from adt_press.llm.text_translation import get_text_translation
+from adt_press.models.config import PromptConfig
+from adt_press.models.image import ProcessedImage
+from adt_press.models.pdf import Page
+from adt_press.models.plate import Plate, PlateImage, PlateSection, PlateText
+from adt_press.models.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.models.text import OutputText
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
