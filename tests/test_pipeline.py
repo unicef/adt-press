@@ -39,6 +39,8 @@ class PipelineTest(unittest.TestCase):
             test_config = {
                 "output_dir": self.temp_dir,
                 "page_range": dict(start=0, end=5),
+                "plate_language": "fr",
+                "output_languages": ["en", "fr"],
                 "print_available_models": "true",
             }
 
@@ -57,6 +59,9 @@ class PipelineTest(unittest.TestCase):
                 "page_report.html",
                 "config.html",
                 "index.html",
+                "plate_report.html",
+                "web_report.html",
+                "translation_report.html",
             ]
 
             for file in output_files:
@@ -65,12 +70,12 @@ class PipelineTest(unittest.TestCase):
 
             self.assertFileCount("*.html", len(output_files), "Unexpected number of HTML files created")
             self.assertFileCount("run.png", 1, "Run image not created")
-            self.assertFileCount("img_p?.png", 5, "Unexpected number of page images created")
-            self.assertFileCount("img_p*_v?.png", 35, "Unexpected number of vector images created")
-            self.assertFileCount("img_p*_r?.png", 3, "Unexpected number of raster images created")
-            self.assertFileCount("img_p*_r*_crop*.png", 2, "Unexpected number of cropped images created")
-            self.assertFileCount("img_p*_r*_recrop.png", 2, "Unexpected number of recropped images created")
-            self.assertFileCount("img_p*_chart.png", 38, "Unexpected number of chart images created")
+            self.assertFileCount("images/img_p?.png", 5, "Unexpected number of page images created")
+            self.assertFileCount("images/img_p*_v?.png", 35, "Unexpected number of vector images created")
+            self.assertFileCount("images/img_p*_r?.png", 3, "Unexpected number of raster images created")
+            self.assertFileCount("images/img_p*_r*_crop*.png", 2, "Unexpected number of cropped images created")
+            self.assertFileCount("images/img_p*_r*_recrop.png", 2, "Unexpected number of recropped images created")
+            self.assertFileCount("images/img_p*_chart.png", 38, "Unexpected number of chart images created")
 
             self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Title not found in page report")
             self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
@@ -89,7 +94,8 @@ class PipelineTest(unittest.TestCase):
             test_config = {
                 "output_dir": self.temp_dir,
                 "page_range": dict(start=0, end=5),
-                "output_language": "en",
+                "plate_language": "en",
+                "output_languages": ["en"],
             }
 
             config = DictConfig(OmegaConf.merge(file_config, test_config))
@@ -107,6 +113,9 @@ class PipelineTest(unittest.TestCase):
                 "page_report.html",
                 "config.html",
                 "index.html",
+                "plate_report.html",
+                "web_report.html",
+                "translation_report.html",                
             ]
 
             for file in output_files:
