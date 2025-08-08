@@ -1,3 +1,5 @@
+import os
+import shutil
 from typing import Any, Dict
 
 import litellm
@@ -58,12 +60,15 @@ class NodeHook(NodeExecutionHook):
 
 
 def run_pipeline(config: DictConfig) -> None:
-    cache_args = {"recompute": True} if config.get("clear_cache", False) else {}
+    cache_path = os.path.join(config["run_output_dir"], "cache")
+    clear_cache = config.get("clear_cache", False)
+    if clear_cache:
+        shutil.rmtree(cache_path, ignore_errors=True)
 
     dr = (
         driver.Builder()
         .with_modules(*modules)
-        .with_cache(**cache_args)
+        .with_cache(path=cache_path)
         .with_adapters(NodeHook())
         .build()
     )  # fmt: off
@@ -77,4 +82,4 @@ def run_pipeline(config: DictConfig) -> None:
     dr.execute(["report_index"], overrides={"config": config})
 
     # output our run graph as a png
-    dr.cache.view_run(output_file_path=f"{config['output_dir']}/run.png")
+    dr.cache.view_run(output_file_path=f"{config['run_output_dir']}/run.png")

@@ -1,3 +1,5 @@
+import os
+
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
 from pydantic import BaseModel
@@ -13,8 +15,8 @@ def config() -> DictConfig:  # pragma: no cover
     assert False, "This function should not be called directly. Use the config from the pipeline instead."
 
 
-def template_config(output_dir_config: str, template_dir_config: str) -> TemplateConfig:
-    return TemplateConfig(output_dir=output_dir_config, template_dir=template_dir_config)
+def template_config(run_output_dir_config: str, template_dir_config: str) -> TemplateConfig:
+    return TemplateConfig(output_dir=run_output_dir_config, template_dir=template_dir_config)
 
 
 def pdf_path_config(config: DictConfig) -> str:
@@ -41,12 +43,23 @@ def output_dir_config(config: DictConfig) -> str:
     return str(config["output_dir"])
 
 
+def label_config(config: DictConfig) -> str:
+    return str(config["label"])
+
+
+@cache(behavior="recompute")
+def run_output_dir_config(config: DictConfig) -> str:
+    run_output_dir = str(config["run_output_dir"])
+    os.makedirs(run_output_dir, exist_ok=True)
+    return run_output_dir
+
+
 def template_dir_config(config: DictConfig) -> str:
     return str(config["template_dir"])
 
 
-def pdf_title_config(config: DictConfig) -> str:
-    return str(config["pdf_title"])
+def pdf_title_config(config: DictConfig, label_config: str) -> str:
+    return str(config.get("pdf_title", label_config))
 
 
 @cache(behavior="recompute")
