@@ -12,6 +12,7 @@ run_output_dir: "${output_dir}/${label}"
 clear_cache: false
 print_available_models: false
 
+# if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
 page_range:

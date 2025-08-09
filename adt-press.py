@@ -19,7 +19,7 @@ def main() -> None:
     config_path = os.path.join(run_output_dir, "config.yaml")
 
     # if the config exists, read it and merge with our config
-    if os.path.exists(config_path):
+    if os.path.exists(config_path):  # pragma: no over
         print("Reading config from:", config_path)
         output_config = OmegaConf.load(config_path)
 
