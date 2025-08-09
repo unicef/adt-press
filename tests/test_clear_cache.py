@@ -96,4 +96,3 @@ class TestClearCache(unittest.TestCase):
 
         # Verify Hamilton driver was called
         mock_driver_instance.execute.assert_called_once_with(["report_index"], overrides={"config": self.config})
-
