@@ -47,7 +47,7 @@ uv sync
 Run the main script with the default configuration:
 
 ```bash
-uv run adt-press.py pdf_path=/path/to/your/document.pdf
+uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf
 ```
 
 ### Configuration
@@ -57,20 +57,21 @@ The application uses OmegaConf for configuration management. The default configu
 To override configuration values from the command line:
 
 ```bash
-uv run adt-press.py pdf_path=/path/to/your/document.pdf page_range.start=0 page_range.end=5
+uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_range.start=0 page_range.end=5
 ```
 
 ### Key Configuration Parameters
 
+- `label`: The label for this PDF file, will be used as the subdirectory name under `output_dir`
 - `pdf_path`: Path to the PDF file to process
 - `page_range`: Range of pages to process (start and end)
-- `output_dir`: Directory to store output files
+- `output_dir`: Base directory to store outputs
 - `template_dir`: Directory containing HTML templates
 - `clear_cache`: Whether to clear the processing cache before the run
 
 ## Output
 
-The application generates the following outputs in the specified output directory:
+The application generates the following outputs in the `output/[your label]` directory:
 
 - Extracted images from the PDF
 - Cropped images
@@ -132,7 +133,7 @@ docker run --rm adt-press
 To run a specific command inside the container (for example, to execute `uv run adt-press.py` with a PDF file):
 
 ```bash
-docker run --rm adt-press uv run adt-press.py pdf_path=/data/yourfile.pdf
+docker run --rm adt-press uv run adt-press.py label=mydocument pdf_path=/data/document.pdf
 ```
 
 Replace `/data/yourfile.pdf` with the path to your PDF file inside the container.
