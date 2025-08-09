@@ -39,10 +39,6 @@ def output_languages_config(config: DictConfig) -> list[str]:
     return list[str](config["output_languages"])
 
 
-def output_dir_config(config: DictConfig) -> str:
-    return str(config["output_dir"])
-
-
 def label_config(config: DictConfig) -> str:
     return str(config["label"])
 
