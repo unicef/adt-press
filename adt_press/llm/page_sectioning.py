@@ -1,7 +1,7 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationInfo, field_validator
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import ProcessedImage
@@ -21,6 +21,31 @@ class SectionResponse(BaseModel):
     reasoning: str
     data: list[Section]
 
+    @field_validator("data")
+    @classmethod
+    def validate_section_ids(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
+        """Ensure all Section IDs reference valid text or image IDs."""
+        # Get valid IDs from context
+        valid_ids = set()
+        if info.context:
+            # Add text IDs
+            text_ids = info.context.get("text_ids", [])
+            valid_ids.update(text_ids)
+
+            # Add image IDs
+            image_ids = info.context.get("image_ids", [])
+            valid_ids.update(image_ids)
+
+        # Validate each section's ID
+        for section in v:
+            if valid_ids and section.id not in valid_ids:
+                raise ValueError(
+                    f"Section with section_id='{section.section_id}' has invalid id='{section.id}'. "
+                    f"Must be one of: {', '.join(sorted(valid_ids))}"
+                )
+
+        return v
+
 
 async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], texts: list[PageText]) -> PageSections:
     context = dict(
@@ -32,11 +57,19 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
 
     prompt = Prompt(cached_read_text_file(config.template_path))
     client = instructor.from_litellm(acompletion)
+
+    # Create validation context
+    validation_context = {
+        "text_ids": [t.text_id for t in texts],
+        "image_ids": [i.image_id for i in images],
+    }
+
     response: SectionResponse = await client.chat.completions.create(
         model=config.model,
         response_model=SectionResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        context=validation_context,
     )
 
     # convert our array to the more logical list of page sections
