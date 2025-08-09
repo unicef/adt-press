@@ -94,6 +94,6 @@ def output_pdf_texts_by_id(
     return texts_by_id
 
 
-def pdf_pages(output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
-    image_dir = os.path.join(output_dir_config, "images")
+def pdf_pages(run_output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
+    image_dir = os.path.join(run_output_dir_config, "images")
     return pages_for_pdf(image_dir, pdf_path_config, page_range_config.start, page_range_config.end)

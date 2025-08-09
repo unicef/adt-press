@@ -40,13 +40,13 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/momo.pdf
+          uv run adt-press.py pdf_path=./assets/momo.pdf label=momo
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: output
+          folder: output/momo
           branch: gh-pages
           clean-exclude: pr-preview
           force: false

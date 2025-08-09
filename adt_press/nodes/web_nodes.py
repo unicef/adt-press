@@ -84,7 +84,7 @@ def web_pages(
 @cache(behavior="recompute")
 def package_adt_web(
     template_config: TemplateConfig,
-    output_dir_config: str,
+    run_output_dir_config: str,
     pdf_title_config: str,
     plate_language_config: str,
     plate: Plate,
@@ -93,7 +93,7 @@ def package_adt_web(
 ) -> str:
     default_language = list(plate_translations.keys())[0]
 
-    adt_dir = os.path.join(output_dir_config, "adt")
+    adt_dir = os.path.join(run_output_dir_config, "adt")
 
     # clear the output adt directory
     if os.path.exists(adt_dir):

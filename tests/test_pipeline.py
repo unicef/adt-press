@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,20 +10,21 @@ from adt_press.pipeline import run_pipeline
 
 class PipelineTest(unittest.TestCase):
     temp_dir: str
+    run_dir: str
 
     def assertFileCount(self, pattern: str, expected_count: int, msg: str = ""):
-        files = list(Path(self.temp_dir).glob(pattern))
+        files = list(Path(self.run_dir).glob(pattern))
         self.assertEqual(len(files), expected_count, msg)
 
     def assertFileContains(self, name: str, content: str, msg: str = ""):
-        file_path = Path(self.temp_dir) / name
+        file_path = Path(self.run_dir) / name
         self.assertTrue(file_path.exists(), f"File {name} does not exist.")
         with open(file_path, "r") as f:
             file_content = f.read()
         self.assertIn(content, file_content, msg)
 
     def assertFileDoesNotContain(self, name: str, content: str, msg: str = ""):
-        file_path = Path(self.temp_dir) / name
+        file_path = Path(self.run_dir) / name
         self.assertTrue(file_path.exists(), f"File {name} does not exist.")
         with open(file_path, "r") as f:
             file_content = f.read()
@@ -35,9 +37,12 @@ class PipelineTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as self.temp_dir:
             file_config = OmegaConf.load("config/config.yaml")
             print(self.temp_dir)
+            self.run_dir = os.path.join(self.temp_dir, "momo")
 
             test_config = {
                 "output_dir": self.temp_dir,
+                "label": "momo",
+                "pdf_path": "assets/momo.pdf",
                 "page_range": dict(start=0, end=5),
                 "plate_language": "fr",
                 "output_languages": ["en", "fr"],
@@ -49,7 +54,7 @@ class PipelineTest(unittest.TestCase):
 
             # print out all the files in the temp directory to help with test failures
             print("Output files in temp directory:")
-            for file in Path(self.temp_dir).iterdir():
+            for file in Path(self.run_dir).iterdir():
                 print(file)
 
             # assert that our output report was created
@@ -65,7 +70,7 @@ class PipelineTest(unittest.TestCase):
             ]
 
             for file in output_files:
-                file_path = Path(f"{self.temp_dir}/{file}")
+                file_path = Path(f"{self.run_dir}/{file}")
                 assert file_path.exists(), f"Output file {file} was not created."
 
             self.assertFileCount("*.html", len(output_files), "Unexpected number of HTML files created")
@@ -90,9 +95,12 @@ class PipelineTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as self.temp_dir:
             file_config = OmegaConf.load("config/config.yaml")
             print(self.temp_dir)
+            self.run_dir = os.path.join(self.temp_dir, "momo")
 
             test_config = {
                 "output_dir": self.temp_dir,
+                "label": "momo",
+                "pdf_path": "assets/momo.pdf",
                 "page_range": dict(start=0, end=5),
                 "plate_language": "en",
                 "output_languages": ["en"],
@@ -103,7 +111,7 @@ class PipelineTest(unittest.TestCase):
 
             # print out all the files in the temp directory to help with test failures
             print("Output files in temp directory:")
-            for file in Path(self.temp_dir).iterdir():
+            for file in Path(self.run_dir).iterdir():
                 print(file)
 
             # assert that our output report was created
@@ -119,7 +127,7 @@ class PipelineTest(unittest.TestCase):
             ]
 
             for file in output_files:
-                file_path = Path(f"{self.temp_dir}/{file}")
+                file_path = Path(f"{self.run_dir}/{file}")
                 assert file_path.exists(), f"Output file {file} was not created."
 
             self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Title not found in page report")
