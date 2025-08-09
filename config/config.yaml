@@ -10,6 +10,7 @@ output_dir: "output"
 clear_cache: false
 print_available_models: false
 
+# if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
 page_range:
