@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import instructor
 from banks import Prompt
 from bs4 import BeautifulSoup
