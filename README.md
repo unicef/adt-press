@@ -110,6 +110,7 @@ uv run pytest
   - `llm/`: LLM integration modules
   - `nodes/`: Hamilton nodes for the processing pipeline
   - `utils/`: Utility functions
+  - `models/`: Data models used in adt-press
 - `assets/`: Example files
 - `config/`: Configuration files
 - `prompts/`: LLM prompt templates
