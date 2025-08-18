@@ -66,6 +66,7 @@ prompts:
   page_sectioning:
     template_path: prompts/page_sectioning.jinja2
     model: gpt-4o-2024-08-06
+    max_retries: 10
     examples:
       - page_image_upath: assets/prompts/sectioning/multiple_activities_1/livinguruguay1_107.png
         images:
@@ -558,6 +559,7 @@ prompts:
   web_generation:
     model: gpt-4o-2024-08-06
     template_path: prompts/web_generation.jinja2
+    max_retries: 30
 
 web_generation_examples:
   - assets/prompts/adt_examples/text_only_1
