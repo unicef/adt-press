@@ -6,6 +6,7 @@ import yaml
 from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation import generate_web_page
+from adt_press.llm.web_row_generation import generate_web_page_from_rows
 from adt_press.models.config import PromptConfig, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.web import WebPage
@@ -43,6 +44,7 @@ def web_generation_examples(web_generation_examples_config: list[str]) -> list[d
 def web_pages(
     plate_language_config: str,
     plate: Plate,
+    template_config: TemplateConfig,
     web_generation_prompt_config: PromptConfig,
     web_generation_examples: list[dict],
 ) -> list[WebPage]:
@@ -62,7 +64,7 @@ def web_pages(
                 images.extend([image] if image else [])
 
             web_pages.append(
-                generate_web_page(web_generation_prompt_config, web_generation_examples, section, texts, images, plate_language_config)
+                generate_web_page_from_rows(template_config, web_generation_prompt_config, web_generation_examples, section, texts, images, plate_language_config)
             )
 
         return await gather_with_limit(web_pages, web_generation_prompt_config.rate_limit)
