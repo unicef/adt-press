@@ -22,4 +22,4 @@ async def gather_with_limit(fs: List[Awaitable[Never]], rate_limit: int) -> Awai
             await rate_limiter.wait()
             return await f
 
-    return await asyncio.gather(*(run_task(f) for f in fs))
+    return asyncio.gather(*(run_task(f) for f in fs))
