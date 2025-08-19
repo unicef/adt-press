@@ -15,12 +15,12 @@ from adt_press.utils.languages import LANGUAGE_MAP
 
 class Column(BaseModel):
     span: int
+    background_color: str = "#ffffff"
+    color: str = "#000000"
     parts: list[str]
 
 class Row(BaseModel):
     columns: list[Column]
-    background_color: str = "#ffffff"
-    color: str = "#000000"
 
 class GenerationResponse(BaseModel):
     reasoning: str

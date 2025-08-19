@@ -1,12 +1,12 @@
 <div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content">
     <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}">
     {% for row in rows %}
-        <div class="flex flex-row p-4 mb-2 rounded" style="color: {{ row.color }}; background-color: {{ row.background_color }};">
+        <div class="flex flex-row mb-2">
             {% for col in row.columns %}
-                <div class="basis-{{ col.span }}/5">
+                <div class="basis-{{ col.span }}/5 p-4 mr-2 rounded" style="color: {{ col.color }}; background-color: {{ col.background_color }};">
                     {% for part in col.parts %}
                     {% if images[part] %}
-                    <img class="px-4" data-id="{{ part }}"></img>
+                    <img class="my-2 max-h-128" data-id="{{ part }}"></img>
                     {% elif texts[part] %}
                     <p data-id="{{ part }}">{{ texts[part] }}</p>
                     {% else %}

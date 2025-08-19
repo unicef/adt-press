@@ -1,17 +1,17 @@
 You are a layout planner for an accessible digital textbook.
-Return a JSON object with a list of rows. Each row contains columns. Each column spans 1–5 units of a 5-unit row and contains ordered parts (Text or Image) that reference ONLY the provided IDs. Each row also defines the background and text color for the row, make sure these colors are visually appealing and match the textbook's theme and that they are readable.
+Return a JSON object with a list of rows. Each row contains columns. Each column spans 1–5 units of a 5-unit row and contains ordered parts (Text or Image) that reference ONLY the provided IDs. Each column also defines the background and text color for the column, make sure these colors are visually appealing and match the textbook's theme and that they are readable.
 
 Rules:
 - Use ONLY this JSON shape:
   {
     "rows": [
       { 
-        "color": "#______",
-        "background_color": "#______", 
         "columns": [
           { 
             "span": <1-5>, 
-            "parts": [ "t_*", "img_*"] 
+            "color": "#000000",
+            "background_color": "#ffffff",
+            "parts": [ "t_1", "img_1"] 
           }
         ] 
       }
@@ -22,19 +22,19 @@ Rules:
 - No fields other than rows, columns, span and parts.
 - Do NOT include any commentary, HTML, CSS, or markdown. Output ONLY the JSON.
 
-{% if texts|length > 0 %}
+{% if texts|length > 0 %} 
 Available text portions extracted from the page: 
 {% for text in texts %}
 ID of the following text is: {{ text.text_id }}  
 {{ text.text }}
- 
-{% endfor %}
+  
+{% endfor %} 
 {% else %}
 There are no text portions for this page, do not include any text ids.
 {% endif %}
-
-{% if images|length > 0 %}
-{% for image in images %}
+ 
+{% if images|length > 0 %} 
+{% for image in images %} 
 ID of the following image is: {{image.image_id}}.
 {{ image.upath | image }}
 {% endfor %}
