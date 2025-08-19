@@ -1,18 +1,20 @@
 <div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content">
     <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}">
     {% for row in rows %}
-        <div class="flex flex-row mb-2">
+        <div class="flex flex-row px-4 mt-4 mb-4">
             {% for col in row.columns %}
-                <div class="basis-{{ col.span }}/5 p-4 mr-2 rounded" style="color: {{ col.color }}; background-color: {{ col.background_color }};">
+                <div class="basis-{{ col.span }}/5 p-4 mr-4 ml-4 rounded text-xl font-semibold text-center flex-col flex-grow" style="color: {{ col.color }}; background-color: {{ col.background_color }};">
+                    <div class="flex flex-col justify-center items-center h-full">
                     {% for part in col.parts %}
                     {% if images[part] %}
-                    <img class="my-2 max-h-128" data-id="{{ part }}"></img>
+                    <img class="mb-4 max-w-md rounded-lg shadow-md" data-id="{{ part }}"></img>
                     {% elif texts[part] %}
-                    <p data-id="{{ part }}">{{ texts[part] }}</p>
+                    <p class="mb-4" data-id="{{ part }}">{{ texts[part] }}</p>
                     {% else %}
                     MISSING PART
                     {% endif %}
                     {% endfor %}
+                    </div>
                 </div>
             {% endfor %}
         </div>

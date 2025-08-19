@@ -22,13 +22,13 @@ Rules:
 - No fields other than rows, columns, span and parts.
 - Do NOT include any commentary, HTML, CSS, or markdown. Output ONLY the JSON.
 
-{% if texts|length > 0 %} 
+{% if texts|length > 0 %}     
 Available text portions extracted from the page: 
-{% for text in texts %}
-ID of the following text is: {{ text.text_id }}  
+{% for text in texts %} 
+ID of the following text is: {{ text.text_id }}    
 {{ text.text }}
-  
-{% endfor %} 
+    
+{% endfor %}   
 {% else %}
 There are no text portions for this page, do not include any text ids.
 {% endif %}

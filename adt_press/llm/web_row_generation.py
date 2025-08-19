@@ -36,10 +36,15 @@ class GenerationResponse(BaseModel):
             valid_ids.update(info.context.get("text_ids", []))
             valid_ids.update(info.context.get("image_ids", []))
 
+        seen_ids = set()
+
         # validate all parts in each column
         for row in v:
             for column in row.columns:
                 for part in column.parts:
+                    if part in seen_ids:
+                        raise ValueError(f"Duplicate part '{part}' found in row with columns {row.columns}.")
+
                     if part not in valid_ids:
                         raise ValueError(
                             f"Part '{part}' in row with columns {row.columns} has invalid ID. "
