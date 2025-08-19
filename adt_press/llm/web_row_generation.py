@@ -1,7 +1,6 @@
 # mypy: ignore-errors
 import instructor
 from banks import Prompt
-from bs4 import BeautifulSoup
 from litellm import acompletion
 from pydantic import BaseModel, ValidationInfo, field_validator
 
@@ -19,8 +18,10 @@ class Column(BaseModel):
     color: str = "#000000"
     parts: list[str]
 
+
 class Row(BaseModel):
     columns: list[Column]
+
 
 class GenerationResponse(BaseModel):
     reasoning: str
@@ -50,7 +51,7 @@ class GenerationResponse(BaseModel):
                             f"Part '{part}' in row with columns {row.columns} has invalid ID. "
                             f"Must be one of: {', '.join(sorted(valid_ids))}"
                         )
- 
+
         return v
 
 
@@ -93,12 +94,16 @@ async def generate_web_page_from_rows(
     )
 
     # Convert response rows to HTML
-    content = render_template_to_string(template_config, "row_render.html", 
-        { "section": section,
-         "rows": response.rows,
-         "texts": {t.text_id: t.text for t in texts},
-         "images": {i.image_id: i for i in images},
-        })
+    content = render_template_to_string(
+        template_config,
+        "row_render.html",
+        {
+            "section": section,
+            "rows": response.rows,
+            "texts": {t.text_id: t.text for t in texts},
+            "images": {i.image_id: i for i in images},
+        },
+    )
 
     return WebPage(
         text_id=texts[0].text_id if texts else "",
