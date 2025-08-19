@@ -7,7 +7,7 @@
     <ol class="nav__list overflow-y-auto h-[calc(100vh-10rem)] text-base pr-2" data-id="nav-list" id="nav__list">
         {% for webpage in webpages %}
         <li class="nav__list-item">
-            <a class="nav__list-link" data-text-id="{{ webpage.text_id }}" href="{{ webpage.section_id }}.html">{% with text=texts[webpage.text_id] %}{{ text.text }}{% endwith %}</a>
+            <a class="nav__list-link" data-text-id="{{ webpage.text_id }}" href="{{ webpage.section_id }}.html">{% if webpage.text_id %}{% with text=texts[webpage.text_id] %}{{ text.text }}{% endwith %}{% endif %}</a>
         </li>
         {% endfor %}
     </ol>

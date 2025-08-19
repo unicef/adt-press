@@ -12,7 +12,14 @@ def run_async_task(task: Callable[[], Coroutine[Any, Any, T]]) -> T:
     return asyncio.run(task())
 
 
-def gather_with_limit(fs: List[Awaitable[Never]], rate_limit: int) -> Awaitable[List[T]]:
+async def gather_with_limit(fs: List[Awaitable[Never]], rate_limit: int) -> Awaitable[List[T]]:
     """Gather async tasks with a rate limit."""
-    limiter = Limiter(rate_limit / 60)
-    return asyncio.gather(*[limiter.wrap(f) for f in fs])
+    rate_limiter = Limiter(rate_limit / 60)  # ops/sec
+    concurrency_limiter = asyncio.Semaphore(250)  # max concurrent tasks
+
+    async def run_task(f: Awaitable[T]) -> T:
+        async with concurrency_limiter:
+            await rate_limiter.wait()
+            return await f
+
+    return await asyncio.gather(*(run_task(f) for f in fs))
