@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from adt_press.llm.web_generation import GenerationResponse
+from adt_press.llm.web_generation_html import GenerationResponse
 
 
 class TestHTMLDataIdValidator:
