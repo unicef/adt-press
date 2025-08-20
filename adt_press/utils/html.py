@@ -36,10 +36,10 @@ def basename(text):
 
 
 # given the passed in dict and template, render using jinja2
-def render_template_to_string(config: TemplateConfig, template_path: str, context: dict) -> str:
+def render_template_to_string(template_path: str, context: dict) -> str:
     from jinja2 import Environment, FileSystemLoader
 
-    env = Environment(loader=FileSystemLoader(config.template_dir))
+    env = Environment(loader=FileSystemLoader([".", "templates"]))
     env.filters["basename"] = basename
     template = env.get_template(template_path)
 
@@ -50,8 +50,8 @@ def render_template_to_string(config: TemplateConfig, template_path: str, contex
 def render_template(config: TemplateConfig, template_path: str, context: dict, output_name=None) -> str:
     # write the output to a file named after the template
     output_name = output_name if output_name else template_path
-    output_path = config.output_dir + os.sep + output_name
+    output_path = config.output_dir + os.sep + basename(output_name)
     with open(output_path, "w") as f:
-        f.write(render_template_to_string(config, template_path, context))
+        f.write(render_template_to_string(template_path, context))
 
     return str(output_path)

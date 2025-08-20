@@ -60,9 +60,9 @@ class GenerationResponse(BaseModel):
         return v
 
 
-async def generate_web_page(
+async def generate_web_page_html(
     config: PromptConfig,
-    examples: list[dict],
+    examples: list[str],
     section: PlateSection,
     texts: list[PlateText],
     images: list[PlateImage],

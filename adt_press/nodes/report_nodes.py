@@ -14,12 +14,12 @@ from adt_press.utils.languages import LANGUAGE_MAP
 
 @cache(behavior="recompute")
 def report_processed_images(template_config: TemplateConfig, processed_images: list[ProcessedImage]) -> str:
-    return render_template(template_config, "processed_images.html", dict(images=processed_images))
+    return render_template(template_config, "templates/processed_images.html", dict(images=processed_images))
 
 
 @cache(behavior="recompute")
 def report_pruned_images(template_config: TemplateConfig, pruned_images: list[PrunedImage]) -> str:
-    return render_template(template_config, "pruned_images.html", dict(images=pruned_images))
+    return render_template(template_config, "templates/pruned_images.html", dict(images=pruned_images))
 
 
 @cache(behavior="recompute")
@@ -42,7 +42,7 @@ def report_pages(
 
     return render_template(
         template_config,
-        "page_report.html",
+        "templates/page_report.html",
         dict(
             pages=pdf_pages,
             texts=filtered_pdf_texts,
@@ -64,12 +64,14 @@ def plate_report(template_config: TemplateConfig, plate: Plate) -> str:
     texts_by_id = {t.text_id: t for t in plate.texts}
     images_by_id = {i.image_id: i for i in plate.images}
 
-    return render_template(template_config, "plate_report.html", dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id))
+    return render_template(
+        template_config, "templates/plate_report.html", dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id)
+    )
 
 
 @cache(behavior="recompute")
 def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
-    return render_template(template_config, "config.html", dict(config=OmegaConf.to_yaml(config)))
+    return render_template(template_config, "templates/config.html", dict(config=OmegaConf.to_yaml(config)))
 
 
 @cache(behavior="recompute")
@@ -78,7 +80,7 @@ def translation_report(
 ) -> str:
     return render_template(
         template_config,
-        "translation_report.html",
+        "templates/translation_report.html",
         dict(
             plate=plate,
             output_languages=output_languages_config,
@@ -94,7 +96,7 @@ def web_report(
 ) -> str:
     return render_template(
         template_config,
-        "web_report.html",
+        "templates/web_report.html",
         dict(
             web_pages=web_pages,
         ),
@@ -115,7 +117,7 @@ def report_index(
 ) -> str:
     return render_template(
         template_config,
-        "index.html",
+        "templates/index.html",
         dict(
             report_processed_images=report_processed_images,
             report_pruned_images=report_pruned_images,

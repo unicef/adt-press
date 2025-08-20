@@ -4,7 +4,7 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel, ValidationInfo, field_validator
 
-from adt_press.models.config import PromptConfig, TemplateConfig
+from adt_press.models.config import RowPromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import WebPage
 from adt_press.utils.file import cached_read_text_file
@@ -42,6 +42,9 @@ class GenerationResponse(BaseModel):
         # validate all parts in each column
         for row in v:
             for column in row.columns:
+                if len(column.parts) == 0:
+                    raise ValueError(f"Row with columns {row.columns} has an empty column.")
+
                 for part in column.parts:
                     if part in seen_ids:
                         raise ValueError(f"Duplicate part '{part}' found in row with columns {row.columns}.")
@@ -55,10 +58,8 @@ class GenerationResponse(BaseModel):
         return v
 
 
-async def generate_web_page_from_rows(
-    template_config: TemplateConfig,
-    config: PromptConfig,
-    examples: list[dict],
+async def generate_web_page_rows(
+    config: RowPromptConfig,
     section: PlateSection,
     texts: list[PlateText],
     images: list[PlateImage],
@@ -71,7 +72,6 @@ async def generate_web_page_from_rows(
         texts=[t.model_dump() for t in texts],
         images=[i.model_dump() for i in images],
         language=language,
-        examples=examples,
     )
 
     template_path = config.template_path
@@ -95,8 +95,7 @@ async def generate_web_page_from_rows(
 
     # Convert response rows to HTML
     content = render_template_to_string(
-        template_config,
-        "row_render.html",
+        config.row_template_path,
         {
             "section": section,
             "rows": response.rows,

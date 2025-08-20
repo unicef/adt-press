@@ -3,10 +3,11 @@ import os
 import shutil
 
 import yaml
-from hamilton.function_modifiers import cache
+from hamilton.function_modifiers import cache, config
 
-from adt_press.llm.web_row_generation import generate_web_page_from_rows
-from adt_press.models.config import PromptConfig, TemplateConfig
+from adt_press.llm.web_generation_html import generate_web_page_html
+from adt_press.llm.web_generation_rows import generate_web_page_rows
+from adt_press.models.config import HTMLPromptConfig, PromptConfig, RowPromptConfig, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.web import WebPage
 from adt_press.utils.file import read_text_file
@@ -15,12 +16,12 @@ from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 @cache(behavior="recompute")
-def web_generation_examples(web_generation_examples_config: list[str]) -> list[dict]:
+def web_generation_html_examples(web_generation_html_prompt_config: HTMLPromptConfig) -> list[dict]:
     def map_image_path(example_dir: str, image_path: str) -> str:
         return os.path.join(example_dir, image_path)
 
     examples = []
-    for example_dir in web_generation_examples_config:
+    for example_dir in web_generation_html_prompt_config.example_dirs:
         # load the yaml file from our assets/prompts/adt_examples directory
         example_path = os.path.join(example_dir, "example.yaml")
 
@@ -40,12 +41,51 @@ def web_generation_examples(web_generation_examples_config: list[str]) -> list[d
     return examples
 
 
-def web_pages(
+@config.when(web_generation="rows")
+def web_pages__rows(
     plate_language_config: str,
     plate: Plate,
-    template_config: TemplateConfig,
-    web_generation_prompt_config: PromptConfig,
-    web_generation_examples: list[dict],
+    web_generation_rows_prompt_config: RowPromptConfig,
+) -> list[WebPage]:
+    images_by_id = {img.image_id: img for img in plate.images}
+    texts_by_id = {txt.text_id: txt for txt in plate.texts}
+
+    async def generate_pages():
+        web_pages = []
+        for section in plate.sections:
+            texts: list[PlateText] = []
+            images: list[PlateImage] = []
+
+            for part_id in section.part_ids:
+                text = texts_by_id.get(part_id)
+                texts.extend([text] if text else [])
+                image = images_by_id.get(part_id)
+                images.extend([image] if image else [])
+
+            web_pages.append(generate_web_page_rows(web_generation_rows_prompt_config, section, texts, images, plate_language_config))
+
+        return await gather_with_limit(web_pages, web_generation_rows_prompt_config.rate_limit)
+
+    pages: list[WebPage] = run_async_task(generate_pages)
+
+    image_urls = {
+        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption=img.caption)
+        for img in plate.images
+    }
+
+    # for each page, remap images
+    for page in pages:
+        page.content = replace_images(page.content, image_urls)
+
+    return pages
+
+
+@config.when(web_generation="html")
+def web_pages__html(
+    plate_language_config: str,
+    plate: Plate,
+    web_generation_html_prompt_config: PromptConfig,
+    web_generation_html_examples: list[dict],
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -63,12 +103,12 @@ def web_pages(
                 images.extend([image] if image else [])
 
             web_pages.append(
-                generate_web_page_from_rows(
-                    template_config, web_generation_prompt_config, web_generation_examples, section, texts, images, plate_language_config
+                generate_web_page_html(
+                    web_generation_html_prompt_config, web_generation_html_examples, section, texts, images, plate_language_config
                 )
             )
 
-        return await gather_with_limit(web_pages, web_generation_prompt_config.rate_limit)
+        return await gather_with_limit(web_pages, web_generation_html_prompt_config.rate_limit)
 
     pages: list[WebPage] = run_async_task(generate_pages)
 
