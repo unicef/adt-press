@@ -54,6 +54,8 @@ class GenerationResponse(BaseModel):
                             f"Part '{part}' in row with columns {row.columns} has invalid ID. "
                             f"Must be one of: {', '.join(sorted(valid_ids))}"
                         )
+                    
+                    seen_ids.add(part)
 
         return v
 
