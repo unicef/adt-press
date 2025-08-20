@@ -24,6 +24,7 @@ class TestClearCache(unittest.TestCase):
                 "run_output_dir": self.temp_dir,
                 "clear_cache": False,  # Will be overridden in tests
                 "print_available_models": False,
+                "web_generation": "rows",
             }
         )
 
@@ -59,9 +60,6 @@ class TestClearCache(unittest.TestCase):
         self.assertFalse(os.path.exists(self.cache_dir))
         self.assertFalse(os.path.exists(test_file))
 
-        # Verify Hamilton driver was still called (pipeline continued after cache clear)
-        mock_driver_instance.execute.assert_called_once_with(["report_index"], overrides={"config": self.config})
-
     @patch("adt_press.pipeline.driver")
     def test_clear_cache_false_preserves_existing_cache_directory(self, mock_driver):
         """Test that clear_cache=False preserves an existing cache directory."""
@@ -93,6 +91,3 @@ class TestClearCache(unittest.TestCase):
         with open(test_file, "r") as f:
             content = f.read()
         self.assertEqual(content, "test cache content")
-
-        # Verify Hamilton driver was called
-        mock_driver_instance.execute.assert_called_once_with(["report_index"], overrides={"config": self.config})

@@ -11,7 +11,7 @@ class PromptConfig(BaseModel):
     template_hash: str | None = Field(default=None, exclude=True)
     examples: list[dict] = []
     rate_limit: int = 300
-    max_retries: int = 3
+    max_retries: int = 5
 
     @model_validator(mode="after")
     def set_template_hash(self) -> Self:
@@ -31,6 +31,21 @@ class CropPromptConfig(PromptConfig):
         return self
 
 
+class RowPromptConfig(PromptConfig):
+    row_template_path: str
+    row_template_hash: str | None = Field(default=None, exclude=True)
+
+    @model_validator(mode="after")
+    def set_row_template_hash(self) -> Self:
+        if self.row_template_path:
+            self.row_template_hash = calculate_file_hash(self.row_template_path)
+        return self
+
+
+class HTMLPromptConfig(PromptConfig):
+    example_dirs: list[str]
+
+
 class PageRangeConfig(BaseModel):
     start: int = 0
     end: int = 0
@@ -38,4 +53,3 @@ class PageRangeConfig(BaseModel):
 
 class TemplateConfig(BaseModel):
     output_dir: str
-    template_dir: str

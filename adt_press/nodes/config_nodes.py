@@ -5,7 +5,7 @@ from omegaconf import DictConfig
 from pydantic import BaseModel
 
 from adt_press.llm.image_crop import CropPromptConfig
-from adt_press.models.config import PageRangeConfig, PromptConfig
+from adt_press.models.config import HTMLPromptConfig, PageRangeConfig, PromptConfig, RowPromptConfig
 from adt_press.utils.config import conf_to_object
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
@@ -15,8 +15,8 @@ def config() -> DictConfig:  # pragma: no cover
     assert False, "This function should not be called directly. Use the config from the pipeline instead."
 
 
-def template_config(run_output_dir_config: str, template_dir_config: str) -> TemplateConfig:
-    return TemplateConfig(output_dir=run_output_dir_config, template_dir=template_dir_config)
+def template_config(run_output_dir_config: str) -> TemplateConfig:
+    return TemplateConfig(output_dir=run_output_dir_config)
 
 
 def pdf_path_config(config: DictConfig) -> str:
@@ -48,10 +48,6 @@ def run_output_dir_config(config: DictConfig) -> str:
     run_output_dir = str(config["run_output_dir"])
     os.makedirs(run_output_dir, exist_ok=True)
     return run_output_dir
-
-
-def template_dir_config(config: DictConfig) -> str:
-    return str(config["template_dir"])
 
 
 def pdf_title_config(config: DictConfig, label_config: str) -> str:
@@ -113,13 +109,13 @@ def section_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
 
 
 @cache(behavior="recompute")
-def web_generation_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["web_generation"]))
+def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
+    return HTMLPromptConfig.model_validate(conf_to_object(config["prompts"]["web_generation_html"]))
 
 
 @cache(behavior="recompute")
-def web_generation_examples_config(config: DictConfig) -> list[str]:
-    return list[str](config.get("web_generation_examples", []))
+def web_generation_rows_prompt_config(config: DictConfig) -> RowPromptConfig:
+    return RowPromptConfig.model_validate(conf_to_object(config["prompts"]["web_generation_rows"]))
 
 
 def image_config(config: DictConfig) -> DictConfig:

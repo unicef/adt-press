@@ -5,12 +5,14 @@ input_language: en
 plate_language: en
 output_languages: [en, es, fr]
 
-template_dir: "templates"
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
 
 clear_cache: false
 print_available_models: false
+
+# whether to have the LLM generate full HTML web pages or structured rows
+web_generation: rows
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
@@ -556,15 +558,23 @@ prompts:
     template_path: prompts/section_easy_read.jinja2
     model: gpt-4o-2024-08-06
 
-  web_generation:
+  web_generation_html:
     model: gpt-4o-2024-08-06
-    template_path: prompts/web_generation.jinja2
-    max_retries: 30
+    template_path: prompts/web_generation_html.jinja2
+    max_retries: 25
 
-web_generation_examples:
-  - assets/prompts/adt_examples/text_only_1
-  - assets/prompts/adt_examples/text_and_images_1
-  - assets/prompts/adt_examples/text_and_images_2
-  - assets/prompts/adt_examples/text_and_images_3
+    example_dirs:
+      - assets/prompts/adt_examples/text_only_1
+      - assets/prompts/adt_examples/text_and_images_1
+      - assets/prompts/adt_examples/text_and_images_2
+      - assets/prompts/adt_examples/text_and_images_3    
+
+  web_generation_rows:
+    model: gpt-4o-2024-08-06
+    template_path: prompts/web_generation_rows.jinja2
+    row_template_path: templates/row_render.html
+
+
+
 
 
