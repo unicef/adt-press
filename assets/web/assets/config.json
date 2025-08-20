@@ -15,8 +15,8 @@
     "autoplay": true,
     "describeImages": true,
     "notepad": true,
-    "state": true,
-    "characterDisplay": true,
+    "state": false,
+    "characterDisplay": false,
     "highlight": false
   },
   "analytics": {
