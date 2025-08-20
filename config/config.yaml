@@ -561,6 +561,7 @@ prompts:
   web_generation_html:
     model: gpt-4o-2024-08-06
     template_path: prompts/web_generation_html.jinja2
+    max_retries: 25
 
     example_dirs:
       - assets/prompts/adt_examples/text_only_1
