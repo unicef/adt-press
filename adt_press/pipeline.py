@@ -67,7 +67,7 @@ def run_pipeline(config: DictConfig) -> None:
 
     dr = (
         driver.Builder()
-        .with_config(dict(web_generation=config["web_generation"]))
+        .with_config(dict(web_strategy=config["web_strategy"], crop_strategy=config["crop_strategy"]))
         .with_modules(*modules)
         .with_cache(path=cache_path)
         .with_adapters(NodeHook())

@@ -24,7 +24,8 @@ class TestClearCache(unittest.TestCase):
                 "run_output_dir": self.temp_dir,
                 "clear_cache": False,  # Will be overridden in tests
                 "print_available_models": False,
-                "web_generation": "rows",
+                "web_strategy": "rows",
+                "crop_strategy": "none",
             }
         )
 
