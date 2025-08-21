@@ -102,7 +102,7 @@ class PipelineTest(unittest.TestCase):
             test_config = {
                 "output_dir": self.temp_dir,
                 "web_strategy": "html",
-                "crop_strategy": "none",                
+                "crop_strategy": "none",
                 "label": "momo",
                 "pdf_path": "assets/momo.pdf",
                 "page_range": dict(start=0, end=5),
