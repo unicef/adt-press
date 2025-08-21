@@ -27,9 +27,9 @@
 | adt\_press/models/web.py                        |        8 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py                |        0 |        0 |    100% |           |
 | adt\_press/nodes/config\_nodes.py               |       83 |        0 |    100% |           |
-| adt\_press/nodes/image\_nodes.py                |       95 |        0 |    100% |           |
+| adt\_press/nodes/image\_nodes.py                |      100 |        0 |    100% |           |
 | adt\_press/nodes/pdf\_nodes.py                  |       49 |        0 |    100% |           |
-| adt\_press/nodes/plate\_nodes.py                |       57 |        1 |     98% |        35 |
+| adt\_press/nodes/plate\_nodes.py                |       57 |        0 |    100% |           |
 | adt\_press/nodes/report\_nodes.py               |       39 |        0 |    100% |           |
 | adt\_press/nodes/section\_nodes.py              |       70 |        0 |    100% |           |
 | adt\_press/nodes/web\_nodes.py                  |      116 |        0 |    100% |           |
@@ -48,7 +48,7 @@
 | tests/test\_pipeline.py                         |       72 |        0 |    100% |           |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **1556** |    **4** | **99%** |           |
+|                                       **TOTAL** | **1561** |    **3** | **99%** |           |
 
 
 ## Setup coverage badge
