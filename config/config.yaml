@@ -12,7 +12,10 @@ clear_cache: false
 print_available_models: false
 
 # whether to have the LLM generate full HTML web pages or structured rows
-web_generation: rows
+web_strategy: rows
+
+# our strategy for cropping, either llm or none
+crop_strategy: llm
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""

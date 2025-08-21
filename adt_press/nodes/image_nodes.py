@@ -1,8 +1,19 @@
+from hamilton.function_modifiers import config
+
 from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import CropPromptConfig, get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
 from adt_press.models.config import PromptConfig
-from adt_press.models.image import Image, ImageCaption, ImageCrop, ImageFilterFailure, ImageMeaningfulness, ProcessedImage, PrunedImage
+from adt_press.models.image import (
+    CropCoordinates,
+    Image,
+    ImageCaption,
+    ImageCrop,
+    ImageFilterFailure,
+    ImageMeaningfulness,
+    ProcessedImage,
+    PrunedImage,
+)
 from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
 from adt_press.utils.file import write_file
 from adt_press.utils.image import crop_image, image_bytes, is_blank_image
@@ -119,7 +130,23 @@ def image_captions(
     return {c.image_id: c for c in run_async_task(generate_captions)}
 
 
-def image_crops(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
+@config.when(crop_strategy="none")
+def image_crops__none(pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
+    # in the noop case, we return the full image as the crop
+    return {
+        img.image_id: ImageCrop(
+            image_id=img.image_id,
+            crop_coordinates=CropCoordinates(top_left_x=0, top_left_y=0, bottom_right_x=img.width, bottom_right_y=img.height),
+            upath=img.upath,
+        )
+        for page in pdf_pages
+        for img in page.images
+        if img.image_id not in pruned_image_ids
+    }
+
+
+@config.when(crop_strategy="llm")
+def image_crops__llm(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
     async def generate_crop(page: Page, img: Image) -> ImageCrop:
         coord = await get_image_crop_coordinates(crop_prompt_config, page, img)
 

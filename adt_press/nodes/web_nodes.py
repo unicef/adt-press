@@ -41,7 +41,7 @@ def web_generation_html_examples(web_generation_html_prompt_config: HTMLPromptCo
     return examples
 
 
-@config.when(web_generation="rows")
+@config.when(web_strategy="rows")
 def web_pages__rows(
     plate_language_config: str,
     plate: Plate,
@@ -80,7 +80,7 @@ def web_pages__rows(
     return pages
 
 
-@config.when(web_generation="html")
+@config.when(web_strategy="html")
 def web_pages__html(
     plate_language_config: str,
     plate: Plate,
