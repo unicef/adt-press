@@ -626,7 +626,10 @@ const handleEli5Audio = (eli5Id) => {
         stopAudio();
         const eli5Container = document.getElementById("eli5-content-text");
         highlightElement(eli5Container);
-        const eli5AudioSrc = state.audioFiles[eli5Id];
+        // Get the current language from state or a global config
+        const currentLanguage = state.currentLanguage || (window.appConfig && window.appConfig.languages && window.appConfig.languages.default) || 'es';
+        const audioBasePath = `content/i18n/${currentLanguage}/audio/`;
+        const eli5AudioSrc = audioBasePath + state.audioFiles[eli5Id];
 
         if (eli5AudioSrc) {
             addEli5AudioToQueue(eli5AudioSrc, eli5Container);
