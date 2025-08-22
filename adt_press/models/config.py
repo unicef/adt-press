@@ -11,7 +11,7 @@ class PromptConfig(BaseModel):
     template_hash: str | None = Field(default=None, exclude=True)
     examples: list[dict] = []
     rate_limit: int = 300
-    max_retries: int = 5
+    max_retries: int = 10
 
     @model_validator(mode="after")
     def set_template_hash(self) -> Self:
