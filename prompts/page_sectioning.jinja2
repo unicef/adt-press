@@ -20,14 +20,14 @@ Section the text and images and provide a json output of this format:
 {
     "data": [
         {
-            "id": "<text-id or image-id, this can be duplicated across sections>",
             "section_id": "<section_id>",
-            "section_type": "<section_type>"
+            "section_type": "<section_type>",
+            "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...]
         }
     ]
 }
 
-`id` MUST be the text id or image id.
+`part_ids` MUST contain the text ids and/or image ids that belong to this section.
 
 <section_type_definition>
 "section_type" must only be one of:
