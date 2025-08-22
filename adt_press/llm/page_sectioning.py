@@ -12,9 +12,8 @@ from adt_press.utils.file import cached_read_text_file
 
 
 class Section(BaseModel):
-    section_id: str
-    id: str
     section_type: SectionType
+    part_ids: list[str]
 
 
 class SectionResponse(BaseModel):
@@ -24,7 +23,7 @@ class SectionResponse(BaseModel):
     @field_validator("data")
     @classmethod
     def validate_section_ids(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
-        """Ensure all Section IDs reference valid text or image IDs."""
+        """Ensure all Section part IDs reference valid text or image IDs."""
         # Get valid IDs from context
         valid_ids = set()
         if info.context:
@@ -36,13 +35,13 @@ class SectionResponse(BaseModel):
             image_ids = info.context.get("image_ids", [])
             valid_ids.update(image_ids)
 
-        # Validate each section's ID
-        for section in v:
-            if valid_ids and section.id not in valid_ids:
-                raise ValueError(
-                    f"Section with section_id='{section.section_id}' has invalid id='{section.id}'. "
-                    f"Must be one of: {', '.join(sorted(valid_ids))}"
-                )
+        # Validate each section's part IDs
+        for i, section in enumerate(v):
+            for part_id in section.part_ids:
+                if valid_ids and part_id not in valid_ids:
+                    raise ValueError(
+                        f"Section at index {i} has invalid part_id='{part_id}'. Must be one of: {', '.join(sorted(valid_ids))}"
+                    )
 
         return v
 
@@ -72,20 +71,15 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
         context=validation_context,
     )
 
-    # convert our array to the more logical list of page sections
+    # convert response data directly to page sections
     sections = []
-    section_by_id: dict[str, PageSection] = {}
-    for s in response.data:
-        section = section_by_id.get(s.section_id)
-        if not section:
-            section = PageSection(
-                section_id=f"sec_{page.page_id}_s{s.section_id}",
-                section_type=s.section_type,
-            )
-            section_by_id[s.section_id] = section
-            sections.append(section)
-
-        section.part_ids.append(s.id)
+    for i, s in enumerate(response.data):
+        section = PageSection(
+            section_id=f"sec_{page.page_id}_s{i}",
+            section_type=s.section_type,
+            part_ids=s.part_ids.copy(),
+        )
+        sections.append(section)
 
     return PageSections(
         page_id=page.page_id,
