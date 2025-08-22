@@ -11,25 +11,24 @@ def main() -> None:
 
     # Enable struct mode to validate CLI parameters against config schema
     OmegaConf.set_struct(default_config, True)
-    config = DictConfig(OmegaConf.merge(default_config, cli_config))
+    default_config = DictConfig(OmegaConf.merge(default_config, cli_config))
 
-    run_output_dir = config["run_output_dir"]
+    run_output_dir = default_config["run_output_dir"]
     os.makedirs(run_output_dir, exist_ok=True)
 
     config_path = os.path.join(run_output_dir, "config.yaml")
+    if not os.path.exists(config_path):
+        # create an empty config file to hold our merged config
+        with open(config_path, "w") as f:  # pragma: no cover
+            f.write("# Configuration overrides\n")
 
-    # if the config exists, read it and merge with our config
-    if os.path.exists(config_path):  # pragma: no over
-        print("Reading config from:", config_path)
-        output_config = OmegaConf.load(config_path)
+    file_config = OmegaConf.load(config_path)
 
-        # rebuild our config for this run - cli > output config > default config
-        config = DictConfig(OmegaConf.merge(config, output_config, cli_config))
-    else:
-        print("Writing config to:", config_path)
+    # write our config file out, merging in any new cli options
+    OmegaConf.save(OmegaConf.merge(file_config, cli_config), config_path)
 
-        # otherwise, write our cli config to the output directory
-        OmegaConf.save(cli_config, config_path)
+    # our final config is the merging of the default config, file config and cli config
+    config = DictConfig(OmegaConf.merge(default_config, file_config, cli_config))
 
     # print the final config for debugging
     print("Final configuration:")
