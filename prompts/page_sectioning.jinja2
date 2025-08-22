@@ -20,7 +20,6 @@ Section the text and images and provide a json output of this format:
 {
     "data": [
         {
-            "section_id": "<section_id>",
             "section_type": "<section_type>",
             "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...]
         }
@@ -53,12 +52,12 @@ Section the text and images and provide a json output of this format:
 - "other": For any other section type that does not fit the above categories.
 </section_type_definition>
 
-<section_id_definition>
-- "section_id" is an integer starting from 0, used to indicate a complete self-contained section.
-- EACH SECTION SHOULD BE A SINGLE SELF-CONTAINED SECTION AND ACTIVITY. FOR EXAMPLE, IF THE PAGE HAS THREE activity_multiple_choice sections, THEY SHOULD EACH HAVE THEIR OWN SECTION.
-- FOR THE SAME section_id, the section_type MUST BE THE SAME. However, THERE CAN BE MULTIPLE SECTION IDS FOR THE SAME SECTION TYPE.
-- If text belongs in a different logical section, increment the section_id and give the section a different section_id.
-</section_id_definition>
+<section_definition>
+- Each entry in the data array represents one complete self-contained section.
+- EACH SECTION SHOULD BE A SINGLE SELF-CONTAINED SECTION AND ACTIVITY. FOR EXAMPLE, IF THE PAGE HAS THREE activity_multiple_choice sections, THEY SHOULD EACH HAVE THEIR OWN ENTRY IN THE DATA ARRAY.
+- Sections will be assigned IDs based on their position in the array (0, 1, 2, etc.).
+- If text belongs in a different logical section, create a separate entry in the data array.
+</section_definition>
 
 IMPORTANT:
 - image ids and text-ids can be assigned to multiple sections if it makes educational sense.
