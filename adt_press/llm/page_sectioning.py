@@ -40,8 +40,7 @@ class SectionResponse(BaseModel):
             for part_id in section.part_ids:
                 if valid_ids and part_id not in valid_ids:
                     raise ValueError(
-                        f"Section at index {i} has invalid part_id='{part_id}'. "
-                        f"Must be one of: {', '.join(sorted(valid_ids))}"
+                        f"Section at index {i} has invalid part_id='{part_id}'. Must be one of: {', '.join(sorted(valid_ids))}"
                     )
 
         return v
