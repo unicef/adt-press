@@ -10,7 +10,7 @@
 | adt\_press/llm/image\_caption.py                |       19 |        0 |     100% |           |
 | adt\_press/llm/image\_crop.py                   |       32 |        0 |     100% |           |
 | adt\_press/llm/image\_meaningfulness.py         |       17 |        0 |     100% |           |
-| adt\_press/llm/page\_sectioning.py              |       46 |        0 |     100% |           |
+| adt\_press/llm/page\_sectioning.py              |       41 |        0 |     100% |           |
 | adt\_press/llm/section\_easy\_read.py           |       18 |        0 |     100% |           |
 | adt\_press/llm/section\_explanations.py         |       20 |        0 |     100% |           |
 | adt\_press/llm/section\_glossary.py             |       18 |        0 |     100% |           |
@@ -43,12 +43,12 @@
 | adt\_press/utils/sync.py                        |       14 |        0 |     100% |           |
 | adt\_press/utils/vector.py                      |       14 |        0 |     100% |           |
 | tests/test\_clear\_cache.py                     |       45 |        0 |     100% |           |
-| tests/test\_page\_sectioning\_validator.py      |       49 |        0 |     100% |           |
+| tests/test\_page\_sectioning\_validator.py      |       46 |        0 |     100% |           |
 | tests/test\_parameter\_validation.py            |       30 |        0 |     100% |           |
 | tests/test\_pipeline.py                         |       72 |        0 |     100% |           |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |     100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |     100% |           |
-|                                       **TOTAL** | **1560** |    **0** | **100%** |           |
+|                                       **TOTAL** | **1552** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
