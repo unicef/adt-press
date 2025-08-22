@@ -80,7 +80,10 @@ def run_pipeline(config: DictConfig) -> None:
         for model in litellm.get_valid_models():
             print(f"- {model}")
 
-    dr.execute(["report_index"], overrides={"config": config})
+    # Execute nodes in sequence to ensure reports are generated even if later steps fail
+    nodes_to_execute = ["report_pages", "plate_report", "web_report", "report_index"]
+
+    dr.execute(nodes_to_execute, overrides={"config": config})
 
     # output our run graph as a png
     dr.cache.view_run(output_file_path=f"{config['run_output_dir']}/run.png")
