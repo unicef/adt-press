@@ -20,6 +20,9 @@ crop_strategy: llm
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
+# the default model used for all prompts, unless overridden in a specific prompt config
+default_model: gpt-5
+
 page_range:
   start: 0
   end: 0
@@ -45,22 +48,22 @@ section_filters:
 
 prompts:
   text_extraction:
+    model: default
     template_path: prompts/text_extraction.jinja2
-    model: gpt-5
 
   meaningfulness:
+    model: default
     template_path: prompts/image_meaningfulness.jinja2
-    model: gpt-5
 
   crop:
+    model: default
     template_path: prompts/image_crop.jinja2
-    model: gpt-5
     recrop_template_path: prompts/image_recrop.jinja2
     recrops: 1
 
   caption:
+    model: default
     template_path: prompts/image_caption.jinja2
-    model: gpt-5
     examples:
       - language: Spanish
         page_image: assets/prompts/caption/cuaderno5_13.png
@@ -69,8 +72,8 @@ prompts:
         caption: Un entorno polar donde se aprecian icebergs, agua y nieve.
 
   page_sectioning:
+    model: default
     template_path: prompts/page_sectioning.jinja2
-    model: gpt-5
     max_retries: 10
     examples:
       - page_image_upath: assets/prompts/sectioning/multiple_activities_1/livinguruguay1_107.png
@@ -512,8 +515,8 @@ prompts:
             id: text-39-31
 
   section_explanation:
+    model: default
     template_path: prompts/section_explanation.jinja2
-    model: gpt-5
     examples:
       - page_image_upath: assets/prompts/explanations/avoid_adding_opinions_1/cuaderno5_41.png
         texts:
@@ -550,19 +553,19 @@ prompts:
         response: This is a matching game with questions and answers. You'll see some questions like 'What's your name?' and answers like 'My name is Peter.' The goal is to put the right answer with each question. This helps us practice and get better at saying things in English, like asking about the weather or how someone's feeling. If you match them all, great job!
 
   text_translation:
+    model: default
     template_path: prompts/text_translation.jinja2
-    model: gpt-5
 
   section_glossary:
+    model: default
     template_path: prompts/section_glossary.jinja2
-    model: gpt-5
 
   section_easy_read:
+    model: default
     template_path: prompts/section_easy_read.jinja2
-    model: gpt-5
 
   web_generation_html:
-    model: gpt-5
+    model: default
     template_path: prompts/web_generation_html.jinja2
     max_retries: 25
 
@@ -573,7 +576,7 @@ prompts:
       - assets/prompts/adt_examples/text_and_images_3    
 
   web_generation_rows:
-    model: gpt-5
+    model: default    
     template_path: prompts/web_generation_rows.jinja2
     row_template_path: templates/row_render.html
 
