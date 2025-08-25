@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.models.config import HTMLPromptConfig, PageRangeConfig, PromptConfig, RowPromptConfig
-from adt_press.utils.config import conf_to_object, prompt_config_with_model
+from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
 
@@ -62,6 +62,7 @@ def pdf_hash_config(pdf_path_config: str) -> str:
 def page_range_config(config: DictConfig) -> PageRangeConfig:
     return PageRangeConfig.model_validate(config.get("page_range", {}))
 
+
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["caption"], config["default_model"]))
@@ -70,7 +71,6 @@ def caption_prompt_config(config: DictConfig) -> PromptConfig:
 @cache(behavior="recompute")
 def crop_prompt_config(config: DictConfig) -> CropPromptConfig:
     return CropPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["crop"], config["default_model"]))
-
 
 
 @cache(behavior="recompute")
