@@ -47,7 +47,7 @@ You are an expert at extracting text from a textbook. I have attached a page fro
 
 {% chat role="user" %}
 The following text is extracted from the PDF with fitz (it might be empty):
-{page.text}
+{{ page.text }}
 
 The following image is the page from the PDF to extract the text from.
 {{ page.image_upath | image }}

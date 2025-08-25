@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.models.config import HTMLPromptConfig, PageRangeConfig, PromptConfig, RowPromptConfig
-from adt_press.utils.config import conf_to_object
+from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
 
@@ -65,57 +65,57 @@ def page_range_config(config: DictConfig) -> PageRangeConfig:
 
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["caption"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["caption"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def crop_prompt_config(config: DictConfig) -> CropPromptConfig:
-    return CropPromptConfig.model_validate(conf_to_object(config["prompts"]["crop"]))
+    return CropPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["crop"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def meaningfulness_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["meaningfulness"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["meaningfulness"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def text_extraction_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["text_extraction"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["text_extraction"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["page_sectioning"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["page_sectioning"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def section_explanation_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_explanation"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_explanation"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def text_translation_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["text_translation"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["text_translation"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def section_glossary_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_glossary"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_glossary"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def section_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(conf_to_object(config["prompts"]["section_easy_read"]))
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_easy_read"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
-    return HTMLPromptConfig.model_validate(conf_to_object(config["prompts"]["web_generation_html"]))
+    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_html"], config["default_model"]))
 
 
 @cache(behavior="recompute")
 def web_generation_rows_prompt_config(config: DictConfig) -> RowPromptConfig:
-    return RowPromptConfig.model_validate(conf_to_object(config["prompts"]["web_generation_rows"]))
+    return RowPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_rows"], config["default_model"]))
 
 
 def image_config(config: DictConfig) -> DictConfig:
