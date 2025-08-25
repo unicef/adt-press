@@ -24,6 +24,19 @@ The [sample report](https://unicef.github.io/adt-press/) can help in better unde
 
 - Python 3.13 or higher
 - UV package manager (recommended)
+- Cairo graphics library and headers (e.g., on macOS: `brew install pkg-config cairo pango`)
+  - For Apple Silicon (ARM64) ensure your Homebrew is ARM64 and configure pkg-config:
+    ```bash
+    export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
+    export LDFLAGS="-L/opt/homebrew/lib $LDFLAGS"
+    export CPPFLAGS="-I/opt/homebrew/include $CPPFLAGS"
+    ```
+  - Upgrade pip and force a source build of Pycairo (to avoid pulling a prebuilt wheel):
+    ```bash
+    pip install --upgrade pip setuptools wheel
+    pip uninstall -y pycairo
+    pip install --no-binary=pycairo pycairo
+    ```
 - **You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work.**
 
 ## Installation
