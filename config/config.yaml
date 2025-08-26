@@ -21,7 +21,7 @@ crop_strategy: llm
 custom_plate_path: ""
 
 # the default model used for all prompts, unless overridden in a specific prompt config
-default_model: gemini/gemini-2.5-pro
+default_model: gpt-5
 
 page_range:
   start: 0
