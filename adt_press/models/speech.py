@@ -1,5 +1,5 @@
 
-from openai import BaseModel
+from pydantic import BaseModel
 
 
 class SpeechFile(BaseModel):
