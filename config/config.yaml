@@ -21,7 +21,7 @@ crop_strategy: llm
 custom_plate_path: ""
 
 # the default model used for all prompts, unless overridden in a specific prompt config
-default_model: gpt-5
+default_model: gemini/gemini-2.5-pro
 
 page_range:
   start: 0
@@ -573,13 +573,16 @@ prompts:
       - assets/prompts/adt_examples/text_only_1
       - assets/prompts/adt_examples/text_and_images_1
       - assets/prompts/adt_examples/text_and_images_2
-      - assets/prompts/adt_examples/text_and_images_3    
+      - assets/prompts/adt_examples/text_and_images_3
 
   web_generation_rows:
     model: default    
     template_path: prompts/web_generation_rows.jinja2
     row_template_path: templates/row_render.html
 
+  speech_generation:
+    model: gpt-4o-mini-tts
+    template_path: prompts/speech_generation.jinja2
 
 
 
