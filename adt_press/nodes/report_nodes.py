@@ -77,7 +77,11 @@ def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
 
 @cache(behavior="recompute")
 def translation_report(
-    template_config: TemplateConfig, output_languages_config: list[str], plate: Plate, plate_translations: dict[str, dict[str, str]], speech_files: dict[str, dict[str, SpeechFile]]
+    template_config: TemplateConfig,
+    output_languages_config: list[str],
+    plate: Plate,
+    plate_translations: dict[str, dict[str, str]],
+    speech_files: dict[str, dict[str, SpeechFile]],
 ) -> str:
     return render_template(
         template_config,

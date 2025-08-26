@@ -1,12 +1,12 @@
-
-
 from adt_press.llm.speech_generation import generate_speech_file
 from adt_press.models.config import PromptConfig
 from adt_press.models.speech import SpeechFile
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
-def speech_files(run_output_dir_config: str, speech_prompt_config: PromptConfig, plate_translations: dict[str, dict[str, str]]) -> dict[str, dict[str, SpeechFile]]:
+def speech_files(
+    run_output_dir_config: str, speech_prompt_config: PromptConfig, plate_translations: dict[str, dict[str, str]]
+) -> dict[str, dict[str, SpeechFile]]:
     async def generate_speech_files():
         tts = []
         for language, texts in plate_translations.items():
