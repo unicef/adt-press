@@ -6,6 +6,7 @@ from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate
 from adt_press.models.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.models.speech import SpeechFile
 from adt_press.models.text import OutputText, PageText, PageTexts
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
@@ -76,7 +77,11 @@ def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
 
 @cache(behavior="recompute")
 def translation_report(
-    template_config: TemplateConfig, output_languages_config: list[str], plate: Plate, plate_translations: dict[str, dict[str, str]]
+    template_config: TemplateConfig,
+    output_languages_config: list[str],
+    plate: Plate,
+    plate_translations: dict[str, dict[str, str]],
+    speech_files: dict[str, dict[str, SpeechFile]],
 ) -> str:
     return render_template(
         template_config,
@@ -85,6 +90,8 @@ def translation_report(
             plate=plate,
             output_languages=output_languages_config,
             translations=plate_translations,
+            speech_files=speech_files,
+            LANGUAGE_MAP=LANGUAGE_MAP,
         ),
     )
 

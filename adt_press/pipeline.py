@@ -8,7 +8,7 @@ from hamilton import driver, registry, telemetry
 from hamilton.lifecycle import NodeExecutionHook
 from omegaconf import DictConfig
 
-from adt_press.nodes import config_nodes, image_nodes, pdf_nodes, plate_nodes, report_nodes, section_nodes, web_nodes
+from adt_press.nodes import config_nodes, image_nodes, pdf_nodes, plate_nodes, report_nodes, section_nodes, speech_nodes, web_nodes
 
 registry.disable_autoload()
 telemetry.disable_telemetry()
@@ -24,6 +24,7 @@ modules = [
     section_nodes,
     web_nodes,
     plate_nodes,
+    speech_nodes,
 ]
 
 

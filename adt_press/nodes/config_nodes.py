@@ -109,6 +109,11 @@ def section_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
 
 
 @cache(behavior="recompute")
+def speech_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["speech_generation"], config["default_model"]))
+
+
+@cache(behavior="recompute")
 def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
     return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_html"], config["default_model"]))
 
