@@ -35,7 +35,7 @@
 | adt\_press/nodes/report\_nodes.py               |       40 |        0 |     100% |           |
 | adt\_press/nodes/section\_nodes.py              |       70 |        0 |     100% |           |
 | adt\_press/nodes/speech\_nodes.py               |       16 |        0 |     100% |           |
-| adt\_press/nodes/web\_nodes.py                  |      116 |        0 |     100% |           |
+| adt\_press/nodes/web\_nodes.py                  |      129 |        0 |     100% |           |
 | adt\_press/pipeline.py                          |       31 |        0 |     100% |           |
 | adt\_press/utils/\_\_init\_\_.py                |        0 |        0 |     100% |           |
 | adt\_press/utils/file.py                        |       30 |        0 |     100% |           |
@@ -51,7 +51,7 @@
 | tests/test\_pipeline.py                         |       72 |        0 |     100% |           |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |     100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |     100% |           |
-|                                       **TOTAL** | **1596** |    **0** | **100%** |           |
+|                                       **TOTAL** | **1609** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
