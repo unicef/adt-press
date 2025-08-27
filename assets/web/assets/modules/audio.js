@@ -238,10 +238,10 @@ const processAudioQueue = async () => {
     const { currentIndex, audioElements, audioSpeed, describeImagesMode, navigationDirection } = state;
 
     if (currentIndex < 0 || currentIndex >= audioElements.length) {
+        console.log(`Audio index: ${state.currentIndex} out of bounds in elements of length ${audioElements.length}`);
         stopAudio();
         state.currentIndex = 0; // Reset index if out of bounds
         state.navigationDirection = 'forward'; // Reset navigation direction
-        console.log('Audio index out of bounds, stopping audio playback.');
         return;
     }
 
