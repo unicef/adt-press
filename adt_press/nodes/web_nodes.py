@@ -9,6 +9,7 @@ from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_rows import generate_web_page_rows
 from adt_press.models.config import HTMLPromptConfig, PromptConfig, RowPromptConfig, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
+from adt_press.models.speech import SpeechFile
 from adt_press.models.web import WebPage
 from adt_press.utils.file import read_text_file
 from adt_press.utils.html import render_template, replace_images, replace_texts
@@ -132,6 +133,7 @@ def package_adt_web(
     plate_language_config: str,
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
+    speech_files: dict[str, dict[str, SpeechFile]],
     web_pages: list[WebPage],
 ) -> str:
     default_language = list(plate_translations.keys())[0]
@@ -188,6 +190,9 @@ def package_adt_web(
     render_template(template_config, "nav.html", dict(webpages=web_pages, texts=plate_texts), output_name="adt/content/navigation/nav.html")
 
     for language, translations in plate_translations.items():
+        # speech files
+        speeches = speech_files.get(language, {})
+
         # create our language directory
         locale_dir = os.path.join(adt_dir, "content", "i18n", language)
         os.makedirs(locale_dir, exist_ok=True)
@@ -196,12 +201,27 @@ def package_adt_web(
         with open(os.path.join(locale_dir, "texts.json"), "w") as f:
             json.dump(translations, f, indent=2)
 
-        # TODO: replace with TTS
+        audio_dir = os.path.join(locale_dir, "audio")
+        os.makedirs(audio_dir, exist_ok=True)
         with open(os.path.join(locale_dir, "audios.json"), "w") as f:
-            json.dump({}, f, indent=2)
+            audio_map = dict[str, str]()
+            for text_id, speech in speeches.items():
+                filename = f"{speech.text_id}.mp3"
+                audio_map[text_id] = filename
+
+                # copy the audio file over
+                shutil.copy(os.path.join(run_output_dir_config, speech.speech_upath), os.path.join(audio_dir, filename))
+
+            json.dump(audio_map, f, indent=2)
 
         # TODO: replace with real sign videos
         with open(os.path.join(locale_dir, "videos.json"), "w") as f:
+            json.dump({}, f, indent=2)
+
+        # TODO: replace with real glossary
+        glossary_dir = os.path.join(locale_dir, "glossary")
+        os.makedirs(glossary_dir, exist_ok=True)
+        with open(os.path.join(glossary_dir, "glossary.json"), "w") as f:
             json.dump({}, f, indent=2)
 
     # copy our assets to the output directory

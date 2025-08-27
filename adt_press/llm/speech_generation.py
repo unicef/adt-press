@@ -21,7 +21,7 @@ async def generate_speech_file(run_output_dir: str, config: PromptConfig, langua
     # since we are calling the speech endpoint, not completion, we don't use banks but render straight to text
     prompt = render_template_to_string(config.template_path, context)
 
-    speech_id = f"tts_{language_code}_{text_id}"
+    speech_id = f"{text_id}_{language_code}"
     speech_dir = os.path.join(run_output_dir, "audio", language_code)
     os.makedirs(speech_dir, exist_ok=True)
 
