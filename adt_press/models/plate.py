@@ -19,7 +19,7 @@ class PlateSection(BaseModel):
     section_type: SectionType
     page_image_upath: str
     part_ids: list[str]
-    explanation: str
+    explanation_id: str | None
     easy_read: str
     glossary: list[GlossaryItem]
 

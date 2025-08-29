@@ -35,7 +35,8 @@ class PageSection(BaseModel):
 
 
 class SectionExplanation(BaseModel):
-    section_id: str
+    explanation_id: str
+    section_id: str    
     reasoning: str
     explanation: str
 
