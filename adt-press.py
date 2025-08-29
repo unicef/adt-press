@@ -7,6 +7,7 @@ from adt_press.pipeline import run_pipeline
 # never write these flags to our config file
 TEMP_FLAGS = ["clear_cache", "print_available_models"]
 
+
 def main() -> None:
     cli_config = OmegaConf.from_cli()
     default_config = OmegaConf.load("config/config.yaml")
@@ -27,7 +28,7 @@ def main() -> None:
     file_config = OmegaConf.load(config_path)
 
     # write our config file out, merging in any new cli options
-    output_config = OmegaConf.merge(file_config, cli_config)
+    output_config = DictConfig(OmegaConf.merge(file_config, cli_config))
     for flag in TEMP_FLAGS:
         if flag in output_config:
             del output_config[flag]
