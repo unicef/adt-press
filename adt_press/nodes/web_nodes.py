@@ -236,8 +236,12 @@ def package_adt_web(
         output_name="adt/assets/config.json",
     )
 
-    # copy tailwind in
-    tailwind_path = os.path.join("assets", "web", "assets", "tailwind_output.css")
-    shutil.copy(tailwind_path, os.path.join(content_dir, "tailwind_output.css"))
+    # copy Makefile in
+    makefile_path = os.path.join("assets", "web", "utils", "Makefile")
+    shutil.copy(makefile_path, os.path.join(adt_dir, "Makefile"))
+
+    # copy package.json in
+    package_path = os.path.join("assets", "web", "utils", "package.json")
+    shutil.copy(package_path, os.path.join(adt_dir, "package.json"))
 
     return "done"
