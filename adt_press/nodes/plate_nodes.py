@@ -34,7 +34,7 @@ def generated_plate(
             if page_section.is_pruned:
                 continue
 
-            eli5 = explanations_by_section_id[page_section.section_id]
+            eli5 = explanations_by_section_id.get(page_section.section_id, None)
 
             plate_sections.append(
                 PlateSection(
