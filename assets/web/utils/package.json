@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "tailwindcss": "^3.4.17"
+  },
+  "type": "module"
+}
