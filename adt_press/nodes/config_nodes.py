@@ -5,7 +5,7 @@ from omegaconf import DictConfig
 from pydantic import BaseModel
 
 from adt_press.llm.image_crop import CropPromptConfig
-from adt_press.models.config import HTMLPromptConfig, PageRangeConfig, PromptConfig, RowPromptConfig
+from adt_press.models.config import HTMLPromptConfig, PageRangeConfig, PromptConfig, RowPromptConfig, TwoColumnsPromptConfig
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
@@ -121,6 +121,11 @@ def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
 @cache(behavior="recompute")
 def web_generation_rows_prompt_config(config: DictConfig) -> RowPromptConfig:
     return RowPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_rows"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def web_generation_twoColumns_prompt_config(config: DictConfig) -> TwoColumnsPromptConfig:
+    return TwoColumnsPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_twoColumns"], config["default_model"]))
 
 
 def image_config(config: DictConfig) -> DictConfig:

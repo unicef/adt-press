@@ -42,6 +42,17 @@ class RowPromptConfig(PromptConfig):
         return self
 
 
+class TwoColumnsPromptConfig(PromptConfig):
+    row_template_path: str
+    row_template_hash: str | None = Field(default=None, exclude=True)
+
+    @model_validator(mode="after")
+    def set_row_template_hash(self) -> Self:
+        if self.row_template_path:
+            self.row_template_hash = calculate_file_hash(self.row_template_path)
+        return self
+
+
 class HTMLPromptConfig(PromptConfig):
     example_dirs: list[str]
 

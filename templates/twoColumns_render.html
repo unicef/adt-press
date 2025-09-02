@@ -1,0 +1,29 @@
+<div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content">
+    <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}" data-id="{{ section.section_id }}" {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}"{% endif %}>
+    {% for row in rows %}
+        <div class="flex flex-row px-4 mt-6 mb-6 items-start">
+            {% for col in row.columns %}
+                {% if loop.index == 1 %}
+                    <!-- Center column for images (span 3) -->
+                    <div class="basis-{{ col.span }}/5 p-6 mr-6 flex flex-col justify-center items-center" style="background-color: {{ col.background_color }};">
+                        {% for part in col.parts %}
+                        {% if images[part] %}
+                        <img class="mb-6 max-w-full rounded-lg shadow-lg" data-id="{{ part }}" style="max-height: 500px; object-fit: contain;"></img>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- Right column for text (span 2) -->
+                    <div class="basis-{{ col.span }}/5 p-6 flex flex-col justify-start" style="color: {{ col.color }}; background-color: {{ col.background_color }};">
+                        {% for part in col.parts %}
+                        {% if texts[part] %}
+                        <p class="mb-4 text-lg leading-relaxed text-left font-normal" data-id="{{ part }}">{{ texts[part] }}</p>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </section>
+</div>
