@@ -8,9 +8,9 @@
   },
   "features": {
     "signLanguage": false,
-    "easyRead": false,
+    "easyRead": true,
     "glossary": false,
-    "eli5": false,
+    "eli5": true,
     "readAloud": true,
     "autoplay": false,
     "describeImages": false,

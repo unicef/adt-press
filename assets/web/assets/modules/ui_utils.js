@@ -427,13 +427,12 @@ const handleEli5State = () => {
  * @private
  */
 const displayEli5Content = () => {
-    const mainSection = document.querySelector('section[data-id^="sectioneli5"]');
-    if (!mainSection) {
+    const eli5Id = document.querySelector('section[data-eli5-id]')?.getAttribute("data-eli5-id");
+    if (!eli5Id) {
         console.log('ELI5 section not found on this page, skipping content display');
         return;
     }
     
-    const eli5Id = mainSection.getAttribute("data-id");
     const eli5Text = state.translations[eli5Id];
     
     if (eli5Text) {
@@ -522,7 +521,7 @@ export const handleEli5Popup = () => {
     const explainButton = document.getElementById('explain-me-button');
     const eli5Content = document.getElementById('eli5-content');
     const closeButton = document.getElementById('close-eli5-content');
-    const mainSection = document.querySelector('section[data-id^="sectioneli5"]');
+    const mainSection = document.querySelector('section[data-eli5-id]');
     
     // Check if elements exist before proceeding
     if (!explainButton || !eli5Content || !closeButton || !mainSection) {
@@ -530,7 +529,7 @@ export const handleEli5Popup = () => {
         return;
     }
     
-    const eli5Id = mainSection.getAttribute("data-id");
+    const eli5Id = mainSection.getAttribute("data-eli5-id");
 
     // Toggle the visibility when the button is clicked
     explainButton.addEventListener('click', function () {
@@ -574,7 +573,7 @@ export const handleEli5Popup = () => {
 const handleEli5ModeToggle = () => {
     const explainButton = document.getElementById('explain-me-button');
     if (state.eli5Mode) {
-        const mainSection = document.querySelector('section[data-id^="sectioneli5"]');
+        const mainSection = document.querySelector('section[data-eli5-id]');
         if (!mainSection) {
             console.log('ELI5 section not found on this page');
             if (explainButton) {
@@ -583,7 +582,7 @@ const handleEli5ModeToggle = () => {
             return;
         }
 
-        const eli5Id = mainSection.getAttribute("data-id");
+        const eli5Id = mainSection.getAttribute("data-eli5-id");
         const eli5Text = state.translations[eli5Id];
 
         if (eli5Text) {

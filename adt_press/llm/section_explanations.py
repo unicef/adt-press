@@ -40,6 +40,7 @@ async def get_section_explanation(
     )
 
     return SectionExplanation(
+        explanation_id=f"{section.section_id}_eli5",
         section_id=section.section_id,
         reasoning=response.reasoning,
         explanation=response.explanation,

@@ -34,17 +34,22 @@ def generated_plate(
             if page_section.is_pruned:
                 continue
 
+            eli5 = explanations_by_section_id.get(page_section.section_id, None)
+
             plate_sections.append(
                 PlateSection(
                     section_id=page_section.section_id,
                     section_type=page_section.section_type,
                     page_image_upath=page.image_upath,
-                    explanation=explanations_by_section_id[page_section.section_id].explanation,
+                    explanation_id=eli5.explanation_id if eli5 else None,
                     easy_read=section_easy_reads_by_id[page_section.section_id].text,
                     glossary=section_glossaries_by_id[page_section.section_id].items,
                     part_ids=page_section.part_ids,
                 )
             )
+
+            if eli5:
+                texts[eli5.explanation_id] = PlateText(text_id=eli5.explanation_id, text=eli5.explanation)
 
             for part_id in page_section.part_ids:
                 if part_id in processed_images_by_id:
