@@ -35,7 +35,7 @@
 | adt\_press/nodes/report\_nodes.py               |       40 |        0 |    100% |           |
 | adt\_press/nodes/section\_nodes.py              |       70 |        0 |    100% |           |
 | adt\_press/nodes/speech\_nodes.py               |       16 |        0 |    100% |           |
-| adt\_press/nodes/web\_nodes.py                  |      129 |        0 |    100% |           |
+| adt\_press/nodes/web\_nodes.py                  |      135 |        0 |    100% |           |
 | adt\_press/pipeline.py                          |       31 |        0 |    100% |           |
 | adt\_press/utils/\_\_init\_\_.py                |        0 |        0 |    100% |           |
 | adt\_press/utils/file.py                        |       30 |        0 |    100% |           |
@@ -45,13 +45,14 @@
 | adt\_press/utils/pdf.py                         |       46 |        0 |    100% |           |
 | adt\_press/utils/sync.py                        |       14 |        0 |    100% |           |
 | adt\_press/utils/vector.py                      |       14 |        0 |    100% |           |
+| adt\_press/utils/web\_assets.py                 |        7 |        0 |    100% |           |
 | tests/test\_clear\_cache.py                     |       45 |        0 |    100% |           |
 | tests/test\_page\_sectioning\_validator.py      |       46 |        0 |    100% |           |
 | tests/test\_parameter\_validation.py            |       30 |        0 |    100% |           |
 | tests/test\_pipeline.py                         |       72 |        0 |    100% |           |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **1618** |    **1** | **99%** |           |
+|                                       **TOTAL** | **1631** |    **1** | **99%** |           |
 
 
 ## Setup coverage badge
