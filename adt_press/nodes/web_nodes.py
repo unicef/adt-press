@@ -14,6 +14,7 @@ from adt_press.models.web import WebPage
 from adt_press.utils.file import read_text_file
 from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.sync import gather_with_limit, run_async_task
+from adt_press.utils.web_assets import build_web_assets
 
 
 @cache(behavior="recompute")
@@ -243,5 +244,11 @@ def package_adt_web(
     # copy package.json in
     package_path = os.path.join("assets", "web", "utils", "package.json")
     shutil.copy(package_path, os.path.join(adt_dir, "package.json"))
+
+    # copy tailwind.config.js in
+    tailwind_path = os.path.join("assets", "web", "utils", "tailwind.config.js")
+    shutil.copy(tailwind_path, os.path.join(adt_dir, "tailwind.config.js"))
+
+    build_web_assets(run_output_dir_config)
 
     return "done"

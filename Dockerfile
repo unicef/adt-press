@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     libcairo2-dev \
     pkg-config \
     python3-dev \
+    npm \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
