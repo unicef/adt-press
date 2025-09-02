@@ -34,24 +34,42 @@
         {% endfor %}
     </div>
 
-
+            <!-- Easy Read Section -->
             <div class="border-t bg-green-50 overflow-hidden">
+                <!-- Easy Read Header -->
                 <div class="bg-green-600 text-white px-3 py-2 text-sm font-medium">
                     Easy Read
                 </div>
-                <div class="p-3">
-                    <div class="text-sm text-gray-800">{{ section.easy_read }}</div>
+                {% for part_id in section.part_ids %}
+                {% with easy_read_id = part_id ~ "_easy_read" %}
+                {% with easy_read = texts_by_id[easy_read_id] %}
+                {% if easy_read %}
+                <div class="grid grid-cols-8">
+                    <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+                        {{ easy_read.text }}
+                    </div>
+                    <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ easy_read_id }}</span>
+                    </div>
                 </div>
+                {% endif %}
+                {% endwith %}
+                {% endwith %}
+                {% endfor %}
             </div>
 
+            {% with explanation=texts_by_id[section.explanation_id] %}
+            {% if explanation %}
             <div class="border-t bg-gray-50 overflow-hidden">
                 <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
                     Explanation
                 </div>
                 <div class="p-3">
-                    <div class="text-sm text-gray-800">{{ section.explanation }}</div>
+                    <div class="text-sm text-gray-800">{{ explanation.text }}</div>
                 </div>
             </div>
+            {% endif %}
+            {% endwith %}
 
         <div class="border-t bg-yellow-50 overflow-hidden">
             <!-- Glossary Header -->

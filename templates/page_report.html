@@ -212,7 +212,6 @@
                                                 <!-- Content Rows -->
                                                 
                                                 {% for part_id in section.part_ids %}
-                                                <!-- Content -->
                                                 <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
                                                     {% if texts_by_id[part_id] %}
                                                     {{ texts_by_id[part_id].text }}
@@ -279,25 +278,26 @@
                                             {% endwith %}   
                                             
                                             <!-- Easy Read Section -->
-                                            {% with easy_read=section_easy_reads[section.section_id] %}
-                                            {% if easy_read %}
                                             <div class="border-t bg-green-50 overflow-hidden">
                                                 <!-- Easy Read Header -->
                                                 <div class="bg-green-600 text-white px-3 py-2 text-sm font-medium">
                                                     Easy Read
                                                 </div>
-                                                <!-- Easy Read Content -->
-                                                <div class="p-3">
-                                                    <div class="text-sm text-gray-800">{{ easy_read.text }}</div>
+                                                {% for part_id in section.part_ids %}
+                                                {% with easy_read = easy_reads[part_id] %}
+                                                {% if easy_read %}                                            
+                                                <div class="grid grid-cols-8">
+                                                    <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+                                                        {{ easy_read.easy_read }}
+                                                    </div>
+                                                    <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                                                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ easy_read.easy_read_id }}</span>
+                                                    </div>
                                                 </div>
-                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
-                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
-                                                    {{ easy_read.reasoning }}
-                                                    <div class="clear-both"></div>
-                                                </div>
+                                                {% endif %}
+                                                {% endwith %}
+                                                {% endfor %}
                                             </div>
-                                            {% endif %}
-                                            {% endwith %}
                                             
                                             <!-- Glossary Section -->
                                             {% with glossary=section_glossaries[section.section_id] %}

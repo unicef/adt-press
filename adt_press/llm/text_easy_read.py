@@ -4,7 +4,7 @@ from litellm import acompletion
 from pydantic import BaseModel
 
 from adt_press.models.config import PromptConfig
-from adt_press.models.section import PageSection, SectionEasyRead
+from adt_press.models.text import EasyReadText, PageText
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
@@ -14,12 +14,11 @@ class EasyReadResponse(BaseModel):
     reasoning: str
 
 
-async def get_section_easy_read(language_code: str, config: PromptConfig, section: PageSection, texts: list[str]) -> SectionEasyRead:
+async def get_text_easy_read(language_code: str, config: PromptConfig, text: PageText) -> EasyReadText:
     output_language = LANGUAGE_MAP[language_code]
 
     context = dict(
-        section=section,
-        texts=texts,
+        text=text,
         output_language=output_language,
         examples=config.examples,
     )
@@ -33,8 +32,9 @@ async def get_section_easy_read(language_code: str, config: PromptConfig, sectio
         max_retries=config.max_retries,
     )
 
-    return SectionEasyRead(
-        section_id=section.section_id,
-        text=response.data,
+    return EasyReadText(
+        easy_read_id=f"{text.text_id}_easy_read",
+        text_id=text.text_id,
+        easy_read=response.data,
         reasoning=response.reasoning,
     )

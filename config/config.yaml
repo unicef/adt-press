@@ -560,9 +560,9 @@ prompts:
     model: default
     template_path: prompts/section_glossary.jinja2
 
-  section_easy_read:
+  text_easy_read:
     model: default
-    template_path: prompts/section_easy_read.jinja2
+    template_path: prompts/text_easy_read.jinja2
 
   web_generation_html:
     model: default
