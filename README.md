@@ -11,10 +11,10 @@
 | adt\_press/llm/image\_crop.py                   |       32 |        0 |    100% |           |
 | adt\_press/llm/image\_meaningfulness.py         |       17 |        0 |    100% |           |
 | adt\_press/llm/page\_sectioning.py              |       41 |        0 |    100% |           |
-| adt\_press/llm/section\_easy\_read.py           |       18 |        0 |    100% |           |
 | adt\_press/llm/section\_explanations.py         |       20 |        0 |    100% |           |
 | adt\_press/llm/section\_glossary.py             |       18 |        0 |    100% |           |
 | adt\_press/llm/speech\_generation.py            |       18 |        0 |    100% |           |
+| adt\_press/llm/text\_easy\_read.py              |       18 |        0 |    100% |           |
 | adt\_press/llm/text\_extraction.py              |       20 |        0 |    100% |           |
 | adt\_press/llm/text\_translation.py             |       19 |        0 |    100% |           |
 | adt\_press/llm/web\_generation\_html.py         |       46 |        0 |    100% |           |
@@ -22,18 +22,18 @@
 | adt\_press/models/\_\_init\_\_.py               |        0 |        0 |    100% |           |
 | adt\_press/models/image.py                      |       36 |        0 |    100% |           |
 | adt\_press/models/pdf.py                        |        8 |        0 |    100% |           |
-| adt\_press/models/plate.py                      |       23 |        0 |    100% |           |
-| adt\_press/models/section.py                    |       51 |        0 |    100% |           |
+| adt\_press/models/plate.py                      |       22 |        0 |    100% |           |
+| adt\_press/models/section.py                    |       47 |        0 |    100% |           |
 | adt\_press/models/speech.py                     |        6 |        0 |    100% |           |
-| adt\_press/models/text.py                       |       37 |        0 |    100% |           |
+| adt\_press/models/text.py                       |       42 |        0 |    100% |           |
 | adt\_press/models/web.py                        |        8 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py                |        0 |        0 |    100% |           |
 | adt\_press/nodes/config\_nodes.py               |       86 |        0 |    100% |           |
 | adt\_press/nodes/image\_nodes.py                |      100 |        0 |    100% |           |
-| adt\_press/nodes/pdf\_nodes.py                  |       49 |        0 |    100% |           |
-| adt\_press/nodes/plate\_nodes.py                |       60 |        0 |    100% |           |
+| adt\_press/nodes/pdf\_nodes.py                  |       62 |        0 |    100% |           |
+| adt\_press/nodes/plate\_nodes.py                |       64 |        0 |    100% |           |
 | adt\_press/nodes/report\_nodes.py               |       40 |        0 |    100% |           |
-| adt\_press/nodes/section\_nodes.py              |       70 |        0 |    100% |           |
+| adt\_press/nodes/section\_nodes.py              |       59 |        0 |    100% |           |
 | adt\_press/nodes/speech\_nodes.py               |       16 |        0 |    100% |           |
 | adt\_press/nodes/web\_nodes.py                  |      135 |        0 |    100% |           |
 | adt\_press/pipeline.py                          |       31 |        0 |    100% |           |
@@ -52,7 +52,7 @@
 | tests/test\_pipeline.py                         |       72 |        0 |    100% |           |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **1631** |    **1** | **99%** |           |
+|                                       **TOTAL** | **1637** |    **1** | **99%** |           |
 
 
 ## Setup coverage badge
