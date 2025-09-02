@@ -31,7 +31,7 @@ audio::-webkit-media-controls-time-remaining-display {
         </div>
         
         {% for text in plate.texts %}
-        <div class="grid grid-cols-10">
+        <div class="grid grid-cols-12">
             <div class="col-span-6 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
                 {{ translations[text.text_id] }}
             </div>
@@ -39,7 +39,9 @@ audio::-webkit-media-controls-time-remaining-display {
                 <audio controls>
                 <source src="{{ speech_files[text.text_id].speech_upath }}" type="audio/mpeg">
                 Your browser does not support the audio element.
-                </audio>                
+                </audio>     
+            </div>           
+            <div class="col-span-2 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
                 <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text.text_id }}</span>
             </div>
         </div>

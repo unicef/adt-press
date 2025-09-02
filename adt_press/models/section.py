@@ -54,12 +54,6 @@ class SectionGlossary(BaseModel):
     reasoning: str
 
 
-class SectionEasyRead(BaseModel):
-    section_id: str
-    text: str
-    reasoning: str
-
-
 class PageSections(BaseModel):
     page_id: str
     sections: list[PageSection]

@@ -26,6 +26,13 @@ class TextType(str, enum.Enum):
     other = "other"
 
 
+class EasyReadText(BaseModel):
+    easy_read_id: str
+    text_id: str
+    easy_read: str
+    reasoning: str
+
+
 class PageText(BaseModel):
     text_id: str
     text: str

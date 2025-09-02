@@ -24,7 +24,5 @@ Provide me the answer in the given structure. Please take your time and think ca
 {% endchat %}
 
 {% chat role="user" %}
-{% for text in texts %}
-{{ text }}
-{% endfor %}
+{{ text.text }}
 {% endchat %}

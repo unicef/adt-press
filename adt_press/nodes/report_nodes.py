@@ -5,9 +5,9 @@ from adt_press.models.config import TemplateConfig
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate
-from adt_press.models.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
+from adt_press.models.section import PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.speech import SpeechFile
-from adt_press.models.text import OutputText, PageText, PageTexts
+from adt_press.models.text import EasyReadText, OutputText, PageText, PageTexts
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -34,7 +34,7 @@ def report_pages(
     explanations_by_section_id: dict[str, SectionExplanation],
     output_pdf_texts_by_id: dict[str, OutputText],
     section_glossaries_by_id: dict[str, SectionGlossary],
-    section_easy_reads_by_id: dict[str, SectionEasyRead],
+    easy_reads_by_text_id: dict[str, EasyReadText],
     input_language_config: str,
     plate_language_config: str,
 ) -> str:
@@ -53,7 +53,7 @@ def report_pages(
             explanations=explanations_by_section_id,
             output_texts=output_pdf_texts_by_id,
             section_glossaries=section_glossaries_by_id,
-            section_easy_reads=section_easy_reads_by_id,
+            easy_reads=easy_reads_by_text_id,
             input_language=input_language,
             output_language=output_language,
         ),

@@ -7,8 +7,8 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateImage, PlateSection, PlateText
-from adt_press.models.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
-from adt_press.models.text import OutputText
+from adt_press.models.section import PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.text import EasyReadText, OutputText
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
@@ -22,7 +22,7 @@ def generated_plate(
     output_pdf_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
     section_glossaries_by_id: dict[str, SectionGlossary],
-    section_easy_reads_by_id: dict[str, SectionEasyRead],
+    easy_reads_by_text_id: dict[str, EasyReadText],
 ) -> Plate:
     images: dict[str, PlateImage] = {}
     texts: dict[str, PlateText] = {}
@@ -42,7 +42,6 @@ def generated_plate(
                     section_type=page_section.section_type,
                     page_image_upath=page.image_upath,
                     explanation_id=eli5.explanation_id if eli5 else None,
-                    easy_read=section_easy_reads_by_id[page_section.section_id].text,
                     glossary=section_glossaries_by_id[page_section.section_id].items,
                     part_ids=page_section.part_ids,
                 )
@@ -58,6 +57,12 @@ def generated_plate(
                 else:
                     txt = output_pdf_texts_by_id[part_id]
                     texts[txt.text_id] = PlateText(text_id=txt.text_id, text=txt.text)
+
+                    # add easy read version if it exists
+                    easy_read = easy_reads_by_text_id.get(txt.text_id)
+                    if easy_read:
+                        txt = output_pdf_texts_by_id[easy_read.easy_read_id]
+                        texts[txt.text_id] = PlateText(text_id=txt.text_id, text=txt.text)
 
     return Plate(
         title=pdf_title_config,
