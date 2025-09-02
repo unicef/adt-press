@@ -187,7 +187,6 @@ export const applyTranslations = async () => {
  * @private
  */
 const applyTranslationToElements = (key, translationKey) => {
-    console.log(`Applying translation for key: ${key} using translationKey: ${translationKey}`);
     const elements = document.querySelectorAll(`[data-id="${key}"]`);
     elements.forEach((element) => {
         if (element) {
