@@ -47,6 +47,8 @@ section_filters:
   pruned_section_types:
     - back_cover
     - credits
+    - inside_cover
+   
 
 prompts:
   text_extraction:
@@ -59,9 +61,9 @@ prompts:
 
   crop:
     model: default
-    template_path: prompts/image_crop.jinja2
-    recrop_template_path: prompts/image_recrop.jinja2
-    recrops: 1
+    template_path: prompts/image_crop_storybook.jinja2
+    recrop_template_path: prompts/image_recrop_storybook.jinja2
+    recrops: 2
 
   caption:
     model: default

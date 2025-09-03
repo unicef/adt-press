@@ -1,12 +1,19 @@
 You are a layout planner for a storybook being adapted from print PDF to web and mobile.
-Return a JSON object with a list of rows. Each row contains exactly 2 columns arranged as follows:
+Return a JSON object with a list of rows. The layout depends on whether the page has text:
+
+FOR PAGES WITH TEXT AND IMAGES:
 - CENTER COLUMN: Contains ONLY images (span 3 units) - positioned in the center
 - RIGHT COLUMN: Contains ONLY text (span 2 units) - positioned after the image
 
-Each column uses plain white background with clean, large black text for optimal storybook readability.
+FOR PAGES WITH ONLY IMAGES (no text):
+- SINGLE COLUMN: Contains all images (span 5 units) - centered and full width
+
+For COVER PAGES (front_cover section type): Analyze the cover image to extract a light, readable background color that contrasts well with black text. Use colors from the cover art but ensure they are light enough for good readability.
+
+For REGULAR PAGES: Use plain white background with clean, large black text for optimal storybook readability.
 
 Rules:
-- Use ONLY this JSON shape:
+- For pages WITH TEXT AND IMAGES, use this JSON shape:
   {
     "rows": [
       { 
@@ -27,12 +34,30 @@ Rules:
       }
     ]
   }
-- ALWAYS create exactly 2 columns per row: center column (span 3) for images, right column (span 2) for text.
-- CENTER COLUMN: Include ALL available images in their logical order.
-- RIGHT COLUMN: Include ALL available text portions in their logical reading order.
-- If no images exist, center column should have empty parts array: "parts": []
-- If no text exists, right column should have empty parts array: "parts": []
-- ALWAYS use plain white background (#ffffff) and clean black text (#000000) for optimal storybook readability.
+- For pages with ONLY IMAGES (no text), use this JSON shape:
+  {
+    "rows": [
+      { 
+        "columns": [
+          { 
+            "span": 5, 
+            "color": "#000000",
+            "background_color": "#ffffff",
+            "parts": ["img_1", "img_2"] 
+          }
+        ] 
+      }
+    ]
+  }
+- PAGES WITH TEXT AND IMAGES: Create exactly 2 columns per row: center column (span 3) for images, right column (span 2) for text.
+- PAGES WITH ONLY IMAGES: Create exactly 1 column per row: single column (span 5) for all images.
+- Include ALL available images in their logical order.
+- Include ALL available text portions (if any) in their logical reading order.
+- If no images exist, the image column should have empty parts array: "parts": []
+- If no text exists, use the single-column layout for images only
+- COLOR SELECTION:
+  * For COVER PAGES: Analyze the cover image and select a light background color from the image that provides good contrast with black text (contrast ratio > 4.5). Choose colors like light blues, soft greens, pale yellows, or other pastel tones from the cover art. Avoid dark colors.
+  * For REGULAR PAGES: Use plain white background (#ffffff) and black text (#000000).
 - parts MUST reference ONLY the provided IDs. Do not invent, paraphrase, or alter text.
 - No fields other than rows, columns, span, color, background_color and parts.
 - Do NOT include any commentary, HTML, CSS, or markdown. Output ONLY the JSON.
@@ -56,17 +81,25 @@ ID of the following image is: {{image.image_id}}.
 {% else %}
 There are no images for this page, do not include any image ids.
 {% endif %}
+
+Page Type: {{ section.section_type.name }}
+{% if section.section_type.name == "front_cover" %}
+IMPORTANT: This is a COVER PAGE. Analyze the cover image colors and choose a light, pleasant background color from the cover art that provides excellent contrast with black text (contrast ratio > 4.5). Look for light blues, soft greens, pale yellows, or other pastel tones present in the cover. Avoid pure white - make it feel warm and inviting while maintaining readability.
+{% endif %}
  
 Objectives:
-- Create a consistent storybook layout: images centered (span 3), text on right (span 2).
-- Use plain white backgrounds with clean, large black text for optimal storybook readability.
-- Maintain clear reading order for text portions in the right column.
-- Place all images in the center column in their logical order.
+- Create appropriate storybook layouts based on content:
+  * Pages with text: images centered (span 3), text on right (span 2)
+  * Pages with only images: single centered column (span 5) for optimal image viewing
+- For COVER PAGES: Extract and use light background colors from the cover art that provide excellent contrast with black text.
+- For REGULAR PAGES: Use plain white backgrounds with clean, large black text for optimal storybook readability.
+- Maintain clear reading order for text portions (when present) in the right column.
+- Place all images in appropriate column(s) in their logical order.
 - Keep related images and text aligned when possible by grouping them in the same row.
-- If a page has multiple text-image pairs, create multiple rows with the same two-column structure.
-- Ensure the layout works well for storybook format with centered visual focus.
+- If a page has multiple text-image pairs, create multiple rows with the same column structure.
+- For image-only pages, ensure the single column layout provides optimal viewing experience.
 
-This is the image of the entire page from the storybook for context only, you can use it to inform your layout:
+This is the image of the entire page from the storybook for context only, you can use it to inform your layout and color choices:
 {{ section.page_image_upath | image }}
 
 Return the JSON now.

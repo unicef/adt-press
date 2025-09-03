@@ -31,34 +31,51 @@ class GenerationResponse(BaseModel):
     def validate_two_columns_layout(
         cls, v: list[Row], info: ValidationInfo
     ) -> list[Row]:
-        """Ensure 2-column layout rules and valid IDs for storybooks."""
+        """Ensure valid layout rules and IDs for storybooks."""
         # Get valid IDs from context
         valid_ids = set()
+        text_ids = []
+        image_ids = []
         if info.context:
-            valid_ids.update(info.context.get("text_ids", []))
-            valid_ids.update(info.context.get("image_ids", []))
+            text_ids = info.context.get("text_ids", [])
+            image_ids = info.context.get("image_ids", [])
+            valid_ids.update(text_ids)
+            valid_ids.update(image_ids)
 
         seen_ids = set()
 
         # validate all parts in each row
         for row in v:
-            # Ensure exactly 2 columns
-            if len(row.columns) != 2:
+            # Allow either 1 column (image-only) or 2 columns (text + images)
+            if len(row.columns) == 1:
+                # Single column layout - must be image-only page
+                if len(text_ids) > 0:
+                    raise ValueError(
+                        "Single column only allowed for image-only pages."
+                        f" Found text IDs: {text_ids}"
+                    )
+                # Single column should span 5
+                if row.columns[0].span != 5:
+                    raise ValueError(
+                        f"Single column must have span 5, "
+                        f"found {row.columns[0].span}."
+                    )
+            elif len(row.columns) == 2:
+                # Two column layout validation
+                if row.columns[0].span != 3:
+                    raise ValueError(
+                        f"Center column (images) must have span 3, "
+                        f"found {row.columns[0].span}."
+                    )
+                if row.columns[1].span != 2:
+                    raise ValueError(
+                        f"Right column (text) must have span 2, "
+                        f"found {row.columns[1].span}."
+                    )
+            else:
                 raise ValueError(
-                    f"Row must have exactly 2 columns, "
-                    f"found {len(row.columns)}."
-                )
-            
-            # Validate spans: center column (images) span 3, right (text) 2
-            if row.columns[0].span != 3:
-                raise ValueError(
-                    f"Center column (images) must have span 3, "
-                    f"found {row.columns[0].span}."
-                )
-            if row.columns[1].span != 2:
-                raise ValueError(
-                    f"Right column (text) must have span 2, "
-                    f"found {row.columns[1].span}."
+                    f"Row must have either 1 column (image-only) or "
+                    f"2 columns (text+images), found {len(row.columns)}."
                 )
 
             for column in row.columns:

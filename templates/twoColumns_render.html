@@ -1,25 +1,61 @@
-<div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content">
+{% set cover_bg_color = "#ffffff" %}
+{% if section.section_type.name == "front_cover" %}
+    {% for row in rows %}
+        {% for col in row.columns %}
+            {% if col.background_color != "#ffffff" %}
+                {% set cover_bg_color = col.background_color %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+
+<div class="container content mx-auto w-full min-h-screen px-8 py-8 flex items-center justify-center" id="content" style="background-color: {{ cover_bg_color }};">
     <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}" data-id="{{ section.section_id }}" {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}"{% endif %}>
     {% for row in rows %}
-        <div class="flex flex-row px-4 mt-6 mb-6 items-start">
+        <div class="flex flex-col lg:flex-row px-8 items-center max-w-none w-full">
             {% for col in row.columns %}
-                {% if loop.index == 1 %}
-                    <!-- Center column for images (span 3) -->
-                    <div class="basis-{{ col.span }}/5 p-6 mr-6 flex flex-col justify-center items-center" style="background-color: {{ col.background_color }};">
+                {% if row.columns|length == 1 %}
+                    <!-- Single column layout for image-only pages -->
+                    <div class="basis-full p-4 flex flex-col justify-center items-center">
                         {% for part in col.parts %}
                         {% if images[part] %}
-                        <img class="mb-6 max-w-full rounded-lg shadow-lg" data-id="{{ part }}" style="max-height: 500px; object-fit: contain;"></img>
+                        <img class="mb-8 w-full rounded-lg" data-id="{{ part }}" style="max-height: 80vh; object-fit: contain;"></img>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% elif loop.index == 1 %}
+                    <!-- Center column for images (span 3) - stacks above text on mobile -->
+                    <div class="basis-full lg:basis-{{ col.span }}/5 p-4 lg:mr-4 flex flex-col justify-center items-center order-1 lg:order-none">
+                        {% for part in col.parts %}
+                        {% if images[part] %}
+                        <img class="mb-8 w-full rounded-lg" data-id="{{ part }}" style="max-height: 80vh; object-fit: contain;"></img>
                         {% endif %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <!-- Right column for text (span 2) -->
-                    <div class="basis-{{ col.span }}/5 p-6 flex flex-col justify-start" style="color: {{ col.color }}; background-color: {{ col.background_color }};">
-                        {% for part in col.parts %}
-                        {% if texts[part] %}
-                        <p class="mb-4 text-lg leading-relaxed text-left font-normal" data-id="{{ part }}">{{ texts[part] }}</p>
+                    <!-- Right column for text (span 2) - stacks below image on mobile -->
+                    <div class="basis-full lg:basis-{{ col.span }}/5 p-4 flex flex-col justify-center order-2 lg:order-none" style="color: {{ col.color }};">
+                        {% if section.section_type.name == "front_cover" %}
+                            <!-- Cover page styling: First text as title (h1), rest as smaller paragraphs -->
+                            {% set first_text = true %}
+                            {% for part in col.parts %}
+                                {% if texts[part] %}
+                                    {% if first_text %}
+                                        <h1 class="mb-8 text-4xl font-bold leading-tight text-center" data-id="{{ part }}">{{ texts[part] }}</h1>
+                                        {% set first_text = false %}
+                                    {% else %}
+                                        <p class="mb-4 text-lg leading-relaxed text-center font-normal" data-id="{{ part }}">{{ texts[part] }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <!-- Regular page styling -->
+                            {% for part in col.parts %}
+                                {% if texts[part] %}
+                                    <p class="mb-8 text-2xl lg:text-3xl leading-relaxed text-left font-normal" data-id="{{ part }}">{{ texts[part] }}</p>
+                                {% endif %}
+                            {% endfor %}
                         {% endif %}
-                        {% endfor %}
                     </div>
                 {% endif %}
             {% endfor %}
