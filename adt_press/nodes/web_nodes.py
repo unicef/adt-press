@@ -9,6 +9,7 @@ from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_rows import generate_web_page_rows
 from adt_press.models.config import HTMLPromptConfig, PromptConfig, RowPromptConfig, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
+from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import WebPage
 from adt_press.utils.file import read_text_file
@@ -134,6 +135,7 @@ def package_adt_web(
     plate_language_config: str,
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
+    plate_glossary_translations: dict[str, list[GlossaryItem]],
     speech_files: dict[str, dict[str, SpeechFile]],
     web_pages: list[WebPage],
 ) -> str:
@@ -219,11 +221,12 @@ def package_adt_web(
         with open(os.path.join(locale_dir, "videos.json"), "w") as f:
             json.dump({}, f, indent=2)
 
-        # TODO: replace with real glossary
-        glossary_dir = os.path.join(locale_dir, "glossary")
-        os.makedirs(glossary_dir, exist_ok=True)
-        with open(os.path.join(glossary_dir, "glossary.json"), "w") as f:
-            json.dump({}, f, indent=2)
+        glossary = {
+            i.word: dict(word=i.word, definition=i.definition, variations=i.variations, emoji="".join(i.emojis))
+            for i in plate_glossary_translations[language]
+        }
+        with open(os.path.join(locale_dir, "glossary.json"), "w") as f:
+            json.dump(glossary, f, indent=2)
 
     # copy our assets to the output directory
     assets_dir = os.path.join("assets", "web", "assets")

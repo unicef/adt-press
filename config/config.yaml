@@ -556,6 +556,10 @@ prompts:
     model: default
     template_path: prompts/text_translation.jinja2
 
+  glossary_translation:
+    model: default
+    template_path: prompts/glossary_translation.jinja2
+
   section_glossary:
     model: default
     template_path: prompts/section_glossary.jinja2

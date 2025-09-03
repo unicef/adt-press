@@ -564,7 +564,7 @@ export const loadGlossaryTerms = async () => {
   try {
     // Fallback to "es" if state.currentLanguage is not set
     const language = state.currentLanguage || "es";
-    const response = await fetch(`./content/i18n/${language}/glossary/glossary.json`);
+    const response = await fetch(`./content/i18n/${language}/glossary.json`);
     const data = await response.json();
     glossaryTerms = data;
     state.glossaryTerms = data;
