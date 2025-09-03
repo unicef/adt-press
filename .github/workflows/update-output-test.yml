@@ -37,16 +37,16 @@ jobs:
           git config --global user.name "gbergengruen"
           git config --global user.email "gbergengruen@unicef.org"
           git clone https://x-access-token:${{ secrets.ADT_OUTPUT_TESTS_TOKEN }}@github.com/unicef/ADT-output-tests.git
-          mkdir -p adt-output-tests/pdfs
+          mkdir -p ADT-output-tests/pdfs
           for pdf in assets/*.pdf; do
             label=$(basename "$pdf" .pdf)
-            cp -r output/$label adt-output-tests/
-            cp "$pdf" adt-output-tests/pdfs/
+            cp -r output/$label ADT-output-tests/
+            cp "$pdf" ADT-output-tests/pdfs/
           done
 
       - name: Update index.html in ADT-output-tests
         run: |
-          cd adt-output-tests
+          cd ADT-output-tests
           echo '<!DOCTYPE html>
             <html lang="en">
             <head>
@@ -103,7 +103,7 @@ jobs:
 
       - name: Commit and push
         run: |
-          cd adt-output-tests
+          cd ADT-output-tests
           git add .
           git commit -m "Update the repo from adt-press"
           git push
