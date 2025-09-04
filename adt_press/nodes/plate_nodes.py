@@ -23,12 +23,10 @@ def generated_plate(
     plate_output_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
     plate_glossary: list[GlossaryItem],
-    easy_reads_by_text_id: dict[str, EasyReadText],
 ) -> Plate:
-    images: dict[str, PlateImage] = {}
-    texts: dict[str, PlateText] = {}
     plate_sections: list[PlateSection] = []
 
+    # build our place sections from our pages
     for page in pdf_pages:
         page_sections = filtered_sections_by_page_id[page.page_id]
         for page_section in page_sections.sections:
@@ -47,30 +45,16 @@ def generated_plate(
                 )
             )
 
-            if eli5:
-                texts[eli5.explanation_id] = PlateText(text_id=eli5.explanation_id, text=eli5.explanation)
-
-            for part_id in page_section.part_ids:
-                if part_id in processed_images_by_id:
-                    img = processed_images_by_id[part_id]
-                    images[img.image_id] = PlateImage(image_id=img.image_id, upath=img.crop.upath, caption_id=img.image_id)
-                    texts[img.image_id] = PlateText(text_id=img.image_id, text=plate_output_texts_by_id[img.image_id].text)
-                else:
-                    txt = plate_output_texts_by_id[part_id]
-                    texts[txt.text_id] = PlateText(text_id=txt.text_id, text=txt.text)
-
-                    # add easy read version if it exists
-                    easy_read = easy_reads_by_text_id.get(txt.text_id)
-                    if easy_read:
-                        txt = plate_output_texts_by_id[easy_read.easy_read_id]
-                        texts[txt.text_id] = PlateText(text_id=txt.text_id, text=txt.text)
+    # build our plate texts and images from our output texts and processed images
+    texts = [PlateText(text_id=t.text_id, text=t.text) for t in plate_output_texts_by_id.values()]
+    images = [PlateImage(image_id=i.image_id, upath=i.crop.upath, caption_id=i.image_id) for i in processed_images_by_id.values()]
 
     return Plate(
         title=pdf_title_config,
         language_code=plate_language_config,
         sections=plate_sections,
-        images=list(images.values()),
-        texts=list(texts.values()),
+        images=images,
+        texts=texts,
         glossary=plate_glossary,
     )
 
@@ -152,6 +136,7 @@ def plate_output_texts_by_id(
     filtered_pdf_texts: dict[str, PageTexts],
     easy_reads_by_text_id: dict[str, EasyReadText],
     image_captions_by_id: dict[str, ImageCaption],
+    explanations_by_section_id: dict[str, SectionExplanation],
     input_language_config: str,
     plate_language_config: str,
 ) -> dict[str, OutputText]:
@@ -164,21 +149,29 @@ def plate_output_texts_by_id(
                 texts_by_id[text.text_id] = OutputText(
                     text_id=text.text_id,
                     text=text.text,
-                    language_code=input_language_config,
+                    language_code=plate_language_config,
                     reasoning="",
                 )
                 easy_read = easy_reads_by_text_id[text.text_id]
                 texts_by_id[easy_read.easy_read_id] = OutputText(
                     text_id=easy_read.easy_read_id,
                     text=easy_read.easy_read,
-                    language_code=input_language_config,
+                    language_code=plate_language_config,
                     reasoning="",
                 )
         for key, caption in image_captions_by_id.items():
             texts_by_id[key] = OutputText(
                 text_id=key,
                 text=caption.caption,
-                language_code=input_language_config,
+                language_code=plate_language_config,
+                reasoning="",
+            )
+
+        for explanation in explanations_by_section_id.values():
+            texts_by_id[explanation.explanation_id] = OutputText(
+                text_id=explanation.explanation_id,
+                text=explanation.explanation,
+                language_code=plate_language_config,
                 reasoning="",
             )
 
@@ -213,6 +206,17 @@ def plate_output_texts_by_id(
                     text_translation_prompt_config,
                     key,
                     caption.text,
+                    input_language_config,
+                    plate_language_config,
+                )
+            )
+
+        for explanation in explanations_by_section_id.values():
+            tasks.append(
+                get_text_translation(
+                    text_translation_prompt_config,
+                    explanation.explanation_id,
+                    explanation.explanation,
                     input_language_config,
                     plate_language_config,
                 )

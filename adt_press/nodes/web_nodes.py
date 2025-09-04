@@ -60,10 +60,10 @@ def web_pages__rows(
             images: list[PlateImage] = []
 
             for part_id in section.part_ids:
-                text = texts_by_id.get(part_id)
-                texts.extend([text] if text else [])
-                image = images_by_id.get(part_id)
-                images.extend([image] if image else [])
+                if part_id.startswith("txt_"):
+                    texts.append(texts_by_id[part_id])
+                elif part_id.startswith("img_"):
+                    images.append(images_by_id[part_id])
 
             web_pages.append(generate_web_page_rows(web_generation_rows_prompt_config, section, texts, images, plate_language_config))
 
@@ -100,10 +100,10 @@ def web_pages__html(
             images: list[PlateImage] = []
 
             for part_id in section.part_ids:
-                text = texts_by_id.get(part_id)
-                texts.extend([text] if text else [])
-                image = images_by_id.get(part_id)
-                images.extend([image] if image else [])
+                if part_id.startswith("txt_"):
+                    texts.append(texts_by_id[part_id])
+                elif part_id.startswith("img_"):
+                    images.append(images_by_id[part_id])
 
             web_pages.append(
                 generate_web_page_html(
