@@ -41,8 +41,11 @@ jobs:
           timestamp=$(date +%Y%m%d)
           for pdf in assets/*.pdf; do
             label=$(basename "$pdf" .pdf)
-            mkdir -p ADT-output-tests/$label/$timestamp
-            cp -r output/$label/* ADT-output-tests/$label/$timestamp/
+            if compgen -G "output/$label/*" > /dev/null; then
+              cp -r output/$label/* ADT-output-tests/$label/$timestamp/
+            else
+              echo "Warning: No output files found for label '$label' in output/$label/"
+            fi
             cp "$pdf" ADT-output-tests/pdfs/
           done
 
