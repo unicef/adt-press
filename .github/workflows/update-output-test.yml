@@ -34,8 +34,8 @@ jobs:
 
       - name: Copy all outputs and PDFs to repo
         run: |
-          git config --global user.name "gbergengruen"
-          git config --global user.email "gbergengruen@unicef.org"
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git clone https://x-access-token:${{ secrets.ADT_OUTPUT_TESTS_TOKEN }}@github.com/unicef/ADT-output-tests.git
           mkdir -p ADT-output-tests/pdfs
           for pdf in assets/*.pdf; do
