@@ -20,7 +20,6 @@ class PlateSection(BaseModel):
     page_image_upath: str
     part_ids: list[str]
     explanation_id: str | None
-    glossary: list[GlossaryItem]
 
 
 class Plate(BaseModel):
@@ -29,3 +28,4 @@ class Plate(BaseModel):
     sections: list[PlateSection]
     images: list[PlateImage]
     texts: list[PlateText]
+    glossary: list[GlossaryItem]

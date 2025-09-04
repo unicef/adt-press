@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Glossary: {{ plate.title }}{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    {% for language in output_languages %}
+    {% with language_name = LANGUAGE_MAP[language] %}
+    {% with glossary = glossary_translations[language] %}
+    <div class="rounded border bg-yellow-50 overflow-hidden">
+        <!-- Glossary Header -->
+        <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">
+            <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ glossary|length }} terms</span>
+            {{ language_name }} Glossary
+            <div class="clear-both"></div>
+        </div>
+        <!-- Glossary Content -->
+        <div class="grid grid-cols-1">
+            {% for item in glossary %}
+            <div class="bg-white border-b border-gray-100 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3">
+                    <!-- Term Column -->
+                    <div class="px-3 py-2">
+                        <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %} {{ emoji }}{% endfor %}</div>
+                        <div class="text-xs text-gray-600 mt-1">
+                            {% for variant in item.variations %}
+                            <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!-- Definition Column -->
+                    <div class="col-span-2 px-3 py-2">
+                        <div class="text-sm text-gray-800">{{ item.definition }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endwith %}
+    {% endwith %}
+    {% endfor %}
+{% endblock %}

@@ -69,6 +69,7 @@ class PipelineTest(unittest.TestCase):
                 "index.html",
                 "plate_report.html",
                 "web_report.html",
+                "glossary_report.html",
                 "translation_report.html",
             ]
 
@@ -128,6 +129,7 @@ class PipelineTest(unittest.TestCase):
                 "index.html",
                 "plate_report.html",
                 "web_report.html",
+                "glossary_report.html",
                 "translation_report.html",
             ]
 
