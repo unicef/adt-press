@@ -8,6 +8,10 @@ FOR PAGES WITH TEXT AND IMAGES:
 FOR PAGES WITH ONLY IMAGES (no text):
 - SINGLE COLUMN: Contains all images (span 5 units) - centered and full width
 
+FOR PAGES WITH ONLY TEXT (no images):
+- SINGLE COLUMN: Contains all text (span 5 units) - centered and full width
+- NOTE: This applies to both pages with no images AND pages with section_type "text_only"
+
 For COVER PAGES (front_cover section type): Analyze the cover image to extract a light, readable background color that contrasts well with black text. Use colors from the cover art but ensure they are light enough for good readability.
 
 For REGULAR PAGES: Use plain white background with clean, large black text for optimal storybook readability.
@@ -49,12 +53,29 @@ Rules:
       }
     ]
   }
+- For pages with ONLY TEXT (no images), use this JSON shape:
+  {
+    "rows": [
+      { 
+        "columns": [
+          { 
+            "span": 5, 
+            "color": "#000000",
+            "background_color": "#ffffff",
+            "parts": ["t_1", "t_2"] 
+          }
+        ] 
+      }
+    ]
+  }
 - PAGES WITH TEXT AND IMAGES: Create exactly 2 columns per row: center column (span 3) for images, right column (span 2) for text.
 - PAGES WITH ONLY IMAGES: Create exactly 1 column per row: single column (span 5) for all images.
+- PAGES WITH ONLY TEXT (including text_only section type): Create exactly 1 column per row: single column (span 5) for all text portions.
 - Include ALL available images in their logical order.
 - Include ALL available text portions (if any) in their logical reading order.
 - If no images exist, the image column should have empty parts array: "parts": []
 - If no text exists, use the single-column layout for images only
+- If no images exist OR section type is "text_only", use the single-column layout for text only
 - COLOR SELECTION:
   * For COVER PAGES: Analyze the cover image and select a light background color from the image that provides good contrast with black text (contrast ratio > 4.5). Choose colors like light blues, soft greens, pale yellows, or other pastel tones from the cover art. Avoid dark colors.
   * For REGULAR PAGES: Use plain white background (#ffffff) and black text (#000000).
@@ -85,19 +106,24 @@ There are no images for this page, do not include any image ids.
 Page Type: {{ section.section_type.name }}
 {% if section.section_type.name == "front_cover" %}
 IMPORTANT: This is a COVER PAGE. Analyze the cover image colors and choose a light, pleasant background color from the cover art that provides excellent contrast with black text (contrast ratio > 4.5). Look for light blues, soft greens, pale yellows, or other pastel tones present in the cover. Avoid pure white - make it feel warm and inviting while maintaining readability.
+{% elif section.section_type.name == "text_only" %}
+IMPORTANT: This is a TEXT-ONLY PAGE. Use the single column layout (span 5) for all text portions. Do NOT create a two-column layout.
 {% endif %}
  
 Objectives:
 - Create appropriate storybook layouts based on content:
-  * Pages with text: images centered (span 3), text on right (span 2)
+  * Pages with text and images: images centered (span 3), text on right (span 2)
   * Pages with only images: single centered column (span 5) for optimal image viewing
+  * Pages with only text (including text_only section type): single centered column (span 5) for optimal text reading
 - For COVER PAGES: Extract and use light background colors from the cover art that provide excellent contrast with black text.
 - For REGULAR PAGES: Use plain white backgrounds with clean, large black text for optimal storybook readability.
+- For TEXT-ONLY PAGES: Always use single column layout regardless of text length.
 - Maintain clear reading order for text portions (when present) in the right column.
 - Place all images in appropriate column(s) in their logical order.
 - Keep related images and text aligned when possible by grouping them in the same row.
 - If a page has multiple text-image pairs, create multiple rows with the same column structure.
 - For image-only pages, ensure the single column layout provides optimal viewing experience.
+- For text-only pages, ensure the single column layout provides optimal reading experience.
 
 This is the image of the entire page from the storybook for context only, you can use it to inform your layout and color choices:
 {{ section.page_image_upath | image }}

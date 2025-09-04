@@ -36,9 +36,11 @@ class GenerationResponse(BaseModel):
         valid_ids = set()
         text_ids = []
         image_ids = []
+        section_type = ""
         if info.context:
             text_ids = info.context.get("text_ids", [])
             image_ids = info.context.get("image_ids", [])
+            section_type = info.context.get("section_type", "")
             valid_ids.update(text_ids)
             valid_ids.update(image_ids)
 
@@ -48,12 +50,24 @@ class GenerationResponse(BaseModel):
         for row in v:
             # Allow either 1 column (image-only) or 2 columns (text + images)
             if len(row.columns) == 1:
-                # Single column layout - must be image-only page
-                if len(text_ids) > 0:
+                # Single column layout - allowed for image-only OR text-only
+                if len(text_ids) > 0 and len(image_ids) > 0:
                     raise ValueError(
-                        "Single column only allowed for image-only pages."
-                        f" Found text IDs: {text_ids}"
+                        "Single column layout can only be used for pages with "
+                        "ONLY images OR ONLY text, not both. "
+                        f"Found text IDs: {text_ids} and image IDs: "
+                        f"{image_ids}"
                     )
+                # For text_only sections, require text and no images
+                if section_type == "text_only":
+                    if len(text_ids) == 0:
+                        raise ValueError(
+                            "text_only sections must have text content"
+                        )
+                    if len(image_ids) > 0:
+                        raise ValueError(
+                            "text_only sections should not have images"
+                        )
                 # Single column should span 5
                 if row.columns[0].span != 5:
                     raise ValueError(
@@ -121,6 +135,7 @@ async def generate_web_page_twoColumns(
     validation_context = {
         "text_ids": [t.text_id for t in texts],
         "image_ids": [i.image_id for i in images],
+        "section_type": section.section_type.name,
     }
 
     response: GenerationResponse = await client.chat.completions.create(

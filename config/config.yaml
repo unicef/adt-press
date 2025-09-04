@@ -1,11 +1,11 @@
 # An example config for storybooks like Molly Hopper - this book is a single page portrait storybook with text and images
 
-label: "molly-twoColumns"
-pdf_path: "assets/molly.pdf"
+label: "triste-twoColumns"
+pdf_path: "output/IMLE0000250301P240302000000_CARA.pdf"
 
-input_language: en
+input_language: pt
 plate_language: en
-output_languages: [en, es]
+output_languages: [pt, en]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -31,7 +31,7 @@ page_range:
 
 image_filters:
   size:
-    max_side: 2500
+    max_side: 3500
     min_side: 150
 
   blank:
@@ -53,7 +53,7 @@ section_filters:
 prompts:
   text_extraction:
     model: default
-    template_path: prompts/text_extraction.jinja2
+    template_path: prompts/text_extraction_paragraph.jinja2
 
   meaningfulness:
     model: default
@@ -71,7 +71,7 @@ prompts:
 
   page_sectioning:
     model: default
-    template_path: prompts/page_sectioning.jinja2
+    template_path: prompts/page_sectioning_by_page.jinja2
     max_retries: 10
 
   section_explanation:
