@@ -205,7 +205,7 @@ def plate_output_texts_by_id(
                 get_text_translation(
                     text_translation_prompt_config,
                     key,
-                    caption.text,
+                    caption.caption,
                     input_language_config,
                     plate_language_config,
                 )
