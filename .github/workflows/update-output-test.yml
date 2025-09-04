@@ -1,9 +1,6 @@
 name: Convert PDFs and Update Output Repo
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
