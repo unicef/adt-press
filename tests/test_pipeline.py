@@ -49,7 +49,6 @@ class PipelineTest(unittest.TestCase):
                 "plate_language": "fr",
                 "output_languages": ["en", "fr"],
                 "print_available_models": "true",
-                "clear_cache": "true",
             }
 
             config = DictConfig(OmegaConf.merge(file_config, test_config))

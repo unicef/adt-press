@@ -48,7 +48,9 @@ class TestParameterValidation(unittest.TestCase):
     def test_main_succeeds_on_valid_parameters(self):
         """Test that main() succeeds when called with valid parameters."""
         # Test with valid parameter that should succeed
-        with patch.object(sys, "argv", ["adt-press.py", "image_filters.size.min_side=300", "label=momo", "pdf_path=assets/momo.pdf"]):
+        with patch.object(
+            sys, "argv", ["adt-press.py", "image_filters.size.min_side=300", "label=momo", "clear_cache=true", "pdf_path=assets/momo.pdf"]
+        ):
             # This should not raise any exceptions
             self.adt_press_main.main()
 
