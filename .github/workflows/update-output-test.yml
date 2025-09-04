@@ -73,45 +73,45 @@ jobs:
                                 </tr>
                             </thead>
                             <tbody>' > index.html
-
-            for pdf in pdfs/*.pdf; do
-            label=$(basename "$pdf" .pdf)
-            title=$(echo "$label" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
-            # Find all version folders for this label
-            versions=$(ls -d $label/*/ 2>/dev/null | sort)
-            latest=$(echo "$versions" | tail -n 1)
-            # Remove trailing slash
-            latest=${latest%/}
-            # List previous versions (excluding latest)
-            prev_versions=$(echo "$versions" | grep -v "$latest/")
-            # Build links for previous versions
-            prev_links="<details><summary>Show</summary>"
-            for v in $prev_versions; do
-            v=${v%/}
-            vname=$(basename "$v")
-            prev_links="$prev_links <a href=\"$label/$vname/index.html\" class=\"text-blue-600 hover:underline\">$vname</a><br>"
-            done
-            prev_links="$prev_links</details>"
-            # Only show row if there is at least one version
-            if [ -n "$latest" ]; then
-                echo "                    <tr class=\"border-b hover:bg-blue-50\">
-                                    <td class=\"py-4 px-6 font-medium text-blue-700 flex items-center gap-2\">
-                                        <a href=\"pdfs/$label.pdf\" target=\"_blank\" class=\"flex items-center text-blue-700 hover:underline font-bold\">
-                                            <span class=\"mr-1\">🔗</span>
-                                            $title
-                                        </a>
-                                    </td>
-                                    <td class=\"py-4 px-6\">
-                                        <a href=\"$label/$(basename "$latest")/index.html\" class=\"text-blue-600 hover:underline font-semibold\">Report</a>
-                                    </td>
-                                    <td class=\"py-4 px-6\">
-                                        <a href=\"$label/$(basename "$latest")/adt/sec_p1_s0.html\" class=\"text-blue-600 hover:underline font-semibold\">ADT</a>
-                                    </td>
-                                    <td class=\"py-4 px-6\">$prev_links</td>
-                                </tr>" >> index.html
+            if ls pdfs/*.pdf 1> /dev/null 2>&1; then
+              for pdf in pdfs/*.pdf; do
+                label=$(basename "$pdf" .pdf)
+                title=$(echo "$label" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
+                # Find all version folders for this label
+                versions=$(ls -d $label/*/ 2>/dev/null | sort)
+                latest=$(echo "$versions" | tail -n 1)
+                # Remove trailing slash
+                latest=${latest%/}
+                # List previous versions (excluding latest)
+                prev_versions=$(echo "$versions" | grep -v "$latest/")
+                # Build links for previous versions
+                prev_links="<details><summary>Show</summary>"
+                for v in $prev_versions; do
+                  v=${v%/}
+                  vname=$(basename "$v")
+                  prev_links="$prev_links <a href=\"$label/$vname/index.html\" class=\"text-blue-600 hover:underline\">$vname</a><br>"
+                done
+                prev_links="$prev_links</details>"
+                # Only show row if there is at least one version
+                if [ -n "$latest" ]; then
+                  echo "<tr class=\"border-b hover:bg-blue-50\">
+                      <td class=\"py-4 px-6 font-medium text-blue-700 flex items-center gap-2\">
+                          <a href=\"pdfs/$label.pdf\" target=\"_blank\" class=\"flex items-center text-blue-700 hover:underline font-bold\">
+                              <span class=\"mr-1\">🔗</span>
+                              $title
+                          </a>
+                      </td>
+                      <td class=\"py-4 px-6\">
+                          <a href=\"$label/$(basename "$latest")/index.html\" class=\"text-blue-600 hover:underline font-semibold\">Report</a>
+                      </td>
+                      <td class=\"py-4 px-6\">
+                          <a href=\"$label/$(basename "$latest")/adt/sec_p1_s0.html\" class=\"text-blue-600 hover:underline font-semibold\">ADT</a>
+                      </td>
+                      <td class=\"py-4 px-6\">$prev_links</td>
+                    </tr>" >> index.html
+                fi
+              done
             fi
-            done
-
             echo '                </tbody>
                         </table>
                     </div>
