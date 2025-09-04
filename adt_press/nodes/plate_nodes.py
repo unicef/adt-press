@@ -2,12 +2,13 @@ import json
 
 from hamilton.function_modifiers import cache
 
+from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateImage, PlateSection, PlateText
-from adt_press.models.section import PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.text import EasyReadText, OutputText
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
@@ -21,7 +22,7 @@ def generated_plate(
     processed_images_by_id: dict[str, ProcessedImage],
     output_pdf_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
-    section_glossaries_by_id: dict[str, SectionGlossary],
+    plate_glossary: list[GlossaryItem],
     easy_reads_by_text_id: dict[str, EasyReadText],
 ) -> Plate:
     images: dict[str, PlateImage] = {}
@@ -42,7 +43,6 @@ def generated_plate(
                     section_type=page_section.section_type,
                     page_image_upath=page.image_upath,
                     explanation_id=eli5.explanation_id if eli5 else None,
-                    glossary=section_glossaries_by_id[page_section.section_id].items,
                     part_ids=page_section.part_ids,
                 )
             )
@@ -70,6 +70,7 @@ def generated_plate(
         sections=plate_sections,
         images=list(images.values()),
         texts=list(texts.values()),
+        glossary=plate_glossary,
     )
 
 
@@ -92,6 +93,57 @@ def plate(plate_path: str, plate_hash: str) -> Plate:
 
 def plate_texts(plate: Plate) -> list[PlateText]:
     return plate.texts
+
+
+def plate_glossary(
+    filtered_sections_by_page_id: dict[str, PageSections], section_glossaries_by_id: dict[str, SectionGlossary]
+) -> list[GlossaryItem]:
+    # build glossary from all section glossaries, we keep the first definition we see
+    glossary_items = dict[str, GlossaryItem]()
+    for page_sections in filtered_sections_by_page_id.values():
+        for page_section in page_sections.sections:
+            if page_section.is_pruned:
+                continue
+
+            for item in section_glossaries_by_id[page_section.section_id].items:
+                if item.word not in glossary_items:
+                    glossary_items[item.word] = item
+    return list(sorted(glossary_items.values(), key=lambda x: x.word))
+
+
+def plate_glossary_translations(
+    glossary_translation_prompt_config: PromptConfig,
+    plate_language_config: str,
+    output_languages_config: list[str],
+    plate_glossary: list[GlossaryItem],
+) -> dict[str, list[GlossaryItem]]:
+    glossary_translations: dict[str, list[GlossaryItem]] = {}
+
+    def translate_glossary_to_lang(output_language: str):
+        async def translate_glossary():
+            tasks = []
+            for item in plate_glossary:
+                tasks.append(
+                    get_glossary_translation(
+                        glossary_translation_prompt_config,
+                        plate_language_config,
+                        output_language,
+                        item,
+                    )
+                )
+
+            return await gather_with_limit(tasks, glossary_translation_prompt_config.rate_limit)
+
+        return translate_glossary
+
+    for language in output_languages_config:
+        if language == plate_language_config:
+            glossary_translations[language] = plate_glossary
+            continue
+
+        glossary_translations[language] = sorted(run_async_task(translate_glossary_to_lang(language)), key=lambda x: x.word)
+
+    return glossary_translations
 
 
 def plate_translations(

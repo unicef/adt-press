@@ -5,7 +5,7 @@ from adt_press.models.config import TemplateConfig
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate
-from adt_press.models.section import PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.speech import SpeechFile
 from adt_press.models.text import EasyReadText, OutputText, PageText, PageTexts
 from adt_press.models.web import WebPage
@@ -91,6 +91,25 @@ def translation_report(
             output_languages=output_languages_config,
             translations=plate_translations,
             speech_files=speech_files,
+            LANGUAGE_MAP=LANGUAGE_MAP,
+        ),
+    )
+
+
+@cache(behavior="recompute")
+def glossary_report(
+    template_config: TemplateConfig,
+    plate: Plate,
+    output_languages_config: list[str],
+    plate_glossary_translations: dict[str, list[GlossaryItem]],
+) -> str:
+    return render_template(
+        template_config,
+        "templates/glossary_report.html",
+        dict(
+            plate=plate,
+            output_languages=output_languages_config,
+            glossary_translations=plate_glossary_translations,
             LANGUAGE_MAP=LANGUAGE_MAP,
         ),
     )

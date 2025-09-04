@@ -43,7 +43,7 @@ class SectionExplanation(BaseModel):
 
 class GlossaryItem(BaseModel):
     word: str
-    variants: list[str]
+    variations: list[str]
     definition: str
     emojis: list[str]
 
