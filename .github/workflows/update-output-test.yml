@@ -76,7 +76,7 @@ jobs:
             if [ -n "$(find pdfs -name '*.pdf' -print -quit 2>/dev/null)" ]; then
               for pdf in pdfs/*.pdf; do
                 label=$(basename "$pdf" .pdf)
-                title=$(echo "$label" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
+                title=$(echo "$label" | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1' OFS=' ')
                 # Find all version folders for this label
                 versions=$(ls -d $label/*/ 2>/dev/null | sort)
                 latest=$(echo "$versions" | tail -n 1)
