@@ -123,5 +123,5 @@ jobs:
         run: |
           cd ADT-output-tests
           git add .
-          git commit -m "Update the repo from adt-press"
+          git diff --staged --quiet || git commit -m "Update the repo from adt-press"
           git push
