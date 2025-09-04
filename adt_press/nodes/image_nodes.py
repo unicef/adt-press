@@ -115,7 +115,7 @@ def filtered_images(pdf_images: list[Image], pruned_image_ids: set[str]) -> list
     return [img for img in pdf_images if img.image_id not in pruned_image_ids]
 
 
-def image_captions(
+def image_captions_by_id(
     plate_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
 ) -> dict[str, ImageCaption]:
     async def generate_captions():
@@ -191,14 +191,14 @@ def processed_images_by_id(processed_images: list[ProcessedImage]) -> dict[str, 
 
 def processed_images(
     filtered_images: list[Image],
-    image_captions: dict[str, ImageCaption],
+    image_captions_by_id: dict[str, ImageCaption],
     image_crops: dict[str, ImageCrop],
     image_meaningfulness: dict[str, ImageMeaningfulness],
 ) -> list[ProcessedImage]:
     processed_images = []
     for img in filtered_images:
         image_args = img.model_dump()
-        image_args["caption"] = image_captions.get(img.image_id)
+        image_args["caption"] = image_captions_by_id.get(img.image_id)
         image_args["meaningfulness"] = image_meaningfulness.get(img.image_id)
         image_args["crop"] = image_crops.get(img.image_id)
         processed_images.append(ProcessedImage(**image_args))

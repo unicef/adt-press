@@ -66,9 +66,15 @@ def run_pipeline(config: DictConfig) -> None:
     if clear_cache:
         shutil.rmtree(cache_path, ignore_errors=True)
 
+    # we pass through all strategies as configs to the driver
+    driver_config = {}
+    for key, value in config.items():
+        if str(key).endswith("_strategy"):
+            driver_config[key] = value
+
     dr = (
         driver.Builder()
-        .with_config(dict(web_strategy=config["web_strategy"], crop_strategy=config["crop_strategy"]))
+        .with_config(driver_config)
         .with_modules(*modules)
         .with_cache(path=cache_path)
         .with_adapters(NodeHook())

@@ -11,7 +11,7 @@ class PlateText(BaseModel):
 class PlateImage(BaseModel):
     image_id: str
     upath: str
-    caption: str
+    caption_id: str
 
 
 class PlateSection(BaseModel):
