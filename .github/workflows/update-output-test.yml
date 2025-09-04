@@ -73,7 +73,7 @@ jobs:
                                 </tr>
                             </thead>
                             <tbody>' > index.html
-            if ls pdfs/*.pdf 1> /dev/null 2>&1; then
+            if [ -n "$(find pdfs -name '*.pdf' -print -quit 2>/dev/null)" ]; then
               for pdf in pdfs/*.pdf; do
                 label=$(basename "$pdf" .pdf)
                 title=$(echo "$label" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
