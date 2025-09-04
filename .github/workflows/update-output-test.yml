@@ -38,9 +38,14 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git clone https://x-access-token:${{ secrets.ADT_OUTPUT_TESTS_TOKEN }}@github.com/unicef/ADT-output-tests.git
           mkdir -p ADT-output-tests/pdfs
+          timestamp=$(date +%Y%m%d)
           for pdf in assets/*.pdf; do
             label=$(basename "$pdf" .pdf)
-            cp -r output/$label ADT-output-tests/
+            if compgen -G "output/$label/*" > /dev/null; then
+              cp -r output/$label/* ADT-output-tests/$label/$timestamp/
+            else
+              echo "Warning: No output files found for label '$label' in output/$label/"
+            fi
             cp "$pdf" ADT-output-tests/pdfs/
           done
 
