@@ -7,6 +7,7 @@
 | adt-press.py                                    |       23 |        1 |     96% |        34 |
 | adt\_press/\_\_init\_\_.py                      |        0 |        0 |    100% |           |
 | adt\_press/llm/\_\_init\_\_.py                  |        3 |        0 |    100% |           |
+| adt\_press/llm/glossary\_translation.py         |       21 |        0 |    100% |           |
 | adt\_press/llm/image\_caption.py                |       19 |        0 |    100% |           |
 | adt\_press/llm/image\_crop.py                   |       32 |        0 |    100% |           |
 | adt\_press/llm/image\_meaningfulness.py         |       17 |        0 |    100% |           |
@@ -28,11 +29,11 @@
 | adt\_press/models/text.py                       |       42 |        0 |    100% |           |
 | adt\_press/models/web.py                        |        8 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py                |        0 |        0 |    100% |           |
-| adt\_press/nodes/config\_nodes.py               |       86 |        0 |    100% |           |
+| adt\_press/nodes/config\_nodes.py               |       89 |        0 |    100% |           |
 | adt\_press/nodes/image\_nodes.py                |      100 |        0 |    100% |           |
 | adt\_press/nodes/pdf\_nodes.py                  |       62 |        0 |    100% |           |
-| adt\_press/nodes/plate\_nodes.py                |       64 |        0 |    100% |           |
-| adt\_press/nodes/report\_nodes.py               |       40 |        0 |    100% |           |
+| adt\_press/nodes/plate\_nodes.py                |       90 |        0 |    100% |           |
+| adt\_press/nodes/report\_nodes.py               |       43 |        0 |    100% |           |
 | adt\_press/nodes/section\_nodes.py              |       59 |        0 |    100% |           |
 | adt\_press/nodes/speech\_nodes.py               |       16 |        0 |    100% |           |
 | adt\_press/nodes/web\_nodes.py                  |      135 |        0 |    100% |           |
@@ -52,7 +53,7 @@
 | tests/test\_pipeline.py                         |       72 |        0 |    100% |           |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **1637** |    **1** | **99%** |           |
+|                                       **TOTAL** | **1690** |    **1** | **99%** |           |
 
 
 ## Setup coverage badge
