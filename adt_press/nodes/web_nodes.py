@@ -72,13 +72,13 @@ def web_pages__rows(
     pages: list[WebPage] = run_async_task(generate_pages)
 
     image_urls = {
-        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption=img.caption)
+        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption_id=img.image_id)
         for img in plate.images
     }
 
     # for each page, remap images
     for page in pages:
-        page.content = replace_images(page.content, image_urls)
+        page.content = replace_images(page.content, image_urls, texts_by_id)
 
     return pages
 
@@ -116,13 +116,13 @@ def web_pages__html(
     pages: list[WebPage] = run_async_task(generate_pages)
 
     image_urls = {
-        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption=img.caption)
+        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption_id=img.caption_id)
         for img in plate.images
     }
 
     # for each page, remap images
     for page in pages:
-        page.content = replace_images(page.content, image_urls)
+        page.content = replace_images(page.content, image_urls, texts_by_id)
 
     return pages
 
@@ -155,7 +155,6 @@ def package_adt_web(
     content_dir = os.path.join(adt_dir, "content")
     os.makedirs(content_dir, exist_ok=True)
 
-    all_texts = {}
     plate_images = {img.image_id: img for img in plate.images}
     plate_texts = {txt.text_id: txt for txt in plate.texts}
     sections_by_id = {section.section_id: section for section in plate.sections}
@@ -167,18 +166,13 @@ def package_adt_web(
         images = {}
         for image_id in webpage.image_ids:
             image = plate_images[image_id]
-            images[image_id] = PlateImage(image_id=image.image_id, upath=f"images/{image_id}.png", caption=image.caption)
+            images[image_id] = PlateImage(image_id=image.image_id, upath=f"images/{image_id}.png", caption_id=image.caption_id)
+
             shutil.copy(image.upath, os.path.join(image_dir, f"{image_id}.png"))
 
-        # build our map of texts
-        texts = {}
-        for text_id in webpage.text_ids:
-            texts[text_id] = plate_texts[text_id].text
-            all_texts[text_id] = plate_texts[text_id].text
-
         content = webpage.content
-        content = replace_images(content, images)
-        content = replace_texts(content, texts)
+        content = replace_images(content, images, plate_texts)
+        content = replace_texts(content, plate_texts)
 
         render_template(
             template_config,
@@ -221,6 +215,7 @@ def package_adt_web(
         with open(os.path.join(locale_dir, "videos.json"), "w") as f:
             json.dump({}, f, indent=2)
 
+        # write our glossary
         glossary = {
             i.word: dict(word=i.word, definition=i.definition, variations=i.variations, emoji="".join(i.emojis))
             for i in plate_glossary_translations[language]

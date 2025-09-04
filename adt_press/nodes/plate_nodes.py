@@ -5,11 +5,11 @@ from hamilton.function_modifiers import cache
 from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig
-from adt_press.models.image import ProcessedImage
+from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateImage, PlateSection, PlateText
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
-from adt_press.models.text import EasyReadText, OutputText
+from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
@@ -20,7 +20,7 @@ def generated_plate(
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     processed_images_by_id: dict[str, ProcessedImage],
-    output_pdf_texts_by_id: dict[str, OutputText],
+    plate_output_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
     plate_glossary: list[GlossaryItem],
     easy_reads_by_text_id: dict[str, EasyReadText],
@@ -53,15 +53,16 @@ def generated_plate(
             for part_id in page_section.part_ids:
                 if part_id in processed_images_by_id:
                     img = processed_images_by_id[part_id]
-                    images[img.image_id] = PlateImage(image_id=img.image_id, upath=img.crop.upath, caption=img.caption.caption)
+                    images[img.image_id] = PlateImage(image_id=img.image_id, upath=img.crop.upath, caption_id=img.image_id)
+                    texts[img.image_id] = PlateText(text_id=img.image_id, text=plate_output_texts_by_id[img.image_id].text)
                 else:
-                    txt = output_pdf_texts_by_id[part_id]
+                    txt = plate_output_texts_by_id[part_id]
                     texts[txt.text_id] = PlateText(text_id=txt.text_id, text=txt.text)
 
                     # add easy read version if it exists
                     easy_read = easy_reads_by_text_id.get(txt.text_id)
                     if easy_read:
-                        txt = output_pdf_texts_by_id[easy_read.easy_read_id]
+                        txt = plate_output_texts_by_id[easy_read.easy_read_id]
                         texts[txt.text_id] = PlateText(text_id=txt.text_id, text=txt.text)
 
     return Plate(
@@ -144,6 +145,85 @@ def plate_glossary_translations(
         glossary_translations[language] = sorted(run_async_task(translate_glossary_to_lang(language)), key=lambda x: x.word)
 
     return glossary_translations
+
+
+def plate_output_texts_by_id(
+    text_translation_prompt_config: PromptConfig,
+    filtered_pdf_texts: dict[str, PageTexts],
+    easy_reads_by_text_id: dict[str, EasyReadText],
+    image_captions_by_id: dict[str, ImageCaption],
+    input_language_config: str,
+    plate_language_config: str,
+) -> dict[str, OutputText]:
+    texts_by_id = {}
+
+    # noop if input and output languages are the same
+    if input_language_config == plate_language_config:
+        for page_texts in filtered_pdf_texts.values():
+            for text in page_texts.texts:
+                texts_by_id[text.text_id] = OutputText(
+                    text_id=text.text_id,
+                    text=text.text,
+                    language_code=input_language_config,
+                    reasoning="",
+                )
+                easy_read = easy_reads_by_text_id[text.text_id]
+                texts_by_id[easy_read.easy_read_id] = OutputText(
+                    text_id=easy_read.easy_read_id,
+                    text=easy_read.easy_read,
+                    language_code=input_language_config,
+                    reasoning="",
+                )
+        for key, caption in image_captions_by_id.items():
+            texts_by_id[key] = OutputText(
+                text_id=key,
+                text=caption.caption,
+                language_code=input_language_config,
+                reasoning="",
+            )
+
+        return texts_by_id
+
+    async def translate_texts():
+        tasks = []
+        for page_texts in filtered_pdf_texts.values():
+            for text in page_texts.texts:
+                tasks.append(
+                    get_text_translation(
+                        text_translation_prompt_config,
+                        text.text_id,
+                        text.text,
+                        input_language_config,
+                        plate_language_config,
+                    )
+                )
+                tasks.append(
+                    get_text_translation(
+                        text_translation_prompt_config,
+                        easy_reads_by_text_id[text.text_id].easy_read_id,
+                        easy_reads_by_text_id[text.text_id].easy_read,
+                        input_language_config,
+                        plate_language_config,
+                    )
+                )
+
+        for key, caption in image_captions_by_id.items():
+            tasks.append(
+                get_text_translation(
+                    text_translation_prompt_config,
+                    key,
+                    caption.text,
+                    input_language_config,
+                    plate_language_config,
+                )
+            )
+
+        return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
+
+    texts = run_async_task(translate_texts)
+    for t in texts:
+        texts_by_id[t.text_id] = t
+    return texts_by_id
 
 
 def plate_translations(

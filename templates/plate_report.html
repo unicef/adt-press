@@ -16,18 +16,16 @@
 
     <div class="grid grid-cols-8">
         {% for part_id in section.part_ids %}
-        {% if texts_by_id[part_id] %}
         <div class="col-span-6 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+        {% if images_by_id[part_id] %}
+        <div class="flex items-start gap-3">
+            <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded flex-shrink-0" alt="Image {{ part_id }}">
+            <div class="flex-1 text-sm text-gray-700">{{ texts_by_id[part_id].text }}</div>
+        </div>
+        {% elif texts_by_id[part_id] %}        
             {{ texts_by_id[part_id].text }}
-        </div>
-        {% elif images_by_id[part_id] %}
-        <div class="col-span-1 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
-            <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded" alt="Image {{ part_id }}">
-        </div>
-        <div class="col-span-5 px-3 py-2 flex items-center text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100 italic">
-            {{ images_by_id[part_id].caption }}
-        </div>
         {% endif %}
+        </div>
         <div class="col-span-2 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
             <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ part_id }}</span>
         </div>            
