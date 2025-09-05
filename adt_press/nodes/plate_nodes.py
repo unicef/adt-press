@@ -90,7 +90,8 @@ def plate_glossary(
             if page_section.is_pruned:
                 continue
 
-            for item in section_glossaries_by_id[page_section.section_id].items:
+            section_glossary = section_glossaries_by_id.get(page_section.section_id, {})
+            for item in section_glossary.items:
                 if item.word not in glossary_items:
                     glossary_items[item.word] = item
     return list(sorted(glossary_items.values(), key=lambda x: x.word))
@@ -152,20 +153,22 @@ def plate_output_texts_by_id(
                     language_code=plate_language_config,
                     reasoning="",
                 )
-                easy_read = easy_reads_by_text_id[text.text_id]
-                texts_by_id[easy_read.easy_read_id] = OutputText(
-                    text_id=easy_read.easy_read_id,
-                    text=easy_read.easy_read,
+                easy_read = easy_reads_by_text_id.get(text.text_id, None)
+                if easy_read:
+                    texts_by_id[easy_read.easy_read_id] = OutputText(
+                        text_id=easy_read.easy_read_id,
+                        text=easy_read.easy_read,
+                        language_code=plate_language_config,
+                        reasoning="",
+                    )
+        for key, caption in image_captions_by_id.items():
+            if caption.caption:
+                texts_by_id[key] = OutputText(
+                    text_id=key,
+                    text=caption.caption,
                     language_code=plate_language_config,
                     reasoning="",
                 )
-        for key, caption in image_captions_by_id.items():
-            texts_by_id[key] = OutputText(
-                text_id=key,
-                text=caption.caption,
-                language_code=plate_language_config,
-                reasoning="",
-            )
 
         for explanation in explanations_by_section_id.values():
             texts_by_id[explanation.explanation_id] = OutputText(
@@ -190,26 +193,29 @@ def plate_output_texts_by_id(
                         plate_language_config,
                     )
                 )
+                easy_read = easy_reads_by_text_id.get(text.text_id, None)
+                if easy_read:
+                    tasks.append(
+                        get_text_translation(
+                            text_translation_prompt_config,
+                            easy_read.easy_read_id,
+                            easy_read.easy_read,
+                            input_language_config,
+                            plate_language_config,
+                        )
+                    )
+
+        for key, caption in image_captions_by_id.items():
+            if caption.caption:
                 tasks.append(
                     get_text_translation(
                         text_translation_prompt_config,
-                        easy_reads_by_text_id[text.text_id].easy_read_id,
-                        easy_reads_by_text_id[text.text_id].easy_read,
+                        key,
+                        caption.caption,
                         input_language_config,
                         plate_language_config,
                     )
                 )
-
-        for key, caption in image_captions_by_id.items():
-            tasks.append(
-                get_text_translation(
-                    text_translation_prompt_config,
-                    key,
-                    caption.caption,
-                    input_language_config,
-                    plate_language_config,
-                )
-            )
 
         for explanation in explanations_by_section_id.values():
             tasks.append(

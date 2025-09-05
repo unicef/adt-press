@@ -132,6 +132,19 @@ def image_config(config: DictConfig) -> DictConfig:
     return DictConfig(config.get("image_filters", {}))
 
 
+def strategy_config(config: DictConfig) -> dict[str, str]:
+    return dict[str, str](
+        {
+            "caption_strategy": config["caption_strategy"],
+            "crop_strategy": config["crop_strategy"],
+            "glossary_strategy": config["glossary_strategy"],
+            "explanation_strategy": config["explanation_strategy"],
+            "easy_read_strategy": config["easy_read_strategy"],
+            "web_strategy": config["web_strategy"],
+        }
+    )
+
+
 class ImageSizeFilterConfig(BaseModel):
     max_side: int = 500
     min_side: int = 50

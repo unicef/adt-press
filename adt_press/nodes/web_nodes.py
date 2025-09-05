@@ -138,6 +138,7 @@ def package_adt_web(
     plate_glossary_translations: dict[str, list[GlossaryItem]],
     speech_files: dict[str, dict[str, SpeechFile]],
     web_pages: list[WebPage],
+    strategy_config: dict[str, str],
 ) -> str:
     default_language = list(plate_translations.keys())[0]
 
@@ -231,7 +232,12 @@ def package_adt_web(
     render_template(
         template_config,
         "config.json",
-        dict(languages=list(plate_translations.keys()), default_language=default_language, book_title=pdf_title_config),
+        dict(
+            languages=list(plate_translations.keys()),
+            default_language=default_language,
+            book_title=pdf_title_config,
+            config=strategy_config,
+        ),
         output_name="adt/assets/config.json",
     )
 

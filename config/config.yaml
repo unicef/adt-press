@@ -11,11 +11,26 @@ run_output_dir: "${output_dir}/${label}"
 clear_cache: false
 print_available_models: false
 
-# whether to have the LLM generate full HTML web pages or structured rows
+# our strategy for generating the web version, either html or rows
 web_strategy: rows
 
 # our strategy for cropping, either llm or none
 crop_strategy: llm
+
+# our glossary strategy, either llm or none
+glossary_strategy: llm
+
+# our explanation strategy, either llm or none
+explanation_strategy: llm
+
+# our easy read strategy, either llm or none
+easy_read_strategy: llm
+
+# our caption strategy, either llm or none
+caption_strategy: llm
+
+# our TTS / speech strategy, either tts or none
+speech_strategy: tts
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
