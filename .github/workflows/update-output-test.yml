@@ -1,9 +1,6 @@
 name: Convert PDFs and Update Output Repo
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -41,6 +38,7 @@ jobs:
           timestamp=$(date +%Y%m%d)
           for pdf in assets/*.pdf; do
             label=$(basename "$pdf" .pdf)
+            mkdir -p ADT-output-tests/$label/$timestamp
             if compgen -G "output/$label/*" > /dev/null; then
               cp -r output/$label/* ADT-output-tests/$label/$timestamp/
             else
