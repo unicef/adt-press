@@ -30,7 +30,7 @@ def speech_files__tts(
 def speech_files__none(
     run_output_dir_config: str, speech_prompt_config: PromptConfig, plate_translations: dict[str, dict[str, str]]
 ) -> dict[str, dict[str, SpeechFile]]:
-    empty_tts = {}
+    empty_tts = dict[str, dict[str, SpeechFile]]()
     for language in plate_translations.keys():
-        empty_tts[language] = {}
+        empty_tts[language] = dict[str, SpeechFile]()
     return empty_tts

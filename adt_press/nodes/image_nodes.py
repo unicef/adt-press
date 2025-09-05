@@ -139,9 +139,7 @@ def image_captions_by_id__none(
     for page in pdf_pages:
         for image in page.images:
             if image.image_id not in pruned_image_ids:
-                captions[image.image_id] = ImageCaption(
-                    image_id=image.image_id, caption="", language_code=plate_language_config, reasoning="caption generation disabled"
-                )
+                captions[image.image_id] = ImageCaption(image_id=image.image_id, caption="", reasoning="caption generation disabled")
     return captions
 
 

@@ -90,10 +90,11 @@ def plate_glossary(
             if page_section.is_pruned:
                 continue
 
-            section_glossary = section_glossaries_by_id.get(page_section.section_id, {})
-            for item in section_glossary.items:
-                if item.word not in glossary_items:
-                    glossary_items[item.word] = item
+            section_glossary = section_glossaries_by_id.get(page_section.section_id, None)
+            if section_glossary:
+                for item in section_glossary.items:
+                    if item.word not in glossary_items:
+                        glossary_items[item.word] = item
     return list(sorted(glossary_items.values(), key=lambda x: x.word))
 
 
