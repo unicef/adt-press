@@ -425,17 +425,31 @@ function applyFeatureFlags(features) {
     // Convert camelCase to kebab-case for element IDs
     const kebabFeature = feature.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
     
-    // Find the toggle element
-    const toggleElement = elementCache.get(`toggle-${kebabFeature}`);
-    
-    // If the toggle exists but feature is disabled, hide its container
-    if (toggleElement) {
-      const container = toggleElement.closest('.setting-item') || 
-                       toggleElement.closest('.feature-container') || 
-                       toggleElement.parentElement;
+    // Handle special cases that don't follow the toggle pattern
+    if (feature === 'notepad') {
+      // Hide/show notepad button and content
+      const notepadButton = document.getElementById('notepad-button');
+      const notepadContent = document.getElementById('notepad-content');
       
-      if (container) {
-        container.classList.toggle('hidden', !enabled);
+      if (notepadButton) {
+        notepadButton.classList.toggle('hidden', !enabled);
+      }
+      if (notepadContent) {
+        notepadContent.classList.toggle('hidden', !enabled);
+      }
+    } else {
+      // Find the toggle element for other features
+      const toggleElement = elementCache.get(`toggle-${kebabFeature}`);
+      
+      // If the toggle exists but feature is disabled, hide its container
+      if (toggleElement) {
+        const container = toggleElement.closest('.setting-item') || 
+                         toggleElement.closest('.feature-container') || 
+                         toggleElement.parentElement;
+        
+        if (container) {
+          container.classList.toggle('hidden', !enabled);
+        }
       }
     }
     
@@ -470,10 +484,14 @@ function setupEventListeners() {
     "forward-button": nextPage,
     "nav-popup": toggleNav,
     "nav-close": toggleNav,
-    "notepad-button": toggleNotepad,
-    "close-notepad": toggleNotepad,
-    "save-notepad": saveNotes,
   };
+  
+  // Add notepad handlers only if notepad feature is enabled
+  if (isFeatureEnabled('notepad')) {
+    clickHandlers["notepad-button"] = toggleNotepad;
+    clickHandlers["close-notepad"] = toggleNotepad;
+    clickHandlers["save-notepad"] = saveNotes;
+  }
   
   // Attach all click handlers
   Object.entries(clickHandlers).forEach(([id, handler]) => {
@@ -485,14 +503,16 @@ function setupEventListeners() {
   const languageDropdown = elementCache.get("language-dropdown");
   if (languageDropdown) languageDropdown.addEventListener("change", switchLanguage);
   
-  // Set up notepad auto-save
-  const notepadTextarea = elementCache.get("notepad-textarea");
-  if (notepadTextarea) {
-    let saveTimeout;
-    notepadTextarea.addEventListener("input", () => {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(saveNotes, 1000);
-    });
+  // Set up notepad auto-save - only if notepad feature is enabled
+  if (isFeatureEnabled('notepad')) {
+    const notepadTextarea = elementCache.get("notepad-textarea");
+    if (notepadTextarea) {
+      let saveTimeout;
+      notepadTextarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(saveNotes, 1000);
+      });
+    }
   }
   
   // Global listeners
