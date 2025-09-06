@@ -84,8 +84,8 @@ jobs:
                           </thead>
                           <tbody>' > index.html
 
-                    if [ -n "$(find pdfs -name '*.pdf' -print -quit 2>/dev/null)" ]; then
-                      for pdf in pdfs/*.pdf; do
+                    if [ -n "$(find ../assets -name '*.pdf' -print -quit 2>/dev/null)" ]; then
+                      for pdf in ../assets/*.pdf; do
                         label=$(basename "$pdf" .pdf)
                         echo "Processing label: $label"
                         ls -l "$label" || echo "Label directory $label does not exist"
