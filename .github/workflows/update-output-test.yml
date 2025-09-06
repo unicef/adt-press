@@ -50,6 +50,13 @@ jobs:
       - name: Update index.html in ADT-output-tests
         run: |
           cd ADT-output-tests
+          echo "Current directory: $(pwd)"
+          echo "Listing contents of ADT-output-tests:"
+          ls -l
+          echo "Listing contents of pdfs:"
+          ls -l pdfs || echo "No pdfs directory"
+          echo "Listing all label directories:"
+          ls -d */ || echo "No label directories"
           echo '<!DOCTYPE html>
           <html lang="en">
           <head>
@@ -80,6 +87,8 @@ jobs:
                     if [ -n "$(find pdfs -name '*.pdf' -print -quit 2>/dev/null)" ]; then
                       for pdf in pdfs/*.pdf; do
                         label=$(basename "$pdf" .pdf)
+                        echo "Processing label: $label"
+                        ls -l "$label" || echo "Label directory $label does not exist"
                         title=$(echo "$label" | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1' OFS=' ')
                         # Only continue if label directory exists and has at least one version folder
                         if [ -d "$label" ] && [ -n "$(find "$label" -mindepth 1 -maxdepth 1 -type d -print -quit 2>/dev/null)" ]; then
