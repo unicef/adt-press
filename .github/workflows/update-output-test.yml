@@ -51,76 +51,75 @@ jobs:
         run: |
           cd ADT-output-tests
           echo '<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <title>ADT Output Tests</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <script src="https://cdn.tailwindcss.com"></script>
-            </head>
-            <body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen">
-                <div class="max-w-4xl mx-auto mt-16 bg-white rounded-2xl shadow-xl p-10">
-                    <h1 class="text-3xl font-bold text-blue-700 text-center mb-4">ADT Output Tests</h1>
-                    <p class="text-center text-gray-700 mb-8 text-lg">
-                        Welcome! This website lets you check the converted versions of PDFs into ADTs.<br>
-                        Select a folder below to view its converted files.
-                    </p>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white rounded-lg shadow">
-                            <thead>
-                                <tr class="bg-blue-50">
-                                    <th class="py-3 px-6 text-left font-semibold text-blue-800">ADT Title</th>
-                                    <th class="py-3 px-6 text-left font-semibold text-blue-800">Report Index</th>
-                                    <th class="py-3 px-6 text-left font-semibold text-blue-800">ADT Index</th>
-                                    <th class="py-3 px-6 text-left font-semibold text-blue-800">Other Versions</th>
-                                </tr>
-                            </thead>
-                            <tbody>' > index.html
-            if [ -n "$(find pdfs -name '*.pdf' -print -quit 2>/dev/null)" ]; then
-              for pdf in pdfs/*.pdf; do
-                label=$(basename "$pdf" .pdf)
-                title=$(echo "$label" | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1' OFS=' ')
-                # Find all version folders for this label
-                versions=$(ls -d $label/*/ 2>/dev/null | sort)
-                latest=$(echo "$versions" | tail -n 1)
-                # Remove trailing slash
-                latest=${latest%/}
-                # List previous versions (excluding latest)
-                prev_versions=$(echo "$versions" | grep -v "$latest/")
-                # Build links for previous versions
-                prev_links="<details><summary>Show</summary>"
-                for v in $prev_versions; do
-                  v=${v%/}
-                  vname=$(basename "$v")
-                  prev_links="$prev_links <a href=\"$label/$vname/index.html\" class=\"text-blue-600 hover:underline\">$vname</a><br>"
-                done
-                prev_links="$prev_links</details>"
-                # Only show row if there is at least one version
-                if [ -n "$latest" ]; then
-                  echo "<tr class=\"border-b hover:bg-blue-50\">
-                      <td class=\"py-4 px-6 font-medium text-blue-700 flex items-center gap-2\">
-                          <a href=\"pdfs/$label.pdf\" target=\"_blank\" class=\"flex items-center text-blue-700 hover:underline font-bold\">
-                              <span class=\"mr-1\">🔗</span>
-                              $title
-                          </a>
-                      </td>
-                      <td class=\"py-4 px-6\">
-                          <a href=\"$label/$(basename "$latest")/index.html\" class=\"text-blue-600 hover:underline font-semibold\">Report</a>
-                      </td>
-                      <td class=\"py-4 px-6\">
-                          <a href=\"$label/$(basename "$latest")/adt/sec_p1_s0.html\" class=\"text-blue-600 hover:underline font-semibold\">ADT</a>
-                      </td>
-                      <td class=\"py-4 px-6\">$prev_links</td>
-                    </tr>" >> index.html
-                fi
-              done
-            fi
-            echo '                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </body>
-            </html>' >> index.html
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <title>ADT Output Tests</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <script src="https://cdn.tailwindcss.com"></script>
+          </head>
+          <body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen">
+              <div class="max-w-4xl mx-auto mt-16 bg-white rounded-2xl shadow-xl p-10">
+                  <h1 class="text-3xl font-bold text-blue-700 text-center mb-4">ADT Output Tests</h1>
+                  <p class="text-center text-gray-700 mb-8 text-lg">
+                      Welcome! This website lets you check the converted versions of PDFs into ADTs.<br>
+                      Select a folder below to view its converted files.
+                  </p>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full bg-white rounded-lg shadow">
+                          <thead>
+                              <tr class="bg-blue-50">
+                                  <th class="py-3 px-6 text-left font-semibold text-blue-800">ADT Title</th>
+                                  <th class="py-3 px-6 text-left font-semibold text-blue-800">Report Index</th>
+                                  <th class="py-3 px-6 text-left font-semibold text-blue-800">ADT Index</th>
+                                  <th class="py-3 px-6 text-left font-semibold text-blue-800">Other Versions</th>
+                              </tr>
+                          </thead>
+                          <tbody>' > index.html
+
+                    if [ -n "$(find pdfs -name '*.pdf' -print -quit 2>/dev/null)" ]; then
+                      for pdf in pdfs/*.pdf; do
+                        label=$(basename "$pdf" .pdf)
+                        title=$(echo "$label" | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1' OFS=' ')
+                        # Only continue if label directory exists and has at least one version folder
+                        if [ -d "$label" ] && [ -n "$(find "$label" -mindepth 1 -maxdepth 1 -type d -print -quit 2>/dev/null)" ]; then
+                          versions=$(ls -d $label/*/ 2>/dev/null | sort)
+                          latest=$(echo "$versions" | tail -n 1)
+                          latest=${latest%/}
+                          prev_versions=$(echo "$versions" | grep -v "$latest/")
+                          prev_links="<details><summary>Show</summary>"
+                          for v in $prev_versions; do
+                            v=${v%/}
+                            vname=$(basename "$v")
+                            prev_links="$prev_links <a href=\"$label/$vname/index.html\" class=\"text-blue-600 hover:underline\">$vname</a><br>"
+                          done
+                          prev_links="$prev_links</details>"
+                          if [ -n "$latest" ]; then
+                            echo "<tr class=\"border-b hover:bg-blue-50\">
+                                <td class=\"py-4 px-6 font-medium text-blue-700 flex items-center gap-2\">
+                                    <a href=\"pdfs/$label.pdf\" target=\"_blank\" class=\"flex items-center text-blue-700 hover:underline font-bold\">
+                                        <span class=\"mr-1\">🔗</span>
+                                        $title
+                                    </a>
+                                </td>
+                                <td class=\"py-4 px-6\">
+                                    <a href=\"$label/$(basename "$latest")/index.html\" class=\"text-blue-600 hover:underline font-semibold\">Report</a>
+                                </td>
+                                <td class=\"py-4 px-6\">
+                                    <a href=\"$label/$(basename "$latest")/adt/sec_p1_s0.html\" class=\"text-blue-600 hover:underline font-semibold\">ADT</a>
+                                </td>
+                                <td class=\"py-4 px-6\">$prev_links</td>
+                              </tr>" >> index.html
+                          fi
+                        fi
+                      done
+                    fi
+                    echo '                </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </body>
+              </html>' >> index.html
 
       - name: Commit and push
         run: |
