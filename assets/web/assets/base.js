@@ -450,6 +450,13 @@ function applyFeatureFlags(features) {
           container.classList.toggle('hidden', !enabled);
         }
       }
+    } else if (feature === 'characterDisplay') {
+      // Hide/show the character profile row
+      const characterProfileRow = document.getElementById('character-profile-row');
+      
+      if (characterProfileRow) {
+        characterProfileRow.classList.toggle('hidden', !enabled);
+      }
     } else {
       // Find the toggle element for other features
       const toggleElement = elementCache.get(`toggle-${kebabFeature}`);
