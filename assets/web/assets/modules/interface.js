@@ -1112,12 +1112,19 @@ export const toggleStateMode = () => {
  * Loads state mode from cookies and applies state.
  */
 export const loadStateMode = () => {
-  const stateModeCookie = getCookie("stateMode") === "true" || getCookie("stateMode") === "" || getCookie("stateMode") === null;
-
-  if (stateModeCookie !== "") {
-    setState("stateMode", stateModeCookie);
-    setCookie("stateMode", state.stateMode ? "true" : "false", 7);
-    toggleButtonState("toggle-state", state.stateMode);
+  const stateModeCookie = getCookie("stateMode");
+  
+  // Only apply state if the cookie has a value and the feature is enabled
+  if (stateModeCookie !== "" && stateModeCookie !== null) {
+    const isEnabled = stateModeCookie === "true";
+    setState("stateMode", isEnabled);
+    setCookie("stateMode", isEnabled ? "true" : "false", 7);
+    toggleButtonState("toggle-state", isEnabled);
+  } else {
+    // Set default state - auto-hide disabled by default
+    setState("stateMode", false);
+    setCookie("stateMode", "false", 7);
+    toggleButtonState("toggle-state", false);
   }
 };
 

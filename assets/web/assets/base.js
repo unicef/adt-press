@@ -437,6 +437,19 @@ function applyFeatureFlags(features) {
       if (notepadContent) {
         notepadContent.classList.toggle('hidden', !enabled);
       }
+    } else if (feature === 'showAutoHideButton') {
+      // Hide/show the auto-hide menu toggle button
+      const toggleStateElement = document.getElementById('toggle-state');
+      
+      if (toggleStateElement) {
+        // Find the container (the div that wraps the toggle)
+        const container = toggleStateElement.closest('.flex.justify-between.items-left') || 
+                         toggleStateElement.parentElement;
+        
+        if (container) {
+          container.classList.toggle('hidden', !enabled);
+        }
+      }
     } else {
       // Find the toggle element for other features
       const toggleElement = elementCache.get(`toggle-${kebabFeature}`);
@@ -608,7 +621,8 @@ async function initializeUIComponents() {
       const stateInitTasks = [];
       
       if (isFeatureEnabled('easyRead')) stateInitTasks.push(loadEasyReadMode);
-      if (isFeatureEnabled('state')) stateInitTasks.push(loadStateMode);
+      // Always load state mode to maintain consistency, regardless of button visibility
+      stateInitTasks.push(loadStateMode);
       if (isFeatureEnabled('signLanguage')) {
         initializeSignLanguage();
         stateInitTasks.push(loadSignLanguageMode);
