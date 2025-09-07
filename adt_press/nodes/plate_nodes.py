@@ -144,25 +144,25 @@ def plate_output_texts_by_id(
 ) -> dict[str, OutputText]:
     # Collect all texts that need processing
     texts_to_process = []
-    
+
     # Page texts and easy reads
     for page_texts in filtered_pdf_texts.values():
         for text in page_texts.texts:
             texts_to_process.append((text.text_id, text.text))
-            
+
             easy_read = easy_reads_by_text_id.get(text.text_id, None)
             if easy_read:
                 texts_to_process.append((easy_read.easy_read_id, easy_read.easy_read))
-    
+
     # Image captions
     for key, caption in image_captions_by_id.items():
         if caption.caption:
             texts_to_process.append((key, caption.caption))
-    
+
     # Explanations
     for explanation in explanations_by_section_id.values():
         texts_to_process.append((explanation.explanation_id, explanation.explanation))
-    
+
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:
         return {
@@ -174,7 +174,7 @@ def plate_output_texts_by_id(
             )
             for text_id, text_content in texts_to_process
         }
-    
+
     # Handle translation case
     async def translate_texts():
         tasks = [
@@ -188,7 +188,7 @@ def plate_output_texts_by_id(
             for text_id, text_content in texts_to_process
         ]
         return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
-    
+
     texts = run_async_task(translate_texts)
     return {t.text_id: t for t in texts}
 
