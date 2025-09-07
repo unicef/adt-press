@@ -20,7 +20,7 @@
         {% if images_by_id[part_id] %}
         <div class="flex items-start gap-3">
             <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded flex-shrink-0" alt="Image {{ part_id }}">
-            <div class="flex-1 text-sm text-gray-700">{{ texts_by_id[part_id].text }}</div>
+            <div class="flex-1 text-sm text-gray-700">{{ texts_by_id.get(part_id, {}).text }}</div>
         </div>
         {% elif texts_by_id[part_id] %}        
             {{ texts_by_id[part_id].text }}

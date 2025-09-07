@@ -49,6 +49,6 @@ class PrunedImage(Image):
 
 
 class ProcessedImage(Image):
-    caption: ImageCaption
+    caption: ImageCaption | None
     crop: ImageCrop
     meaningfulness: ImageMeaningfulness

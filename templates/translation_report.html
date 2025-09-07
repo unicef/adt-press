@@ -36,10 +36,14 @@ audio::-webkit-media-controls-time-remaining-display {
                 {{ translations[text.text_id] }}
             </div>
             <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                {% if not speech_files[text.text_id] %}
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">No TTS generated</span>
+                {% else %}
                 <audio controls>
                 <source src="{{ speech_files[text.text_id].speech_upath }}" type="audio/mpeg">
                 Your browser does not support the audio element.
                 </audio>     
+                {% endif %}
             </div>           
             <div class="col-span-2 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
                 <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text.text_id }}</span>

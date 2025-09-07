@@ -14,7 +14,9 @@ def replace_images(html_content: str, image_replacements: dict[str, PlateImage],
         if tag.get("data-id") in image_replacements:
             img = image_replacements[tag["data-id"]]
             tag["src"] = img.upath
-            tag["alt"] = text_replacements[img.caption_id].text
+            caption = text_replacements.get(img.caption_id)
+            if caption:
+                tag["alt"] = caption.text
 
     return str(soup)
 

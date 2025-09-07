@@ -90,9 +90,11 @@ def plate_glossary(
             if page_section.is_pruned:
                 continue
 
-            for item in section_glossaries_by_id[page_section.section_id].items:
-                if item.word not in glossary_items:
-                    glossary_items[item.word] = item
+            section_glossary = section_glossaries_by_id.get(page_section.section_id, None)
+            if section_glossary:
+                for item in section_glossary.items:
+                    if item.word not in glossary_items:
+                        glossary_items[item.word] = item
     return list(sorted(glossary_items.values(), key=lambda x: x.word))
 
 
@@ -140,94 +142,55 @@ def plate_output_texts_by_id(
     input_language_config: str,
     plate_language_config: str,
 ) -> dict[str, OutputText]:
-    texts_by_id = {}
+    # Collect all texts that need processing
+    texts_to_process = []
 
-    # noop if input and output languages are the same
+    # Page texts and easy reads
+    for page_texts in filtered_pdf_texts.values():
+        for text in page_texts.texts:
+            texts_to_process.append((text.text_id, text.text))
+
+            easy_read = easy_reads_by_text_id.get(text.text_id, None)
+            if easy_read:
+                texts_to_process.append((easy_read.easy_read_id, easy_read.easy_read))
+
+    # Image captions
+    for key, caption in image_captions_by_id.items():
+        if caption.caption:
+            texts_to_process.append((key, caption.caption))
+
+    # Explanations
+    for explanation in explanations_by_section_id.values():
+        texts_to_process.append((explanation.explanation_id, explanation.explanation))
+
+    # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:
-        for page_texts in filtered_pdf_texts.values():
-            for text in page_texts.texts:
-                texts_by_id[text.text_id] = OutputText(
-                    text_id=text.text_id,
-                    text=text.text,
-                    language_code=plate_language_config,
-                    reasoning="",
-                )
-                easy_read = easy_reads_by_text_id[text.text_id]
-                texts_by_id[easy_read.easy_read_id] = OutputText(
-                    text_id=easy_read.easy_read_id,
-                    text=easy_read.easy_read,
-                    language_code=plate_language_config,
-                    reasoning="",
-                )
-        for key, caption in image_captions_by_id.items():
-            texts_by_id[key] = OutputText(
-                text_id=key,
-                text=caption.caption,
+        return {
+            text_id: OutputText(
+                text_id=text_id,
+                text=text_content,
                 language_code=plate_language_config,
                 reasoning="",
             )
+            for text_id, text_content in texts_to_process
+        }
 
-        for explanation in explanations_by_section_id.values():
-            texts_by_id[explanation.explanation_id] = OutputText(
-                text_id=explanation.explanation_id,
-                text=explanation.explanation,
-                language_code=plate_language_config,
-                reasoning="",
-            )
-
-        return texts_by_id
-
+    # Handle translation case
     async def translate_texts():
-        tasks = []
-        for page_texts in filtered_pdf_texts.values():
-            for text in page_texts.texts:
-                tasks.append(
-                    get_text_translation(
-                        text_translation_prompt_config,
-                        text.text_id,
-                        text.text,
-                        input_language_config,
-                        plate_language_config,
-                    )
-                )
-                tasks.append(
-                    get_text_translation(
-                        text_translation_prompt_config,
-                        easy_reads_by_text_id[text.text_id].easy_read_id,
-                        easy_reads_by_text_id[text.text_id].easy_read,
-                        input_language_config,
-                        plate_language_config,
-                    )
-                )
-
-        for key, caption in image_captions_by_id.items():
-            tasks.append(
-                get_text_translation(
-                    text_translation_prompt_config,
-                    key,
-                    caption.caption,
-                    input_language_config,
-                    plate_language_config,
-                )
+        tasks = [
+            get_text_translation(
+                text_translation_prompt_config,
+                text_id,
+                text_content,
+                input_language_config,
+                plate_language_config,
             )
-
-        for explanation in explanations_by_section_id.values():
-            tasks.append(
-                get_text_translation(
-                    text_translation_prompt_config,
-                    explanation.explanation_id,
-                    explanation.explanation,
-                    input_language_config,
-                    plate_language_config,
-                )
-            )
-
+            for text_id, text_content in texts_to_process
+        ]
         return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
 
     texts = run_async_task(translate_texts)
-    for t in texts:
-        texts_by_id[t.text_id] = t
-    return texts_by_id
+    return {t.text_id: t for t in texts}
 
 
 def plate_translations(

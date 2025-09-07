@@ -115,7 +115,8 @@ def filtered_images(pdf_images: list[Image], pruned_image_ids: set[str]) -> list
     return [img for img in pdf_images if img.image_id not in pruned_image_ids]
 
 
-def image_captions_by_id(
+@config.when(caption_strategy="llm")
+def image_captions_by_id__llm(
     plate_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
 ) -> dict[str, ImageCaption]:
     async def generate_captions():
@@ -128,6 +129,18 @@ def image_captions_by_id(
         return await gather_with_limit(captions, caption_prompt_config.rate_limit)
 
     return {c.image_id: c for c in run_async_task(generate_captions)}
+
+
+@config.when(caption_strategy="none")
+def image_captions_by_id__none(
+    plate_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
+) -> dict[str, ImageCaption]:
+    captions = {}
+    for page in pdf_pages:
+        for image in page.images:
+            if image.image_id not in pruned_image_ids:
+                captions[image.image_id] = ImageCaption(image_id=image.image_id, caption="", reasoning="caption generation disabled")
+    return captions
 
 
 @config.when(crop_strategy="none")
