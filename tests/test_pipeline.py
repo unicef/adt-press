@@ -108,6 +108,7 @@ class PipelineTest(unittest.TestCase):
                 "glossary_strategy": "none",
                 "explanation_strategy": "none",
                 "easy_read_strategy": "none",
+                "speech_strategy": "none",
                 "label": "momo",
                 "pdf_path": "assets/momo.pdf",
                 "page_range": dict(start=0, end=5),
