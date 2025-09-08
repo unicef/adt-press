@@ -58,7 +58,7 @@ class SectionGlossary(BaseModel):
 class SectionLayoutType(str, enum.Enum):
     single_column = "single_column"
     two_column = "two_column"
-    comic = "comic"
+    comic_book = "comic_book"
     other = "other"
 
 
