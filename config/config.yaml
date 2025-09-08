@@ -1,11 +1,9 @@
-# An example config for storybooks like Molly Hopper - this book is a single page portrait storybook with text and images
+label: "???"
+pdf_path: "???"
 
-label: "triste-twoColumns"
-pdf_path: "output/IMLE0000250301P240302000000_CARA.pdf"
-
-input_language: pt
+input_language: en
 plate_language: en
-output_languages: [pt, en]
+output_languages: [en]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -13,7 +11,7 @@ run_output_dir: "${output_dir}/${label}"
 clear_cache: false
 print_available_models: false
 
-# our strategy for generating the web version, either html or rows
+# our strategy for generating the web version, either html, rows or two_column
 web_strategy: rows
 
 # our strategy for cropping, either llm or none
@@ -104,6 +102,10 @@ prompts:
   section_glossary:
     model: default
     template_path: prompts/section_glossary.jinja2
+
+  section_metadata:
+    model: default
+    template_path: prompts/section_metadata.jinja2
 
   text_easy_read:
     model: default

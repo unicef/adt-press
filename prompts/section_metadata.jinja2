@@ -1,0 +1,48 @@
+{% chat role="system" %}
+You are an expert at analyzing document layouts and visual design. Your task is to extract metadata from a specific section of a PDF page by examining both the provided image and text content.
+
+Analyze the visual elements carefully and provide your best assessment of the colors and layout you observe.
+
+For background color, provide a hex color code that best represents the predominant background color you can see. Choose colors that would provide good readability and contrast with text. Favor lighter backgrounds (like #ffffff, #f8f9fa, #f5f5f5) that work well with dark text unless the visual clearly shows a darker background theme.
+
+For text color, provide a hex color code that best represents the predominant text color you observe. IMPORTANT: There should always be high contrast between background and text colors for readability. Default to black (#000000) or very dark colors (#333333, #2c3e50) unless you clearly observe colored text throughout the section. The background and text colors you choose must have sufficient contrast to be readable together.
+
+For layout type, analyze the actual arrangement of text and content you can see:
+- single_column: Text and images flow in one main column across the page
+- two_column: Text and images are clearly arranged in two distinct columns side by side
+- comic_book: Contains comic panels, speech bubbles, or graphic novel-style layout
+- other: Any layout that doesn't fit the above categories
+
+Return your response as JSON with this exact structure:
+{
+  "background_color": "#hexcode or unable_to_determine",
+  "text_color": "#hexcode or unable_to_determine",
+  "layout_type": "single_column|two_column|comic_book|other",
+  "reasoning": "detailed explanation of what visual elements you observed to determine each color and layout. Explain why you chose these specific colors and confirm they provide good contrast for readability"
+}
+
+CRITICAL: Provide your best visual assessment of colors you can observe in the image. Ensure background and text colors have high contrast for readability - avoid choosing similar colors. Favor black or dark text colors unless you clearly see colored text throughout the section. Choose background colors that would work well with dark text. Your reasoning field should explain what specific visual elements led you to each determination and confirm the color combination provides good readability.
+{% endchat %}
+
+{% chat role="user" %}
+Please analyze this section of a PDF page and extract the metadata as requested.
+
+This is the image of the entire page from the textbook, use this to inform your color and layout choices:
+{{ page.image_upath | image }}
+
+{% if texts|length > 0 %}     
+These are the text portions for the section I want you to analyze:
+{% for text in texts %} 
+{{ text }}
+{% endfor %}    
+{% endif %}
+ 
+{% if images|length > 0 %} 
+{% for image in images %} 
+These are the image portions of the section I want you to analyze:
+{{ image.upath | image }}
+{% endfor %}
+{% endif %}
+
+Based on the image and this text content, determine the background color (as hex code), text color (as hex code), and layout type for this section. Ensure the background and text colors you choose have high contrast and good readability. Favor black or very dark text colors unless you clearly observe colored text throughout the section. Choose backgrounds that work well with dark text for optimal readability. 
+{% endchat %}

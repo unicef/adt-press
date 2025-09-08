@@ -13,6 +13,10 @@ from adt_press.utils.pdf import pages_for_pdf
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
+def pdf_pages_by_id(pdf_pages: list[Page]) -> dict[str, Page]:
+    return {p.page_id: p for p in pdf_pages}
+
+
 def pdf_images(pdf_pages: list[Page]) -> list[Image]:
     pdf_images = []
     for page in pdf_pages:
