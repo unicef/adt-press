@@ -31,14 +31,16 @@ class CropPromptConfig(PromptConfig):
         return self
 
 
-class RowPromptConfig(PromptConfig):
-    row_template_path: str
-    row_template_hash: str | None = Field(default=None, exclude=True)
+class RenderPromptConfig(PromptConfig):
+    """Prompt config that also includes a template used to render the final output."""
+
+    render_template_path: str | None = None
+    render_template_hash: str | None = Field(default=None, exclude=True)
 
     @model_validator(mode="after")
-    def set_row_template_hash(self) -> Self:
-        if self.row_template_path:
-            self.row_template_hash = calculate_file_hash(self.row_template_path)
+    def set_render_template_hash(self) -> Self:
+        if self.render_template_path:
+            self.render_template_hash = calculate_file_hash(self.render_template_path)
         return self
 
 

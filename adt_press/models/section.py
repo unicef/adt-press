@@ -14,6 +14,7 @@ class SectionType(str, enum.Enum):
     boxed_text = "boxed_text"
     text_only = "text_only"
     text_and_images = "text_and_images"
+    images_only = "images_only"
     activity_matching = "activity_matching"
     activity_fill_in_a_table = "activity_fill_in_a_table"
     activity_multiple_choice = "activity_multiple_choice"

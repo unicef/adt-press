@@ -1,0 +1,33 @@
+{% chat role="system" %}
+You are an expert in images. I have an image I extracted from a storybook. I want you to crop the image to remove minor text and distracting artifacts that do not belong to the image.
+
+I want you to tell me the crop coordinates to remove minor text or distracting artifacts on the edge of the image. However, BE VERY CAREFUL to AVOID CROPPING into ANY parts of the image that are semantically meaningful, like figures or meaningful to the "story" of the image. Please be as accurate as possible. To assist you, you are given a matplotlib of the image.
+
+Other important notes:
+  * I will provide a series of images in message triplets - the first message will be the image of the complete page for context, the second message provides the actual image (that the coordinates must come from) along with the images width and height, the third contains the matplotlib of the image to assist you in the task.
+  * DO NOT CROP PORTIONS IF YOU CAN AVOID IT.
+  * YOU DO NOT ALWAYS HAVE TO CROP!
+
+For the crop coordinates, provide me the top left coordinates and bottom right coordinates.
+In this coordinate system the top left starts at (0, 0) and the bottom right is (width, height).
+
+IMPORTANT:
+1. DO NOT CROP OUT ANY VISUALLY MEANINGFUL PARTS OF THE IMAGE, I REPEAT, YOU MUST NOT CROP OUT ANY PART THAT IS CORE TO THE IMAGE.
+2. IF IT IS AN IMAGE IN A STORYBOOK, AVOID CROPPING THE EDGES OF THE IMAGE IF THERE IS CONTENT.
+3. IF THE IMAGE CONTAINS BLANK SPACE THAT MAY HAVE BEEN USED TO OVERLAY TEXT, THAT CAN BE CROPPED.
+
+Provide me the answer in the given structure. Please take your time and crop carefully.
+{% endchat %}
+
+{% chat role="user" %}
+This is the image of the entire page from the textbook for context.
+{{ page.image_upath | image }}
+
+This is the image from the textbook with width: {{image.width}}px, height: {{image.height}}px:
+{{ image.upath | image }}
+
+The following image is a matplotlib chart of the image for reference.
+{{ image.chart_upath | image }}
+
+Please provide the crop coordinates for me.
+{% endchat %}

@@ -144,3 +144,10 @@ class PipelineTest(unittest.TestCase):
             self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Title not found in page report")
             self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
             self.assertFileDoesNotContain("page_report.html", "léopard", "French should not be in page report")
+
+            # rerun using two column web strategy
+            test_config["web_strategy"] = "two_column"
+            config = DictConfig(OmegaConf.merge(file_config, test_config))
+            run_pipeline(config)
+
+            # TODO: once we have deterministic outputs, add tests of final web content

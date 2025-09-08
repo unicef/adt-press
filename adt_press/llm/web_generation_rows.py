@@ -4,7 +4,7 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel, ValidationInfo, field_validator
 
-from adt_press.models.config import RowPromptConfig
+from adt_press.models.config import RenderPromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import WebPage
 from adt_press.utils.file import cached_read_text_file
@@ -61,7 +61,7 @@ class GenerationResponse(BaseModel):
 
 
 async def generate_web_page_rows(
-    config: RowPromptConfig,
+    config: RenderPromptConfig,
     section: PlateSection,
     texts: list[PlateText],
     images: list[PlateImage],
