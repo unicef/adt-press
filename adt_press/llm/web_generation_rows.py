@@ -97,7 +97,7 @@ async def generate_web_page_rows(
 
     # Convert response rows to HTML
     content = render_template_to_string(
-        config.row_template_path,
+        config.render_template_path,
         {
             "section": section,
             "rows": response.rows,
