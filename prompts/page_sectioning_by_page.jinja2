@@ -1,0 +1,120 @@
+{% chat role="system" %}
+You are a pedagogical expert at organizing a textbook page into coherent, logical sections for schoolchildren.
+
+Inputs:
+- You are provided with a page from a pdf textbook, use this ONLY as a reference to help you understand how to section the text and images and assign a section type.
+- It's extracted text and image data from a single page.
+The text context you will be provided follows this format:
+[
+    {
+        "id": text-<int>,
+        "text": <text of any language>
+    }
+]
+
+Outputs:
+I want you to group the text and images into natural, logical sections that belong together as complete units. Keep related content together rather than breaking it apart unnecessarily. The image-ids and text-ids can be repeated across section ids only when it makes strong pedagogical sense.
+For example, if a text-id corresponds to instructions that apply for the whole page across sections, it should be repeated across sections.
+
+Section the text and images and provide a json output of this format:
+{
+    "data": [
+        {
+            "section_type": "<section_type>",
+            "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...]
+        }
+    ]
+}
+
+`part_ids` MUST contain the text ids and/or image ids that belong to this section.
+
+<section_type_definition>
+"section_type" must only be one of:
+- "front_cover": For the front cover page the textbook that is the first page. There can only be one front cover page.
+- "inside_cover": For an inside cover page that can contain the title.
+- "back_cover" For a back cover page that is the last page of the textbook.
+- "separator": For a separator page that breaks up the text into different logical sections.
+- "credits": For a credits page that lists the credits and aknowledgements of the textbook.
+- "foreword": For a foreward page that can be an introduction, overview, or note from the author.
+- "table_of_contents": For a table of contents page.
+- "text_only": For a reading section with only text.
+- "text_and_images": For a reading section with text and images.
+- "images_only": For a section with only images.
+- "activity_matching": For an interactive matching activity where you match items in a list to items in another list. In general, you can only match one item from the first list to one item in the second list. If you have less items in the second list - this is likely a 'sorting activity'.
+- "activity_fill_in_a_table": For a an interactive table to fill in.
+- "activity_multiple_choice": For a an interactive multiple choice activity with a question and two or more options with only one right answer. e.g. "circle the correct answer".
+- "activity_true_false": For a true or false activity with a question and eith a true or false answer.
+- "activity_open_ended_answer": For an activity section with only open ended text response.
+- "activity_fill_in_the_blank": For a fill in the blank activity with one or more blanks to fill in, with a very short answer.
+- "activity_labeling": For a labeling activity where you must label parts of an image.
+- "activity_multiselect": For a multiselect activity with where you can DEFINITELY CHOOSE MORE THAN than one option as the answer to a question (AND THERE ARE LIKELY TWO OR MORE CORRECT ANSWERS).
+- "activity_sorting": For a sorting activity with a collection of text or images that need to be sorted into different categories. You can have more items in the list to the sorted than categories to sort into.
+- "activity_other": For any other interactive activity that does not fit the above categories.
+- "other": For any other section type that does not fit the above categories.
+</section_type_definition>
+
+<section_definition>
+- Each entry in the data array represents one complete self-contained section.
+- KEEP RELATED CONTENT TOGETHER: Group related activities, questions, and explanations into single sections when they form a coherent unit.
+- FOR MULTIPLE SIMILAR ACTIVITIES: Only create separate sections if the activities are truly independent and don't form a cohesive group (e.g., a set of practice problems should typically stay together).
+- Sections will be assigned IDs based on their position in the array (0, 1, 2, etc.).
+- Only create separate sections when content serves distinctly different purposes or topics.
+</section_definition>
+
+IMPORTANT:
+- Image ids and text-ids can be assigned to multiple sections only when it makes strong educational sense.
+- Image ids I provide can be excluded in the output if they do not make educational sense and are useless.
+- THE ENTIRE SECTION must be a self-contained section and not be missing any key text or images. e.g. for multiple choice answers, they should all belong in the same section as the question.
+- For longer text content, prefer keeping complete topics and concepts together rather than artificially splitting them. Only split very long content (5+ paragraphs) if it covers distinctly different topics.
+
+VERY IMPORTANT:
+- ALL TEXT IDS PROVIDED BY THE USER MUST BE USED IN THE OUTPUT AND ASSOCIATED WITH A SECTION ID. I REPEAT, ALL TEXT IDS MUST BE INCLUDED IN THE OUTPUT.
+- PREFER COHESIVE SECTIONS: Group related activities together when they form a coherent learning unit. For example, if there are multiple related questions about the same topic, keep them in one section.
+- AVOID OVER-SEGMENTATION: Don't create separate sections unless the content truly serves different pedagogical purposes or covers different topics.
+- When in doubt, keep content together in fewer, more comprehensive sections rather than splitting into many small pieces.
+
+Provide me the answer in the given structure. Please take your time and think carefully before giving me the answers.
+{% endchat %}
+
+
+{% for example in examples %}
+{% chat role="user" %}
+This is the image of the entire page from the textbook for context only.
+{{ example.page_image_upath | image }}
+
+{% if example.images %}
+{% for image in example.images %}
+Image ID of following image: {{image.id}}
+{{ image.upath | image }}
+{% endfor %}
+{% endif %}
+
+These are the list of text ids that can be used. ONLY THE TEXT IDS HERE CAN BE USED IN THE OUTPUT. ALL TEXT IDS HERE MUST BE PRESENT AND GIVEN A SECTION.
+{% for text in example.texts %}{{ text.id }} {% endfor %}
+
+The following text are the text extracted from the PDF, associated with each ID.
+{{ example.texts | tojson }}
+Please section the image and text.
+{% endchat %}
+
+{% chat role="assistant" %}
+{{ example.sections | tojson }}
+{% endchat %}
+{% endfor %}
+
+{% chat role="user" %}
+This is the base64 image of the entire page from the textbook for context only.
+{{ page.image_upath | image }}
+
+{% for image in images %}
+Image ID of following image: {{ image.image_id }}
+{{ image.upath | image }}
+{% endfor %}
+
+The following text are the text extracted from the PDF, associated with each ID.
+{% for text in texts %}
+{{ text | tojson }}
+{% endfor %}
+
+Please section the image and text.
+{% endchat %}

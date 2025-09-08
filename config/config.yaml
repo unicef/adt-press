@@ -1,9 +1,11 @@
-label: "???"
-pdf_path: "???"
+# An example config for storybooks like Molly Hopper - this book is a single page portrait storybook with text and images
 
-input_language: en
+label: "triste-twoColumns"
+pdf_path: "output/IMLE0000250301P240302000000_CARA.pdf"
+
+input_language: pt
 plate_language: en
-output_languages: [en, es, fr]
+output_languages: [pt, en]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -44,7 +46,7 @@ page_range:
 
 image_filters:
   size:
-    max_side: 2500
+    max_side: 3500
     min_side: 150
 
   blank:
@@ -60,11 +62,13 @@ section_filters:
   pruned_section_types:
     - back_cover
     - credits
+    - inside_cover
+   
 
 prompts:
   text_extraction:
     model: default
-    template_path: prompts/text_extraction.jinja2
+    template_path: prompts/text_extraction_paragraph.jinja2
 
   meaningfulness:
     model: default
@@ -72,501 +76,23 @@ prompts:
 
   crop:
     model: default
-    template_path: prompts/image_crop.jinja2
-    recrop_template_path: prompts/image_recrop.jinja2
-    recrops: 1
+    template_path: prompts/image_crop_storybook.jinja2
+    recrop_template_path: prompts/image_recrop_storybook.jinja2
+    recrops: 2
 
   caption:
     model: default
     template_path: prompts/image_caption.jinja2
-    examples:
-      - language: Spanish
-        page_image: assets/prompts/caption/cuaderno5_13.png
-        image: assets/prompts/caption/cuaderno5_img-13-2.png
-        reasoning: I noted the relevant sections in the contextual image, focusing on descriptions of environments like polar regions. The image shows a polar scene with prominent ice features. I should provide some context for the purpose of why the image is here.
-        caption: Un entorno polar donde se aprecian icebergs, agua y nieve.
 
   page_sectioning:
     model: default
-    template_path: prompts/page_sectioning.jinja2
+    template_path: prompts/page_sectioning_by_page.jinja2
     max_retries: 10
-    examples:
-      - page_image_upath: assets/prompts/sectioning/multiple_activities_1/livinguruguay1_107.png
-        images:
-          - upath: assets/prompts/sectioning/multiple_activities_1/105_img-105-1.png
-            id: img-105-1
-        texts:
-          - id: text-105-0
-            text: The importance of snacks
-          - id: text-105-1
-            text: Let’s play a game.
-          - id: text-105-2
-            text: I’ll give you four words or phrases.
-          - id: text-105-3
-            text: One of them is different.
-          - id: text-105-4
-            text: Circle the odd one out.
-          - id: text-105-5
-            text: "1"
-          - id: text-105-6
-            text: A- noodles
-          - id: text-105-7
-            text: B- salad
-          - id: text-105-8
-            text: C- peanut
-          - id: text-105-9
-            text: D- BBQ
-          - id: text-105-10
-            text: "2"
-          - id: text-105-11
-            text: A- an apple
-          - id: text-105-12
-            text: B- steak
-          - id: text-105-13
-            text: C- granola
-          - id: text-105-14
-            text: D- raisins
-          - id: text-105-15
-            text: "3"
-          - id: text-105-16
-            text: A-cherry tomatoes
-          - id: text-105-17
-            text: B-sliced bananas
-          - id: text-105-18
-            text: C-stew
-          - id: text-105-19
-            text: D-cereal bar
-          - id: text-105-20
-            text: About you…
-          - id: text-105-21
-            text: How can you classify or differentiate food?
-          - id: text-105-22
-            text: Which food do you get for lunch or dinner?
-          - id: text-105-23
-            text: Which food do you get between meals?
-          - id: text-105-24
-            text: The other day I was reading about the importance of snacks in our lives.
-          - id: text-105-25
-            text: Why do you think that snacks are important?
-          - id: text-105-26
-            text: For example, I eat granola between meals.
-          - id: text-105-27
-            text: Get with a partner and discuss the reasons all your classmates gave.
-          - id: text-105-28
-            text: Choose 3 reasons you believe as the most important ones.
-          - id: text-105-30
-            text: "#livingUruguay1"
-          - id: text-105-32
-            text: UNIT 5
-        sections:
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-0
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-1
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-2
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-3
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-4
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-5
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-6
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-7
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-8
-          - section_id: 0
-            section_type: activity_multiple_choice
-            id: text-105-9
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-0
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-1
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-2
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-3
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-4
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-10
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-11
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-12
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-13
-          - section_id: 1
-            section_type: activity_multiple_choice
-            id: text-105-14
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-0
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-1
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-2
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-3
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-4
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-15
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-16
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-17
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-18
-          - section_id: 2
-            section_type: activity_multiple_choice
-            id: text-105-19
-          - section_id: 3
-            section_type: activity_open_ended_answer
-            id: text-105-20
-          - section_id: 3
-            section_type: activity_open_ended_answer
-            id: text-105-21
-          - section_id: 3
-            section_type: activity_open_ended_answer
-            id: text-105-22
-          - section_id: 3
-            section_type: activity_open_ended_answer
-            id: text-105-23
-          - section_id: 4
-            section_type: activity_open_ended_answer
-            id: text-105-24
-          - section_id: 4
-            section_type: activity_open_ended_answer
-            id: text-105-25
-          - section_id: 4
-            section_type: activity_open_ended_answer
-            id: text-105-26
-          - section_id: 4
-            section_type: activity_open_ended_answer
-            id: img-105-1
-          - section_id: 5
-            section_type: activity_open_ended_answer
-            id: text-105-20
-          - section_id: 5
-            section_type: activity_open_ended_answer
-            id: text-105-27
-          - section_id: 5
-            section_type: activity_open_ended_answer
-            id: text-105-28
-          - section_id: 6
-            section_type: other
-            id: text-105-30
-          - section_id: 6
-            section_type: other
-            id: text-105-32
-      - page_image_upath: assets/prompts/sectioning/multiple_activities_2/cuaderno3_27.png
-        images: []
-        texts:
-          - id: text-28-2
-            text: FUENTES DE LUZ
-          - id: text-28-14
-            text: TIPO DE CUERPO
-          - id: text-28-15
-            text: CARACTERÍSTICAS
-          - id: text-28-6
-            text: estrellas
-          - id: text-28-0
-            text: Relee el artículo «La luz y la sombra».
-          - id: text-28-1
-            text: Completa el cuadro con las palabras de la lista.
-          - id: text-28-3
-            text: NATURAL
-          - id: text-28-4
-            text: ARTIFICIAL
-          - id: text-28-5
-            text: sol
-          - id: text-28-8
-            text: linterna
-          - id: text-28-7
-            text: vela
-          - id: text-28-10
-            text: luciérnagas
-          - id: text-28-11
-            text: rayos
-          - id: text-28-12
-            text: lámpara eléctrica
-          - id: text-28-13
-            text: Completa el cuadro que resume información sobre el tema.
-          - id: text-28-19
-            text: vidrio esmerilado
-          - id: text-28-18
-            text: Permiten el paso de la luz y se puede ver a través de ellos con nitidez.
-          - id: text-28-17
-            text: opaco
-          - id: text-28-16
-            text: EJEMPLOS
-          - id: text-28-9
-            text: fuego
-        sections:
-          - section_id: 1
-            section_type: activity_fill_in_a_table
-            id: text-28-3
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-4
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-5
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-8
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-7
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-10
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-11
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-12
-          - section_id: 1
-            section_type: activity_fill_in_a_table
-            id: text-28-13
-          - section_id: 1
-            section_type: activity_fill_in_a_table
-            id: text-28-19
-          - section_id: 1
-            section_type: activity_fill_in_a_table
-            id: text-28-18
-          - section_id: 1
-            section_type: activity_fill_in_a_table
-            id: text-28-17
-          - section_id: 1
-            section_type: activity_fill_in_a_table
-            id: text-28-16
-          - section_id: 0
-            section_type: activity_sorting
-            id: text-28-9
-      - page_image_upath: assets/prompts/sectioning/full_page_section_1/cuaderno3_38.png
-        images: []
-        texts:
-          - id: text-39-0
-            text: "Elige las expresiones que te permitan completar los enunciados de abajo."
-          - id: text-39-1
-            text: "unas piedras del suelo"
-          - id: text-39-2
-            text: "algunas papas y boniatos"
-          - id: text-39-3
-            text: "algunos condimentos"
-          - id: text-39-4
-            text: "cebolla, perejil, sal y ajo"
-          - id: text-39-5
-            text: "en la vasija"
-          - id: text-39-6
-            text: "en la cazuela"
-          - id: text-39-7
-            text: "en la cacerola"
-          - id: text-39-8
-            text: "en la olla"
-          - id: text-39-9
-            text: "reluciente."
-          - id: text-39-10
-            text: "lustroso."
-          - id: text-39-11
-            text: "curado."
-          - id: text-39-12
-            text: "esmaltada."
-          - id: text-39-15
-            text: "las"
-          - id: text-39-16
-            text: "los"
-          - id: text-39-17
-            text: "Pedro Malasartes tomó"
-          - id: text-39-18
-            text: "algunos condimentos"
-          - id: text-39-19
-            text: "y"
-          - id: text-39-20
-            text: "los"
-          - id: text-39-21
-            text: "puso"
-          - id: text-39-22
-            text: "en una olla"
-          - id: text-39-23
-            text: "de metal"
-          - id: text-39-24
-            text: "reluciente."
-          - id: text-39-25
-            text: "Pedro Malasartes tomó"
-          - id: text-39-26
-            text: "arrojó"
-          - id: text-39-27
-            text: "de barro"
-          - id: text-39-28
-            text: "Pedro Malasartes tomó"
-          - id: text-39-29
-            text: "colocó"
-          - id: text-39-30
-            text: "de cerámica"
-          - id: text-39-31
-            text: "Con las expresiones que quedaron sin tachar escribe el último enunciado."
-        sections:
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-0
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-1
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-2
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-3
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-4
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-5
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-6
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-7
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-8
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-9
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-10
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-11
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-12
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-15
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-16
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-17
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-18
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-19
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-20
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-21
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-22
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-23
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-24
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-25
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-26
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-27
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-28
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-29
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-30
-          - section_id: 0
-            section_type: activity_fill_in_the_blank
-            id: text-39-31
 
   section_explanation:
     model: default
     template_path: prompts/section_explanation.jinja2
-    examples:
-      - page_image_upath: assets/prompts/explanations/avoid_adding_opinions_1/cuaderno5_41.png
-        texts:
-          - "«Antiprincesas» latinoamericanas rompen los estereotipos de los cuentos de hadas"
-          - "Dos editoriales argentinas acaban de publicar la colección infantil Antiprincesas, que tiene como protagonistas a mujeres que lucharon por lo que querían."
-          - "Lejos de los cuentos de hadas en los que princesas bellísimas esperan ser salvadas por su príncipe azul, esta colección busca romper estereotipos."
-          - "A diferencia de las clásicas historias infantiles, que son ficción, estas antiprincesas no son de fantasía: son algunas de las mujeres más destacadas de la cultura y la historia latinoamericanas."
-        language: Spanish
-        response: Las 'Antiprincesas' son libros sobre mujeres reales en América Latina que fueron fuertes y valientes. A diferencia de los cuentos de hadas donde las princesas esperan ser salvadas, estas historias muestran a mujeres que hicieron su propio camino en el mundo. Estas son historias verdaderas sobre mujeres importantes de la historia.
-      - page_image_upath: assets/prompts/explanations/avoid_answering_questions_1/livinguruguay1_10.png
-        texts:
-          - "Challenge! Match the questions with the answers."
-          - "A"
-          - "What's your name?"
-          - "B" 
-          - "Who is he?"
-          - "C"
-          - "What's the weather like?"
-          - "D"
-          - "How are you?"
-          - "E"
-          - "What day is it today?" 
-          - "1"
-          - "I am fine, thank you!"
-          - "2"
-          - "It's Monday."
-          - "3"
-          - "My name is Peter."
-          - "4"
-          - "It's cloudy and rainy."
-          - "5"
-          - "That is John."
-        language: English
-        response: This is a matching game with questions and answers. You'll see some questions like 'What's your name?' and answers like 'My name is Peter.' The goal is to put the right answer with each question. This helps us practice and get better at saying things in English, like asking about the weather or how someone's feeling. If you match them all, great job!
-
+   
   text_translation:
     model: default
     template_path: prompts/text_translation.jinja2
@@ -597,12 +123,13 @@ prompts:
   web_generation_rows:
     model: default    
     template_path: prompts/web_generation_rows.jinja2
-    row_template_path: templates/row_render.html
+    render_template_path: templates/row_render.html
+
+  web_generation_two_column:
+    model: default
+    template_path: prompts/web_generation_two_column.jinja2
+    render_template_path: templates/two_column_render.html
 
   speech_generation:
     model: gpt-4o-mini-tts
     template_path: prompts/speech_generation.jinja2
-
-
-
-

@@ -7,7 +7,8 @@ from hamilton.function_modifiers import cache, config
 
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_rows import generate_web_page_rows
-from adt_press.models.config import HTMLPromptConfig, PromptConfig, RowPromptConfig, TemplateConfig
+from adt_press.llm.web_generation_two_column import generate_web_page_two_column
+from adt_press.models.config import HTMLPromptConfig, PromptConfig, RenderPromptConfig, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
@@ -48,7 +49,7 @@ def web_generation_html_examples(web_generation_html_prompt_config: HTMLPromptCo
 def web_pages__rows(
     plate_language_config: str,
     plate: Plate,
-    web_generation_rows_prompt_config: RowPromptConfig,
+    web_generation_rows_prompt_config: RenderPromptConfig,
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -117,6 +118,53 @@ def web_pages__html(
 
     image_urls = {
         img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption_id=img.caption_id)
+        for img in plate.images
+    }
+
+    # for each page, remap images
+    for page in pages:
+        page.content = replace_images(page.content, image_urls, texts_by_id)
+
+    return pages
+
+
+@config.when(web_strategy="two_column")
+def web_pages__two_column(
+    plate_language_config: str,
+    plate: Plate,
+    web_generation_two_column_prompt_config: RenderPromptConfig,
+) -> list[WebPage]:
+    images_by_id = {img.image_id: img for img in plate.images}
+    texts_by_id = {txt.text_id: txt for txt in plate.texts}
+
+    async def generate_pages():
+        web_pages = []
+        for section in plate.sections:
+            texts: list[PlateText] = []
+            images: list[PlateImage] = []
+
+            for part_id in section.part_ids:
+                text = texts_by_id.get(part_id)
+                texts.extend([text] if text else [])
+                image = images_by_id.get(part_id)
+                images.extend([image] if image else [])
+
+            web_pages.append(
+                generate_web_page_two_column(
+                    web_generation_two_column_prompt_config,
+                    section,
+                    texts,
+                    images,
+                    plate_language_config,
+                )
+            )
+
+        return await gather_with_limit(web_pages, web_generation_two_column_prompt_config.rate_limit)
+
+    pages: list[WebPage] = run_async_task(generate_pages)
+
+    image_urls = {
+        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption_id=img.image_id)
         for img in plate.images
     }
 
