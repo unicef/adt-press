@@ -3,12 +3,10 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel
 
-from adt_press.llm.section_glossary import GlossaryResponse
 from adt_press.models.config import PromptConfig
 from adt_press.models.pdf import Page
-from adt_press.models.section import GlossaryItem, PageSection, SectionGlossary, SectionLayoutType, SectionMetadata
+from adt_press.models.section import PageSection, SectionLayoutType, SectionMetadata
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.languages import LANGUAGE_MAP
 
 
 class MetadataResponse(BaseModel):
@@ -16,6 +14,7 @@ class MetadataResponse(BaseModel):
     text_color: str
     layout_type: SectionLayoutType
     reasoning: str
+
 
 async def get_section_metadata(config: PromptConfig, page: Page, section: PageSection, texts: list[str]) -> SectionMetadata:
     context = dict(

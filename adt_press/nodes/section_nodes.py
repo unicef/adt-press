@@ -61,7 +61,12 @@ def filtered_sections_by_page_id(
     return filtered_sections
 
 
-def section_metadata_by_id(section_metadata_prompt_config: PromptConfig, pdf_pages_by_id: dict[str, Page], filtered_sections_by_page_id: dict[str, PageSections], filtered_pdf_texts_by_id: dict[str, PageText]) -> dict[str, SectionMetadata]:
+def section_metadata_by_id(
+    section_metadata_prompt_config: PromptConfig,
+    pdf_pages_by_id: dict[str, Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    filtered_pdf_texts_by_id: dict[str, PageText],
+) -> dict[str, SectionMetadata]:
     async def get_metadata():
         tasks = []
         for page_sections in filtered_sections_by_page_id.values():

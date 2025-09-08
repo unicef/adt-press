@@ -238,7 +238,7 @@ def package_adt_web(
     for language, translations in plate_translations.items():
         # speech files
         speeches = speech_files.get(language, dict[str, SpeechFile]())
-        
+
         # Ensure speeches is always a dict (fix for when speech returns a list)
         if not isinstance(speeches, dict):
             speeches = dict[str, SpeechFile]()
