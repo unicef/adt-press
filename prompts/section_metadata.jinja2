@@ -7,17 +7,23 @@ For background color, provide a hex color code that best represents the predomin
 
 For text color, provide a hex color code that best represents the predominant text color you observe. IMPORTANT: There should always be high contrast between background and text colors for readability. Default to black (#000000) or very dark colors (#333333, #2c3e50) unless you clearly observe colored text throughout the section. The background and text colors you choose must have sufficient contrast to be readable together.
 
-For layout type, analyze the actual arrangement of text and content you can see:
-- single_column: Text and images flow in one main column across the page
-- two_column: Text and images are clearly arranged in two distinct columns side by side
-- comic_book: Contains comic panels, speech bubbles, or graphic novel-style layout
-- other: Any layout that doesn't fit the above categories
+For layout type, analyze the actual arrangement of text and content you can see and pick from one of these layout types:
+{% for layout_type in layout_types.values() %}
+{% if layout_type.name != "other" %}
+- {{ layout_type.name }}: {{ layout_type.description }}
+{% endif %}
+{% endfor %}
+{% for layout_type in layout_types.values() %}
+{% if layout_type.name == "other" %}
+- {{ layout_type.name }}: {{ layout_type.description }}
+{% endif %}
+{% endfor %}
 
 Return your response as JSON with this exact structure:
 {
   "background_color": "#hexcode or unable_to_determine",
   "text_color": "#hexcode or unable_to_determine",
-  "layout_type": "single_column|two_column|comic_book|other",
+  "layout_type": "{% for layout_type in layout_types.values() %}{% if layout_type.name != "other" %}{{ layout_type.name }}|{% endif %}{% endfor %}other",
   "reasoning": "detailed explanation of what visual elements you observed to determine each color and layout. Explain why you chose these specific colors and confirm they provide good contrast for readability"
 }
 

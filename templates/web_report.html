@@ -18,6 +18,52 @@
             {{ page.reasoning }}
             <div class="clear-both"></div>
         </div>
+            <!-- Section Metadata -->
+
+        {% with section = sections[page.section_id] %}
+        <div class="border-t overflow-hidden">
+            <!-- Metadata Header -->
+            <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                Section Metadata
+            </div>
+            <!-- Metadata Content -->
+            <div class="p-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Background Color -->
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.background_color }}"></div>
+                        <div class="text-sm">
+                            <div class="font-medium text-gray-700">Background</div>
+                            <div class="text-gray-600">{{ section.background_color }}</div>
+                        </div>
+                    </div>
+                    <!-- Text Color -->
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.text_color }}"></div>
+                        <div class="text-sm">
+                            <div class="font-medium text-gray-700">Text Color</div>
+                            <div class="text-gray-600">{{ section.text_color }}</div>
+                        </div>
+                    </div>
+                    <!-- Layout Type -->
+                    <div class="flex items-center gap-2">
+                        <div class="text-sm">
+                            <div class="font-medium text-gray-700">Layout Type</div>
+                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ section.layout_type }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Render Strategy -->
+                    <div class="flex items-center gap-2">
+                        <div class="text-sm">
+                            <div class="font-medium text-gray-700">Render Strategy</div>
+                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ page.render_strategy }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+        {% endwith %}
     </div>
     {% endfor %}
 </div>

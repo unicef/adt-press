@@ -1,51 +1,99 @@
+import enum
+import os
 from typing import Self
+from functools import cache
 
+from omegaconf import DictConfig
 from pydantic import BaseModel, Field, model_validator
+import yaml
 
-from adt_press.utils.file import calculate_file_hash
+from adt_press.utils.file import calculate_file_hash, read_text_file
+
+class RenderType(str, enum.Enum):
+    html = "html"
+    rows = "rows"
+    two_column = "two_column"
 
 
-class PromptConfig(BaseModel):
+class LayoutType(BaseModel):
+    name: str
+    description: str = ""
+    render_strategy: str
+
+
+class RenderStrategy(BaseModel):
+    name: str
+    render_type: RenderType
+    config: dict
+
+
+class PathHashMixin(BaseModel):
+    path_hash: str | None = Field(default=None, exclude=True)
+
+    @model_validator(mode="after")
+    def set_dependency_hash(self) -> Self:
+        """Calculate combined hash of all fields ending in '_path'."""
+        path_hashes = []
+        
+        # Get all field names that end with '_path'
+        for field_name, field_value in self.model_dump().items():
+            if field_name.endswith('_path') and field_value is not None:
+                try:
+                    file_hash = calculate_file_hash(field_value)
+                    path_hashes.append(f"{field_name}:{file_hash}")
+                except Exception:
+                    # Skip files that can't be hashed (e.g., don't exist)
+                    continue
+
+        # Combine all hashes into a single path hash
+        self.path_hash = "|".join(path_hashes)
+        return self
+
+class PromptConfig(PathHashMixin):
     model: str
     template_path: str
-    template_hash: str | None = Field(default=None, exclude=True)
     examples: list[dict] = []
+    
     rate_limit: int = 300
     max_retries: int = 10
 
-    @model_validator(mode="after")
-    def set_template_hash(self) -> Self:
-        self.template_hash = calculate_file_hash(self.template_path)
-        return self
+class HTMLPromptConfig(PromptConfig):
+    example_dirs: list[dict] = []
+
+    @cache    
+    def example_dirs_as_examples(self) -> list[dict]:
+        def map_image_path(example_dir: str, image_path: str) -> str:
+            return os.path.join(example_dir, image_path)
+
+        examples = []
+        for example_dir in self.example_dirs:
+            # load the yaml file from our assets/prompts/adt_examples directory
+            example_path = os.path.join(example_dir, "example.yaml")
+
+            # read the file as YAML
+            example = yaml.safe_load(read_text_file(example_path))
+
+            # remap the image path to the correct location
+            example["page_image_upath"] = map_image_path(example_dir, example["page_image_path"])
+            example["section"]["parts"] = [
+                {**part, "image_upath": map_image_path(example_dir, part["image_path"])} if part.get("type") == "image" else part
+                for part in example["section"]["parts"]
+            ]
+            example["response"]["html_upath"] = map_image_path(example_dir, example["response"]["html_path"])
+            example["response"]["content"] = read_text_file(example["response"]["html_upath"])
+            examples.append(example)
+
+        return examples
 
 
 class CropPromptConfig(PromptConfig):
     recrop_template_path: str | None = None
-    recrop_template_hash: str | None = Field(default=None, exclude=True)
     recrops: int = 0
-
-    @model_validator(mode="after")
-    def set_recrop_template_hash(self) -> Self:
-        if self.recrop_template_path:
-            self.recrop_template_hash = calculate_file_hash(self.recrop_template_path)
-        return self
 
 
 class RenderPromptConfig(PromptConfig):
     """Prompt config that also includes a template used to render the final output."""
-
     render_template_path: str | None = None
-    render_template_hash: str | None = Field(default=None, exclude=True)
-
-    @model_validator(mode="after")
-    def set_render_template_hash(self) -> Self:
-        if self.render_template_path:
-            self.render_template_hash = calculate_file_hash(self.render_template_path)
-        return self
-
-
-class HTMLPromptConfig(PromptConfig):
-    example_dirs: list[str]
 
 
 class PageRangeConfig(BaseModel):

@@ -7,6 +7,8 @@ from pydantic import BaseModel
 from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.models.config import (
     HTMLPromptConfig,
+    RenderStrategy,
+    LayoutType,
     PageRangeConfig,
     PromptConfig,
     RenderPromptConfig,
@@ -67,6 +69,38 @@ def pdf_hash_config(pdf_path_config: str) -> str:
 def page_range_config(config: DictConfig) -> PageRangeConfig:
     return PageRangeConfig.model_validate(config.get("page_range", {}))
 
+
+@cache(behavior="recompute")
+def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
+    types = dict[str, LayoutType]()
+    for name, layout_type in config["layout_types"].items():
+        params = dict(layout_type)
+        params["name"] = name
+        types[name] = LayoutType.model_validate(params)
+    return types
+
+
+@cache(behavior="recompute")
+def render_strategy_config(config: DictConfig, render_strategies_config: dict[str, RenderStrategy]) -> str:
+    strategy = config["render_strategy"]
+    if strategy != "dynamic" and strategy not in render_strategies_config:
+        raise ValueError(f"Unknown render strategy: {strategy}")
+    return strategy
+
+
+@cache(behavior="recompute")
+def render_strategies_config(config: DictConfig) -> dict[str, RenderStrategy]:
+    strategies = dict[str, RenderStrategy]()
+    for name, strategy in config["render_strategies"].items():
+            params = dict(strategy)
+            params["name"] = name
+            strategies[name] = RenderStrategy.model_validate(params)
+    return strategies
+
+
+@cache(behavior="recompute")
+def default_model_config(config: DictConfig) -> str:
+    return str(config["default_model"])
 
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
@@ -157,7 +191,6 @@ def strategy_config(config: DictConfig) -> dict[str, str]:
             "glossary_strategy": config["glossary_strategy"],
             "explanation_strategy": config["explanation_strategy"],
             "easy_read_strategy": config["easy_read_strategy"],
-            "web_strategy": config["web_strategy"],
         }
     )
 

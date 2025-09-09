@@ -8,3 +8,4 @@ class WebPage(BaseModel):
     content: str
     text_ids: list[str]
     image_ids: list[str]
+    render_strategy: str

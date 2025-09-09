@@ -11,9 +11,6 @@ run_output_dir: "${output_dir}/${label}"
 clear_cache: false
 print_available_models: false
 
-# our strategy for generating the web version, either html, rows or two_column
-web_strategy: rows
-
 # our strategy for cropping, either llm or none
 crop_strategy: llm
 
@@ -37,6 +34,61 @@ custom_plate_path: ""
 
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
+
+# what strategy is used to render sections into web pages, dynamic will choose based on layout type
+render_strategy: dynamic
+
+layout_types:
+  single_column:
+    description: "Single column layout with text and images flowing in one main column across the page."    
+    render_strategy: two_column
+
+  two_column: 
+    description: "Two column layout with text and images arranged in two distinct columns side by side."
+    render_strategy: two_column
+
+  comic_book:
+    description: "Comic book layout with panels arranged in a grid, allowing for a dynamic visual storytelling experience."
+    render_strategy: overlay
+
+  other:
+    description: "Other layout type that does not fit any of the other categories. "
+    render_strategy: rows
+
+render_strategies:
+  two_column:
+    render_type: two_column
+    config:
+      model: default
+      template_path: prompts/web_generation_two_column.jinja2
+      render_template_path: templates/two_column_render.html
+
+  overlay:
+    render_type: html
+    config:
+      model: default
+      template_path: prompts/web_generation_overlay.jinja2
+      max_retries: 25
+
+  html:
+    render_type: html
+    config:
+      model: default
+      template_path: prompts/web_generation_html.jinja2
+      max_retries: 25
+
+      example_dirs:
+        - assets/prompts/adt_examples/text_only_1
+        - assets/prompts/adt_examples/text_and_images_1
+        - assets/prompts/adt_examples/text_and_images_2
+        - assets/prompts/adt_examples/text_and_images_3
+
+  rows:
+    render_type: rows
+    config:
+      model: default    
+      template_path: prompts/web_generation_rows.jinja2
+      render_template_path: templates/row_render.html
 
 page_range:
   start: 0
@@ -110,27 +162,6 @@ prompts:
   text_easy_read:
     model: default
     template_path: prompts/text_easy_read.jinja2
-
-  web_generation_html:
-    model: default
-    template_path: prompts/web_generation_html.jinja2
-    max_retries: 25
-
-    example_dirs:
-      - assets/prompts/adt_examples/text_only_1
-      - assets/prompts/adt_examples/text_and_images_1
-      - assets/prompts/adt_examples/text_and_images_2
-      - assets/prompts/adt_examples/text_and_images_3
-
-  web_generation_rows:
-    model: default    
-    template_path: prompts/web_generation_rows.jinja2
-    render_template_path: templates/row_render.html
-
-  web_generation_two_column:
-    model: default
-    template_path: prompts/web_generation_two_column.jinja2
-    render_template_path: templates/two_column_render.html
 
   speech_generation:
     model: gpt-4o-mini-tts

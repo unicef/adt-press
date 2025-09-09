@@ -4,7 +4,7 @@ from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
 from adt_press.llm.section_metadata import get_section_metadata
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
@@ -63,6 +63,7 @@ def filtered_sections_by_page_id(
 
 def section_metadata_by_id(
     section_metadata_prompt_config: PromptConfig,
+    layout_types_config: dict[str, LayoutType],
     pdf_pages_by_id: dict[str, Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     filtered_pdf_texts_by_id: dict[str, PageText],
@@ -73,7 +74,7 @@ def section_metadata_by_id(
             page = pdf_pages_by_id[page_sections.page_id]
             for section in filter(lambda s: not s.is_pruned, page_sections.sections):
                 texts = [filtered_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
-                tasks.append(get_section_metadata(section_metadata_prompt_config, page, section, texts))
+                tasks.append(get_section_metadata(section_metadata_prompt_config, layout_types_config, page, section, texts))
 
         return await gather_with_limit(tasks, section_metadata_prompt_config.rate_limit)
 

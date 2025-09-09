@@ -8,7 +8,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateImage, PlateSection, PlateText
-from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
@@ -22,6 +22,7 @@ def generated_plate(
     processed_images_by_id: dict[str, ProcessedImage],
     plate_output_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
+    section_metadata_by_id: dict[str, SectionMetadata],
     plate_glossary: list[GlossaryItem],
 ) -> Plate:
     plate_sections: list[PlateSection] = []
@@ -35,6 +36,8 @@ def generated_plate(
 
             eli5 = explanations_by_section_id.get(page_section.section_id, None)
 
+            metadata = section_metadata_by_id[page_section.section_id]
+
             plate_sections.append(
                 PlateSection(
                     section_id=page_section.section_id,
@@ -42,6 +45,9 @@ def generated_plate(
                     page_image_upath=page.image_upath,
                     explanation_id=eli5.explanation_id if eli5 else None,
                     part_ids=page_section.part_ids,
+                    layout_type=metadata.layout_type,
+                    background_color=metadata.background_color,
+                    text_color=metadata.text_color,
                 )
             )
 
@@ -57,6 +63,10 @@ def generated_plate(
         texts=texts,
         glossary=plate_glossary,
     )
+
+
+def plate_sections_by_id(plate: Plate) -> dict[str, PlateSection]:
+    return {section.section_id: section for section in plate.sections}
 
 
 def plate_path(run_output_dir_config: str, generated_plate: Plate, custom_plate_path_config: str) -> str:

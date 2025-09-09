@@ -89,6 +89,7 @@ class GenerationResponse(BaseModel):
 
 
 async def generate_web_page_two_column(
+    render_strategy: str,
     config: RenderPromptConfig,
     section: PlateSection,
     texts: list[PlateText],
@@ -142,4 +143,5 @@ async def generate_web_page_two_column(
         content=content,
         image_ids=[i.image_id for i in images],
         text_ids=[t.text_id for t in texts],
+        render_strategy=render_strategy,
     )
