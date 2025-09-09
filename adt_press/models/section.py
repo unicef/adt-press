@@ -55,6 +55,21 @@ class SectionGlossary(BaseModel):
     reasoning: str
 
 
+class SectionLayoutType(str, enum.Enum):
+    single_column = "single_column"
+    two_column = "two_column"
+    comic_book = "comic_book"
+    other = "other"
+
+
+class SectionMetadata(BaseModel):
+    section_id: str
+    background_color: str
+    text_color: str
+    layout_type: SectionLayoutType
+    reasoning: str
+
+
 class PageSections(BaseModel):
     page_id: str
     sections: list[PageSection]
