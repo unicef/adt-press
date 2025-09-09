@@ -7,11 +7,11 @@ from pydantic import BaseModel
 from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.models.config import (
     HTMLPromptConfig,
-    RenderStrategy,
     LayoutType,
     PageRangeConfig,
     PromptConfig,
     RenderPromptConfig,
+    RenderStrategy,
 )
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
@@ -92,15 +92,16 @@ def render_strategy_config(config: DictConfig, render_strategies_config: dict[st
 def render_strategies_config(config: DictConfig) -> dict[str, RenderStrategy]:
     strategies = dict[str, RenderStrategy]()
     for name, strategy in config["render_strategies"].items():
-            params = dict(strategy)
-            params["name"] = name
-            strategies[name] = RenderStrategy.model_validate(params)
+        params = dict(strategy)
+        params["name"] = name
+        strategies[name] = RenderStrategy.model_validate(params)
     return strategies
 
 
 @cache(behavior="recompute")
 def default_model_config(config: DictConfig) -> str:
     return str(config["default_model"])
+
 
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:

@@ -1,13 +1,12 @@
 import enum
 import os
 from typing import Self
-from functools import cache
 
-from omegaconf import DictConfig
-from pydantic import BaseModel, Field, model_validator
 import yaml
+from pydantic import BaseModel, Field, model_validator
 
 from adt_press.utils.file import calculate_file_hash, read_text_file
+
 
 class RenderType(str, enum.Enum):
     html = "html"
@@ -34,10 +33,10 @@ class PathHashMixin(BaseModel):
     def set_dependency_hash(self) -> Self:
         """Calculate combined hash of all fields ending in '_path'."""
         path_hashes = []
-        
+
         # Get all field names that end with '_path'
         for field_name, field_value in self.model_dump().items():
-            if field_name.endswith('_path') and field_value is not None:
+            if field_name.endswith("_path") and field_value is not None:
                 try:
                     file_hash = calculate_file_hash(field_value)
                     path_hashes.append(f"{field_name}:{file_hash}")
@@ -49,19 +48,21 @@ class PathHashMixin(BaseModel):
         self.path_hash = "|".join(path_hashes)
         return self
 
+
 class PromptConfig(PathHashMixin):
     model: str
     template_path: str
     examples: list[dict] = []
-    
+
     rate_limit: int = 300
     max_retries: int = 10
 
-class HTMLPromptConfig(PromptConfig):
-    example_dirs: list[dict] = []
 
-    @cache    
-    def example_dirs_as_examples(self) -> list[dict]:
+class HTMLPromptConfig(PromptConfig):
+    example_dirs: list[str] = []
+
+    @model_validator(mode="after")
+    def set_examples(self) -> Self:
         def map_image_path(example_dir: str, image_path: str) -> str:
             return os.path.join(example_dir, image_path)
 
@@ -83,7 +84,8 @@ class HTMLPromptConfig(PromptConfig):
             example["response"]["content"] = read_text_file(example["response"]["html_upath"])
             examples.append(example)
 
-        return examples
+        self.examples = examples
+        return self
 
 
 class CropPromptConfig(PromptConfig):
@@ -93,6 +95,7 @@ class CropPromptConfig(PromptConfig):
 
 class RenderPromptConfig(PromptConfig):
     """Prompt config that also includes a template used to render the final output."""
+
     render_template_path: str | None = None
 
 

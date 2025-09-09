@@ -14,7 +14,7 @@ class MetadataResponse(BaseModel):
     text_color: str
     layout_type: str
     reasoning: str
-    
+
     @field_validator("layout_type")
     @classmethod
     def validate_layout_type(cls, v: str, info: ValidationInfo) -> str:
@@ -24,7 +24,9 @@ class MetadataResponse(BaseModel):
         return v
 
 
-async def get_section_metadata(config: PromptConfig, layout_types: dict[str, LayoutType], page: Page, section: PageSection, texts: list[str]) -> SectionMetadata:
+async def get_section_metadata(
+    config: PromptConfig, layout_types: dict[str, LayoutType], page: Page, section: PageSection, texts: list[str]
+) -> SectionMetadata:
     context = dict(
         page=page,
         section=section,

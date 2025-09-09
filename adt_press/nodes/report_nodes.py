@@ -68,7 +68,9 @@ def plate_report(template_config: TemplateConfig, plate: Plate, strategy_config:
     images_by_id = {i.image_id: i for i in plate.images}
 
     return render_template(
-        template_config, "templates/plate_report.html", dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, strategy_config=strategy_config)
+        template_config,
+        "templates/plate_report.html",
+        dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, strategy_config=strategy_config),
     )
 
 

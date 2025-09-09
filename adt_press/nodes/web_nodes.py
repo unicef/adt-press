@@ -2,20 +2,16 @@ import json
 import os
 import shutil
 
-import yaml
-from hamilton.function_modifiers import cache, config
+from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_rows import generate_web_page_rows
 from adt_press.llm.web_generation_two_column import generate_web_page_two_column
-from adt_press.models.config import HTMLPromptConfig, RenderStrategy, LayoutType, PromptConfig, RenderPromptConfig, TemplateConfig
+from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderPromptConfig, RenderStrategy, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import WebPage
-from adt_press.nodes.config_nodes import web_generation_html_prompt_config
-from adt_press.utils.config import prompt_config_with_model
-from adt_press.utils.file import read_text_file
 from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_web_assets
@@ -27,7 +23,8 @@ def web_pages(
     default_model_config: str,
     layout_types_config: dict[str, LayoutType],
     render_strategy_config: str,
-    render_strategies_config: dict[str, RenderStrategy]) -> list[WebPage]:
+    render_strategies_config: dict[str, RenderStrategy],
+) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
 
@@ -48,7 +45,7 @@ def web_pages(
             layout_type = layout_types_config.get(section.layout_type)
             if not layout_type:
                 raise ValueError(f"Unknown layout type: {section.layout_type}")
-            
+
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":
                 strategy_name = layout_type.render_strategy
@@ -72,7 +69,9 @@ def web_pages(
                 cached_configs[strategy.name] = config
 
             if strategy.render_type == "html":
-                web_pages.append(generate_web_page_html(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(
+                    generate_web_page_html(strategy_name, config, config.examples, section, texts, images, plate_language_config)
+                )
             elif strategy.render_type == "rows":
                 web_pages.append(generate_web_page_rows(strategy_name, config, section, texts, images, plate_language_config))
             elif strategy.render_type == "two_column":
