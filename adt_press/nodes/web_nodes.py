@@ -58,6 +58,7 @@ def web_pages(
             if not config:
                 if strategy.config["model"] == "default":
                     strategy.config["model"] = default_model_config
+
                 if strategy.render_type == "html":
                     config = HTMLPromptConfig.model_validate(strategy.config)
                 elif strategy.render_type == "rows":
@@ -66,7 +67,7 @@ def web_pages(
                     config = RenderPromptConfig.model_validate(strategy.config)
                 else:
                     raise ValueError(f"Unknown render strategy type: {strategy.render_type}")
-                cached_configs[strategy.name] = config
+                cached_configs[strategy_name] = config
 
             if strategy.render_type == "html":
                 web_pages.append(
