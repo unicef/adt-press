@@ -4,7 +4,7 @@ from omegaconf import DictConfig, OmegaConf
 from adt_press.models.config import TemplateConfig
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.pdf import Page
-from adt_press.models.plate import Plate
+from adt_press.models.plate import Plate, PlateSection
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
 from adt_press.models.speech import SpeechFile
 from adt_press.models.text import EasyReadText, OutputText, PageText, PageTexts
@@ -63,12 +63,14 @@ def report_pages(
 
 
 @cache(behavior="recompute")
-def plate_report(template_config: TemplateConfig, plate: Plate) -> str:
+def plate_report(template_config: TemplateConfig, plate: Plate, strategy_config: dict[str, str]) -> str:
     texts_by_id = {t.text_id: t for t in plate.texts}
     images_by_id = {i.image_id: i for i in plate.images}
 
     return render_template(
-        template_config, "templates/plate_report.html", dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id)
+        template_config,
+        "templates/plate_report.html",
+        dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, strategy_config=strategy_config),
     )
 
 
@@ -121,12 +123,14 @@ def glossary_report(
 def web_report(
     template_config: TemplateConfig,
     web_pages: list[WebPage],
+    plate_sections_by_id: dict[str, PlateSection],
 ) -> str:
     return render_template(
         template_config,
         "templates/web_report.html",
         dict(
             web_pages=web_pages,
+            sections=plate_sections_by_id,
         ),
     )
 

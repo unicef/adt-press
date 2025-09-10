@@ -61,6 +61,7 @@ class GenerationResponse(BaseModel):
 
 
 async def generate_web_page_html(
+    render_strategy: str,
     config: PromptConfig,
     examples: list[str],
     section: PlateSection,
@@ -104,4 +105,5 @@ async def generate_web_page_html(
         content=response.content,
         image_ids=[i.image_id for i in images],
         text_ids=[t.text_id for t in texts],
+        render_strategy=render_strategy,
     )
