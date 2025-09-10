@@ -12,6 +12,7 @@ class RenderType(str, enum.Enum):
     html = "html"
     rows = "rows"
     two_column = "two_column"
+    template = "template"
 
 
 class LayoutType(BaseModel):
@@ -24,6 +25,27 @@ class RenderStrategy(BaseModel):
     name: str
     render_type: RenderType
     config: dict
+    config_path_hash: str | None = Field(default=None, exclude=True)
+
+    @model_validator(mode="after")
+    def set_config_path_hash(self) -> Self:
+        """Calculate combined hash of all fields ending in '_path'."""
+        path_hashes = []
+
+        # Get all field names that end with '_path'
+        for field_name in sorted(self.config.keys()):
+            field_value = self.config[field_name]
+            if field_name.endswith("_path") and field_value is not None:
+                try:
+                    file_hash = calculate_file_hash(field_value)
+                    path_hashes.append(f"{field_name}:{file_hash}")
+                except Exception:
+                    # Skip files that can't be hashed (e.g., don't exist)
+                    continue
+
+        # Combine all hashes into a single path hash
+        self.config_path_hash = "|".join(path_hashes)
+        return self
 
 
 class PathHashMixin(BaseModel):
@@ -35,7 +57,9 @@ class PathHashMixin(BaseModel):
         path_hashes = []
 
         # Get all field names that end with '_path'
-        for field_name, field_value in self.model_dump().items():
+        dump = self.model_dump()
+        for field_name in sorted(dump.keys()):
+            field_value = dump[field_name]
             if field_name.endswith("_path") and field_value is not None:
                 try:
                     file_hash = calculate_file_hash(field_value)
@@ -96,7 +120,13 @@ class CropPromptConfig(PromptConfig):
 class RenderPromptConfig(PromptConfig):
     """Prompt config that also includes a template used to render the final output."""
 
-    render_template_path: str | None = None
+    render_template_path: str
+
+
+class TemplateRenderConfig(PathHashMixin):
+    """Render config that only includes a template used to render the final output."""
+
+    render_template_path: str
 
 
 class PageRangeConfig(BaseModel):

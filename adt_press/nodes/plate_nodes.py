@@ -94,7 +94,7 @@ def plate_glossary(
     filtered_sections_by_page_id: dict[str, PageSections], section_glossaries_by_id: dict[str, SectionGlossary]
 ) -> list[GlossaryItem]:
     # build glossary from all section glossaries, we keep the first definition we see
-    glossary_items = dict[str, GlossaryItem]()
+    glossary_items: dict[str, GlossaryItem] = {}
     for page_sections in filtered_sections_by_page_id.values():
         for page_section in page_sections.sections:
             if page_section.is_pruned:
