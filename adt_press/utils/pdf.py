@@ -20,9 +20,14 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
 
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
     pages = []
-    end_page = end_page if end_page > 0 else min(len(doc), end_page if end_page else len(doc))
 
-    for page_index in range(start_page, end_page):
+    # 0 means go to the end
+    end_page = min(end_page, len(doc)) if end_page > 0 else len(doc)
+    
+    # 0 means start at the beginning, page indexes are 1 based
+    start_page = 1 if start_page == 0 else start_page
+
+    for page_index in range(start_page-1, end_page):
         fitz_page = doc[page_index]
         page_image = fitz_page.get_pixmap(matrix=FITZ_MAT)
         page_number = page_index + 1
