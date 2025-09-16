@@ -43,13 +43,13 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
         # and we want to recrop the image
         while recrop < config.recrops:
             cropped = visualize_crop_extents(
-                cached_read_file(image.upath), response.top_left_x, response.top_left_y, response.bottom_right_x, response.bottom_right_y
+                cached_read_file(image.image_path), response.top_left_x, response.top_left_y, response.bottom_right_x, response.bottom_right_y
             )
-            cropped_upath = write_file(image.upath, cropped, "recrop")
+            cropped_path = write_file(image.image_path, cropped, "recrop")
 
             context = dict(
                 crop_coordinates=response.model_dump(),
-                cropped_upath=cropped_upath,
+                cropped_path=cropped_path,
             )
             recrop_messages = [m.model_dump(exclude_none=True) for m in recrop_prompt.chat_messages(context)]
             messages = messages + recrop_messages

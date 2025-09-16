@@ -42,7 +42,7 @@ def generated_plate(
                 PlateSection(
                     section_id=page_section.section_id,
                     section_type=page_section.section_type,
-                    page_image_upath=page.image_upath,
+                    page_image_path=page.page_image_path,
                     explanation_id=eli5.explanation_id if eli5 else None,
                     part_ids=page_section.part_ids,
                     layout_type=metadata.layout_type,
@@ -53,7 +53,7 @@ def generated_plate(
 
     # build our plate texts and images from our output texts and processed images
     texts = [PlateText(text_id=t.text_id, text=t.text) for t in plate_output_texts_by_id.values()]
-    images = [PlateImage(image_id=i.image_id, upath=i.crop.upath, caption_id=i.image_id) for i in processed_images_by_id.values()]
+    images = [PlateImage(image_id=i.image_id, image_path=i.crop.image_path, caption_id=i.image_id) for i in processed_images_by_id.values()]
 
     return Plate(
         title=pdf_title_config,

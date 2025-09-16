@@ -99,13 +99,13 @@ class HTMLPromptConfig(PromptConfig):
             example = yaml.safe_load(read_text_file(example_path))
 
             # remap the image path to the correct location
-            example["page_image_upath"] = map_image_path(example_dir, example["page_image_path"])
+            example["page_image_path"] = map_image_path(example_dir, example["page_image_path"])
             example["section"]["parts"] = [
-                {**part, "image_upath": map_image_path(example_dir, part["image_path"])} if part.get("type") == "image" else part
+                {**part, "image_path": map_image_path(example_dir, part["image_path"])} if part.get("type") == "image" else part
                 for part in example["section"]["parts"]
             ]
-            example["response"]["html_upath"] = map_image_path(example_dir, example["response"]["html_path"])
-            example["response"]["content"] = read_text_file(example["response"]["html_upath"])
+            example["response"]["html_path"] = map_image_path(example_dir, example["response"]["html_path"])
+            example["response"]["content"] = read_text_file(example["response"]["html_path"])
             examples.append(example)
 
         self.examples = examples

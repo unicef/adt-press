@@ -13,7 +13,7 @@ def replace_images(html_content: str, image_replacements: dict[str, PlateImage],
     for tag in soup.find_all("img"):
         if tag.get("data-id") in image_replacements:
             img = image_replacements[tag["data-id"]]
-            tag["src"] = img.upath
+            tag["src"] = img.image_path
             caption = text_replacements.get(img.caption_id)
             if caption:
                 tag["alt"] = caption.text

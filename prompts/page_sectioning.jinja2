@@ -78,12 +78,12 @@ Provide me the answer in the given structure. Please take your time and think ca
 {% for example in examples %}
 {% chat role="user" %}
 This is the image of the entire page from the textbook for context only.
-{{ example.page_image_upath | image }}
+{{ example.page_image_path | image }}
 
 {% if example.images %}
 {% for image in example.images %}
 Image ID of following image: {{image.id}}
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 {% endif %}
 
@@ -102,11 +102,11 @@ Please section the image and text.
 
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ page.image_upath | image }}
+{{ page.page_image_path | image }}
 
 {% for image in images %}
 Image ID of following image: {{ image.image_id }}
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 
 The following text are the text extracted from the PDF, associated with each ID.

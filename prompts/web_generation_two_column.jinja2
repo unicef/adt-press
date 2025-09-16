@@ -97,7 +97,7 @@ There are no text portions for this page, do not include any text ids.
 {% if images|length > 0 %} 
 {% for image in images %} 
 ID of the following image is: {{image.image_id}}.
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 {% else %}
 There are no images for this page, do not include any image ids.
@@ -126,6 +126,6 @@ Objectives:
 - For text-only pages, ensure the single column layout provides optimal reading experience.
 
 This is the image of the entire page from the storybook for context only, you can use it to inform your layout and color choices:
-{{ section.page_image_upath | image }}
+{{ section.page_image_path | image }}
 
 Return the JSON now.

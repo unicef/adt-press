@@ -28,9 +28,9 @@ Provide me the answer in the given structure. Please take your time and make sur
 {% chat role="user" %}
 {#
 This is the image of the entire page from the textbook for context.
-{{ page.image_upath | image }}
+{{ page.page_image_path | image }}
 #}
 This is the image from the textbook with width: {{image.width}}px, height: {{image.height}}px:
-{{ image.upath | image}}
+{{ image.image_path | image}}
 Please determine whether this image is meaningful or not. Provide your reasoning first.
 {% endchat %}

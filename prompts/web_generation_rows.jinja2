@@ -36,7 +36,7 @@ There are no text portions for this page, do not include any text ids.
 {% if images|length > 0 %} 
 {% for image in images %} 
 ID of the following image is: {{image.image_id}}.
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 {% else %}
 There are no images for this page, do not include any image ids.
@@ -50,6 +50,6 @@ Objectives:
 - Use a similar layout as the original textbook page, but adapt to the provided IDs.
 
 This is the image of the entire page from the textbook for context only, you can use it to inform your layout:
-{{ section.page_image_upath | image }}
+{{ section.page_image_path | image }}
 
 Return the JSON now.

@@ -3,14 +3,15 @@ from pydantic import BaseModel
 
 class Image(BaseModel):
     image_id: str
-    upath: str
-    chart_upath: str
+    image_path: str
+    chart_path: str
 
     page_id: str
     index: int
 
     width: int
     height: int
+    image_type: str
 
 
 class ImageFilterFailure(BaseModel):
@@ -41,7 +42,7 @@ class CropCoordinates(BaseModel):
 class ImageCrop(BaseModel):
     image_id: str
     crop_coordinates: CropCoordinates
-    upath: str
+    image_path: str
 
 
 class PrunedImage(Image):

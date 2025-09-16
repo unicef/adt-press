@@ -19,7 +19,7 @@ Provide me the answer in the given structure. Please take your time and think ca
 {% for example in examples %}
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ example.page_image_upath | image }}
+{{ example.page_image_path | image }}
 
 The section's text to use for the simplified ELI5 explanation:
 {% for text in example.texts %}
@@ -36,7 +36,7 @@ Please provide a simplified ELI5 explanation in this language: {{ example.langua
 
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ page.image_upath | image }}
+{{ page.page_image_path | image }}
 
 The section's text to use for the simplified ELI5 explanation:
 {% for text in texts %}
@@ -45,7 +45,7 @@ The section's text to use for the simplified ELI5 explanation:
 
 These are the section's images to take into account in the simplified ELI5 explanation:
 {% for image in images %}
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 
 Please provide a simplified ELI5 explanation in this language: {{ language }}.

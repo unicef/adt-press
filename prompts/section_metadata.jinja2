@@ -34,7 +34,7 @@ CRITICAL: Provide your best visual assessment of colors you can observe in the i
 Please analyze this section of a PDF page and extract the metadata as requested.
 
 This is the image of the entire page from the textbook, use this to inform your color and layout choices:
-{{ page.image_upath | image }}
+{{ page.page_image_path | image }}
 
 {% if texts|length > 0 %}     
 These are the text portions for the section I want you to analyze:
@@ -46,7 +46,7 @@ These are the text portions for the section I want you to analyze:
 {% if images|length > 0 %} 
 {% for image in images %} 
 These are the image portions of the section I want you to analyze:
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 {% endif %}
 

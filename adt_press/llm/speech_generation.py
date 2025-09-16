@@ -37,4 +37,4 @@ async def generate_speech_file(run_output_dir: str, config: PromptConfig, langua
     response.write_to_file(speech_path)
 
     speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.mp3")
-    return SpeechFile(speech_id=speech_id, speech_upath=speech_relative_path, language_code=language_code, text_id=text_id)
+    return SpeechFile(speech_id=speech_id, speech_path=speech_relative_path, language_code=language_code, text_id=text_id)
