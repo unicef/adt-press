@@ -2,17 +2,14 @@
 Utility functions for the PDF extractor tool.
 These are copied and adapted from the main application utilities.
 """
+
 import io
-import os
 import warnings
-from typing import List
 
 import cairo
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL.Image
-
-from models import Image
 
 # Configure matplotlib for headless operation
 plt.switch_backend("Agg")
@@ -22,7 +19,7 @@ plt.rcParams.update({"figure.max_open_warning": 100})
 
 def write_file(output_path: str, data: bytes, suffix: str = "") -> str:
     """Writes bytes to the specified output path, optionally appending a suffix to the filename."""
-    
+
     # if we have a suffix, add it in after removing the extension
     if suffix != "":
         output_path = output_path.rsplit(".", 1)[0] + f"_{suffix}." + output_path.rsplit(".", 1)[1]
@@ -35,7 +32,7 @@ def write_file(output_path: str, data: bytes, suffix: str = "") -> str:
 
 def matplotlib_chart(img_bytes: bytes) -> bytes:
     """Generates a matplotlib chart from the image bytes and returns it as PNG bytes."""
-    
+
     image = PIL.Image.open(io.BytesIO(img_bytes))
     fig, ax = plt.subplots(figsize=(10, 6), dpi=200)
 
@@ -57,13 +54,14 @@ def matplotlib_chart(img_bytes: bytes) -> bytes:
 
 class RenderedVectorImage:
     """Simple class to hold rendered vector image data."""
+
     def __init__(self, image: bytes, width: int, height: int):
         self.image = image
         self.width = width
         self.height = height
 
 
-def convert_color_cairo(color: List[float]) -> tuple:
+def convert_color_cairo(color: list[float]) -> tuple:
     """Convert a float-based color to a Cairo color with a default."""
     return tuple(c for c in color) if color else (0, 0, 0)
 
@@ -85,7 +83,7 @@ def compute_bounding_box(drawing) -> tuple:
         elif cmd in ["m", "l", "c"]:
             points = item[1:]
             for point in points:
-                if hasattr(point, 'x') and hasattr(point, 'y'):
+                if hasattr(point, "x") and hasattr(point, "y"):
                     min_x = min(min_x, point.x)
                     min_y = min(min_y, point.y)
                     max_x = max(max_x, point.x)
@@ -94,11 +92,11 @@ def compute_bounding_box(drawing) -> tuple:
     return (min_x, min_y, max_x, max_y)
 
 
-def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> List[List]:
+def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> list[list]:
     """Group drawings that overlap within threshold."""
     if not drawings:
         return []
-    
+
     # Simple grouping logic - for now, group all drawings together
     # This can be enhanced with actual overlap detection
     return [drawings] if drawings else []
@@ -108,45 +106,45 @@ def render_group_to_image(group) -> RenderedVectorImage:
     """Render a group of drawings to a single image."""
     if not group:
         return RenderedVectorImage(b"", 0, 0)
-    
+
     # Compute overall bounding box
     overall_min_x = overall_min_y = float("inf")
     overall_max_x = overall_max_y = float("-inf")
-    
+
     for drawing in group:
         min_x, min_y, max_x, max_y = compute_bounding_box(drawing)
         overall_min_x = min(overall_min_x, min_x)
         overall_min_y = min(overall_min_y, min_y)
         overall_max_x = max(overall_max_x, max_x)
         overall_max_y = max(overall_max_y, max_y)
-    
+
     # Create surface with padding
     padding = 10
     width = int(overall_max_x - overall_min_x + 2 * padding)
     height = int(overall_max_y - overall_min_y + 2 * padding)
-    
+
     if width <= 0 or height <= 0:
         return RenderedVectorImage(b"", 0, 0)
-    
+
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     ctx = cairo.Context(surface)
-    
+
     # Set white background
     ctx.set_source_rgb(1, 1, 1)
     ctx.paint()
-    
+
     # Translate to account for padding and bounding box offset
     ctx.translate(padding - overall_min_x, padding - overall_min_y)
-    
+
     # Render each drawing
     for drawing in group:
         render_single_drawing(ctx, drawing)
-    
+
     # Convert to PNG bytes
     buffer = io.BytesIO()
     surface.write_to_png(buffer)
     buffer.seek(0)
-    
+
     return RenderedVectorImage(image=buffer.getvalue(), width=width, height=height)
 
 
@@ -157,7 +155,7 @@ def render_single_drawing(ctx: cairo.Context, drawing):
     try:
         for item in drawing.get("items", []):
             cmd = item[0]
-            
+
             if cmd == "re":  # Rectangle
                 rect = item[1]
                 ctx.rectangle(rect.x0, rect.y0, rect.x1 - rect.x0, rect.y1 - rect.y0)
@@ -168,27 +166,27 @@ def render_single_drawing(ctx: cairo.Context, drawing):
                 point = item[1]
                 ctx.line_to(point.x, point.y)
             # Add more drawing commands as needed
-        
+
         # Apply stroke/fill
         drawing_type = drawing.get("type", "")
         if "f" in drawing_type:  # Fill
             fill_color = convert_color_cairo(drawing.get("fill", [0, 0, 0]))
             ctx.set_source_rgb(*fill_color)
             ctx.fill_preserve()
-        
+
         if "s" in drawing_type:  # Stroke
             stroke_color = convert_color_cairo(drawing.get("color", [0, 0, 0]))
             stroke_width = drawing.get("width", 1)
             ctx.set_source_rgb(*stroke_color)
             ctx.set_line_width(stroke_width)
             ctx.stroke()
-            
+
     except Exception:
         # If rendering fails, just skip this drawing
         pass
 
 
-def render_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> List[RenderedVectorImage]:
+def render_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> list[RenderedVectorImage]:
     """Renders the passed in PDF drawings to images, grouping overlapping drawings."""
     groups = group_overlapping_drawings(drawings, margin_allowance, overlap_threshold)
     results = [render_group_to_image(group) for group in groups]

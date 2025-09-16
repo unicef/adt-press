@@ -54,7 +54,7 @@ The tool creates the following directory structure:
 
 ```
 output_directory/
-├── extraction_results.json    # Complete extraction metadata
+├── pdf_extract.json    # Complete extraction metadata
 ├── pages/
 │   ├── page_1.png            # Full page images
 │   ├── page_2.png
@@ -68,7 +68,7 @@ output_directory/
 
 ## JSON Output Format
 
-The `extraction_results.json` file contains:
+The `pdf_extract.json` file contains:
 
 ```json
 {
@@ -125,7 +125,7 @@ def extract_pdf_content(pdf_path, start_page, end_page, output_dir):
         raise Exception(f"PDF extraction failed: {result.stderr}")
     
     # Load results
-    with open(f"{output_dir}/extraction_results.json") as f:
+    with open(f"{output_dir}/pdf_extract.json") as f:
         return json.load(f)
 ```
 

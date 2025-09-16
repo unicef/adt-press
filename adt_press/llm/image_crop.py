@@ -43,7 +43,11 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
         # and we want to recrop the image
         while recrop < config.recrops:
             cropped = visualize_crop_extents(
-                cached_read_file(image.image_path), response.top_left_x, response.top_left_y, response.bottom_right_x, response.bottom_right_y
+                cached_read_file(image.image_path),
+                response.top_left_x,
+                response.top_left_y,
+                response.bottom_right_x,
+                response.bottom_right_y,
             )
             cropped_path = write_file(image.image_path, cropped, "recrop")
 

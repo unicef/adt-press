@@ -21,6 +21,7 @@ async def generate_web_page_template(
         config.render_template_path,
         {
             "section": section,
+            "language": language,
             "texts": {t.text_id: t.text for t in texts},
             "images": {i.image_id: i for i in images},
         },
