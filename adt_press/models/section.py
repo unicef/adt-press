@@ -14,6 +14,7 @@ class SectionType(str, enum.Enum):
     boxed_text = "boxed_text"
     text_only = "text_only"
     text_and_images = "text_and_images"
+    images_only = "images_only"
     activity_matching = "activity_matching"
     activity_fill_in_a_table = "activity_fill_in_a_table"
     activity_multiple_choice = "activity_multiple_choice"
@@ -35,6 +36,7 @@ class PageSection(BaseModel):
 
 
 class SectionExplanation(BaseModel):
+    explanation_id: str
     section_id: str
     reasoning: str
     explanation: str
@@ -42,7 +44,7 @@ class SectionExplanation(BaseModel):
 
 class GlossaryItem(BaseModel):
     word: str
-    variants: list[str]
+    variations: list[str]
     definition: str
     emojis: list[str]
 
@@ -53,9 +55,11 @@ class SectionGlossary(BaseModel):
     reasoning: str
 
 
-class SectionEasyRead(BaseModel):
+class SectionMetadata(BaseModel):
     section_id: str
-    text: str
+    background_color: str
+    text_color: str
+    layout_type: str
     reasoning: str
 
 

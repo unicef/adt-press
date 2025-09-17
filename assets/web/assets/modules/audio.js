@@ -124,7 +124,7 @@ export const gatherAudioElements = () => {
                 }
             }
 
-            // For easyReadMode, check the "easyread-" variant of id
+            // For easyReadMode, check the "_easy_read" variant of id
             // but exclude headers and elements in special containers
             if (state.easyReadMode) {
                 // Check if element is a header
@@ -140,7 +140,7 @@ export const gatherAudioElements = () => {
 
                 // Only use easyread audio if not a header and not in excluded areas
                 if (!isHeader && !isExcluded) {
-                    const easyReadAudioId = `easyread-${id}`;
+                    const easyReadAudioId = `${id}_easy_read`;
                     if (state.audioFiles.hasOwnProperty(easyReadAudioId)) {
                         audioSrc = audioBasePath + state.audioFiles[easyReadAudioId];
                     }
@@ -238,10 +238,10 @@ const processAudioQueue = async () => {
     const { currentIndex, audioElements, audioSpeed, describeImagesMode, navigationDirection } = state;
 
     if (currentIndex < 0 || currentIndex >= audioElements.length) {
+        console.log(`Audio index: ${state.currentIndex} out of bounds in elements of length ${audioElements.length}`);
         stopAudio();
         state.currentIndex = 0; // Reset index if out of bounds
         state.navigationDirection = 'forward'; // Reset navigation direction
-        console.log('Audio index out of bounds, stopping audio playback.');
         return;
     }
 

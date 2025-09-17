@@ -1,5 +1,5 @@
 <div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content">
-    <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}">
+    <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}" data-id="{{ section.section_id }}" {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}"{% endif %}>
     {% for row in rows %}
         <div class="flex flex-row px-4 mt-4 mb-4">
             {% for col in row.columns %}

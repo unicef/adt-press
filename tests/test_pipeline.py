@@ -68,6 +68,7 @@ class PipelineTest(unittest.TestCase):
                 "index.html",
                 "plate_report.html",
                 "web_report.html",
+                "glossary_report.html",
                 "translation_report.html",
             ]
 
@@ -103,6 +104,11 @@ class PipelineTest(unittest.TestCase):
                 "output_dir": self.temp_dir,
                 "web_strategy": "html",
                 "crop_strategy": "none",
+                "caption_strategy": "none",
+                "glossary_strategy": "none",
+                "explanation_strategy": "none",
+                "easy_read_strategy": "none",
+                "speech_strategy": "none",
                 "label": "momo",
                 "pdf_path": "assets/momo.pdf",
                 "page_range": dict(start=0, end=5),
@@ -127,6 +133,7 @@ class PipelineTest(unittest.TestCase):
                 "index.html",
                 "plate_report.html",
                 "web_report.html",
+                "glossary_report.html",
                 "translation_report.html",
             ]
 
@@ -137,3 +144,10 @@ class PipelineTest(unittest.TestCase):
             self.assertFileContains("page_report.html", ">Momo and the Leopards<", "Title not found in page report")
             self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
             self.assertFileDoesNotContain("page_report.html", "léopard", "French should not be in page report")
+
+            # rerun using two column web strategy
+            test_config["web_strategy"] = "two_column"
+            config = DictConfig(OmegaConf.merge(file_config, test_config))
+            run_pipeline(config)
+
+            # TODO: once we have deterministic outputs, add tests of final web content

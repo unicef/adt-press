@@ -212,12 +212,14 @@
                                                 <!-- Content Rows -->
                                                 
                                                 {% for part_id in section.part_ids %}
-                                                <!-- Content -->
                                                 <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
                                                     {% if texts_by_id[part_id] %}
                                                     {{ texts_by_id[part_id].text }}
                                                     {% elif images_by_id[part_id] %}
-                                                    <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded" alt="Image {{ part_id }}">
+                                                    <div class="flex items-start gap-3">
+                                                        <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded flex-shrink-0" alt="Image {{ part_id }}">
+                                                        <div class="flex-1 text-sm text-gray-700">{{ images_by_id[part_id].caption.caption }}</div>
+                                                    </div>
                                                     {% else %}
                                                     {{ part_id }}
                                                     {% endif %}
@@ -255,7 +257,53 @@
                                                     <div class="clear-both"></div>
                                                 </div>
                                             </div>
-                                            {% endif %}                                            
+                                            {% endif %}   
+                                            
+                                                                                        
+                                            <!-- Section Metadata -->
+                                            {% with metadata=section_metadata[section.section_id] %}
+                                            {% if metadata %}
+                                            <div class="border-t overflow-hidden">
+                                                <!-- Metadata Header -->
+                                                <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                                                    Section Metadata
+                                                </div>
+                                                <!-- Metadata Content -->
+                                                <div class="p-3">
+                                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <!-- Background Color -->
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ metadata.background_color }}"></div>
+                                                            <div class="text-sm">
+                                                                <div class="font-medium text-gray-700">Background</div>
+                                                                <div class="text-gray-600">{{ metadata.background_color }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Text Color -->
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ metadata.text_color }}"></div>
+                                                            <div class="text-sm">
+                                                                <div class="font-medium text-gray-700">Text Color</div>
+                                                                <div class="text-gray-600">{{ metadata.text_color }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Layout Type -->
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="text-sm">
+                                                                <div class="font-medium text-gray-700">Layout</div>
+                                                                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ metadata.layout_type.replace('SectionLayoutType.', '') if metadata.layout_type else 'unknown' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                    {{ metadata.reasoning }}
+                                                    <div class="clear-both"></div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endwith %}
                                             
                                             <!-- Explanation Section -->
                                             {% with explanation=explanations[section.section_id] %}
@@ -279,25 +327,28 @@
                                             {% endwith %}   
                                             
                                             <!-- Easy Read Section -->
-                                            {% with easy_read=section_easy_reads[section.section_id] %}
-                                            {% if easy_read %}
+                                            {% if easy_reads %}
                                             <div class="border-t bg-green-50 overflow-hidden">
                                                 <!-- Easy Read Header -->
                                                 <div class="bg-green-600 text-white px-3 py-2 text-sm font-medium">
                                                     Easy Read
                                                 </div>
-                                                <!-- Easy Read Content -->
-                                                <div class="p-3">
-                                                    <div class="text-sm text-gray-800">{{ easy_read.text }}</div>
+                                                {% for part_id in section.part_ids %}
+                                                {% with easy_read = easy_reads[part_id] %}
+                                                {% if easy_read %}                                            
+                                                <div class="grid grid-cols-8">
+                                                    <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+                                                        {{ easy_read.easy_read }}
+                                                    </div>
+                                                    <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                                                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ easy_read.easy_read_id }}</span>
+                                                    </div>
                                                 </div>
-                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
-                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
-                                                    {{ easy_read.reasoning }}
-                                                    <div class="clear-both"></div>
-                                                </div>
+                                                {% endif %}
+                                                {% endwith %}
+                                                {% endfor %}
                                             </div>
                                             {% endif %}
-                                            {% endwith %}
                                             
                                             <!-- Glossary Section -->
                                             {% with glossary=section_glossaries[section.section_id] %}
@@ -319,7 +370,7 @@
                                                             <div class="px-3 py-2">
                                                                 <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %} {{ emoji }}{% endfor %}</div>
                                                                 <div class="text-xs text-gray-600 mt-1">
-                                                                    {% for variant in item.variants %}
+                                                                    {% for variant in item.variations %}
                                                                     <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
                                                                     {% endfor %}
                                                                 </div>

@@ -16,61 +16,118 @@
 
     <div class="grid grid-cols-8">
         {% for part_id in section.part_ids %}
-        {% if texts_by_id[part_id] %}
         <div class="col-span-6 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+        {% if images_by_id[part_id] %}
+        <div class="flex items-start gap-3">
+            <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded flex-shrink-0" alt="Image {{ part_id }}">
+            <div class="flex-1 text-sm text-gray-700">{{ texts_by_id.get(part_id, {}).text }}</div>
+        </div>
+        {% elif texts_by_id[part_id] %}        
             {{ texts_by_id[part_id].text }}
-        </div>
-        {% elif images_by_id[part_id] %}
-        <div class="col-span-1 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
-            <img src="./images/{{ images_by_id[part_id].upath | basename }}" class="h-16 w-16 object-cover rounded" alt="Image {{ part_id }}">
-        </div>
-        <div class="col-span-5 px-3 py-2 flex items-center text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100 italic">
-            {{ images_by_id[part_id].caption }}
-        </div>
         {% endif %}
+        </div>
         <div class="col-span-2 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
             <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ part_id }}</span>
         </div>            
         {% endfor %}
     </div>
 
+    <!-- Section Metadata -->
+    <div class="border-t overflow-hidden">
+        <!-- Metadata Header -->
+        <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+            Section Metadata
+        </div>
+        <!-- Metadata Content -->
+        <div class="p-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Background Color -->
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.background_color }}"></div>
+                    <div class="text-sm">
+                        <div class="font-medium text-gray-700">Background</div>
+                        <div class="text-gray-600">{{ section.background_color }}</div>
+                    </div>
+                </div>
+                <!-- Text Color -->
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.text_color }}"></div>
+                    <div class="text-sm">
+                        <div class="font-medium text-gray-700">Text Color</div>
+                        <div class="text-gray-600">{{ section.text_color }}</div>
+                    </div>
+                </div>
+                <!-- Layout Type -->
+                <div class="flex items-center gap-2">
+                    <div class="text-sm">
+                        <div class="font-medium text-gray-700">Layout</div>
+                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ section.layout_type }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    {% if strategy_config.easy_read_strategy != "none" %}
+            <!-- Easy Read Section -->            
             <div class="border-t bg-green-50 overflow-hidden">
+                <!-- Easy Read Header -->
                 <div class="bg-green-600 text-white px-3 py-2 text-sm font-medium">
                     Easy Read
                 </div>
-                <div class="p-3">
-                    <div class="text-sm text-gray-800">{{ section.easy_read }}</div>
+                {% for part_id in section.part_ids %}
+                {% with easy_read_id = part_id ~ "_easy_read" %}
+                {% with easy_read = texts_by_id[easy_read_id] %}
+                {% if easy_read %}
+                <div class="grid grid-cols-8">
+                    <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+                        {{ easy_read.text }}
+                    </div>
+                    <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ easy_read_id }}</span>
+                    </div>
                 </div>
+                {% endif %}
+                {% endwith %}
+                {% endwith %}
+                {% endfor %}
             </div>
 
+            {% with explanation=texts_by_id[section.explanation_id] %}
+            {% if explanation %}
             <div class="border-t bg-gray-50 overflow-hidden">
                 <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
                     Explanation
                 </div>
                 <div class="p-3">
-                    <div class="text-sm text-gray-800">{{ section.explanation }}</div>
+                    <div class="text-sm text-gray-800">{{ explanation.text }}</div>
                 </div>
             </div>
+            {% endif %}
+            {% endwith %}
+    {% endif %}
 
-        <div class="border-t bg-yellow-50 overflow-hidden">
+        
+    </div>
+    {% endfor %}
+
+    <div class="rounded border bg-yellow-50 overflow-hidden">
             <!-- Glossary Header -->
             <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">
-                <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ section.glossary|length if section.glossary else 0 }} terms</span>
+                <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ plate.glossary|length }} terms</span>
                 Glossary
                 <div class="clear-both"></div>
             </div>
             <!-- Glossary Content -->
-            {% if section.glossary %}
             <div class="grid grid-cols-1">
-                {% for item in section.glossary %}
+                {% for item in plate.glossary %}
                 <div class="bg-white border-b border-gray-100 overflow-hidden">
                     <div class="grid grid-cols-1 md:grid-cols-3">
                         <!-- Term Column -->
                         <div class="px-3 py-2">
                             <div class="font-medium text-gray-900">{{ item.word }} {% for emoji in item.emojis %} {{ emoji }}{% endfor %}</div>
                             <div class="text-xs text-gray-600 mt-1">
-                                {% for variant in item.variants %}
+                                {% for variant in item.variations %}
                                 <span class="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">{{ variant }}</span>
                                 {% endfor %}
                             </div>
@@ -83,9 +140,6 @@
                 </div>
                 {% endfor %}
             </div>
-            {% endif %}
         </div>
-    </div>
-    {% endfor %}
     </div>
 {% endblock %}

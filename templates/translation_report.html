@@ -1,27 +1,58 @@
 {% extends "base.html" %}
-{% block title %}Translations{% endblock %}
+{% block title %}Translations & Speech{% endblock %}
 {% block content %}
+<style>
+audio {
+    height: 32px;
+}
+audio::-webkit-media-controls-panel {
+    padding: 2px;
+}
+audio::-webkit-media-controls-play-button {
+    margin: 0 4px 0 0;
+}
+audio::-webkit-media-controls-timeline {
+    margin: 0 4px;
+}
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+    margin: 0;
+    font-size: 11px;
+}
+</style>
 <div class="space-y-8">
     {% for output_language in output_languages %}
+    {% with language_name = LANGUAGE_MAP[output_language] %}
     {% with translations = translations[output_language] %}
+    {% with speech_files = speech_files[output_language] %}    
     <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-4">
-        <!-- Header with Page Number -->
         <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-bold">{{ output_language }}</h2>
+            <h2 class="text-xl font-bold">{{ language_name }} ({{ output_language }})</h2>
         </div>
-
         
         {% for text in plate.texts %}
-        <div class="grid grid-cols-8">
+        <div class="grid grid-cols-12">
             <div class="col-span-6 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
                 {{ translations[text.text_id] }}
             </div>
+            <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                {% if not speech_files[text.text_id] %}
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">No TTS generated</span>
+                {% else %}
+                <audio controls>
+                <source src="{{ speech_files[text.text_id].speech_upath }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+                </audio>     
+                {% endif %}
+            </div>           
             <div class="col-span-2 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
                 <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text.text_id }}</span>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% endwith %}
+    {% endwith %}
     {% endwith %}
     {% endfor %}
 </div>

@@ -103,7 +103,7 @@ async function attachWordHighlighter(audio) {
     
     // Use easyread translation if not a header and not in excluded areas
     if (!isHeader && !isExcluded) {
-      const easyReadKey = `easyread-${dataId}`;
+      const easyReadKey = `${dataId}_easy_read`;
       if (state.translations && state.translations.hasOwnProperty(easyReadKey)) {
         translationKey = easyReadKey;
         

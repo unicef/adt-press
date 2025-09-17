@@ -4,29 +4,30 @@ import os
 from bs4 import BeautifulSoup
 
 from adt_press.models.config import TemplateConfig
-from adt_press.models.plate import PlateImage
+from adt_press.models.plate import PlateImage, PlateText
 
 
-def replace_images(html_content: str, image_replacements: dict[str, PlateImage]) -> str:
+def replace_images(html_content: str, image_replacements: dict[str, PlateImage], text_replacements: dict[str, PlateText]) -> str:
     soup = BeautifulSoup(html_content, "html.parser")
 
     for tag in soup.find_all("img"):
         if tag.get("data-id") in image_replacements:
             img = image_replacements[tag["data-id"]]
             tag["src"] = img.upath
-            tag["alt"] = img.caption
-            tag["aria-label"] = img.caption
+            caption = text_replacements.get(img.caption_id)
+            if caption:
+                tag["alt"] = caption.text
 
     return str(soup)
 
 
-def replace_texts(html_content: str, text_replacements: dict[str, str]) -> str:
+def replace_texts(html_content: str, text_replacements: dict[str, PlateText]) -> str:
     soup = BeautifulSoup(html_content, "html.parser")
 
     # TODO: is this the right set of tags to replace?
     for tag in soup.find_all(["h1", "h2", "p", "span"]):
         if tag.get("data-id") in text_replacements:
-            tag.string = text_replacements[tag["data-id"]]
+            tag.string = text_replacements[tag["data-id"]].text
 
     return str(soup)
 

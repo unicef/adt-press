@@ -4,9 +4,10 @@ from omegaconf import DictConfig, OmegaConf
 from adt_press.models.config import TemplateConfig
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.pdf import Page
-from adt_press.models.plate import Plate
-from adt_press.models.section import PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
-from adt_press.models.text import OutputText, PageText, PageTexts
+from adt_press.models.plate import Plate, PlateSection
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
+from adt_press.models.speech import SpeechFile
+from adt_press.models.text import EasyReadText, OutputText, PageText, PageTexts
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -31,9 +32,10 @@ def report_pages(
     filtered_pdf_texts_by_id: dict[str, PageText],
     processed_images_by_id: dict[str, ProcessedImage],
     explanations_by_section_id: dict[str, SectionExplanation],
-    output_pdf_texts_by_id: dict[str, OutputText],
+    plate_output_texts_by_id: dict[str, OutputText],
     section_glossaries_by_id: dict[str, SectionGlossary],
-    section_easy_reads_by_id: dict[str, SectionEasyRead],
+    easy_reads_by_text_id: dict[str, EasyReadText],
+    section_metadata_by_id: dict[str, SectionMetadata],
     input_language_config: str,
     plate_language_config: str,
 ) -> str:
@@ -50,9 +52,10 @@ def report_pages(
             texts_by_id=filtered_pdf_texts_by_id,
             images_by_id=processed_images_by_id,
             explanations=explanations_by_section_id,
-            output_texts=output_pdf_texts_by_id,
+            output_texts=plate_output_texts_by_id,
             section_glossaries=section_glossaries_by_id,
-            section_easy_reads=section_easy_reads_by_id,
+            section_metadata=section_metadata_by_id,
+            easy_reads=easy_reads_by_text_id,
             input_language=input_language,
             output_language=output_language,
         ),
@@ -60,12 +63,14 @@ def report_pages(
 
 
 @cache(behavior="recompute")
-def plate_report(template_config: TemplateConfig, plate: Plate) -> str:
+def plate_report(template_config: TemplateConfig, plate: Plate, strategy_config: dict[str, str]) -> str:
     texts_by_id = {t.text_id: t for t in plate.texts}
     images_by_id = {i.image_id: i for i in plate.images}
 
     return render_template(
-        template_config, "templates/plate_report.html", dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id)
+        template_config,
+        "templates/plate_report.html",
+        dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, strategy_config=strategy_config),
     )
 
 
@@ -76,7 +81,11 @@ def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
 
 @cache(behavior="recompute")
 def translation_report(
-    template_config: TemplateConfig, output_languages_config: list[str], plate: Plate, plate_translations: dict[str, dict[str, str]]
+    template_config: TemplateConfig,
+    output_languages_config: list[str],
+    plate: Plate,
+    plate_translations: dict[str, dict[str, str]],
+    speech_files: dict[str, dict[str, SpeechFile]],
 ) -> str:
     return render_template(
         template_config,
@@ -85,6 +94,27 @@ def translation_report(
             plate=plate,
             output_languages=output_languages_config,
             translations=plate_translations,
+            speech_files=speech_files,
+            LANGUAGE_MAP=LANGUAGE_MAP,
+        ),
+    )
+
+
+@cache(behavior="recompute")
+def glossary_report(
+    template_config: TemplateConfig,
+    plate: Plate,
+    output_languages_config: list[str],
+    plate_glossary_translations: dict[str, list[GlossaryItem]],
+) -> str:
+    return render_template(
+        template_config,
+        "templates/glossary_report.html",
+        dict(
+            plate=plate,
+            output_languages=output_languages_config,
+            glossary_translations=plate_glossary_translations,
+            LANGUAGE_MAP=LANGUAGE_MAP,
         ),
     )
 
@@ -93,12 +123,14 @@ def translation_report(
 def web_report(
     template_config: TemplateConfig,
     web_pages: list[WebPage],
+    plate_sections_by_id: dict[str, PlateSection],
 ) -> str:
     return render_template(
         template_config,
         "templates/web_report.html",
         dict(
             web_pages=web_pages,
+            sections=plate_sections_by_id,
         ),
     )
 

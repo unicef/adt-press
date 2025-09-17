@@ -11,7 +11,7 @@ class PlateText(BaseModel):
 class PlateImage(BaseModel):
     image_id: str
     upath: str
-    caption: str
+    caption_id: str
 
 
 class PlateSection(BaseModel):
@@ -19,9 +19,10 @@ class PlateSection(BaseModel):
     section_type: SectionType
     page_image_upath: str
     part_ids: list[str]
-    explanation: str
-    easy_read: str
-    glossary: list[GlossaryItem]
+    explanation_id: str | None
+    background_color: str
+    text_color: str
+    layout_type: str
 
 
 class Plate(BaseModel):
@@ -30,3 +31,4 @@ class Plate(BaseModel):
     sections: list[PlateSection]
     images: list[PlateImage]
     texts: list[PlateText]
+    glossary: list[GlossaryItem]

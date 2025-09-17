@@ -114,7 +114,7 @@ export const applyTranslations = async () => {
     if (!translations) return;
 
     for (const [key, value] of Object.entries(translations)) {
-        if (key.startsWith("sectioneli5")) continue;
+        if (key.endsWith("_eli5")) continue;
 
         let translationKey = key;
 
@@ -128,14 +128,13 @@ export const applyTranslations = async () => {
             const isExcluded = Array.from(elements).some(element => {
                 const wordCard = element.closest('.word-card');
                 const activityItem = element.closest('[data-activity-item]');
-                const navList = element.closest('.nav__list');
                 const activityText = element.closest('.activity-text');
-                return wordCard !== null || activityItem !== null || navList !== null || activityText !== null;
+                return wordCard !== null || activityItem !== null || activityText !== null;
             });
 
             // Skip applying easy-read translation if it's a header or inside excluded areas
             if (!isHeader && !isExcluded) {
-                const easyReadKey = `easyread-${key}`;
+                const easyReadKey = `${key}_easy_read`;
                 if (translations.hasOwnProperty(easyReadKey)) {
                     translationKey = easyReadKey;
                 }
@@ -198,7 +197,12 @@ const applyTranslationToElements = (key, translationKey) => {
                 const translatedText = state.translations[translationKey].replace(/\n/g, '<br>');
 
                 // Check if this is easy-read content
-                const isEasyRead = translationKey.startsWith('easyread-');
+                const isEasyRead = translationKey.endsWith('_easy_read');
+
+                // Don't apply easy read to nav items
+                if (isEasyRead && element.closest('nav')) {
+                    return;
+                }
 
                 // Check if the element is a header
                 const isHeader = element.tagName.toLowerCase().match(/^h[1-6]$/);

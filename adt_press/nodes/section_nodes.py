@@ -1,12 +1,14 @@
+from hamilton.function_modifiers import config
+
 from adt_press.llm.page_sectioning import get_page_sections
-from adt_press.llm.section_easy_read import get_section_easy_read
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
-from adt_press.models.config import PromptConfig
+from adt_press.llm.section_metadata import get_section_metadata
+from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
-from adt_press.models.section import PageSection, PageSections, SectionEasyRead, SectionExplanation, SectionGlossary
-from adt_press.models.text import OutputText, PageText, PageTexts
+from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
+from adt_press.models.text import PageText, PageTexts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -59,7 +61,29 @@ def filtered_sections_by_page_id(
     return filtered_sections
 
 
-def explanations_by_section_id(
+def section_metadata_by_id(
+    section_metadata_prompt_config: PromptConfig,
+    layout_types_config: dict[str, LayoutType],
+    pdf_pages_by_id: dict[str, Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    filtered_pdf_texts_by_id: dict[str, PageText],
+) -> dict[str, SectionMetadata]:
+    async def get_metadata():
+        tasks = []
+        for page_sections in filtered_sections_by_page_id.values():
+            page = pdf_pages_by_id[page_sections.page_id]
+            for section in filter(lambda s: not s.is_pruned, page_sections.sections):
+                texts = [filtered_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
+                tasks.append(get_section_metadata(section_metadata_prompt_config, layout_types_config, page, section, texts))
+
+        return await gather_with_limit(tasks, section_metadata_prompt_config.rate_limit)
+
+    results = run_async_task(get_metadata)
+    return {metadata.section_id: metadata for metadata in results}
+
+
+@config.when(explanation_strategy="llm")
+def explanations_by_section_id__llm(
     plate_language_config: str,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
@@ -95,17 +119,30 @@ def explanations_by_section_id(
     return explanations
 
 
-def section_glossaries_by_id(
+@config.when(explanation_strategy="none")
+def explanations_by_section_id__none(
+    plate_language_config: str,
+    pdf_pages: list[Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    filtered_pdf_texts_by_id: dict[str, PageText],
+    processed_images_by_id: dict[str, ProcessedImage],
+    section_explanation_prompt_config: PromptConfig,
+) -> dict[str, SectionExplanation]:
+    return {}
+
+
+@config.when(glossary_strategy="llm")
+def section_glossaries_by_id__llm(
     plate_language_config: str,
     section_glossary_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
-    output_pdf_texts_by_id: dict[str, OutputText],
+    filtered_pdf_texts_by_id: dict[str, PageText],
 ) -> dict[str, SectionGlossary]:
     async def get_glossaries():
         tasks = []
         for page_sections in filtered_sections_by_page_id.values():
             for section in filter(lambda s: not s.is_pruned, page_sections.sections):
-                texts = [output_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
+                texts = [filtered_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
                 tasks.append(get_section_glossary(plate_language_config, section_glossary_prompt_config, section, texts))
 
         return await gather_with_limit(tasks, section_glossary_prompt_config.rate_limit)
@@ -114,20 +151,11 @@ def section_glossaries_by_id(
     return {glossary.section_id: glossary for glossary in results}
 
 
-def section_easy_reads_by_id(
+@config.when(glossary_strategy="none")
+def section_glossaries_by_id__none(
     plate_language_config: str,
-    section_easy_read_prompt_config: PromptConfig,
+    section_glossary_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
-    output_pdf_texts_by_id: dict[str, OutputText],
-) -> dict[str, SectionEasyRead]:
-    async def get_easy_reads():
-        tasks = []
-        for page_sections in filtered_sections_by_page_id.values():
-            for section in filter(lambda s: not s.is_pruned, page_sections.sections):
-                texts = [output_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
-                tasks.append(get_section_easy_read(plate_language_config, section_easy_read_prompt_config, section, texts))
-
-        return await gather_with_limit(tasks, section_easy_read_prompt_config.rate_limit)
-
-    results = run_async_task(get_easy_reads)
-    return {easy_read.section_id: easy_read for easy_read in results}
+    filtered_pdf_texts_by_id: dict[str, PageText],
+) -> dict[str, SectionGlossary]:
+    return {}
