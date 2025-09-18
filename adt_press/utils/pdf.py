@@ -48,7 +48,7 @@ def pages_for_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int
         raise RuntimeError(f"PDF extraction failed: {e.stderr}") from e
     
     # Parse the results
-    results_file = os.path.join(extract_dir, "extraction_results.json")
+    results_file = os.path.join(extract_dir, "pdf_extract.json")
     if not os.path.exists(results_file):
         raise RuntimeError(f"Extraction results file not found: {results_file}")
     
