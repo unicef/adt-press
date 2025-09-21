@@ -1,0 +1,9 @@
+# PDF Extractor Tool Dependencies
+# Note: This tool uses PyMuPDF which is AGPL-3.0 licensed
+
+pymupdf>=1.24.0
+matplotlib>=3.7.0
+pillow>=10.0.0
+pycairo>=1.20.0
+numpy>=1.24.0
+pydantic>=2.0.0

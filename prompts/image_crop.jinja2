@@ -19,13 +19,13 @@ Provide me the answer in the given structure. Please take your time and crop car
 
 {% chat role="user" %}
 This is the image of the entire page from the textbook for context.
-{{ page.image_upath | image }}
+{{ page.page_image_path | image }}
 
 This is the image from the textbook with width: {{image.width}}px, height: {{image.height}}px:
-{{ image.upath | image }}
+{{ image.image_path | image }}
 
 The following image is a matplotlib chart of the image for reference.
-{{ image.chart_upath | image }}
+{{ image.chart_path | image }}
 
 Please provide the crop coordinates for me.
 {% endchat %}

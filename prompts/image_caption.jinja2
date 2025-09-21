@@ -24,7 +24,7 @@ IMPORTANT NOTES:
 
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ page.image_upath | image}}
+{{ page.page_image_path | image}}
 Please caption the following image in this language: {{ language }}. Provide your reasoning first.
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endchat %}

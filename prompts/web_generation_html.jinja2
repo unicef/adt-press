@@ -67,14 +67,14 @@ Take extra effort to make the web pages beautiful and as aesthetically pleasing 
 
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ example.page_image_upath | image }}
+{{ example.page_image_path | image }}
 
 The section type for this section is: {{example.section.type}}.
 
 {% for part in example.section.parts %}
 {% if part.type == "image" %}
 ID of the following image is: {{ part.id }}.
-{{ part.image_upath | image }}
+{{ part.image_path | image }}
 {% endif %}
 {% endfor %}
 
@@ -95,13 +95,13 @@ text: {{ part.text }}
 
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
-{{ section.page_image_upath | image }}
+{{ section.page_image_path | image }}
 
 The section type for this section is: {{section.section_type.name }}.
 
 {% for image in images %}
 ID of the following image is: {{image.image_id}}.
-{{ image.upath | image }}
+{{ image.image_path | image }}
 {% endfor %}
 
 The follow are text for the section to use for web asset generation. You may use it verbatim or modify it as needed.

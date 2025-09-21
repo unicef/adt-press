@@ -44,7 +44,7 @@ def image_blank_filter_failures(
 ) -> dict[str, ImageFilterFailure]:
     failures = {}
     for img in pdf_images:
-        img_bytes = image_bytes(img.upath)
+        img_bytes = image_bytes(img.image_path)
         if is_blank_image(img_bytes, blank_image_filter_config.threshold):
             failures[img.image_id] = ImageFilterFailure(image_id=img.image_id, filter="blank", reasoning="image is blank")
 
@@ -150,7 +150,7 @@ def image_crops__none(pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict
         img.image_id: ImageCrop(
             image_id=img.image_id,
             crop_coordinates=CropCoordinates(top_left_x=0, top_left_y=0, bottom_right_x=img.width, bottom_right_y=img.height),
-            upath=img.upath,
+            image_path=img.image_path,
         )
         for page in pdf_pages
         for img in page.images
@@ -164,16 +164,16 @@ def image_crops__llm(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page]
         coord = await get_image_crop_coordinates(crop_prompt_config, page, img)
 
         # create a cropped version of the image
-        cropped = crop_image(image_bytes(img.upath), coord)
+        cropped = crop_image(image_bytes(img.image_path), coord)
 
         # add the coordinates to the image path so that we don't cache different crops of the same image
         cropped_path = write_file(
-            img.upath,
+            img.image_path,
             cropped,
             f"cropped_{coord.top_left_x}_{coord.top_left_y}_{coord.bottom_right_x}_{coord.bottom_right_y}",
         )
 
-        return ImageCrop(image_id=img.image_id, crop_coordinates=coord, upath=str(cropped_path))
+        return ImageCrop(image_id=img.image_id, crop_coordinates=coord, image_path=str(cropped_path))
 
     async def generate_crops():
         crops = []

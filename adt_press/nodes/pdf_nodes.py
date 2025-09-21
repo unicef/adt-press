@@ -1,5 +1,3 @@
-import os
-
 from hamilton.function_modifiers import config
 
 from adt_press.llm.text_easy_read import get_text_easy_read
@@ -86,5 +84,4 @@ def filtered_pdf_texts_by_id(filtered_pdf_texts: dict[str, PageTexts]) -> dict[s
 
 
 def pdf_pages(run_output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
-    image_dir = os.path.join(run_output_dir_config, "images")
-    return pages_for_pdf(image_dir, pdf_path_config, page_range_config.start, page_range_config.end)
+    return pages_for_pdf(run_output_dir_config, pdf_path_config, page_range_config.start, page_range_config.end)

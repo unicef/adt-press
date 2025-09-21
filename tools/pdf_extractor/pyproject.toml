@@ -1,0 +1,32 @@
+[project]
+name = "pdf-extractor"
+version = "0.1.0"
+description = "Standalone PDF extraction tool using PyMuPDF"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pymupdf>=1.24.0",  # AGPL-3.0 licensed
+    "matplotlib>=3.7.0",
+    "pillow>=10.0.0",
+    "pycairo>=1.20.0",
+    "numpy>=1.24.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+pdf-extractor = "pdf_extractor:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "T20"]
+ignore = ["E501"]  # Line too long
+
+[tool.ruff.lint.isort]
+known-first-party = ["pdf_extractor"]

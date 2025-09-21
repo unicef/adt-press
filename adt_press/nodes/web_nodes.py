@@ -88,7 +88,7 @@ def web_pages(
     pages: list[WebPage] = run_async_task(generate_pages)
 
     image_urls = {
-        img.image_id: PlateImage(image_id=img.image_id, upath=f"images/{os.path.basename(img.upath)}", caption_id=img.image_id)
+        img.image_id: PlateImage(image_id=img.image_id, image_path=f"images/{os.path.basename(img.image_path)}", caption_id=img.image_id)
         for img in plate.images
     }
 
@@ -139,9 +139,9 @@ def package_adt_web(
         images = {}
         for image_id in webpage.image_ids:
             image = plate_images[image_id]
-            images[image_id] = PlateImage(image_id=image.image_id, upath=f"images/{image_id}.png", caption_id=image.caption_id)
+            images[image_id] = PlateImage(image_id=image.image_id, image_path=f"images/{image_id}.png", caption_id=image.caption_id)
 
-            shutil.copy(image.upath, os.path.join(image_dir, f"{image_id}.png"))
+            shutil.copy(image.image_path, os.path.join(image_dir, f"{image_id}.png"))
 
         content = webpage.content
         content = replace_images(content, images, plate_texts)
@@ -184,7 +184,7 @@ def package_adt_web(
                 audio_map[text_id] = filename
 
                 # copy the audio file over
-                shutil.copy(os.path.join(run_output_dir_config, speech.speech_upath), os.path.join(audio_dir, filename))
+                shutil.copy(os.path.join(run_output_dir_config, speech.speech_path), os.path.join(audio_dir, filename))
 
             json.dump(audio_map, f, indent=2)
 

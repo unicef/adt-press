@@ -10,14 +10,14 @@ class PlateText(BaseModel):
 
 class PlateImage(BaseModel):
     image_id: str
-    upath: str
+    image_path: str
     caption_id: str
 
 
 class PlateSection(BaseModel):
     section_id: str
     section_type: SectionType
-    page_image_upath: str
+    page_image_path: str
     part_ids: list[str]
     explanation_id: str | None
     background_color: str

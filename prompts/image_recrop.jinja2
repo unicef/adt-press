@@ -7,5 +7,5 @@ bottom_right_y: {{ crop_coordinates.bottom_right_y }}
 
 {% chat role="user" %}
 The crop coordinates still don't look great. Here's the image chart again with a red box indicating the coordinates you gave me. Please fix this and give me better crop coordinates.
-{{ cropped_upath | image }}
+{{ cropped_path | image }}
 {% endchat %}
