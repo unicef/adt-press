@@ -2,7 +2,6 @@ import io
 import warnings
 
 import cv2
-import fitz
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
@@ -16,11 +15,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 # Set the figure.max_open_warning to a high number to suppress the warning
 plt.rcParams.update({"figure.max_open_warning": 100})
-
-# We need to set this zoom for PyMuPDF or the image is pixelated.
-FITZ_ZOOM = 2
-FITZ_MAT = fitz.Matrix(FITZ_ZOOM, FITZ_ZOOM)
-
 
 def image_bytes(image_path: str) -> bytes:
     """Returns the bytes of an image given its path."""
