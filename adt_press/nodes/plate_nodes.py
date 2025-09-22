@@ -61,7 +61,7 @@ def generated_plate(
         sections=plate_sections,
         images=images,
         texts=texts,
-        glossary=plate_glossary,
+        glossary=plate_glossary if plate_glossary else [],
     )
 
 
