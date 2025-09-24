@@ -30,7 +30,7 @@ Section the text and images and provide a json output of this format:
 
 <section_type_definition>
 "section_type" must only be one of:
-- "front_cover": For the front cover page the textbook that is the first page. There can only be one front cover page.
+- "front_cover": For the front cover page the textbook that is the first page. There can only be one front cover page. IMPORTANT: Only classify as front_cover if this is page number 1 (the very first page of the document).
 - "inside_cover": For an inside cover page that can contain the title.
 - "back_cover" For a back cover page that is the last page of the textbook.
 - "separator": For a separator page that breaks up the text into different logical sections.
@@ -105,6 +105,8 @@ Please section the image and text.
 {% chat role="user" %}
 This is the base64 image of the entire page from the textbook for context only.
 {{ page.image_upath | image }}
+
+IMPORTANT: This is page number {{ page.page_number }} in the document. Only classify as "front_cover" if this is page number 1.
 
 {% for image in images %}
 Image ID of following image: {{ image.image_id }}

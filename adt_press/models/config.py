@@ -12,6 +12,7 @@ class RenderType(str, enum.Enum):
     html = "html"
     rows = "rows"
     two_column = "two_column"
+    spread = "spread"
 
 
 class LayoutType(BaseModel):

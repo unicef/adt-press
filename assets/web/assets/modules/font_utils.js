@@ -5,16 +5,16 @@
  */
 
 /**
- * Dynamically loads the Atkinson Hyperlegible font from Google Fonts,
+ * Dynamically loads the Merriweather font from Google Fonts,
  * injects the necessary <link> tags for preconnect and stylesheet,
  * and applies the font to the entire document and common elements.
  *
  * This function is idempotent but will append new <link> and <style> tags
  * each time it is called, so it should only be called once per page load.
  */
-export const loadAtkinsonFont = () => {
-    const fontHref = 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap';
-    const styleId = 'atkinson-hyperlegible-style';
+export const loadMerriweatherFont = () => {
+    const fontHref = 'https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap';
+    const styleId = 'merriweather-style';
 
     if (!document.querySelector(`link[href="${fontHref}"]`)) {
         // Create and load the preconnect links
@@ -43,7 +43,7 @@ export const loadAtkinsonFont = () => {
         styleSheet.id = styleId;
         styleSheet.textContent = `
             body, p, h1, h2, h3, h4, h5, h6, span, div, button, input, textarea, select {
-                font-family: "Atkinson Hyperlegible", sans-serif !important;
+                font-family: "Merriweather", serif !important;
             }
         `;
         document.head.appendChild(styleSheet);

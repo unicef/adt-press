@@ -1,0 +1,197 @@
+{% set cover_bg_color = "#ffffff" %}
+{% if section.section_type.name == "front_cover" %}
+    {% for row in rows %}
+        {% for col in row.columns %}
+            {% set col_cover_texts = [] %}
+            {% for part in col.parts %}
+                {% if texts[part] %}
+                    {% set _ = col_cover_texts.append(part) %}
+                {% endif %}
+            {% endfor %}
+            {% set cover_bg_color = col.color %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+
+<div class="container content mx-auto w-full min-h-screen px-8 py-8 flex items-center justify-center" id="content" style="background-color: {{ cover_bg_color }};">
+    <section id="spread-main" role="article" data-section-type="{{ section.section_type.name }}" data-id="{{ section.section_id }}" {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}"{% endif %}>
+    {% for row in rows %}
+        <div class="flex flex-col lg:flex-row items-start max-w-none w-full" style="gap: 0;">
+            {% for col in row.columns %}
+                {% if section.section_type.name == "front_cover" %}
+                    <!-- Cover page layout: left column image, right column text -->
+                    {% set col_images = [] %}
+                    {% set col_texts = [] %}
+                    {% for part in col.parts %}
+                        {% if images[part] %}
+                            {% set _ = col_images.append(part) %}
+                        {% elif texts[part] %}
+                            {% set _ = col_texts.append(part) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if col_images|length > 0 %}
+                        <!-- Left column with cover image -->
+                        <div class="basis-1/2 p-4 flex flex-col justify-start items-center" style="color: {{ col.color }};">
+                            {% for part in col_images %}
+                            <img class="mb-8 w-full rounded-lg" data-id="{{ part }}" style="height: 100vh; object-fit: contain;"></img>
+                            {% endfor %}
+                        </div>
+                    {% elif col_texts|length > 0 %}
+                        <!-- Right column with cover text -->
+                        <div class="basis-1/2 p-4 flex flex-col justify-start items-center" style="color: {{ col.color }};">
+                            {% if col_texts|length > 0 %}
+                            <!-- Group consecutive text parts for accessibility -->
+                            <div class="mb-8 flex flex-col justify-start items-start w-full max-w-4xl">
+                                {% for text_part in col_texts %}
+                                {% if loop.first %}
+                                <span class="block mb-2 text-2xl font-bold leading-tight text-left" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                {% else %}
+                                <span class="block mb-2 text-lg leading-relaxed text-left" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <!-- Empty column -->
+                        <div class="basis-1/2 p-4" style="color: {{ col.color }};"></div>
+                    {% endif %}
+                {% elif row.columns|length == 1 %}
+                    <!-- Single column layout for non-cover pages -->
+                    {% set col_images = [] %}
+                    {% set col_texts = [] %}
+                    {% for part in col.parts %}
+                        {% if images[part] %}
+                            {% set _ = col_images.append(part) %}
+                        {% elif texts[part] %}
+                            {% set _ = col_texts.append(part) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Decide overlay based on content: if we have both text and images in same column -->
+                    {% set should_overlay = col_images|length > 0 and col_texts|length > 0 %}
+                    
+                    {% if should_overlay %}
+                        <!-- Single column with overlay layout -->
+                        <div class="basis-full p-4 flex flex-col justify-start items-center relative">
+                            <img class="w-full rounded-lg" data-id="{{ col_images[0] }}" style="height: 100vh; object-fit: contain;"/>
+                            <div class="absolute inset-0 flex flex-col justify-center items-center p-8" style="color: {{ col.color }};">
+                                {% if col_texts|length > 0 %}
+                                <!-- Group consecutive text parts for accessibility -->
+                                <div class="mb-8 flex flex-col justify-start items-start w-full max-w-4xl">
+                                    {% for text_part in col_texts %}
+                                    {% if loop.first %}
+                                    <span class="block mb-2 text-2xl font-bold leading-tight text-left drop-shadow-lg" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                    {% else %}
+                                    <span class="block mb-2 text-lg leading-relaxed text-left drop-shadow-lg" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                    {% endif %}
+                                    {% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Standard single column layout -->
+                        <div class="basis-full p-4 flex flex-col justify-start items-center">
+                            {% set text_parts = [] %}
+                            {% for part in col.parts %}
+                            {% if texts[part] %}
+                            {% set text_parts = text_parts + [part] %}
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if text_parts|length > 0 %}
+                            <!-- Group consecutive text parts for accessibility -->
+                            <div class="mb-8 flex flex-col justify-start items-start w-full max-w-4xl">
+                                {% for text_part in text_parts %}
+                                {% set text_alignment = "text-center" if section.section_type.name == "credits" else "text-left" %}
+                                {% if loop.first %}
+                                <span class="block mb-2 text-2xl font-bold leading-tight {{ text_alignment }}" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                {% else %}
+                                <span class="block mb-2 text-lg leading-relaxed {{ text_alignment }}" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                {% endif %}
+                                {% if not loop.last %}<br>{% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            {% for part in col.parts %}
+                            {% if images[part] %}
+                            <img class="mb-8 w-full rounded-lg" data-id="{{ part }}" style="height: 100vh; object-fit: contain;"></img>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <!-- Spread layout: Two columns with no gap -->
+                    {% set col_images = [] %}
+                    {% set col_texts = [] %}
+                    {% for part in col.parts %}
+                        {% if images[part] %}
+                            {% set _ = col_images.append(part) %}
+                        {% elif texts[part] %}
+                            {% set _ = col_texts.append(part) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Decide overlay based on content: if we have both text and images in same column -->
+                    {% set should_overlay = col_images|length > 0 and col_texts|length > 0 %}
+                    
+                    {% if should_overlay %}
+                        <!-- Column with overlay layout - text overlaid on image -->
+                        <div class="basis-1/2 p-4 flex flex-col justify-start items-center relative" style="color: {{ col.color }};">
+                            <img class="w-full rounded-lg" data-id="{{ col_images[0] }}" src="images/{{ col_images[0] }}.png" style="height: 100vh; object-fit: contain;"/>
+                            <div class="absolute inset-0 flex flex-col justify-center items-center p-8" style="color: {{ col.color }};">
+                                {% if col_texts|length > 0 %}
+                                <!-- Group consecutive text parts for accessibility -->
+                                <div class="mb-8 flex flex-col justify-start items-start w-full max-w-4xl">
+                                    {% for text_part in col_texts %}
+                                    {% if loop.first %}
+                                    <span class="block mb-2 text-2xl font-bold leading-tight text-left drop-shadow-lg" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                    {% else %}
+                                    <span class="block mb-2 text-lg leading-relaxed text-left drop-shadow-lg" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                                    {% endif %}
+                                    {% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Standard column layout - no overlay needed -->
+                        <div class="basis-1/2 p-4 flex flex-col justify-start items-center" style="color: {{ col.color }};">
+                            {% set text_parts = [] %}
+                            {% for part in col.parts %}
+                            {% if texts[part] %}
+                            {% set text_parts = text_parts + [part] %}
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% for text_part in col_texts %}
+                            {% if loop.first %}
+                            <!-- Group consecutive text parts for accessibility -->
+                            <div class="mb-8 flex flex-col justify-start items-start w-full max-w-4xl">
+                                <span class="block mb-2 text-2xl font-bold leading-tight text-left" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                            {% else %}
+                                <span class="block mb-2 text-lg leading-relaxed text-left" data-id="{{ text_part }}">{{ texts[text_part] }}</span>
+                            {% endif %}
+                            {% if loop.last %}
+                            </div>
+                            {% else %}
+                                <br>
+                            {% endif %}
+                            {% endfor %}                            {% for part in col.parts %}
+                            {% if images[part] %}
+                            <img class="mb-8 w-full rounded-lg" data-id="{{ part }}" style="height: 100vh; object-fit: contain;"></img>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </section>
+</div>

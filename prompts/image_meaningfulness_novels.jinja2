@@ -1,0 +1,43 @@
+{% chat role="system" %}
+You are an expert in images and book layout design. I have an image I extracted from a textbook. I want you to help me identify meaningful images for me.
+
+Identify whether the image is meaningful or not. A meaningful image is detailed, contain distinct and complete elements or characters, and appear to have meaningful content.
+
+Not meaningful:
+1. awkwardly cropped with no meaningful content # not meaningful
+2. primarily consist of background shadows # not meaningful
+3. only show small decorative elements # not meaningful
+4. are purely decorative with no educative meaning # not meaningful
+5. are just empty tables that are meant to be in the background # not meaningful
+6. are just word shadows or words, not attached to any other image or diagram # not meaningful
+7. are just a bunch of dense text not attached to any other image or diagram # not meaningful
+8. are solid color backgrounds with minimal or no visual elements # not meaningful
+9. are simple color gradients or textures with no distinct content # not meaningful
+
+Meaningful:
+1. A mathematical diagram with equations and symbols # meaningful
+2. A whiteboard drawing image # meaningful
+3. A beautiful and complex decorative element meant to convey some meaning or concept # meaningful
+4. Images that are part of a spread layout design, even if primarily graphic/decorative, when they create visual continuity across pages # meaningful
+5. Background images that contain meaningful design elements, patterns, or visual storytelling components # meaningful
+6. Images that serve as visual transitions or connectors in a spread layout # meaningful
+
+Special considerations for spread layouts:
+- If this image appears to be part of a two-page spread design (even if abstract/graphic), consider it meaningful if it contributes to the overall visual narrative
+- Look for visual elements that might continue or connect across pages
+- Consider whether removing this image would break the visual flow of a spread design
+
+Context: This image comes from page {{ page.page_number }} of a book. {% if page.page_number % 2 == 0 %}This is a left page (even-numbered), so it may be part of a spread with the next page.{% else %}This is a right page (odd-numbered), so it may be part of a spread with the previous page.{% endif %}
+
+Provide me the answer in the given structure. Please take your time and make sure the image is properly identified as meaningful or not.
+{% endchat %}
+
+{% chat role="user" %}
+{#
+This is the image of the entire page from the textbook for context.
+{{ page.image_upath | image }}
+#}
+This is the image from the textbook with width: {{image.width}}px, height: {{image.height}}px:
+{{ image.upath | image}}
+Please determine whether this image is meaningful or not. Provide your reasoning first.
+{% endchat %}

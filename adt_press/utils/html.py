@@ -48,7 +48,9 @@ def render_template_to_string(template_path: str, context: dict) -> str:
 
 
 # given the passed in dict and template, render using jinja2
-def render_template(config: TemplateConfig, template_path: str, context: dict, output_name=None) -> str:
+def render_template(
+    config: TemplateConfig, template_path: str, context: dict, output_name=None
+) -> str:
     # write the output to a file named after the template
     output_name = output_name if output_name else basename(template_path)
     output_path = config.output_dir + os.sep + output_name

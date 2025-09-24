@@ -14,6 +14,168 @@ from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
+def generate_spread_sections(
+    pdf_pages: list[Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    section_metadata_by_id: dict[str, SectionMetadata],
+    explanations_by_section_id: dict[str, SectionExplanation],
+    render_strategy_config: str,
+) -> list[PlateSection]:
+    """Generate spread sections by pairing consecutive pages for spreads."""
+    spread_sections = []
+    
+    if render_strategy_config != "spread":
+        # For non-spread strategies, use the original single-page sections
+        for page in pdf_pages:
+            page_sections = filtered_sections_by_page_id[page.page_id]
+            for page_section in page_sections.sections:
+                if page_section.is_pruned:
+                    continue
+
+                eli5 = explanations_by_section_id.get(
+                    page_section.section_id, None
+                )
+                metadata = section_metadata_by_id[page_section.section_id]
+
+                spread_sections.append(
+                    PlateSection(
+                        section_id=page_section.section_id,
+                        section_type=page_section.section_type,
+                        page_image_upath=page.image_upath,
+                        explanation_id=eli5.explanation_id if eli5 else None,
+                        part_ids=page_section.part_ids,
+                        layout_type=metadata.layout_type,
+                        background_color=metadata.background_color,
+                        text_color=metadata.text_color,
+                    )
+                )
+        return spread_sections
+    
+    # For spread strategy, pair consecutive pages sequentially
+    # Page 0 = cover (single spread), Pages 1-2 = spread, etc.
+    pages_by_number = {page.page_number: page for page in pdf_pages}
+    page_numbers = sorted(pages_by_number.keys())
+    
+    i = 0
+    while i < len(page_numbers):
+        current_page_num = page_numbers[i]
+        current_page = pages_by_number[current_page_num]
+        
+        # Page 0 is always on its own (cover page)
+        if current_page_num == 1:  # Page 0 in 0-based, page 1 in 1-based
+            # Handle page 0 as a single spread
+            page_sections = filtered_sections_by_page_id[current_page.page_id]
+            for page_section in page_sections.sections:
+                if page_section.is_pruned:
+                    continue
+
+                eli5 = explanations_by_section_id.get(
+                    page_section.section_id, None
+                )
+                metadata = section_metadata_by_id[page_section.section_id]
+
+                spread_sections.append(
+                    PlateSection(
+                        section_id=f"spread_{current_page.page_id}_single",
+                        section_type=page_section.section_type,
+                        page_image_upath=current_page.image_upath,
+                        explanation_id=(
+                            eli5.explanation_id if eli5 else None
+                        ),
+                        part_ids=page_section.part_ids,
+                        layout_type="spread",  # Use spread layout
+                        background_color=metadata.background_color,
+                        text_color=metadata.text_color,
+                    )
+                )
+            i += 1
+            continue
+        
+        # For other pages, check if we can pair with the next page
+        if i + 1 < len(page_numbers):
+            next_page_num = page_numbers[i + 1]
+            next_page = pages_by_number[next_page_num]
+            
+            # Sequential pairing: first page → left, second page → right
+            left_page = current_page
+            right_page = next_page
+            
+            # Combine sections from both pages
+            left_sections = filtered_sections_by_page_id[left_page.page_id]
+            right_sections = filtered_sections_by_page_id[right_page.page_id]
+            
+            # Create a spread section combining both pages
+            all_part_ids = []
+            all_sections = left_sections.sections + right_sections.sections
+            for section in all_sections:
+                if not section.is_pruned:
+                    all_part_ids.extend(section.part_ids)
+            
+            if all_part_ids:  # Only create spread section if we have content
+                spread_section_id = (
+                    f"spread_{left_page.page_id}_{right_page.page_id}"
+                )
+                
+                # Use metadata from the first available section
+                first_section = None
+                for section in all_sections:
+                    if not section.is_pruned:
+                        first_section = section
+                        break
+                
+                if first_section:
+                    metadata = section_metadata_by_id[first_section.section_id]
+                    eli5 = explanations_by_section_id.get(
+                        first_section.section_id, None
+                    )
+                    
+                    spread_sections.append(
+                        PlateSection(
+                            section_id=spread_section_id,
+                            section_type=first_section.section_type,
+                            page_image_upath=left_page.image_upath,
+                            explanation_id=(
+                                eli5.explanation_id if eli5 else None
+                            ),
+                            part_ids=all_part_ids,
+                            layout_type="spread",  # Mark as spread layout
+                            background_color=metadata.background_color,
+                            text_color=metadata.text_color,
+                        )
+                    )
+            
+            i += 2  # Skip both pages since we processed them as a pair
+        else:
+            # Handle single remaining page (odd number of pages)
+            page_sections = filtered_sections_by_page_id[current_page.page_id]
+            for page_section in page_sections.sections:
+                if page_section.is_pruned:
+                    continue
+
+                eli5 = explanations_by_section_id.get(
+                    page_section.section_id, None
+                )
+                metadata = section_metadata_by_id[page_section.section_id]
+
+                spread_sections.append(
+                    PlateSection(
+                        section_id=f"spread_{current_page.page_id}_single",
+                        section_type=page_section.section_type,
+                        page_image_upath=current_page.image_upath,
+                        explanation_id=(
+                            eli5.explanation_id if eli5 else None
+                        ),
+                        part_ids=page_section.part_ids,
+                        layout_type="spread",  # Use spread layout
+                        background_color=metadata.background_color,
+                        text_color=metadata.text_color,
+                    )
+                )
+            i += 1
+    
+    return spread_sections
+
+
 def generated_plate(
     pdf_title_config: str,
     plate_language_config: str,
@@ -24,32 +186,15 @@ def generated_plate(
     explanations_by_section_id: dict[str, SectionExplanation],
     section_metadata_by_id: dict[str, SectionMetadata],
     plate_glossary: list[GlossaryItem],
+    render_strategy_config: str,
 ) -> Plate:
-    plate_sections: list[PlateSection] = []
-
-    # build our place sections from our pages
-    for page in pdf_pages:
-        page_sections = filtered_sections_by_page_id[page.page_id]
-        for page_section in page_sections.sections:
-            if page_section.is_pruned:
-                continue
-
-            eli5 = explanations_by_section_id.get(page_section.section_id, None)
-
-            metadata = section_metadata_by_id[page_section.section_id]
-
-            plate_sections.append(
-                PlateSection(
-                    section_id=page_section.section_id,
-                    section_type=page_section.section_type,
-                    page_image_upath=page.image_upath,
-                    explanation_id=eli5.explanation_id if eli5 else None,
-                    part_ids=page_section.part_ids,
-                    layout_type=metadata.layout_type,
-                    background_color=metadata.background_color,
-                    text_color=metadata.text_color,
-                )
-            )
+    plate_sections = generate_spread_sections(
+        pdf_pages,
+        filtered_sections_by_page_id,
+        section_metadata_by_id,
+        explanations_by_section_id,
+        render_strategy_config,
+    )
 
     # build our plate texts and images from our output texts and processed images
     texts = [PlateText(text_id=t.text_id, text=t.text) for t in plate_output_texts_by_id.values()]

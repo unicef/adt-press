@@ -6,6 +6,7 @@ from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_rows import generate_web_page_rows
+from adt_press.llm.web_generation_spread import generate_web_page_spread
 from adt_press.llm.web_generation_two_column import generate_web_page_two_column
 from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderPromptConfig, RenderStrategy, TemplateConfig
 from adt_press.models.plate import Plate, PlateImage, PlateText
@@ -65,6 +66,8 @@ def web_pages(
                     config = RenderPromptConfig.model_validate(strategy.config)
                 elif strategy.render_type == "two_column":
                     config = RenderPromptConfig.model_validate(strategy.config)
+                elif strategy.render_type == "spread":
+                    config = RenderPromptConfig.model_validate(strategy.config)
                 else:
                     raise ValueError(f"Unknown render strategy type: {strategy.render_type}")
                 cached_configs[strategy_name] = config
@@ -77,6 +80,8 @@ def web_pages(
                 web_pages.append(generate_web_page_rows(strategy_name, config, section, texts, images, plate_language_config))
             elif strategy.render_type == "two_column":
                 web_pages.append(generate_web_page_two_column(strategy_name, config, section, texts, images, plate_language_config))
+            elif strategy.render_type == "spread":
+                web_pages.append(generate_web_page_spread(strategy_name, config, section, texts, images, plate_language_config))
 
         return await gather_with_limit(web_pages, 300)
 
