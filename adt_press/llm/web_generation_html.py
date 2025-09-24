@@ -7,7 +7,7 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
-from adt_press.models.web import WebPage
+from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
@@ -65,6 +65,7 @@ async def generate_web_page_html(
     config: PromptConfig,
     examples: list[str],
     section: PlateSection,
+    groups: list[RenderTextGroup],
     texts: list[PlateText],
     images: list[PlateImage],
     language_code: str,
@@ -73,6 +74,7 @@ async def generate_web_page_html(
 
     context = dict(
         section=section,
+        groups=[g.model_dump() for g in groups],
         texts=[t.model_dump() for t in texts],
         images=[i.model_dump() for i in images],
         language=language,

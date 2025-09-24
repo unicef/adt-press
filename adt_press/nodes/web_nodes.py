@@ -42,10 +42,13 @@ def web_pages(
             for part_id in section.part_ids:
                 if part_id.startswith("grp_"):
                     group = groups_by_id[part_id]
+                    group_texts = []
                     for text_id in group.text_ids:
-                        texts.append(texts_by_id[text_id])
+                        group_texts.append(texts_by_id[text_id])
 
-                    groups.append(RenderTextGroup(group_id=group.group_id, group_type=group.group_type, texts=texts))
+                    texts.extend(group_texts)
+
+                    groups.append(RenderTextGroup(group_id=group.group_id, group_type=group.group_type, texts=group_texts))
                 elif part_id.startswith("img_"):
                     images.append(images_by_id[part_id])
 
@@ -80,14 +83,14 @@ def web_pages(
 
             if strategy.render_type == "html":
                 web_pages.append(
-                    generate_web_page_html(strategy_name, config, config.examples, section, texts, images, plate_language_config)
+                    generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language_config)
                 )
             elif strategy.render_type == "rows":
-                web_pages.append(generate_web_page_rows(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_rows(strategy_name, config, section, groups, texts, images, plate_language_config))
             elif strategy.render_type == "two_column":
-                web_pages.append(generate_web_page_two_column(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_two_column(strategy_name, config, section, groups, texts, images, plate_language_config))
             elif strategy.render_type == "template":
-                web_pages.append(generate_web_page_template(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
 
         return await gather_with_limit(web_pages, 300)
 

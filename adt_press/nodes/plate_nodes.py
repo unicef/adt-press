@@ -146,9 +146,9 @@ def plate_glossary_translations(
     return glossary_translations
 
 
-def plate_groups(filtered_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
+def plate_groups(processed_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
     groups = []
-    for page_texts in filtered_pdf_texts.values():
+    for page_texts in processed_pdf_texts.values():
         for g in page_texts.groups:
             groups.append(PlateGroup(group_id=g.group_id, group_type=g.group_type, text_ids=[t.text_id for t in g.texts]))
     return groups
@@ -156,7 +156,7 @@ def plate_groups(filtered_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
 
 def plate_output_texts_by_id(
     text_translation_prompt_config: PromptConfig,
-    filtered_pdf_texts: dict[str, PageTexts],
+    processed_pdf_texts: dict[str, PageTexts],
     easy_reads_by_text_id: dict[str, EasyReadText],
     image_captions_by_id: dict[str, ImageCaption],
     explanations_by_section_id: dict[str, SectionExplanation],
@@ -167,7 +167,7 @@ def plate_output_texts_by_id(
     texts_to_process = []
 
     # Page texts and easy reads
-    for page_texts in filtered_pdf_texts.values():
+    for page_texts in processed_pdf_texts.values():
         for page_group in page_texts.groups:
             for text in page_group.texts:
                 texts_to_process.append((text.text_id, text.text))
