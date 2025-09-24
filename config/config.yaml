@@ -49,7 +49,7 @@ layout_types:
 
   other:
     description: "Other layout type that does not fit any of the other categories. "
-    render_strategy: single_column
+    render_strategy: two_column
 
 render_strategies:
   single_column:
