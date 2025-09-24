@@ -20,7 +20,7 @@
                 {% else %}
                 <div class="mb-8">
                 {% with line_style = "inline" %}
-                {% if groups[part].group_type == "stanza" %}                            
+                {% if groups[part].group_type in ["stanza", "list"] %}                            
                 {% set line_style = "block" %}
                 {% endif %}
                 {% for text in groups[part].texts %}

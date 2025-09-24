@@ -41,7 +41,7 @@ render_strategy: dynamic
 layout_types:
   single_column:
     description: "Single column layout with text and images flowing in one main column across the page."    
-    render_strategy: single_column
+    render_strategy: two_column
 
   two_column: 
     description: "Two column layout with text and images arranged in two distinct columns side by side."

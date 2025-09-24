@@ -17,7 +17,7 @@
                         {% set text_size_class = "text-lg lg:text-xl" if total_text_length > 300 else "text-2xl lg:text-3xl" %}
                         
                         {% with line_style = "inline" %}
-                        {% if groups[part].group_type == "stanza" %}                            
+                        {% if groups[part].group_type in ["stanza", "list"] %}                            
                         {% set line_style = "block" %}
                         {% endif %}
 
