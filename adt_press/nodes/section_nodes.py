@@ -24,13 +24,13 @@ def sections_by_page_id(
         sections = []
         for page in pdf_pages:
             page_images = processed_images_by_page[page.page_id]
-            page_texts = [t for t in filtered_pdf_texts[page.page_id].texts if not t.is_pruned]
+            page_groups = filtered_pdf_texts[page.page_id].groups
 
             # if we didn't extract any good images or text, we skip sectioning this page
-            if not page_images and not page_texts:
+            if not page_images and not page_groups:
                 page_sections[page.page_id] = PageSections(page_id=page.page_id, sections=[], reasoning="No images or text to section")
             else:
-                sections.append(get_page_sections(page_sectioning_prompt_config, page, page_images, page_texts))
+                sections.append(get_page_sections(page_sectioning_prompt_config, page, page_images, page_groups))
 
         return await gather_with_limit(sections, page_sectioning_prompt_config.rate_limit)
 

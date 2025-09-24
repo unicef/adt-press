@@ -5,7 +5,14 @@ from adt_press.models.section import GlossaryItem, SectionType
 
 class PlateText(BaseModel):
     text_id: str
+    text_type: str
     text: str
+
+
+class PlateGroup(BaseModel):
+    group_id: str
+    group_type: str
+    text_ids: list[str]
 
 
 class PlateImage(BaseModel):
@@ -30,5 +37,6 @@ class Plate(BaseModel):
     language_code: str
     sections: list[PlateSection]
     images: list[PlateImage]
+    groups: list[PlateGroup]
     texts: list[PlateText]
     glossary: list[GlossaryItem]

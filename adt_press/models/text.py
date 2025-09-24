@@ -2,6 +2,12 @@ import enum
 
 from pydantic import BaseModel
 
+class TextGroupType(str, enum.Enum):
+    stanza = "stanza"
+    list = "list"
+    paragraph = "paragraph"
+    other = "other"
+    
 
 class TextType(str, enum.Enum):
     book_title = "book_title"
@@ -39,12 +45,15 @@ class PageText(BaseModel):
     text_type: TextType
     is_pruned: bool = False
 
+class PageTextGroup(BaseModel):
+    group_id: str
+    group_type: TextGroupType
+    texts: list[PageText]
 
 class PageTexts(BaseModel):
     page_id: str
-    texts: list[PageText]
+    groups: list[PageTextGroup]
     reasoning: str
-
 
 class OutputText(BaseModel):
     text_id: str

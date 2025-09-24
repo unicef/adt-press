@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 
+class RenderTextGroup(BaseModel):
+    group_id: str
+    group_type: str
+    texts: list[str]
 
 class WebPage(BaseModel):
     text_id: str

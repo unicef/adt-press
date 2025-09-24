@@ -36,7 +36,7 @@ custom_plate_path: ""
 default_model: gpt-5
 
 # what strategy is used to render sections into web pages, dynamic will choose based on layout type
-render_strategy: dynamic
+render_strategy: two_column
 
 layout_types:
   single_column:
@@ -123,7 +123,7 @@ section_filters:
 prompts:
   text_extraction:
     model: default
-    template_path: prompts/text_extraction_paragraph.jinja2
+    template_path: prompts/text_extraction_groups.jinja2
 
   meaningfulness:
     model: default
