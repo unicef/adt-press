@@ -354,7 +354,10 @@
                                                     Easy Read
                                                 </div>
                                                 {% for part_id in section.part_ids %}
-                                                {% with easy_read = easy_reads[part_id] %}
+                                                {% with group = groups_by_id[part_id] %}
+                                                {% if group %}
+                                                {% for text in group.texts %}
+                                                {% with easy_read = easy_reads[text.text_id] %}
                                                 {% if easy_read %}                                            
                                                 <div class="grid grid-cols-8">
                                                     <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
@@ -364,6 +367,9 @@
                                                         <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ easy_read.easy_read_id }}</span>
                                                     </div>
                                                 </div>
+                                                {% endif %}
+                                                {% endwith %}
+                                                {% endfor %}
                                                 {% endif %}
                                                 {% endwith %}
                                                 {% endfor %}

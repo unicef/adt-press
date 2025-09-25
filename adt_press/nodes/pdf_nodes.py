@@ -43,8 +43,9 @@ def easy_reads_by_text_id__llm(
     async def get_easy_reads():
         tasks = []
         for page_texts in processed_pdf_texts.values():
-            for text in page_texts.texts:
-                tasks.append(get_text_easy_read(input_language_config, text_easy_read_prompt_config, text))
+            for group in page_texts.groups:
+                for text in group.texts:
+                    tasks.append(get_text_easy_read(input_language_config, text_easy_read_prompt_config, text))
 
         return await gather_with_limit(tasks, text_easy_read_prompt_config.rate_limit)
 

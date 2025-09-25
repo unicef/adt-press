@@ -8,7 +8,7 @@ from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
-from adt_press.models.text import PageText, PageTexts
+from adt_press.models.text import PageText, PageTextGroup, PageTexts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -136,13 +136,17 @@ def section_glossaries_by_id__llm(
     plate_language_config: str,
     section_glossary_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
-    processed_pdf_texts_by_id: dict[str, PageText],
+    pdf_text_groups_by_id: dict[str, PageTextGroup],
 ) -> dict[str, SectionGlossary]:
     async def get_glossaries():
         tasks = []
         for page_sections in filtered_sections_by_page_id.values():
             for section in filter(lambda s: not s.is_pruned, page_sections.sections):
-                texts = [processed_pdf_texts_by_id[part_id].text for part_id in section.part_ids if part_id.startswith("txt_")]
+                texts = []
+                for part_id in section.part_ids:
+                    if part_id.startswith("grp_"):
+                        group = pdf_text_groups_by_id[part_id]
+                        texts.extend([t.text for t in group.texts])
                 tasks.append(get_section_glossary(plate_language_config, section_glossary_prompt_config, section, texts))
 
         return await gather_with_limit(tasks, section_glossary_prompt_config.rate_limit)
