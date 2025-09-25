@@ -66,26 +66,24 @@ def processed_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str
     for page_id, page_texts in pdf_texts.items():
         groups = []
         for g in page_texts.groups:
-            group_texts = [PageText(
+            group_texts = [
+                PageText(
                     text_id=t.text_id,
                     text=t.text,
                     text_type=t.text_type,
                     is_pruned=t.text_type in pruned_text_types_config,
                 )
-                for t in g.texts]
-            
-            groups.append(PageTextGroup(
-                group_id=g.group_id,
-                group_type=g.group_type,
-                texts=group_texts
-            ))
+                for t in g.texts
+            ]
+
+            groups.append(PageTextGroup(group_id=g.group_id, group_type=g.group_type, texts=group_texts))
 
         filtered_texts[page_id] = PageTexts(
             page_id=page_id,
             groups=groups,
-            reasoning=page_texts.reasoning,            
+            reasoning=page_texts.reasoning,
         )
-    
+
     return filtered_texts
 
 
@@ -96,18 +94,14 @@ def filtered_pdf_texts(processed_pdf_texts: dict[str, PageTexts]) -> dict[str, P
         for g in page_texts.groups:
             group_texts = [t for t in g.texts if not t.is_pruned]
             if group_texts:
-                groups.append(PageTextGroup(
-                    group_id=g.group_id,
-                    group_type=g.group_type,
-                    texts=group_texts
-                ))
+                groups.append(PageTextGroup(group_id=g.group_id, group_type=g.group_type, texts=group_texts))
 
         unpruned_texts[page_id] = PageTexts(
             page_id=page_id,
             groups=groups,
-            reasoning=page_texts.reasoning,            
+            reasoning=page_texts.reasoning,
         )
-    
+
     return unpruned_texts
 
 
@@ -119,12 +113,14 @@ def processed_pdf_texts_by_id(processed_pdf_texts: dict[str, PageTexts]) -> dict
                 texts[t.text_id] = t
     return texts
 
+
 def pdf_text_groups_by_id(processed_pdf_texts: dict[str, PageTexts]) -> dict[str, PageTextGroup]:
     groups = {}
     for pt in processed_pdf_texts.values():
         for g in pt.groups:
             groups[g.group_id] = g
     return groups
+
 
 def pdf_pages(run_output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig) -> list[Page]:
     return pages_for_pdf(run_output_dir_config, pdf_path_config, page_range_config.start, page_range_config.end)

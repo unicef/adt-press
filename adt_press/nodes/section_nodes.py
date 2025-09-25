@@ -8,7 +8,7 @@ from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
-from adt_press.models.text import PageText, PageTextGroup, PageTexts
+from adt_press.models.text import PageText, PageTexts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
