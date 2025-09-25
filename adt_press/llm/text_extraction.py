@@ -13,9 +13,11 @@ class Text(BaseModel):
     text_type: TextType
     text: str
 
+
 class TextGroup(BaseModel):
     group_type: TextGroupType
     texts: list[Text]
+
 
 class TextResponse(BaseModel):
     reasoning: str
@@ -40,9 +42,15 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
     return PageTexts(
         page_id=page.page_id,
         groups=[
-            PageTextGroup(group_id=f"grp_p{page.page_number}_g{gi}", 
-                          group_type=g.group_type, 
-                          texts=[PageText(text_id=f"txt_p{page.page_number}_g{gi}_t{ti}", text=t.text, text_type=t.text_type) for ti, t in enumerate(g.texts)]
-            ) for gi, g in enumerate(response.groups)],
+            PageTextGroup(
+                group_id=f"grp_p{page.page_number}_g{gi}",
+                group_type=g.group_type,
+                texts=[
+                    PageText(text_id=f"txt_p{page.page_number}_g{gi}_t{ti}", text=t.text, text_type=t.text_type)
+                    for ti, t in enumerate(g.texts)
+                ],
+            )
+            for gi, g in enumerate(response.groups)
+        ],
         reasoning=response.reasoning,
     )

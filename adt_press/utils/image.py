@@ -16,6 +16,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 # Set the figure.max_open_warning to a high number to suppress the warning
 plt.rcParams.update({"figure.max_open_warning": 100})
 
+
 def image_bytes(image_path: str) -> bytes:
     """Returns the bytes of an image given its path."""
 

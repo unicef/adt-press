@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from typing import Any
 
 from hamilton.function_modifiers import cache
 
@@ -9,7 +10,7 @@ from adt_press.llm.web_generation_rows import generate_web_page_rows
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.llm.web_generation_two_column import generate_web_page_two_column
 from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderPromptConfig, RenderStrategy, TemplateConfig, TemplateRenderConfig
-from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateText
+from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import RenderTextGroup, WebPage
@@ -30,7 +31,7 @@ def web_pages(
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
 
-    cached_configs = {}
+    cached_configs: dict[str, Any] = {}
 
     async def generate_pages():
         web_pages = []

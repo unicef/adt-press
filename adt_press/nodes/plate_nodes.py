@@ -55,7 +55,6 @@ def generated_plate(
     # build our plate texts and images from our output texts and processed images
     texts = [PlateText(text_id=t.text_id, text_type=t.text_type, text=t.text) for t in plate_output_texts_by_id.values()]
     images = [PlateImage(image_id=i.image_id, image_path=i.crop.image_path, caption_id=i.image_id) for i in processed_images_by_id.values()]
-    
 
     return Plate(
         title=pdf_title_config,
@@ -164,7 +163,7 @@ def plate_output_texts_by_id(
     plate_language_config: str,
 ) -> dict[str, OutputText]:
     # Collect all texts that need processing
-    texts_to_process = []
+    texts_to_process = list[tuple[str, str, str]]()
 
     # Page texts and easy reads
     for page_texts in processed_pdf_texts.values():
@@ -204,7 +203,7 @@ def plate_output_texts_by_id(
             get_text_translation(
                 text_translation_prompt_config,
                 text_id,
-                text_type, 
+                text_type,
                 text_content,
                 input_language_config,
                 plate_language_config,
