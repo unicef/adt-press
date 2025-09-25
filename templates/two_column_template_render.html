@@ -20,12 +20,17 @@
                 {% else %}
                 <div class="mb-8">
                 {% with line_style = "inline" %}
-                {% if groups[part].group_type in ["stanza", "list"] %}                            
+                {% if groups[part].group_type in ["stanza", "list", "heading"] %}                            
                 {% set line_style = "block" %}
                 {% endif %}
+                {% with font_style = "font-normal" %}
+                {% if groups[part].group_type == "heading" %}
+                {% set font_style = "font-bold" %}
+                {% endif %}
                 {% for text in groups[part].texts %}
-                <span class="leading-relaxed font-normal max-w-4xl {{ line_style }}" data-id="{{ part }}">{{ text.text }}</span>
+                <span class="leading-relaxed max-w-4xl {{ line_style }} {{ font_style }}" data-id="{{ text.text_id }}">{{ text.text }}</span>
                 {% endfor %}
+                {% endwith %}
                 {% endwith %}
                 </div>
                 {% endif %}

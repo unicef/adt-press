@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Generated Web Pages{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="adt/assets/tailwind_css.css">
+{% endblock %}
 {% block content %}
+
 <div class="space-y-8">
     {% for page in web_pages %}
     <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-4">

@@ -22,7 +22,7 @@
                         {% endif %}
 
                         {% for text in groups[part].texts %}
-                        <span class="mb-8 {{ text_size_class }} {{ line_style }} leading-relaxed text-center font-normal max-w-4xl" data-id="{{ part }}">{{ text.text }}</span>
+                        <span class="mb-8 {{ text_size_class }} {{ line_style }} leading-relaxed text-center font-normal max-w-4xl" data-id="{{ text.text_id }}">{{ text.text }}</span>
                         {% endfor %}
                         {% endwith %}
                         {% endif %}

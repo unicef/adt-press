@@ -3,6 +3,7 @@ import enum
 from pydantic import BaseModel
 
 class TextGroupType(str, enum.Enum):
+    heading = "heading"
     stanza = "stanza"
     list = "list"
     paragraph = "paragraph"
@@ -57,6 +58,7 @@ class PageTexts(BaseModel):
 
 class OutputText(BaseModel):
     text_id: str
+    text_type: str
     language_code: str
     text: str
     reasoning: str
