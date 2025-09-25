@@ -36,4 +36,6 @@ async def get_text_translation(
         max_retries=config.max_retries,
     )
 
-    return OutputText(text_id=text_id, text_type=text_type, text=response.data, reasoning=response.reasoning, language_code=target_language_code)
+    return OutputText(
+        text_id=text_id, text_type=text_type, text=response.data, reasoning=response.reasoning, language_code=target_language_code
+    )

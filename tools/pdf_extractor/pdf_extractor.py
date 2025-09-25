@@ -14,14 +14,14 @@ import os
 import sys
 from datetime import datetime
 
-import fitz  # PyMuPDF
+import pymupdf  # PyMuPDF
 
 from models import Image, Metadata, Page, PDFExtract
 from utils import matplotlib_chart, render_drawings, write_file
 
 # We need to set this zoom for PyMuPDF or the image is pixelated.
 FITZ_ZOOM = 2
-FITZ_MAT = fitz.Matrix(FITZ_ZOOM, FITZ_ZOOM)
+FITZ_MAT = pymupdf.Matrix(FITZ_ZOOM, FITZ_ZOOM)
 
 
 def extract_pages_from_pdf(output_dir: str, pdf_path: str, start_page: int, end_page: int) -> PDFExtract:
@@ -50,7 +50,7 @@ def extract_pages_from_pdf(output_dir: str, pdf_path: str, start_page: int, end_
     with open(pdf_path, "rb") as f:
         pdf_bytes = f.read()
 
-    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
 
     # Determine page range
     total_pages = len(doc)
@@ -87,8 +87,8 @@ def extract_pages_from_pdf(output_dir: str, pdf_path: str, start_page: int, end_
 
         # Extract raster images
         for img in fitz_page.get_images(full=True):
-            pix = fitz.Pixmap(doc, img[0])
-            pix_rgb = fitz.Pixmap(fitz.csRGB, pix)
+            pix = pymupdf.Pixmap(doc, img[0])
+            pix_rgb = pymupdf.Pixmap(pymupdf.csRGB, pix)
             img_id = f"img_{page_id}_r{image_index}"
             img_bytes = pix_rgb.tobytes(output="png")
 
