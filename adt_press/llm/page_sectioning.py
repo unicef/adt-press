@@ -7,7 +7,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionType
-from adt_press.models.text import PageText
+from adt_press.models.text import PageText, PageTextGroup
 from adt_press.utils.file import cached_read_text_file
 
 
@@ -23,7 +23,7 @@ class SectionResponse(BaseModel):
     @field_validator("data")
     @classmethod
     def validate_section_ids(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
-        """Ensure all Section part IDs reference valid text or image IDs."""
+        """Ensure all Section part IDs reference valid group or image IDs."""
         # Get valid IDs from context
         valid_ids = set()
         if info.context:
@@ -46,11 +46,11 @@ class SectionResponse(BaseModel):
         return v
 
 
-async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], texts: list[PageText]) -> PageSections:
+async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]) -> PageSections:
     context = dict(
         page=page,
         images=[i.model_dump() for i in images],
-        texts=[t.model_dump() for t in texts],
+        texts=[dict(text_id=g.group_id, text=" ".join([t.text for t in g.texts])) for g in groups],
         examples=config.examples,
     )
 
@@ -59,7 +59,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
 
     # Create validation context
     validation_context = {
-        "text_ids": [t.text_id for t in texts],
+        "text_ids": [t.group_id for t in groups],
         "image_ids": [i.image_id for i in images],
     }
 

@@ -5,18 +5,21 @@ from pydantic import BaseModel
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.pdf import Page
-from adt_press.models.text import PageText, PageTexts, TextType
+from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.utils.file import cached_read_text_file
 
 
-class Data(BaseModel):
+class Text(BaseModel):
+    text_type: TextType
     text: str
-    type: TextType
 
+class TextGroup(BaseModel):
+    group_type: TextGroupType
+    texts: list[Text]
 
 class TextResponse(BaseModel):
     reasoning: str
-    data: list[Data]
+    groups: list[TextGroup]
 
 
 async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
@@ -36,6 +39,10 @@ async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
 
     return PageTexts(
         page_id=page.page_id,
-        texts=[PageText(text_id=f"txt_p{page.page_number}_t{i}", text=d.text, text_type=d.type) for i, d in enumerate(response.data)],
+        groups=[
+            PageTextGroup(group_id=f"grp_p{page.page_number}_g{gi}", 
+                          group_type=g.group_type, 
+                          texts=[PageText(text_id=f"txt_p{page.page_number}_g{gi}_t{ti}", text=t.text, text_type=t.text_type) for ti, t in enumerate(g.texts)]
+            ) for gi, g in enumerate(response.groups)],
         reasoning=response.reasoning,
     )

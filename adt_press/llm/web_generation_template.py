@@ -2,7 +2,7 @@
 
 from adt_press.models.config import TemplateRenderConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
-from adt_press.models.web import WebPage
+from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import LANGUAGE_MAP
 
@@ -11,6 +11,7 @@ async def generate_web_page_template(
     render_strategy: str,
     config: TemplateRenderConfig,
     section: PlateSection,
+    groups: list[RenderTextGroup],
     texts: list[PlateText],
     images: list[PlateImage],
     language_code: str,
@@ -22,6 +23,7 @@ async def generate_web_page_template(
         {
             "section": section,
             "language": language,
+            "groups": {g.group_id: g.model_dump() for g in groups},
             "texts": {t.text_id: t.text for t in texts},
             "images": {i.image_id: i for i in images},
         },

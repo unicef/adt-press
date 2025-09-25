@@ -49,3 +49,47 @@ export const loadAtkinsonFont = () => {
         document.head.appendChild(styleSheet);
     }
 };
+
+/**
+ * Dynamically loads the Merriweather font from Google Fonts,
+ * injects the necessary <link> tags for preconnect and stylesheet,
+ * and applies the font to the entire document and common elements.
+ *
+ * Idempotent — safe to call once per page load.
+ */
+export const loadMerriweatherFont = () => {
+    const fontHref = 'https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap';
+    const styleId = 'merriweather-style';
+
+    if (!document.querySelector(`link[href="${fontHref}"]`)) {
+        // Preconnects
+        const gFontsPreconnect = document.createElement('link');
+        gFontsPreconnect.rel = 'preconnect';
+        gFontsPreconnect.href = 'https://fonts.googleapis.com';
+
+        const gStaticPreconnect = document.createElement('link');
+        gStaticPreconnect.rel = 'preconnect';
+        gStaticPreconnect.href = 'https://fonts.gstatic.com';
+        gStaticPreconnect.crossOrigin = 'anonymous';
+
+        // Stylesheet
+        const fontStylesheet = document.createElement('link');
+        fontStylesheet.rel = 'stylesheet';
+        fontStylesheet.href = fontHref;
+
+        document.head.appendChild(gFontsPreconnect);
+        document.head.appendChild(gStaticPreconnect);
+        document.head.appendChild(fontStylesheet);
+    }
+
+    if (!document.getElementById(styleId)) {
+        const styleSheet = document.createElement('style');
+        styleSheet.id = styleId;
+        styleSheet.textContent = `
+            body, p, h1, h2, h3, h4, h5, h6, span, div, button, input, textarea, select {
+                font-family: "Merriweather", serif !important;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+};

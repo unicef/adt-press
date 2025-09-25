@@ -7,7 +7,7 @@ from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateSection
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
 from adt_press.models.speech import SpeechFile
-from adt_press.models.text import EasyReadText, OutputText, PageText, PageTexts
+from adt_press.models.text import EasyReadText, OutputText, PageText, PageTextGroup, PageTexts
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -27,9 +27,10 @@ def report_pruned_images(template_config: TemplateConfig, pruned_images: list[Pr
 def report_pages(
     template_config: TemplateConfig,
     pdf_pages: list[Page],
-    filtered_pdf_texts: dict[str, PageTexts],
+    processed_pdf_texts: dict[str, PageTexts],
     filtered_sections_by_page_id: dict[str, PageSections],
-    filtered_pdf_texts_by_id: dict[str, PageText],
+    processed_pdf_texts_by_id: dict[str, PageText],
+    pdf_text_groups_by_id: dict[str, PageTextGroup],
     processed_images_by_id: dict[str, ProcessedImage],
     explanations_by_section_id: dict[str, SectionExplanation],
     plate_output_texts_by_id: dict[str, OutputText],
@@ -47,10 +48,11 @@ def report_pages(
         "templates/page_report.html",
         dict(
             pages=pdf_pages,
-            texts=filtered_pdf_texts,
+            texts=processed_pdf_texts,
             sections=filtered_sections_by_page_id,
-            texts_by_id=filtered_pdf_texts_by_id,
+            texts_by_id=processed_pdf_texts_by_id,
             images_by_id=processed_images_by_id,
+            groups_by_id=pdf_text_groups_by_id,
             explanations=explanations_by_section_id,
             output_texts=plate_output_texts_by_id,
             section_glossaries=section_glossaries_by_id,
@@ -66,11 +68,12 @@ def report_pages(
 def plate_report(template_config: TemplateConfig, plate: Plate, strategy_config: dict[str, str]) -> str:
     texts_by_id = {t.text_id: t for t in plate.texts}
     images_by_id = {i.image_id: i for i in plate.images}
+    groups_by_id = {g.group_id: g for g in plate.groups}
 
     return render_template(
         template_config,
         "templates/plate_report.html",
-        dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, strategy_config=strategy_config),
+        dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, groups_by_id=groups_by_id, strategy_config=strategy_config),
     )
 
 

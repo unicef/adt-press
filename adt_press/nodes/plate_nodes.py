@@ -7,7 +7,7 @@ from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.pdf import Page
-from adt_press.models.plate import Plate, PlateImage, PlateSection, PlateText
+from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateSection, PlateText
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
@@ -20,6 +20,7 @@ def generated_plate(
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     processed_images_by_id: dict[str, ProcessedImage],
+    plate_groups: list[PlateGroup],
     plate_output_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
     section_metadata_by_id: dict[str, SectionMetadata],
@@ -52,14 +53,16 @@ def generated_plate(
             )
 
     # build our plate texts and images from our output texts and processed images
-    texts = [PlateText(text_id=t.text_id, text=t.text) for t in plate_output_texts_by_id.values()]
+    texts = [PlateText(text_id=t.text_id, text_type=t.text_type, text=t.text) for t in plate_output_texts_by_id.values()]
     images = [PlateImage(image_id=i.image_id, image_path=i.crop.image_path, caption_id=i.image_id) for i in processed_images_by_id.values()]
+    
 
     return Plate(
         title=pdf_title_config,
         language_code=plate_language_config,
         sections=plate_sections,
         images=images,
+        groups=plate_groups,
         texts=texts,
         glossary=plate_glossary if plate_glossary else [],
     )
@@ -143,9 +146,17 @@ def plate_glossary_translations(
     return glossary_translations
 
 
+def plate_groups(processed_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
+    groups = []
+    for page_texts in processed_pdf_texts.values():
+        for g in page_texts.groups:
+            groups.append(PlateGroup(group_id=g.group_id, group_type=g.group_type, text_ids=[t.text_id for t in g.texts]))
+    return groups
+
+
 def plate_output_texts_by_id(
     text_translation_prompt_config: PromptConfig,
-    filtered_pdf_texts: dict[str, PageTexts],
+    processed_pdf_texts: dict[str, PageTexts],
     easy_reads_by_text_id: dict[str, EasyReadText],
     image_captions_by_id: dict[str, ImageCaption],
     explanations_by_section_id: dict[str, SectionExplanation],
@@ -156,33 +167,35 @@ def plate_output_texts_by_id(
     texts_to_process = []
 
     # Page texts and easy reads
-    for page_texts in filtered_pdf_texts.values():
-        for text in page_texts.texts:
-            texts_to_process.append((text.text_id, text.text))
+    for page_texts in processed_pdf_texts.values():
+        for page_group in page_texts.groups:
+            for text in page_group.texts:
+                texts_to_process.append((text.text_id, text.text_type, text.text))
 
-            easy_read = easy_reads_by_text_id.get(text.text_id, None)
-            if easy_read:
-                texts_to_process.append((easy_read.easy_read_id, easy_read.easy_read))
+                easy_read = easy_reads_by_text_id.get(text.text_id, None)
+                if easy_read:
+                    texts_to_process.append((easy_read.easy_read_id, text.text_type, easy_read.easy_read))
 
     # Image captions
     for key, caption in image_captions_by_id.items():
         if caption.caption:
-            texts_to_process.append((key, caption.caption))
+            texts_to_process.append((key, "image_caption", caption.caption))
 
     # Explanations
     for explanation in explanations_by_section_id.values():
-        texts_to_process.append((explanation.explanation_id, explanation.explanation))
+        texts_to_process.append((explanation.explanation_id, "explanation", explanation.explanation))
 
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:
         return {
             text_id: OutputText(
                 text_id=text_id,
+                text_type=text_type,
                 text=text_content,
                 language_code=plate_language_config,
                 reasoning="",
             )
-            for text_id, text_content in texts_to_process
+            for text_id, text_type, text_content in texts_to_process
         }
 
     # Handle translation case
@@ -191,11 +204,12 @@ def plate_output_texts_by_id(
             get_text_translation(
                 text_translation_prompt_config,
                 text_id,
+                text_type, 
                 text_content,
                 input_language_config,
                 plate_language_config,
             )
-            for text_id, text_content in texts_to_process
+            for text_id, text_type, text_content in texts_to_process
         ]
         return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
 
@@ -224,6 +238,7 @@ def plate_translations(
                     get_text_translation(
                         text_translation_prompt_config,
                         text.text_id,
+                        text.text_type,
                         text.text,
                         plate_language_config,
                         output_language,

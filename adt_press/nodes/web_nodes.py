@@ -9,10 +9,10 @@ from adt_press.llm.web_generation_rows import generate_web_page_rows
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.llm.web_generation_two_column import generate_web_page_two_column
 from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderPromptConfig, RenderStrategy, TemplateConfig, TemplateRenderConfig
-from adt_press.models.plate import Plate, PlateImage, PlateText
+from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
-from adt_press.models.web import WebPage
+from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_web_assets
@@ -28,6 +28,7 @@ def web_pages(
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
+    groups_by_id = {grp.group_id: grp for grp in plate.groups}
 
     cached_configs = {}
 
@@ -36,10 +37,18 @@ def web_pages(
         for section in plate.sections:
             texts: list[PlateText] = []
             images: list[PlateImage] = []
+            groups: list[RenderTextGroup] = []
 
             for part_id in section.part_ids:
-                if part_id.startswith("txt_"):
-                    texts.append(texts_by_id[part_id])
+                if part_id.startswith("grp_"):
+                    group = groups_by_id[part_id]
+                    group_texts = []
+                    for text_id in group.text_ids:
+                        group_texts.append(texts_by_id[text_id])
+
+                    texts.extend(group_texts)
+
+                    groups.append(RenderTextGroup(group_id=group.group_id, group_type=group.group_type, texts=group_texts))
                 elif part_id.startswith("img_"):
                     images.append(images_by_id[part_id])
 
@@ -74,14 +83,14 @@ def web_pages(
 
             if strategy.render_type == "html":
                 web_pages.append(
-                    generate_web_page_html(strategy_name, config, config.examples, section, texts, images, plate_language_config)
+                    generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language_config)
                 )
             elif strategy.render_type == "rows":
-                web_pages.append(generate_web_page_rows(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_rows(strategy_name, config, section, groups, texts, images, plate_language_config))
             elif strategy.render_type == "two_column":
-                web_pages.append(generate_web_page_two_column(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_two_column(strategy_name, config, section, groups, texts, images, plate_language_config))
             elif strategy.render_type == "template":
-                web_pages.append(generate_web_page_template(strategy_name, config, section, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
 
         return await gather_with_limit(web_pages, 300)
 

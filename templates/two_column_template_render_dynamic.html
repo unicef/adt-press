@@ -1,0 +1,123 @@
+<div class="container content mx-auto w-full min-h-screen px-8 py-8 flex items-center justify-center" id="content"
+    style="background-color: {{ section.background_color }};">
+    <section id="simple-main" role="article" data-section-type="{{ section.section_type.name }}"
+        data-id="{{ section.section_id }}" {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}" {%
+        endif %}>
+        {% macro render_group_p(part_id) -%}
+        {% set g = groups[part_id] %}
+        <p class="mb-8 w-full max-w-2xl">
+            {% set line_style = 'inline' %}
+            {% if g.group_type in ['stanza', 'list'] %}
+            {% set line_style = 'block' %}
+            {% endif %}
+            {% for text in g.texts %}
+            <span class="leading-relaxed font-normal w-full {{ line_style }} text-left" data-id="{{ part_id }}">{{
+                text.text }}</span>
+            {% endfor %}
+        </p>
+        {%- endmacro %}
+        <div class="flex flex-col lg:flex-row px-8 items-start gap-8 max-w-none w-full">
+            {% set counts = namespace(img=0, text=0) %}
+            {% for pid in section.part_ids %}
+            {% if pid[:4] == 'img_' %}
+            {% set counts.img = counts.img + 1 %}
+            {% else %}
+            {% set counts.text = counts.text + 1 %}
+            {% endif %}
+            {% endfor %}
+            {% set image_count = counts.img %}
+            {% set text_count = counts.text %}
+
+            {% if image_count == 2 and text_count == 0 %}
+            {# Exactly two images: render side-by-side columns, one image per column #}
+            <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center lg:justify-center lg:min-h-screen"
+                style="color: {{ section.text_color }};">
+                {% set left = section.part_ids[0] %}
+                <img class="mb-8 max-w-full rounded-lg" data-id="{{ left }}"
+                    style="height: 100%; width: auto; object-fit: contain;"></img>
+            </div>
+            <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center lg:justify-center lg:min-h-screen"
+                style="color: {{ section.text_color }};">
+                {% set right = section.part_ids[1] %}
+                <img class="mb-8 max-w-full rounded-lg" data-id="{{ right }}"
+                    style="height: 100%; width: auto; object-fit: contain;"></img>
+            </div>
+
+            {% elif image_count == 0 and text_count > 2 %}
+            {# Text-only page with multiple groups: split into two balanced columns by line count #}
+            {% set acc = namespace(total=0) %}
+            {% for pid in section.part_ids %}
+            {% if pid[:4] != 'img_' %}
+            {% set acc.total = acc.total + (groups[pid].texts | length) %}
+            {% endif %}
+            {% endfor %}
+            {% set half = (acc.total + 1) // 2 %}
+
+            {# Left column: render groups until cumulative lines reach half #}
+            {% set ns = namespace(cum=0) %}
+            <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center"
+                style="color: {{ section.text_color }};">
+                {% for part in section.part_ids %}
+                {% if part[:4] != 'img_' %}
+                {% set group_lines = groups[part].texts | length %}
+                {% if ns.cum < half %} {{ render_group_p(part) }} {% set ns.cum=ns.cum + group_lines %} {% endif %} {%
+                    endif %} {% endfor %} </div>
+
+                    {# Right column: render remaining groups #}
+                    {% set ns2 = namespace(cum=0) %}
+                    <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center"
+                        style="color: {{ section.text_color }};">
+                        {% for part in section.part_ids %}
+                        {% if part[:4] != 'img_' %}
+                        {% set group_lines = groups[part].texts | length %}
+                        {% if ns2.cum < half %} {% set ns2.cum=ns2.cum + group_lines %} {% else %} {{
+                            render_group_p(part) }} {% endif %} {% endif %} {% endfor %} </div>
+
+                            {% elif text_count == 2 and image_count == 0 %}
+                            {# Exactly two text groups: render side-by-side columns, one group per column (keep groups
+                            intact) #}
+                            <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center"
+                                style="color: {{ section.text_color }};">
+                                {% set left = section.part_ids[0] %}
+                                {{ render_group_p(left) }}
+                            </div>
+                            <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center"
+                                style="color: {{ section.text_color }};">
+                                {% set right = section.part_ids[1] %}
+                                {{ render_group_p(right) }}
+                            </div>
+
+                            {% else %}
+                            {# Original flip behavior: keep all text together in one column and all images in the other
+                            #}
+                            {% set text_first = section.part_ids[0].startswith('grp_') %}
+                            <div class="basis-full p-4 flex flex-col {{ 'items-center' if text_first else 'items-center lg:justify-center lg:min-h-screen' }}"
+                                style="color: {{ section.text_color }};">
+                                {% for part in section.part_ids %}
+                                {% if images[part] %}
+                                <!-- we started with text, close that column only on the first image -->
+                                {% if section.part_ids[0].startswith("grp_") and (loop.first or not
+                                section.part_ids[loop.index0 - 1].startswith("img_")) %}
+                            </div>
+                            <div class="basis-full p-4 flex flex-col items-center lg:justify-center lg:min-h-screen"
+                                style="color: {{ section.text_color }};">
+                                {% endif %}
+                                <img class="mb-8 max-w-full rounded-lg" data-id="{{ part }}"
+                                    style="height: 100%; width: auto; object-fit: contain;"></img>
+
+                                <!-- we started with an image, close this column only after the first image if there is more content -->
+                                {% if section.part_ids[0].startswith("img_") and loop.first and not loop.last %}
+                            </div>
+                            <div class="basis-full p-4 flex flex-col items-center"
+                                style="color: {{ section.text_color }};">
+                                {% endif %}
+
+                                {% else %}
+                                {{ render_group_p(part) }}
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                    </div>
+    </section>
+</div>
