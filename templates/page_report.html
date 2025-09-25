@@ -220,10 +220,16 @@
                                                 <!-- Content Rows -->
                                                 
                                                 {% for part_id in section.part_ids %}
-                                                <div class="col-span-4 px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
+                                                <div class="{% if input_language == output_language %}col-span-7{% else %}col-span-4{% endif %} px-3 py-2 text-sm text-gray-900 {% if not loop.last %}border-b{% endif %} border-gray-100">
                                                     {% if groups_by_id[part_id] %}
                                                     {% for text in groups_by_id[part_id].texts %}
-                                                        {{ text.text }}<br/>
+                                                    <div class="flex items-start justify-between gap-3 py-1">
+                                                        <div class="flex-1 text-sm text-gray-700">{{ text.text }}</div>
+                                                        <div class="flex items-center gap-2 flex-shrink-0">
+                                                            <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ text.text_type.replace('ExtractedTextType.', '') }}</span>
+                                                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ text.text_id }}</span>
+                                                        </div>
+                                                    </div>
                                                     {% endfor %}
                                                     {% elif images_by_id[part_id] %}
                                                     <div class="flex items-start gap-3">
@@ -248,13 +254,17 @@
                                                 {% endif %}
                                                 
                                                 <!-- Tags -->
-                                                <div class="col-span-4 px-3 py-2 flex items-center gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
-                                                    <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ part_id }}</span>
-                                                    {% if texts_by_id[part_id] %}
-                                                    <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ texts_by_id[part_id].text_type.replace('ExtractedTextType.', '') if texts_by_id[part_id].text_type else 'text' }}</span>
-                                                    {% elif images_by_id[part_id] %}
-                                                    <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">image</span>
-                                                    {% endif %}
+                                                <div class="{% if input_language == output_language %}col-span-1{% else %}col-span-4{% endif %} px-3 py-2 flex items-start gap-2 justify-end border-gray-100 {% if not loop.last %}border-b{% endif %}">
+                                                    <div class="flex flex-col gap-1 items-end">
+                                                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ part_id }}</span>
+                                                        {% if groups_by_id[part_id] and groups_by_id[part_id].group_type %}
+                                                        <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">{{ groups_by_id[part_id].group_type.replace('TextGroupType.', '') }}</span>
+                                                        {% elif texts_by_id[part_id] %}
+                                                        <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ texts_by_id[part_id].text_type.replace('ExtractedTextType.', '') if texts_by_id[part_id].text_type else 'text' }}</span>
+                                                        {% elif images_by_id[part_id] %}
+                                                        <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">image</span>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
                                                 {% endfor %}
                                                 

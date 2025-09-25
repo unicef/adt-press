@@ -15,7 +15,7 @@ class TranslationResponse(BaseModel):
 
 
 async def get_text_translation(
-    config: PromptConfig, text_id: str, text: str, base_language_code: str, target_language_code: str
+    config: PromptConfig, text_id: str, text_type: str, text: str, base_language_code: str, target_language_code: str
 ) -> OutputText:
     base_language = LANGUAGE_MAP[base_language_code]
     target_language = LANGUAGE_MAP[target_language_code]
@@ -36,4 +36,4 @@ async def get_text_translation(
         max_retries=config.max_retries,
     )
 
-    return OutputText(text_id=text_id, text=response.data, reasoning=response.reasoning, language_code=target_language_code)
+    return OutputText(text_id=text_id, text_type=text_type, text=response.data, reasoning=response.reasoning, language_code=target_language_code)

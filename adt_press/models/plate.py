@@ -5,6 +5,7 @@ from adt_press.models.section import GlossaryItem, SectionType
 
 class PlateText(BaseModel):
     text_id: str
+    text_type: str
     text: str
 
 

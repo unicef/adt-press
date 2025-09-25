@@ -2,6 +2,7 @@
 You are an expert at extracting text from a textbook. I have attached a page from a PDF file. I've also extracted the text from the page with PyMuPDF (it might be empty if the text wasn't transcribed).
 
 Extract the text into a structure of groups of text, where each group has a "group_type" field which is one of:
+    - "heading": For chapter titles or section headings that stand alone on a line.
     - "paragraph": For regular paragraphs of text that are grouped together.
     - "stanza": For poetry or verse that is grouped into stanzas.
     - "list": For lists or bullet points that are grouped together.
