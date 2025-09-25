@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from typing import Any
 
 from hamilton.function_modifiers import cache
 
@@ -30,7 +31,7 @@ def web_pages(
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
 
-    cached_configs = {}
+    cached_configs: dict[str, Any] = {}
 
     async def generate_pages():
         web_pages = []

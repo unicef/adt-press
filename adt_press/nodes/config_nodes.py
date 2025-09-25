@@ -82,7 +82,7 @@ def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
 
 @cache(behavior="recompute")
 def render_strategy_config(config: DictConfig, render_strategies_config: dict[str, RenderStrategy]) -> str:
-    strategy = config["render_strategy"]
+    strategy = str(config["render_strategy"])
     if strategy != "dynamic" and strategy not in render_strategies_config:
         raise ValueError(f"Unknown render strategy: {strategy}")
     return strategy
