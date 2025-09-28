@@ -25,6 +25,7 @@ async def generate_web_page_template(
             "language": language,
             "groups": {g.group_id: g.model_dump() for g in groups},
             "texts": {t.text_id: t.text for t in texts},
+            "text_types": {t.text_id: t.text_type for t in texts},
             "images": {i.image_id: i for i in images},
         },
     )
