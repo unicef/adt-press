@@ -15,6 +15,7 @@ interface ChangesPanelProps {
   onClearChanges: () => void;
   isOpen: boolean;
   onToggle: () => void;
+  floating?: boolean;
 }
 
 const getChangeIcon = (type: string) => {
@@ -47,6 +48,7 @@ export const ChangesPanel: React.FC<ChangesPanelProps> = ({
   onClearChanges,
   isOpen,
   onToggle,
+  floating = true,
 }) => {
   const [showAllChanges, setShowAllChanges] = useState(false);
   
@@ -54,7 +56,7 @@ export const ChangesPanel: React.FC<ChangesPanelProps> = ({
   const hasChanges = changesSummary.total > 0;
 
   return (
-    <div className="fixed right-4 top-20 z-20 w-80">
+    <div className={floating ? 'fixed right-4 top-20 z-20 w-80' : 'w-full'}>
       {/* Toggle Button */}
       <button
         onClick={onToggle}

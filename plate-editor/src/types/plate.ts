@@ -26,7 +26,8 @@ export interface PlateText {
 export interface PlateImage {
   image_id: string;
   upath: string;
-  caption: string;
+  caption_id?: string | null;
+  caption?: string | null;
 }
 
 export interface PlateSection {
@@ -34,9 +35,13 @@ export interface PlateSection {
   section_type: SectionType;
   page_image_upath: string;
   part_ids: string[];
-  explanation: string;
-  easy_read: string;
+  explanation_id?: string | null;
+  explanation?: string;
+  easy_read?: string;
   glossary: GlossaryItem[];
+  background_color?: string | null;
+  text_color?: string | null;
+  layout_type?: string | null;
 }
 
 export interface Plate {
@@ -45,4 +50,16 @@ export interface Plate {
   sections: PlateSection[];
   images: PlateImage[];
   texts: PlateText[];
+  glossary?: GlossaryItem[];
+  pages?: PlatePage[];
+}
+
+export interface PlatePage {
+  page_id: string;
+  page_number: number;
+  image_upath: string;
+  section_ids: string[];
+  section_count: number;
+  text_count: number;
+  image_count: number;
 }

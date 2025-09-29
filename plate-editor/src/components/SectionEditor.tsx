@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { PlateSection, GlossaryItem } from '../types/plate';
 import { X, Plus, Trash2 } from 'lucide-react';
 
+const normalizeGlossary = (glossary: GlossaryItem[] = []): GlossaryItem[] =>
+  glossary.map(item => ({
+    word: item.word ?? '',
+    variants: item.variants ?? [],
+    definition: item.definition ?? '',
+    emojis: item.emojis ?? [],
+  }));
+
 interface SectionEditorProps {
   section: PlateSection;
   onSave: (section: PlateSection) => void;
@@ -13,10 +21,22 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
   onSave,
   onClose,
 }) => {
-  const [editedSection, setEditedSection] = useState<PlateSection>(section);
+  const [editedSection, setEditedSection] = useState<PlateSection>({
+    ...section,
+    part_ids: section.part_ids ?? [],
+    explanation: section.explanation ?? '',
+    easy_read: section.easy_read ?? '',
+    glossary: normalizeGlossary(section.glossary),
+  });
 
   useEffect(() => {
-    setEditedSection(section);
+    setEditedSection({
+      ...section,
+      part_ids: section.part_ids ?? [],
+      explanation: section.explanation ?? '',
+      easy_read: section.easy_read ?? '',
+      glossary: normalizeGlossary(section.glossary),
+    });
   }, [section]);
 
   const handleSave = () => {
@@ -28,7 +48,7 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
     setEditedSection(prev => ({
       ...prev,
       glossary: [
-        ...prev.glossary,
+        ...(prev.glossary ?? []),
         {
           word: '',
           variants: [],
@@ -42,21 +62,29 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
   const updateGlossaryItem = (index: number, item: GlossaryItem) => {
     setEditedSection(prev => ({
       ...prev,
-      glossary: prev.glossary.map((g, i) => i === index ? item : g),
+      glossary: (prev.glossary ?? []).map((g, i) =>
+        i === index
+          ? {
+              ...item,
+              variants: item.variants ?? [],
+              emojis: item.emojis ?? [],
+            }
+          : g
+      ),
     }));
   };
 
   const removeGlossaryItem = (index: number) => {
     setEditedSection(prev => ({
       ...prev,
-      glossary: prev.glossary.filter((_, i) => i !== index),
+      glossary: (prev.glossary ?? []).filter((_, i) => i !== index),
     }));
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-hidden mx-4">
-        <div className="flex items-center justify-between p-6 border-b">
+      <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] mx-4 flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
           <h2 className="text-lg font-semibold">Edit Section</h2>
           <button
             onClick={onClose}
@@ -66,7 +94,7 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
           </button>
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="overflow-y-auto flex-1">
           <div className="p-6 space-y-6">
             {/* Section Info */}
             <div className="grid grid-cols-2 gap-4">
@@ -148,10 +176,13 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
               </label>
               <input
                 type="text"
-                value={editedSection.part_ids.join(', ')}
+                value={(editedSection.part_ids ?? []).join(', ')}
                 onChange={(e) => setEditedSection(prev => ({
                   ...prev,
-                  part_ids: e.target.value.split(',').map(id => id.trim()).filter(Boolean)
+                  part_ids: e.target.value
+                    .split(',')
+                    .map(id => id.trim())
+                    .filter(Boolean),
                 }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -173,7 +204,7 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
               </div>
 
               <div className="space-y-4">
-                {editedSection.glossary.map((item, index) => (
+                {(editedSection.glossary ?? []).map((item, index) => (
                   <div key={index} className="border border-gray-200 rounded-md p-4">
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="text-sm font-medium text-gray-900">
@@ -194,10 +225,10 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={item.word}
+                          value={item.word ?? ''}
                           onChange={(e) => updateGlossaryItem(index, {
                             ...item,
-                            word: e.target.value
+                            word: e.target.value,
                           })}
                           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
@@ -208,10 +239,13 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={item.variants.join(', ')}
+                          value={(item.variants ?? []).join(', ')}
                           onChange={(e) => updateGlossaryItem(index, {
                             ...item,
-                            variants: e.target.value.split(',').map(v => v.trim()).filter(Boolean)
+                            variants: e.target.value
+                              .split(',')
+                              .map(v => v.trim())
+                              .filter(Boolean),
                           })}
                           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
@@ -223,10 +257,10 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
                         Definition
                       </label>
                       <textarea
-                        value={item.definition}
+                        value={item.definition ?? ''}
                         onChange={(e) => updateGlossaryItem(index, {
                           ...item,
-                          definition: e.target.value
+                          definition: e.target.value,
                         })}
                         rows={2}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -239,10 +273,13 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
                       </label>
                       <input
                         type="text"
-                        value={item.emojis.join(', ')}
+                        value={(item.emojis ?? []).join(', ')}
                         onChange={(e) => updateGlossaryItem(index, {
                           ...item,
-                          emojis: e.target.value.split(',').map(e => e.trim()).filter(Boolean)
+                          emojis: e.target.value
+                            .split(',')
+                            .map(emoji => emoji.trim())
+                            .filter(Boolean),
                         })}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />

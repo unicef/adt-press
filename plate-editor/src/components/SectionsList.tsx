@@ -33,6 +33,8 @@ interface SectionsListProps {
   changedSectionIds?: string[];
   selectedSectionIds?: string[];
   onSelectSection?: (section: PlateSection) => void;
+  audioBasePath: string | null;
+  audioLanguages: string[];
 }
 
 export const SectionsList: React.FC<SectionsListProps> = ({
@@ -50,6 +52,8 @@ export const SectionsList: React.FC<SectionsListProps> = ({
   changedSectionIds = [],
   selectedSectionIds = [],
   onSelectSection,
+  audioBasePath,
+  audioLanguages,
 }) => {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -100,6 +104,8 @@ export const SectionsList: React.FC<SectionsListProps> = ({
                 hasChanges={hasChanges}
                 isSelected={isSelected}
                 canMergeWithNext={canMergeWithNext}
+                audioBasePath={audioBasePath}
+                audioLanguages={audioLanguages}
               />
             ) : (
               <SectionCard

@@ -130,13 +130,20 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
 
       {/* Fullsize modal */}
       {showFullsize && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-7xl max-h-full">
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={closeFullsize}
+        >
+          <div
+            className="relative max-w-7xl max-h-full"
+            onClick={event => event.stopPropagation()}
+          >
             <button
               onClick={closeFullsize}
-              className="absolute -top-12 right-0 text-white hover:text-gray-300 text-xl font-bold z-10"
+              className="absolute top-4 right-4 text-white bg-black/60 hover:bg-black/80 rounded-full p-2 transition-colors"
+              aria-label="Close image preview"
             >
-              ✕ Close
+              ✕
             </button>
             <img
               src={getImageSrc(src)}

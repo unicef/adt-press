@@ -5,6 +5,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 import { ImageDisplay } from './ImageDisplay';
+import { SpeechPlayer } from './SpeechPlayer';
 
 interface CompactSectionCardProps {
   section: PlateSection;
@@ -20,6 +21,8 @@ interface CompactSectionCardProps {
   canMergeWithNext?: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
+  audioBasePath: string | null;
+  audioLanguages: string[];
 }
 
 const getSectionTypeColor = (type: string) => {
@@ -47,6 +50,8 @@ export const CompactSectionCard: React.FC<CompactSectionCardProps> = ({
   canMergeWithNext = false,
   isSelected = false,
   onSelect,
+  audioBasePath,
+  audioLanguages,
 }) => {
   const {
     attributes,
@@ -137,6 +142,41 @@ export const CompactSectionCard: React.FC<CompactSectionCardProps> = ({
 
             {/* Editable Content Preview - Main Focus */}
             <div className="space-y-3">
+              {/* Source Text - show original extracted content */}
+              {sectionTexts.length > 0 && (
+                <div className="border rounded-lg p-3 bg-gray-50 border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <Type className="h-4 w-4 text-gray-500" />
+                      <span>Source Text</span>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {sectionTexts.length} block{sectionTexts.length === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {sectionTexts.slice(0, 2).map(text => (
+                      <div key={text.text_id} className="bg-white border border-gray-200 rounded-md p-2">
+                        <div className="text-[11px] text-gray-500 font-mono mb-1">
+                          {text.text_id}
+                        </div>
+                    <p className="text-sm text-gray-800 line-clamp-3 whitespace-pre-line">
+                      {text.text}
+                    </p>
+                        <SpeechPlayer
+                          textId={text.text_id}
+                          audioBasePath={audioBasePath}
+                          languages={audioLanguages}
+                        />
+                      </div>
+                    ))}
+                    {sectionTexts.length > 2 && (
+                      <p className="text-xs text-gray-500">+{sectionTexts.length - 2} more text block{sectionTexts.length - 2 === 1 ? '' : 's'}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Explanation - Primary editable content */}
               <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
                 <div className="flex items-start justify-between mb-1">

@@ -17,7 +17,9 @@ export const PlateOverview: React.FC<PlateOverviewProps> = ({
     sections: plate.sections.length,
     images: plate.images.length,
     texts: plate.texts.length,
-    glossaryTerms: plate.sections.reduce((acc, section) => acc + section.glossary.length, 0),
+    glossaryTerms: plate.glossary
+      ? plate.glossary.length
+      : plate.sections.reduce((acc, section) => acc + (section.glossary?.length || 0), 0),
   };
 
   return (
