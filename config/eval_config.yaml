@@ -1,0 +1,39 @@
+# eval tasks go to `output/eval` by default
+label: eval
+
+# ADT Evaluation Configuration
+eval:
+
+  # limit to only this many cases per task
+  limit: 10
+
+  # our rate limit (per minute) on calls to the LLM
+  rate_limit: 300
+
+  # Tasks to run (empty list means run all available tasks)
+  tasks_to_run: []
+
+  # Label Studio configuration
+  label_studio:
+    url: ${env:LABELSTUDIO_URL}
+    api_key: ${env:LABELSTUDIO_KEY}
+
+  # Azure Storage configuration
+  azure_storage:
+    account_name: ${env:AZURE_STORAGE_ACCOUNT_NAME}
+    account_key: ${env:AZURE_STORAGE_ACCOUNT_KEY}
+
+  # Task-specific configurations
+  tasks:
+    text_extraction:
+      label_studio_project_name: "A2: Text Type"
+      model: ${default_model}
+      prompt: ${prompts.text_extraction}
+      report_template_path: templates/eval/text_extraction_report.html
+    
+    # Future tasks can be added here
+    # image_analysis:
+    #   label_studio:
+    #     project_name: "Image Analysis Project"
+    #   model: ${default_model}
+    #   prompts: ${prompts.image_analysis}
