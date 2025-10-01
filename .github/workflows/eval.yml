@@ -63,6 +63,7 @@ jobs:
     needs: run-eval
     environment: azure
     runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
     steps:
       - name: Download eval artifacts
         uses: actions/download-artifact@v4
@@ -74,7 +75,21 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch -d '$web' -s output/eval/
+              az storage blob upload-batch -d '$web' -s output/eval/ --destination-path actions/prs/${{ github.event.number }}/
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+  cleanup-azure:
+    environment: azure
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Delete eval directory from blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/*"
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
