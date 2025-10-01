@@ -50,8 +50,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LABELSTUDIO_URL: ${{ secrets.LABELSTUDIO_URL }}
           LABELSTUDIO_KEY: ${{ secrets.LABELSTUDIO_KEY }}
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_LABELSTUDIO_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_LABELSTUDIO_STORAGE_ACCOUNT_KEY }}
 
       - name: Upload eval artifacts
         uses: actions/upload-artifact@v4
@@ -69,15 +69,12 @@ jobs:
         with:
           name: eval-results-${{ github.run_id }}
           path: output/eval/
-          
-      - uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Upload to blob storage
         uses: azure/CLI@v1
         with:
           inlineScript: |
               az storage blob upload-batch --account-name adtpress --auth-mode key -d '$web' -s output/eval/
+
+        env:
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
