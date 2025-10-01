@@ -22,8 +22,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
-    environment: preview
+  run-eval:
+    environment: eval
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,20 +43,37 @@ jobs:
       - name: Install the project
         run: uv sync --locked --all-extras --dev
         
+      - name: Run ADT Eval
+        run: |
+          uv run adt-eval.py eval.limit=5
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload eval artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.run_id }}
+          path: output/eval/
+
+  push-azure:
+    needs: run-eval
+    environment: azure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download eval artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-results-${{ github.run_id }}
+          path: output/eval/
+          
       - uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Run ADT Eval
-        run: |
-          uv run adt-eval.py eval.limit=10
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
       - name: Upload to blob storage
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch --account-name adtpress  --auth-mode key -d '$web' -s .
+              az storage blob upload-batch --account-name adtpress --auth-mode key -d '$web' -s output/eval/
