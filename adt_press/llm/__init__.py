@@ -1,6 +1,7 @@
+import os
+
 import litellm
 import mlflow
-import os
 
 # if langfuse is configured, set up callbacks for litellm
 if os.getenv("LANGFUSE_HOST"):

@@ -1,5 +1,5 @@
 {% extends "eval/base.html" %}
-{% block title %}Text Extraction Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (overall_score * 100) | round | int }}%</span>{% endblock %}
+{% block title %}Text Extraction Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (score * 100) | round | int }}%</span>{% endblock %}
 
 {% block content %}
 {% for result in results %}
@@ -9,7 +9,7 @@
             <span>Page Test {{result.step}}</span>
             <div class="flex gap-2">
                 <span class="px-3 py-1 bg-gray-700 text-white text-sm font-medium rounded-full">{{ result.id }}</span>
-                <span class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (result.page_score * 100) | round | int}}%</span>
+                <span class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (result.score * 100) | round | int}}%</span>
             </div>
         </div>
         
