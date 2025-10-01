@@ -48,6 +48,8 @@ jobs:
           uv run adt-eval.py eval.limit=5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LABELSTUDIO_URL: ${{ secrets.LABELSTUDIO_URL }}
+          LABELSTUDIO_KEY: ${{ secrets.LABELSTUDIO_KEY }}
 
       - name: Upload eval artifacts
         uses: actions/upload-artifact@v4
