@@ -1,0 +1,62 @@
+name: Run Evaluation Metrics
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: "eval-pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment: preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
+      - name: Install dependencies
+        run: sudo apt install libcairo2-dev pkg-config python3-dev
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Update lockfile
+        run: uv lock
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+        
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run ADT Eval
+        run: |
+          uv run adt-eval.py eval.limit=10
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob upload-batch --account-name adtpress  --auth-mode key -d '$web' -s .
