@@ -214,7 +214,7 @@ def package_adt_web(
     config_output_path = "adt/assets/config.json"
     config_dir = os.path.dirname(os.path.join(run_output_dir_config, config_output_path))
     os.makedirs(config_dir, exist_ok=True)
-    
+
     render_template(
         template_config,
         "config.json",
