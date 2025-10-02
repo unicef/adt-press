@@ -75,10 +75,49 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch -d '$web' -s output/eval/ --destination-path actions/prs/${{ github.event.number }}/
+              az storage blob upload-batch -d '$web' -s output/eval/ --destination-path actions/prs/${{ github.event.number }}/eval/
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+      - name: Comment PR with eval results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read eval results if they exist
+            let evalResults = '';
+            try {
+              const resultsPath = path.join('output/eval', 'results.txt');
+              if (fs.existsSync(resultsPath)) {
+                evalResults = fs.readFileSync(resultsPath, 'utf8');
+              }
+            } catch (error) {
+              console.log('No results file found, will create basic summary');
+            }
+            
+            // Create comment body
+            const reportUrl = `https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/eval/index.html`;
+            
+            let commentBody = `## 📊 Evaluation Results\n\n`;
+            
+            if (evalResults) {
+              commentBody += `### Results\n\n\`\`\`\n${evalResults}\n\`\`\`\n\n`;
+            }
+            
+            commentBody += `### 📋 Full Report\n\n`;
+            commentBody += `[View detailed evaluation report](${reportUrl})\n\n`;
+            commentBody += `*Report generated for commit: ${{ github.event.pull_request.head.sha }}*`;
+            
+            // Post comment
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
 
   cleanup-azure:
     environment: azure
@@ -89,7 +128,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/*"
+              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/eval/*"
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}

@@ -1,0 +1,25 @@
+{% extends "eval/base.html" %}
+{% block title %}ADT Evaluation Report{% endblock %}
+
+{% block content %}
+{% for task in tasks %}
+    {% with task_results = results[task] %}
+    {% with task_metrics = metrics[task] %}
+    <div class="bg-white rounded border mb-6 overflow-hidden">
+        <!-- Task header -->
+        <div class="bg-gray-600 text-white px-4 py-3 font-bold text-xl flex justify-between items-center">
+            <span>{{ task }}</span>
+            <div class="flex gap-2">
+                <span class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (task_metrics.score * 100) | round | int }}%</span>
+            </div>
+        </div>
+        {% for result in task_results %}
+        <div class="border-t border-gray-200 px-4 py-2">
+            Test {{ result.id }} - {{ (result.score * 100) | round | int }}%
+        </div>
+        {% endfor %}
+    </div>
+    {% endwith %}
+    {% endwith %}
+{% endfor %}
+{% endblock %}
