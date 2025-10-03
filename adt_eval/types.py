@@ -36,7 +36,7 @@ class LabelStudioConfig(BaseModel):
     """Configuration for Label Studio integration."""
 
     url: str
-    api_key: str
+    key: str
 
 
 class AzureStorageConfig(BaseModel):

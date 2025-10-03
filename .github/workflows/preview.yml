@@ -20,11 +20,11 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: preview
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build-preview:
     environment: preview
     runs-on: ubuntu-latest
     steps:
@@ -51,9 +51,56 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: Deploy preview
-        uses: rossjrw/pr-preview-action@v1
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
         with:
-          source-dir: ./output/momo
-          umbrella-dir: pr-preview
-          action: auto
+          name: preview-${{ github.run_id }}
+          path: output/momo/
+
+  push-azure:
+    needs: build-preview
+    environment: preview
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
+    steps:          
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-${{ github.run_id }}
+          path: output/momo/
+
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/preview/*" || true
+              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite --destination-path actions/prs/${{ github.event.number }}/preview/
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+      - name: Comment PR with preview URL
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ## ADT Preview
+
+            [View Report](https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/index.html)
+
+            [View Generated ADT](https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/adt/sec_p1_s0.html)
+
+            *ADT generated for commit: ${{ github.event.pull_request.head.sha }}*
+
+  cleanup-azure:
+    environment: preview
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Delete eval preview from blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/preview/*"
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}

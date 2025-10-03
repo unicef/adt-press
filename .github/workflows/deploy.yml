@@ -13,12 +13,12 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: "sample"
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    environment: preview
+  build-sample:
+    environment: sample
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,9 +44,28 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload sample artifact
+        uses: actions/upload-artifact@v4
         with:
-          folder: output/momo
-          branch: gh-pages
-          clean-exclude: pr-preview
-          force: false
+          name: sample-${{ github.run_id }}
+          path: output/momo/
+
+  push-azure:
+    needs: build-sample
+    environment: sample
+    runs-on: ubuntu-latest
+    steps:          
+      - name: Download sample artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sample-${{ github.run_id }}
+          path: output/momo/
+
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite --destination-path sample/
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}

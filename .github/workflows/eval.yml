@@ -1,0 +1,122 @@
+name: Run Evaluation Metrics
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: eval
+  cancel-in-progress: true
+
+jobs:
+  run-eval:
+    environment: eval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
+      - name: Install dependencies
+        run: sudo apt install libcairo2-dev pkg-config python3-dev
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Update lockfile
+        run: uv lock
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+        
+      - name: Run ADT Eval
+        run: |
+          uv run adt-eval.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LABEL_STUDIO_URL: ${{ secrets.LABEL_STUDIO_URL }}
+          LABEL_STUDIO_KEY: ${{ secrets.LABEL_STUDIO_KEY }}
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_LABEL_STUDIO_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_LABEL_STUDIO_STORAGE_ACCOUNT_KEY }}
+
+      - name: Upload eval artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.run_id }}
+          path: output/eval/
+
+  push-azure:
+    needs: run-eval
+    environment: eval
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
+    steps:
+      - name: Download eval artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-results-${{ github.run_id }}
+          path: output/eval/
+
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/eval/*" || true
+              az storage blob upload-batch -d '$web' -s output/eval/ --overwrite --destination-path actions/prs/${{ github.event.number }}/eval/
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+      - name: Read results file
+        id: read-results
+        run: |
+          if [ -f "output/eval/results.txt" ]; then
+            echo "results<<EOF" >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_OUTPUT
+            cat output/eval/results.txt >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "results=*No results file generated*" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment PR with eval results
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: eval-results
+          message: |
+            ## 📊 Evaluation Results
+
+            ${{ steps.read-results.outputs.results }}
+
+            [View full evaluation report](https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/eval/index.html)
+
+            *Report generated for commit: ${{ github.event.pull_request.head.sha }}*
+            
+  cleanup-azure:
+    environment: eval
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Delete eval directory from blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/eval/*"
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
