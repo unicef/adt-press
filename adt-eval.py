@@ -143,10 +143,10 @@ async def main():
             print(f"✓ {task}: {len(results)} cases, {metrics['score']:.1%} score")
 
         context = {
-                "tasks": tasks_to_run,
-                "metrics": all_metrics,
-                "results": all_results,
-            }
+            "tasks": tasks_to_run,
+            "metrics": all_metrics,
+            "results": all_results,
+        }
 
         render_template(TemplateConfig(output_dir=str(output_dir)), "eval/index.html", context)
         render_template(TemplateConfig(output_dir=str(output_dir)), "eval/results.txt", context)
