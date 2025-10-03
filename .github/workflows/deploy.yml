@@ -13,12 +13,12 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: "sample"
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    environment: preview
+  build-sample:
+    environment: sample
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,3 +50,17 @@ jobs:
           branch: gh-pages
           clean-exclude: pr-preview
           force: false
+
+  push-azure:
+    needs: build-sample
+    environment: sample
+    runs-on: ubuntu-latest
+    steps:          
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite true --destination-path sample/
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
