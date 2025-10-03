@@ -1,5 +1,6 @@
 """Base evaluation classes and interfaces."""
 
+import os
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
@@ -23,9 +24,16 @@ class BaseEvaluator(ABC):
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Extract configurations
-        self.label_studio_config = LabelStudioConfig(**global_config["eval"]["label_studio"])
-        self.azure_storage_config = AzureStorageConfig(**global_config["eval"]["azure_storage"])
+        # populate our keys from the environment
+        self.label_studio_config = LabelStudioConfig(
+            os.environ.get("LABEL_STUDIO_URL", "MISSING_LABEL_STUDIO_URL"),
+            os.environ.get("LABEL_STUDIO_KEY", "MISSING_LABEL_STUDIO_KEY"),
+        )
+
+        self.azure_storage_config = AzureStorageConfig(
+            os.environ.get("AZURE_STORAGE_ACCOUNT_NAME", "MISSING_AZURE_STORAGE_ACCOUNT_NAME"),
+            os.environ.get("AZURE_STORAGE_ACCOUNT_KEY", "MISSING_AZURE_STORAGE_ACCOUNT_KEY"),
+        )
 
         # Create images subdirectory
         self.image_dir = output_dir / "images"
@@ -37,8 +45,7 @@ class BaseEvaluator(ABC):
 
     def load_data(self) -> List[Dict[str, Any]]:
         """Load test cases from Label Studio."""
-        label_studio_url = f"https://{self.label_studio_config.url}"
-        ls_client = LabelStudio(base_url=label_studio_url, api_key=self.label_studio_config.api_key)
+        ls_client = LabelStudio(base_url=self.label_studio_config.url, api_key=self.label_studio_config.api_key)
 
         response = ls_client.projects.list()
         project_ids = {i.title: i.id for i in response.items}
