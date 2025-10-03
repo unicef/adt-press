@@ -45,7 +45,7 @@ jobs:
         
       - name: Run ADT Eval
         run: |
-          uv run adt-eval.py eval.limit=5
+          uv run adt-eval.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LABELSTUDIO_URL: ${{ secrets.LABELSTUDIO_URL }}
@@ -104,11 +104,10 @@ jobs:
             let commentBody = `## 📊 Evaluation Results\n\n`;
             
             if (evalResults) {
-              commentBody += `### Results\n\n\`\`\`\n${evalResults}\n\`\`\`\n\n`;
+              commentBody += `\`\`\`${evalResults}\n\`\`\`\n\n`;
             }
             
-            commentBody += `### 📋 Full Report\n\n`;
-            commentBody += `[View detailed evaluation report](${reportUrl})\n\n`;
+            commentBody += `[View full evaluation report](${reportUrl})\n\n`;
             commentBody += `*Report generated for commit: ${{ github.event.pull_request.head.sha }}*`;
             
             // Post comment
