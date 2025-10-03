@@ -18,8 +18,8 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "eval-pages"
-  cancel-in-progress: false
+  group: eval
+  cancel-in-progress: true
 
 jobs:
   run-eval:
@@ -61,7 +61,7 @@ jobs:
 
   push-azure:
     needs: run-eval
-    environment: azure
+    environment: eval
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
     steps:
@@ -75,7 +75,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch -d '$web' -s output/eval/ --destination-path actions/prs/${{ github.event.number }}/eval/
+              az storage blob upload-batch -d '$web' -s output/eval/ --overwrite true --destination-path actions/prs/${{ github.event.number }}/eval/
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
@@ -119,7 +119,7 @@ jobs:
             });
 
   cleanup-azure:
-    environment: azure
+    environment: eval
     runs-on: ubuntu-latest
     if: github.event.action == 'closed'
     steps:
