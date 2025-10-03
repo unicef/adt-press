@@ -51,12 +51,24 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-${{ github.run_id }}
+          path: output/momo/
+
   push-azure:
     needs: build-preview
     environment: preview
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
     steps:          
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-${{ github.run_id }}
+          path: output/momo/
+
       - name: Upload to blob storage
         uses: azure/CLI@v1
         with:
