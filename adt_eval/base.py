@@ -26,13 +26,13 @@ class BaseEvaluator(ABC):
 
         # populate our keys from the environment
         self.label_studio_config = LabelStudioConfig(
-            os.environ.get("LABEL_STUDIO_URL", "MISSING_LABEL_STUDIO_URL"),
-            os.environ.get("LABEL_STUDIO_KEY", "MISSING_LABEL_STUDIO_KEY"),
+            url=os.environ.get("LABEL_STUDIO_URL", "MISSING_LABEL_STUDIO_URL"),
+            key=os.environ.get("LABEL_STUDIO_KEY", "MISSING_LABEL_STUDIO_KEY"),
         )
 
         self.azure_storage_config = AzureStorageConfig(
-            os.environ.get("AZURE_STORAGE_ACCOUNT_NAME", "MISSING_AZURE_STORAGE_ACCOUNT_NAME"),
-            os.environ.get("AZURE_STORAGE_ACCOUNT_KEY", "MISSING_AZURE_STORAGE_ACCOUNT_KEY"),
+            account_name=os.environ.get("AZURE_STORAGE_ACCOUNT_NAME", "MISSING_AZURE_STORAGE_ACCOUNT_NAME"),
+            account_key=os.environ.get("AZURE_STORAGE_ACCOUNT_KEY", "MISSING_AZURE_STORAGE_ACCOUNT_KEY"),
         )
 
         # Create images subdirectory
@@ -45,7 +45,7 @@ class BaseEvaluator(ABC):
 
     def load_data(self) -> List[Dict[str, Any]]:
         """Load test cases from Label Studio."""
-        ls_client = LabelStudio(base_url=self.label_studio_config.url, api_key=self.label_studio_config.api_key)
+        ls_client = LabelStudio(base_url=self.label_studio_config.url, api_key=self.label_studio_config.key)
 
         response = ls_client.projects.list()
         project_ids = {i.title: i.id for i in response.items}
