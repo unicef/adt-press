@@ -27,6 +27,7 @@ class TextExtractionEvaluator(BaseEvaluator):
         truth = tc["annotations"][0]["result"]
         result = {
             "id": tc["id"],
+            "label_studio_url": f"{self.label_studio_config.url}/projects/{tc['project']}/data?task={tc['id']}",
             "page_text": text,
             "page_image_path": str(page_image_path.relative_to(self.output_dir)),
         }

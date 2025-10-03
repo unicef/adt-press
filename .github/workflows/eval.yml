@@ -104,7 +104,7 @@ jobs:
             let commentBody = `## 📊 Evaluation Results\n\n`;
             
             if (evalResults) {
-              commentBody += `\`\`\`${evalResults}\n\`\`\`\n\n`;
+              commentBody += `\`\`\`${evalResults}\`\`\`\n\n`;
             }
             
             commentBody += `[View full evaluation report](${reportUrl})\n\n`;
