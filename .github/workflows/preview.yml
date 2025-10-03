@@ -80,28 +80,16 @@ jobs:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
 
       - name: Comment PR with preview URL
-        uses: actions/github-script@v7
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            
-            // Create comment body
-            const reportURL = `https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/index.html`;
-            const adtURL = `https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/adt/sec_p1_s0.html`;
-            
-            let commentBody = `## ADT Preview\n\n`;
-            commentBody += `[View Report](${reportURL})\n\n`;
-            commentBody += `[View Generated ADT](${adtURL})\n\n`;
-            commentBody += `*ADT generated for commit: ${{ github.event.pull_request.head.sha }}*`;
-            
-            // Post comment
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: commentBody
-            });
+          message: |
+            ## ADT Preview
+
+            [View Report](https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/index.html)
+
+            [View Generated ADT](https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/adt/sec_p1_s0.html)
+
+            *ADT generated for commit: ${{ github.event.pull_request.head.sha }}*
 
   cleanup-azure:
     environment: preview
