@@ -65,7 +65,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite true --destination-path sample/
+              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite --destination-path sample/
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
