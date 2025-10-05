@@ -23,14 +23,17 @@
                 {% if groups[part].group_type in ["stanza", "list", "heading"] %}                            
                 {% set line_style = "block" %}
                 {% endif %}
-                {% with font_style = "font-normal" %}
-                {% if groups[part].group_type == "heading" %}
-                {% set font_style = "font-bold" %}
-                {% endif %}
                 {% for text in groups[part].texts %}
-                <span class="leading-relaxed max-w-4xl {{ line_style }} {{ font_style }}" data-id="{{ text.text_id }}">{{ text.text }}</span>
+                    {% if text.text_type in ['book_title', 'chapter_title'] %}
+                    <h1 class="mb-6 w-full max-w-4xl font-bold text-4xl" data-id="{{ text.text_id }}">{{ text.text }}</h1>
+                    {% elif text.text_type == 'section_heading' %}
+                    <h2 class="mb-6 w-full max-w-4xl font-bold text-2xl" data-id="{{ text.text_id }}">{{ text.text }}</h2>
+                    {% elif text.text_type == 'book_subtitle' %}
+                    <h3 class="mb-6 w-full max-w-4xl font-semibold text-lg" data-id="{{ text.text_id }}">{{ text.text }}</h3>
+                    {% else %}
+                    <span class="leading-relaxed max-w-4xl {{ line_style }} font-normal" data-id="{{ text.text_id }}">{{ text.text }}</span>
+                    {% endif %}
                 {% endfor %}
-                {% endwith %}
                 {% endwith %}
                 </div>
                 {% endif %}

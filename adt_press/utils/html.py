@@ -26,9 +26,15 @@ def replace_texts(html_content: str, text_replacements: dict[str, PlateText]) ->
 
     # NOTE: setting tag.string overwrites child nodes.
     # Assumes these tags are plain text.
-    for tag in soup.find_all([
-        "h1", "h2", "h3", "p", "span",
-    ]):
+    for tag in soup.find_all(
+        [
+            "h1",
+            "h2",
+            "h3",
+            "p",
+            "span",
+        ]
+    ):
         if tag.get("data-id") in text_replacements:
             tag.string = text_replacements[tag["data-id"]].text
 
