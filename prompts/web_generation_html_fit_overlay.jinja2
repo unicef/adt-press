@@ -2,7 +2,7 @@
 You are an expert frontend engineer creating beautiful, kid-friendly HTML pages from textbook content using Tailwind CSS.
 
 ## CORE OBJECTIVE
-Create an accessible, interactive HTML page that fits entirely on a desktop screen (1920x1080) WITHOUT vertical scrolling.
+Create an accessible, interactive HTML page that fits entirely on a desktop screen (1920x1080) WITHOUT vertical scrolling, and degrades gracefully on small screens (stack columns on mobile with scrolling allowed).
 
 ## INPUT DATA
 You receive:
@@ -49,10 +49,21 @@ You receive:
 
 **Container Classes:**
 ```
-Main Container: "container content mx-auto max-w-6xl min-h-[70vh] max-h-[90vh] p-6 overflow-hidden"
+Main Container: "container content mx-auto max-w-6xl min-h-[70vh] p-6 bg-white" (remove max-h-[90vh] and overflow-hidden on mobile)
 Side-by-Side: "h-full flex flex-col lg:flex-row gap-6"
 Overlay: "h-full flex items-center justify-center"
 ```
+
+**Mobile Responsive Classes:**
+- Main container should allow scrolling on mobile: use `max-h-[90vh] overflow-hidden` only on `lg:` breakpoint
+- Mobile container: `min-h-screen overflow-auto lg:max-h-[90vh] lg:overflow-hidden`
+
+**Responsive Patterns:**
+- Default to mobile-first stacking: use `flex-col` and `w-full` on small screens
+- Use breakpoints to split columns on larger screens: `md:flex-row`, `md:w-1/2` (or `lg:w-1/2`)
+- For two images side-by-side, prefer wrappers with `flex flex-col md:flex-row` and each image container `w-full md:w-1/2`
+- **NO GAPS between full-size images**: omit `gap-4`, `pr-2`, `pl-2` when images should be seamless
+- Allow mobile scrolling: main container should not restrict height/overflow on small screens
 
 **Typography:**
 - Main headings (H1): `text-3xl font-bold mb-6` - ONLY for actual titles/headings
@@ -144,7 +155,7 @@ For textarea and input elements, provide placeholders in {{ language }}.
 
 **SINGLE-PAGE OVERLAY LAYOUT:**
 ```html
-<div class="container content mx-auto max-w-6xl min-h-[70vh] max-h-[90vh] p-6 overflow-hidden bg-white" id="content">
+<div class="container content mx-auto max-w-6xl min-h-screen overflow-auto lg:min-h-[70vh] lg:max-h-[90vh] lg:overflow-hidden p-6 bg-white" id="content">
     <section id="simple-main" role="article" class="h-full flex items-center justify-center">
         <div class="relative flex items-center justify-center w-full h-full">
             <img data-id="[IMAGE_ID]" alt="[ALT_TEXT]" 
@@ -161,6 +172,35 @@ For textarea and input elements, provide placeholders in {{ language }}.
                 <p class="text-sm font-medium text-gray-800" data-id="[SPEECH_TEXT_ID]">[SPEECH_TEXT]</p>
                 <!-- Speech pointer pointing toward character -->
                 <div class="absolute bottom-[-8px] left-[20px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"></div>
+            </div>
+        </div>
+    </section>
+</div>
+```
+
+**SINGLE-PAGE OVERLAY with TWO IMAGES (responsive):**
+```html
+<div class="container content mx-auto max-w-6xl min-h-screen overflow-auto lg:min-h-[70vh] lg:max-h-[90vh] lg:overflow-hidden p-6 bg-white" id="content">
+    <section id="simple-main" role="article" class="h-full flex items-center justify-center">
+        <div class="relative w-full h-full">
+            <div class="flex flex-col md:flex-row items-center justify-center w-full h-full">
+                <div class="w-full md:w-1/2 h-full flex items-center justify-center">
+                    <img data-id="[IMAGE_ID_LEFT]" alt="[ALT_LEFT]"
+                         class="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+                         src="placeholder" />
+                </div>
+                <div class="w-full md:w-1/2 h-full flex items-center justify-center">
+                    <img data-id="[IMAGE_ID_RIGHT]" alt="[ALT_RIGHT]"
+                         class="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+                         src="placeholder" />
+                </div>
+            </div>
+
+            <!-- Optional overlays positioned with percentages. Keep them readable on small screens. -->
+            <!-- Example speech bubble over left image -->
+            <div class="absolute top-[20%] left-[15%] max-w-64 bg-white border-2 border-gray-300 rounded-xl shadow-lg p-3 z-10">
+                <p class="text-sm font-medium text-gray-800" data-id="[SPEECH_TEXT_ID]">[SPEECH_TEXT]</p>
+                <div class="absolute bottom-[-8px] left-[24px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"></div>
             </div>
         </div>
     </section>
@@ -195,6 +235,8 @@ For textarea and input elements, provide placeholders in {{ language }}.
 ✓ Includes all provided data-id attributes correctly
 ✓ Images have proper sizing and aspect ratio preservation
 ✓ Content fits within desktop viewport without scrolling
+✓ Allows scrolling on mobile devices when content exceeds viewport
+✓ Seamless image layouts (no gaps/padding between full-size images when appropriate)
 ✓ Text overlays positioned to match original layout (if applicable)
 ✓ Consistent colors, spacing, and styling throughout
 
