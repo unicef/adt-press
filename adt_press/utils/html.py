@@ -24,8 +24,17 @@ def replace_images(html_content: str, image_replacements: dict[str, PlateImage],
 def replace_texts(html_content: str, text_replacements: dict[str, PlateText]) -> str:
     soup = BeautifulSoup(html_content, "html.parser")
 
-    # TODO: is this the right set of tags to replace?
-    for tag in soup.find_all(["h1", "h2", "p", "span"]):
+    # NOTE: setting tag.string overwrites child nodes.
+    # Assumes these tags are plain text.
+    for tag in soup.find_all(
+        [
+            "h1",
+            "h2",
+            "h3",
+            "p",
+            "span",
+        ]
+    ):
         if tag.get("data-id") in text_replacements:
             tag.string = text_replacements[tag["data-id"]].text
 
@@ -48,7 +57,12 @@ def render_template_to_string(template_path: str, context: dict) -> str:
 
 
 # given the passed in dict and template, render using jinja2
-def render_template(config: TemplateConfig, template_path: str, context: dict, output_name=None) -> str:
+def render_template(
+    config: TemplateConfig,
+    template_path: str,
+    context: dict,
+    output_name=None,
+) -> str:
     # write the output to a file named after the template
     output_name = output_name if output_name else basename(template_path)
     output_path = config.output_dir + os.sep + output_name

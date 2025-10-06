@@ -9,7 +9,7 @@
                     {% if images[part] %}
                     <img class="mb-4 max-w-md rounded-lg shadow-md" data-id="{{ part }}"></img>
                     {% elif texts[part] %}
-                    <p class="mb-4" data-id="{{ part }}">{{ texts[part] }}</p>
+                    <p class="mb-4" data-id="{{ part }}">{{ texts[part].text }}</p>
                     {% else %}
                     MISSING PART
                     {% endif %}

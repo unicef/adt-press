@@ -36,14 +36,14 @@
                         {% set total_text_length = 0 %}
                         {% for text_part in section.part_ids %}
                             {% if texts[text_part] %}
-                                {% set total_text_length = total_text_length + texts[text_part]|length %}
+                                {% set total_text_length = total_text_length + texts[text_part].text|length %}
                             {% endif %}
                         {% endfor %}
                         
                         <!-- Use smaller text if total text length exceeds 300 characters -->
                         {% set text_size_class = "text-lg lg:text-xl" if total_text_length > 300 else "text-2xl lg:text-3xl" %}
                         
-                        <p class="mb-8 {{ text_size_class }} leading-relaxed text-center font-normal max-w-4xl" data-id="{{ part }}">{{ texts[part] }}</p>
+                        <p class="mb-8 {{ text_size_class }} leading-relaxed text-center font-normal max-w-4xl" data-id="{{ part }}">{{ texts[part].text }}</p>
                         {% endif %}
                         {% endfor %}
                     </div>
