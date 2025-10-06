@@ -103,7 +103,7 @@ async def generate_web_page_rows(
         {
             "section": section,
             "rows": response.rows,
-            "texts": {t.text_id: t.text for t in texts},
+            "texts": {t.text_id: t.model_dump() for t in texts},
             "images": {i.image_id: i for i in images},
         },
     )

@@ -17,12 +17,20 @@
                         {% set text_size_class = "text-lg lg:text-xl" if total_text_length > 300 else "text-2xl lg:text-3xl" %}
                         
                         {% with line_style = "inline" %}
-                        {% if groups[part].group_type in ["stanza", "list"] %}                            
+                        {% if groups[part].group_type in ["stanza", "list", "heading"] %}                            
                         {% set line_style = "block" %}
                         {% endif %}
 
                         {% for text in groups[part].texts %}
-                        <span class="mb-8 {{ text_size_class }} {{ line_style }} leading-relaxed text-center font-normal max-w-4xl" data-id="{{ text.text_id }}">{{ text.text }}</span>
+                            {% if text.text_type in ['book_title', 'chapter_title'] %}
+                            <h1 class="mb-6 w-full max-w-4xl font-bold text-center text-4xl" data-id="{{ text.text_id }}">{{ text.text }}</h1>
+                            {% elif text.text_type == 'section_heading' %}
+                            <h2 class="mb-6 w-full max-w-4xl font-bold text-center text-2xl" data-id="{{ text.text_id }}">{{ text.text }}</h2>
+                            {% elif text.text_type == 'book_subtitle' %}
+                            <h3 class="mb-6 w-full max-w-4xl font-semibold text-center text-lg" data-id="{{ text.text_id }}">{{ text.text }}</h3>
+                            {% else %}
+                            <span class="mb-8 {{ text_size_class }} {{ line_style }} leading-relaxed text-center font-normal max-w-4xl" data-id="{{ text.text_id }}">{{ text.text }}</span>
+                            {% endif %}
                         {% endfor %}
                         {% endwith %}
                         {% endif %}

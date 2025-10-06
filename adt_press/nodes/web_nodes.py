@@ -210,11 +210,11 @@ def package_adt_web(
         with open(os.path.join(locale_dir, "glossary.json"), "w") as f:
             json.dump(glossary, f, indent=2)
 
-    # copy our assets to the output directory
-    assets_dir = os.path.join("assets", "web", "assets")
-    shutil.copytree(assets_dir, os.path.join(adt_dir, "assets"), dirs_exist_ok=True)
-
     # write our config file
+    config_output_path = "adt/assets/config.json"
+    config_dir = os.path.dirname(os.path.join(run_output_dir_config, config_output_path))
+    os.makedirs(config_dir, exist_ok=True)
+
     render_template(
         template_config,
         "config.json",
@@ -224,21 +224,9 @@ def package_adt_web(
             book_title=pdf_title_config,
             config=strategy_config,
         ),
-        output_name="adt/assets/config.json",
+        output_name=config_output_path,
     )
 
-    # copy Makefile in
-    makefile_path = os.path.join("assets", "web", "utils", "Makefile")
-    shutil.copy(makefile_path, os.path.join(adt_dir, "Makefile"))
-
-    # copy package.json in
-    package_path = os.path.join("assets", "web", "utils", "package.json")
-    shutil.copy(package_path, os.path.join(adt_dir, "package.json"))
-
-    # copy tailwind.config.js in
-    tailwind_path = os.path.join("assets", "web", "utils", "tailwind.config.js")
-    shutil.copy(tailwind_path, os.path.join(adt_dir, "tailwind.config.js"))
-
-    build_web_assets(run_output_dir_config)
+    build_web_assets(run_output_dir_config, list(plate_translations.keys()))
 
     return "done"

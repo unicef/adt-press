@@ -5,18 +5,35 @@
         endif %}>
         {% macro render_group_p(part_id) -%}
         {% set g = groups[part_id] %}
+        {% set is_heading_group = (g.group_type == 'heading') %}
+
+        {% if not is_heading_group %}
         <p class="mb-8 w-full max-w-2xl">
             {% set line_style = 'inline' %}
             {% if g.group_type in ['stanza', 'list'] %}
             {% set line_style = 'block' %}
             {% endif %}
             {% for text in g.texts %}
-            <span class="leading-relaxed font-normal w-full {{ line_style }} text-left" data-id="{{ part_id }}">{{
-                text.text }}</span>
+            <span class="leading-relaxed font-normal w-full {{ line_style }} text-left" data-id="{{ text.text_id }}">{{ text.text }}</span>
             {% endfor %}
         </p>
+        {% else %}
+            {% for text in g.texts %}
+                {% if text.text_type in ['book_title', 'chapter_title'] %}
+                <h1 class="mb-6 w-full max-w-2xl font-bold text-left text-4xl" data-id="{{ text.text_id }}">{{ text.text }}</h1>
+                {% elif text.text_type == 'section_heading' %}
+                <h2 class="mb-6 w-full max-w-2xl font-bold text-left text-2xl" data-id="{{ text.text_id }}">{{ text.text }}</h2>
+                {% elif text.text_type == 'book_subtitle' %}
+                <h3 class="mb-6 w-full max-w-2xl font-semibold text-left text-lg" data-id="{{ text.text_id }}">{{ text.text }}</h3>
+                {% else %}
+                <p class="mb-8 w-full max-w-2xl">
+                    <span class="leading-relaxed font-normal w-full block text-left" data-id="{{ text.text_id }}">{{ text.text }}</span>
+                </p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
         {%- endmacro %}
-        <div class="flex flex-col lg:flex-row px-8 items-start gap-8 max-w-none w-full">
+        <div class="flex flex-col lg:flex-row px-8 items-center gap-8 max-w-none w-full">
             {% set counts = namespace(img=0, text=0) %}
             {% for pid in section.part_ids %}
             {% if pid[:4] == 'img_' %}
@@ -34,13 +51,13 @@
                 style="color: {{ section.text_color }};">
                 {% set left = section.part_ids[0] %}
                 <img class="mb-8 max-w-full rounded-lg" data-id="{{ left }}"
-                    style="height: 100%; width: auto; object-fit: contain;"></img>
+                    style="height: 100vh; width: auto; object-fit: contain;"></img>
             </div>
             <div class="basis-full lg:basis-1/2 p-4 flex flex-col items-center lg:justify-center lg:min-h-screen"
                 style="color: {{ section.text_color }};">
                 {% set right = section.part_ids[1] %}
                 <img class="mb-8 max-w-full rounded-lg" data-id="{{ right }}"
-                    style="height: 100%; width: auto; object-fit: contain;"></img>
+                    style="height: 100vh; width: auto; object-fit: contain;"></img>
             </div>
 
             {% elif image_count == 0 and text_count > 2 %}
@@ -88,9 +105,19 @@
                             </div>
 
                             {% else %}
-                            {# Original flip behavior: keep all text together in one column and all images in the other
-                            #}
-                            {% set text_first = section.part_ids[0].startswith('grp_') %}
+                            {# Original flip behavior with improved detection: choose first contentful item
+                            (ignore heading-only groups). If image first -> image-left, if non-heading text first -> text-left. #}
+                            {% set fc = namespace(kind='') %}
+                            {% for pid in section.part_ids %}
+                                {% if not fc.kind %}
+                                    {% if pid[:4] == 'img_' %}
+                                        {% set fc.kind = 'image' %}
+                                    {% elif pid[:4] == 'grp_' and groups[pid].group_type != 'heading' %}
+                                        {% set fc.kind = 'text' %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set text_first = (fc.kind == 'text') %}
                             <div class="basis-full p-4 flex flex-col {{ 'items-center' if text_first else 'items-center lg:justify-center lg:min-h-screen' }}"
                                 style="color: {{ section.text_color }};">
                                 {% for part in section.part_ids %}
