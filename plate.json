@@ -1,0 +1,2516 @@
+{
+  "title": "momo",
+  "language_code": "en",
+  "sections": [
+    {
+      "section_id": "sec_p1_s0",
+      "section_type": "front_cover",
+      "page_image_path": "output/momo/images/page_1.png",
+      "part_ids": [
+        "grp_p1_g0",
+        "img_p1_r0"
+      ],
+      "explanation_id": "sec_p1_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "single_column"
+    },
+    {
+      "section_id": "sec_p3_s0",
+      "section_type": "front_cover",
+      "page_image_path": "output/momo/images/page_3.png",
+      "part_ids": [
+        "grp_p3_g0",
+        "grp_p3_g1"
+      ],
+      "explanation_id": "sec_p3_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "single_column"
+    },
+    {
+      "section_id": "sec_p5_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_5.png",
+      "part_ids": [
+        "grp_p5_g0",
+        "img_p5_r0"
+      ],
+      "explanation_id": "sec_p5_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "single_column"
+    },
+    {
+      "section_id": "sec_p6_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_6.png",
+      "part_ids": [
+        "grp_p6_g0",
+        "img_p6_r0"
+      ],
+      "explanation_id": "sec_p6_s0_eli5",
+      "background_color": "#f0f4fa",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p7_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_7.png",
+      "part_ids": [
+        "grp_p7_g0",
+        "img_p7_r0"
+      ],
+      "explanation_id": "sec_p7_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p8_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_8.png",
+      "part_ids": [
+        "img_p8_r0",
+        "grp_p8_g0",
+        "grp_p8_g1"
+      ],
+      "explanation_id": "sec_p8_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p9_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_9.png",
+      "part_ids": [
+        "grp_p9_g0",
+        "img_p9_r0"
+      ],
+      "explanation_id": "sec_p9_s0_eli5",
+      "background_color": "#f8f9fa",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p10_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_10.png",
+      "part_ids": [
+        "img_p10_r0",
+        "grp_p10_g0"
+      ],
+      "explanation_id": "sec_p10_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p11_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_11.png",
+      "part_ids": [
+        "grp_p11_g0",
+        "img_p11_r0"
+      ],
+      "explanation_id": "sec_p11_s0_eli5",
+      "background_color": "#f8f9fa",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p12_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_12.png",
+      "part_ids": [
+        "img_p12_r0",
+        "grp_p12_g0",
+        "grp_p12_g1"
+      ],
+      "explanation_id": "sec_p12_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p13_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_13.png",
+      "part_ids": [
+        "img_p13_r0",
+        "grp_p13_g0",
+        "grp_p13_g1"
+      ],
+      "explanation_id": "sec_p13_s0_eli5",
+      "background_color": "#eef3fa",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p14_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_14.png",
+      "part_ids": [
+        "img_p14_r0",
+        "grp_p14_g0"
+      ],
+      "explanation_id": "sec_p14_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p15_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_15.png",
+      "part_ids": [
+        "img_p15_r0",
+        "grp_p15_g0"
+      ],
+      "explanation_id": "sec_p15_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p16_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_16.png",
+      "part_ids": [
+        "grp_p16_g0",
+        "img_p16_r0"
+      ],
+      "explanation_id": "sec_p16_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "single_column"
+    },
+    {
+      "section_id": "sec_p17_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_17.png",
+      "part_ids": [
+        "grp_p17_g0",
+        "img_p17_r0"
+      ],
+      "explanation_id": "sec_p17_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p18_s0",
+      "section_type": "text_and_images",
+      "page_image_path": "output/momo/images/page_18.png",
+      "part_ids": [
+        "img_p18_r0",
+        "grp_p18_g0",
+        "grp_p18_g1"
+      ],
+      "explanation_id": "sec_p18_s0_eli5",
+      "background_color": "#f5f5f5",
+      "text_color": "#000000",
+      "layout_type": "overlay"
+    },
+    {
+      "section_id": "sec_p20_s0",
+      "section_type": "foreword",
+      "page_image_path": "output/momo/images/page_20.png",
+      "part_ids": [
+        "grp_p20_g0"
+      ],
+      "explanation_id": "sec_p20_s0_eli5",
+      "background_color": "#ffffff",
+      "text_color": "#000000",
+      "layout_type": "single_column"
+    }
+  ],
+  "images": [
+    {
+      "image_id": "img_p1_r0",
+      "image_path": "output/momo/images/img_p1_r0_cropped_0_360_974_1241.png",
+      "caption_id": "img_p1_r0"
+    },
+    {
+      "image_id": "img_p5_r0",
+      "image_path": "output/momo/images/img_p5_r0_cropped_0_0_976_885.png",
+      "caption_id": "img_p5_r0"
+    },
+    {
+      "image_id": "img_p6_r0",
+      "image_path": "output/momo/images/img_p6_r0_cropped_0_0_976_1243.png",
+      "caption_id": "img_p6_r0"
+    },
+    {
+      "image_id": "img_p7_r0",
+      "image_path": "output/momo/images/img_p7_r0_cropped_0_0_977_965.png",
+      "caption_id": "img_p7_r0"
+    },
+    {
+      "image_id": "img_p8_r0",
+      "image_path": "output/momo/images/img_p8_r0_cropped_0_0_970_855.png",
+      "caption_id": "img_p8_r0"
+    },
+    {
+      "image_id": "img_p9_r0",
+      "image_path": "output/momo/images/img_p9_r0_cropped_0_0_977_1120.png",
+      "caption_id": "img_p9_r0"
+    },
+    {
+      "image_id": "img_p10_r0",
+      "image_path": "output/momo/images/img_p10_r0_cropped_0_0_975_1120.png",
+      "caption_id": "img_p10_r0"
+    },
+    {
+      "image_id": "img_p11_r0",
+      "image_path": "output/momo/images/img_p11_r0_cropped_0_0_975_1244.png",
+      "caption_id": "img_p11_r0"
+    },
+    {
+      "image_id": "img_p12_r0",
+      "image_path": "output/momo/images/img_p12_r0_cropped_0_0_975_1060.png",
+      "caption_id": "img_p12_r0"
+    },
+    {
+      "image_id": "img_p13_r0",
+      "image_path": "output/momo/images/img_p13_r0_cropped_0_0_977_1245.png",
+      "caption_id": "img_p13_r0"
+    },
+    {
+      "image_id": "img_p14_r0",
+      "image_path": "output/momo/images/img_p14_r0_cropped_0_0_975_1128.png",
+      "caption_id": "img_p14_r0"
+    },
+    {
+      "image_id": "img_p15_r0",
+      "image_path": "output/momo/images/img_p15_r0_cropped_0_0_977_1085.png",
+      "caption_id": "img_p15_r0"
+    },
+    {
+      "image_id": "img_p16_r0",
+      "image_path": "output/momo/images/img_p16_r0_cropped_2_0_974_1045.png",
+      "caption_id": "img_p16_r0"
+    },
+    {
+      "image_id": "img_p17_r0",
+      "image_path": "output/momo/images/img_p17_r0_cropped_0_0_974_980.png",
+      "caption_id": "img_p17_r0"
+    },
+    {
+      "image_id": "img_p18_r0",
+      "image_path": "output/momo/images/img_p18_r0_cropped_0_0_976_990.png",
+      "caption_id": "img_p18_r0"
+    }
+  ],
+  "groups": [
+    {
+      "group_id": "grp_p1_g0",
+      "group_type": "heading",
+      "text_ids": [
+        "txt_p1_g0_t0",
+        "txt_p1_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p3_g0",
+      "group_type": "heading",
+      "text_ids": [
+        "txt_p3_g0_t0",
+        "txt_p3_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p3_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p3_g1_t0",
+        "txt_p3_g1_t1",
+        "txt_p3_g1_t2",
+        "txt_p3_g1_t3"
+      ]
+    },
+    {
+      "group_id": "grp_p4_g0",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p4_g0_t0",
+        "txt_p4_g0_t1",
+        "txt_p4_g0_t2",
+        "txt_p4_g0_t3",
+        "txt_p4_g0_t4",
+        "txt_p4_g0_t5"
+      ]
+    },
+    {
+      "group_id": "grp_p4_g1",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p4_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p4_g2",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p4_g2_t0",
+        "txt_p4_g2_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p4_g3",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p4_g3_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p4_g4",
+      "group_type": "list",
+      "text_ids": [
+        "txt_p4_g4_t0",
+        "txt_p4_g4_t1",
+        "txt_p4_g4_t2",
+        "txt_p4_g4_t3"
+      ]
+    },
+    {
+      "group_id": "grp_p4_g5",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p4_g5_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p5_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p5_g0_t0",
+        "txt_p5_g0_t1",
+        "txt_p5_g0_t2"
+      ]
+    },
+    {
+      "group_id": "grp_p5_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p5_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p5_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p5_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p6_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p6_g0_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p6_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p6_g1_t0",
+        "txt_p6_g1_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p7_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p7_g0_t0",
+        "txt_p7_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p7_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p7_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p7_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p7_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p8_g0",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p8_g0_t0",
+        "txt_p8_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p8_g1",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p8_g1_t0",
+        "txt_p8_g1_t1",
+        "txt_p8_g1_t2"
+      ]
+    },
+    {
+      "group_id": "grp_p8_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p8_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p8_g3",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p8_g3_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p9_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p9_g0_t0",
+        "txt_p9_g0_t1",
+        "txt_p9_g0_t2"
+      ]
+    },
+    {
+      "group_id": "grp_p9_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p9_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p9_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p9_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p10_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p10_g0_t0",
+        "txt_p10_g0_t1",
+        "txt_p10_g0_t2",
+        "txt_p10_g0_t3"
+      ]
+    },
+    {
+      "group_id": "grp_p10_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p10_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p10_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p10_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p11_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p11_g0_t0",
+        "txt_p11_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p11_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p11_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p11_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p11_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p12_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p12_g0_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p12_g1",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p12_g1_t0",
+        "txt_p12_g1_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p12_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p12_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p12_g3",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p12_g3_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p13_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p13_g0_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p13_g1",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p13_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p13_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p13_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p13_g3",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p13_g3_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p14_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p14_g0_t0",
+        "txt_p14_g0_t1",
+        "txt_p14_g0_t2"
+      ]
+    },
+    {
+      "group_id": "grp_p14_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p14_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p14_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p14_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p15_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p15_g0_t0",
+        "txt_p15_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p15_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p15_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p15_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p15_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p16_g0",
+      "group_type": "heading",
+      "text_ids": [
+        "txt_p16_g0_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p16_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p16_g1_t0",
+        "txt_p16_g1_t1",
+        "txt_p16_g1_t2"
+      ]
+    },
+    {
+      "group_id": "grp_p17_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p17_g0_t0",
+        "txt_p17_g0_t1"
+      ]
+    },
+    {
+      "group_id": "grp_p17_g1",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p17_g1_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p17_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p17_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p18_g0",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p18_g0_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p18_g1",
+      "group_type": "paragraph",
+      "text_ids": [
+        "txt_p18_g1_t0",
+        "txt_p18_g1_t1",
+        "txt_p18_g1_t2"
+      ]
+    },
+    {
+      "group_id": "grp_p18_g2",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p18_g2_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p18_g3",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p18_g3_t0"
+      ]
+    },
+    {
+      "group_id": "grp_p20_g0",
+      "group_type": "other",
+      "text_ids": [
+        "txt_p20_g0_t0",
+        "txt_p20_g0_t1"
+      ]
+    }
+  ],
+  "texts": [
+    {
+      "text_id": "txt_p1_g0_t0",
+      "text_type": "book_title",
+      "text": "Momo and the Leopards"
+    },
+    {
+      "text_id": "txt_p1_g0_t0_easy_read",
+      "text_type": "book_title",
+      "text": "Momo and the big spotted cats"
+    },
+    {
+      "text_id": "txt_p1_g0_t1",
+      "text_type": "book_subtitle",
+      "text": "Class I Book 11"
+    },
+    {
+      "text_id": "txt_p1_g0_t1_easy_read",
+      "text_type": "book_subtitle",
+      "text": "Class 1, Book 11."
+    },
+    {
+      "text_id": "txt_p3_g0_t0",
+      "text_type": "book_title",
+      "text": "Momo and the Leopards"
+    },
+    {
+      "text_id": "txt_p3_g0_t0_easy_read",
+      "text_type": "book_title",
+      "text": "Momo and the leopards."
+    },
+    {
+      "text_id": "txt_p3_g0_t1",
+      "text_type": "book_subtitle",
+      "text": "Class I Book 11"
+    },
+    {
+      "text_id": "txt_p3_g0_t1_easy_read",
+      "text_type": "book_subtitle",
+      "text": "Class 1 Book 11."
+    },
+    {
+      "text_id": "txt_p3_g1_t0",
+      "text_type": "standalone_text",
+      "text": "Department of School Education"
+    },
+    {
+      "text_id": "txt_p3_g1_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The group that looks after schools and learning."
+    },
+    {
+      "text_id": "txt_p3_g1_t1",
+      "text_type": "standalone_text",
+      "text": "Ministry of Education and Skills Development"
+    },
+    {
+      "text_id": "txt_p3_g1_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "This government office looks after schools and job skills."
+    },
+    {
+      "text_id": "txt_p3_g1_t2",
+      "text_type": "standalone_text",
+      "text": "Royal Government of Bhutan"
+    },
+    {
+      "text_id": "txt_p3_g1_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "Bhutan's royal government."
+    },
+    {
+      "text_id": "txt_p3_g1_t3",
+      "text_type": "standalone_text",
+      "text": "Thimphu"
+    },
+    {
+      "text_id": "txt_p3_g1_t3_easy_read",
+      "text_type": "standalone_text",
+      "text": "Thimphu"
+    },
+    {
+      "text_id": "txt_p4_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Published by"
+    },
+    {
+      "text_id": "txt_p4_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The publisher made it."
+    },
+    {
+      "text_id": "txt_p4_g0_t1",
+      "text_type": "standalone_text",
+      "text": "School Curriculum Division"
+    },
+    {
+      "text_id": "txt_p4_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "The team plans what students learn in school."
+    },
+    {
+      "text_id": "txt_p4_g0_t2",
+      "text_type": "standalone_text",
+      "text": "Department of School Education (DSE)"
+    },
+    {
+      "text_id": "txt_p4_g0_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "School Education Department. Short name: DSE."
+    },
+    {
+      "text_id": "txt_p4_g0_t3",
+      "text_type": "standalone_text",
+      "text": "Ministry of Education and Skills Development"
+    },
+    {
+      "text_id": "txt_p4_g0_t3_easy_read",
+      "text_type": "standalone_text",
+      "text": "This is a government group. It takes care of schools and learning. It helps people learn job skills."
+    },
+    {
+      "text_id": "txt_p4_g0_t4",
+      "text_type": "standalone_text",
+      "text": "Royal Government of Bhutan"
+    },
+    {
+      "text_id": "txt_p4_g0_t4_easy_read",
+      "text_type": "standalone_text",
+      "text": "The government of Bhutan under the king."
+    },
+    {
+      "text_id": "txt_p4_g0_t5",
+      "text_type": "standalone_text",
+      "text": "Thimphu"
+    },
+    {
+      "text_id": "txt_p4_g0_t5_easy_read",
+      "text_type": "standalone_text",
+      "text": "Thimphu is a city."
+    },
+    {
+      "text_id": "txt_p4_g1_t0",
+      "text_type": "standalone_text",
+      "text": "Copyright © 2022 Department of School Education, MoESD, Thimphu."
+    },
+    {
+      "text_id": "txt_p4_g1_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The Department of School Education, MoESD, Thimphu owns this work. Year: 2022."
+    },
+    {
+      "text_id": "txt_p4_g2_t0",
+      "text_type": "standalone_text",
+      "text": "All rights reserved."
+    },
+    {
+      "text_id": "txt_p4_g2_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The owner keeps all rights to this."
+    },
+    {
+      "text_id": "txt_p4_g2_t1",
+      "text_type": "standalone_text",
+      "text": "No part of this book may be reproduced in any form without the permission from Department of School Education, MoESD, Thimphu."
+    },
+    {
+      "text_id": "txt_p4_g2_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "Do not copy or share any part of this book in any way unless you get permission from the Department of School Education, MoESD, Thimphu."
+    },
+    {
+      "text_id": "txt_p4_g3_t0",
+      "text_type": "standalone_text",
+      "text": "This book remains the property of the Ministry of Education and Skills Development and must not be taken out of the school at any time."
+    },
+    {
+      "text_id": "txt_p4_g3_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "This book belongs to the Ministry of Education and Skills Development. Never take it out of the school."
+    },
+    {
+      "text_id": "txt_p4_g4_t0",
+      "text_type": "standalone_text",
+      "text": "Pilot Edition 1991"
+    },
+    {
+      "text_id": "txt_p4_g4_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "This is a test edition from 1991."
+    },
+    {
+      "text_id": "txt_p4_g4_t1",
+      "text_type": "standalone_text",
+      "text": "New Edition 1992"
+    },
+    {
+      "text_id": "txt_p4_g4_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "This is a new edition from 1992."
+    },
+    {
+      "text_id": "txt_p4_g4_t2",
+      "text_type": "standalone_text",
+      "text": "Revised 2007"
+    },
+    {
+      "text_id": "txt_p4_g4_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "They changed it in 2007."
+    },
+    {
+      "text_id": "txt_p4_g4_t3",
+      "text_type": "standalone_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p4_g4_t3_easy_read",
+      "text_type": "standalone_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p4_g5_t0",
+      "text_type": "standalone_text",
+      "text": "ISBN 99936-0-128-4"
+    },
+    {
+      "text_id": "txt_p4_g5_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "This is a book's special number: 99936-0-128-4."
+    },
+    {
+      "text_id": "txt_p5_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Every night the monkeys climb a tree to sleep in."
+    },
+    {
+      "text_id": "txt_p5_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "Every night, the monkeys climb a tree and sleep there."
+    },
+    {
+      "text_id": "txt_p5_g0_t1",
+      "text_type": "standalone_text",
+      "text": "They sleep on very long branches."
+    },
+    {
+      "text_id": "txt_p5_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "They sleep on very long branches."
+    },
+    {
+      "text_id": "txt_p5_g0_t2",
+      "text_type": "standalone_text",
+      "text": "There, no animal can get them."
+    },
+    {
+      "text_id": "txt_p5_g0_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "Animals can't get them there."
+    },
+    {
+      "text_id": "txt_p5_g1_t0",
+      "text_type": "page_number",
+      "text": "1"
+    },
+    {
+      "text_id": "txt_p5_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "One."
+    },
+    {
+      "text_id": "txt_p5_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p5_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p6_g0_t0",
+      "text_type": "standalone_text",
+      "text": "One night a mother leopard came to the monkeys’ tree."
+    },
+    {
+      "text_id": "txt_p6_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "One night, a mother leopard came to the monkeys' tree."
+    },
+    {
+      "text_id": "txt_p6_g1_t0",
+      "text_type": "page_number",
+      "text": "2"
+    },
+    {
+      "text_id": "txt_p6_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "The number is two."
+    },
+    {
+      "text_id": "txt_p6_g1_t1",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p6_g1_t1_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p7_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Mother leopard climbed the tree."
+    },
+    {
+      "text_id": "txt_p7_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The mother leopard climbed up the tree."
+    },
+    {
+      "text_id": "txt_p7_g0_t1",
+      "text_type": "standalone_text",
+      "text": "She climbed it very, very quietly."
+    },
+    {
+      "text_id": "txt_p7_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "She climbed it very quietly."
+    },
+    {
+      "text_id": "txt_p7_g1_t0",
+      "text_type": "page_number",
+      "text": "3"
+    },
+    {
+      "text_id": "txt_p7_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "Three."
+    },
+    {
+      "text_id": "txt_p7_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p7_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "We printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p8_g0_t0",
+      "text_type": "image_overlay",
+      "text": "She saw a baby monkey."
+    },
+    {
+      "text_id": "txt_p8_g0_t0_easy_read",
+      "text_type": "image_overlay",
+      "text": "She saw a baby monkey."
+    },
+    {
+      "text_id": "txt_p8_g0_t1",
+      "text_type": "image_overlay",
+      "text": "It was Momo."
+    },
+    {
+      "text_id": "txt_p8_g0_t1_easy_read",
+      "text_type": "image_overlay",
+      "text": "Momo was the one."
+    },
+    {
+      "text_id": "txt_p8_g1_t0",
+      "text_type": "standalone_text",
+      "text": "She climbed onto the branch."
+    },
+    {
+      "text_id": "txt_p8_g1_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "She got on the branch."
+    },
+    {
+      "text_id": "txt_p8_g1_t1",
+      "text_type": "standalone_text",
+      "text": "She moved very, very quietly."
+    },
+    {
+      "text_id": "txt_p8_g1_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "She moved very quietly."
+    },
+    {
+      "text_id": "txt_p8_g1_t2",
+      "text_type": "standalone_text",
+      "text": "She did not want to wake Momo up."
+    },
+    {
+      "text_id": "txt_p8_g1_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "She wanted Momo to stay asleep."
+    },
+    {
+      "text_id": "txt_p8_g2_t0",
+      "text_type": "page_number",
+      "text": "4"
+    },
+    {
+      "text_id": "txt_p8_g2_t0_easy_read",
+      "text_type": "page_number",
+      "text": "This is the number four."
+    },
+    {
+      "text_id": "txt_p8_g3_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p8_g3_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p9_g0_t0",
+      "text_type": "standalone_text",
+      "text": "She came near Momo but the branch shook."
+    },
+    {
+      "text_id": "txt_p9_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "She went near Momo. The branch shook."
+    },
+    {
+      "text_id": "txt_p9_g0_t1",
+      "text_type": "standalone_text",
+      "text": "It shook and it shook."
+    },
+    {
+      "text_id": "txt_p9_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "It shook again and again."
+    },
+    {
+      "text_id": "txt_p9_g0_t2",
+      "text_type": "standalone_text",
+      "text": "Momo woke up and saw the leopard in front of him."
+    },
+    {
+      "text_id": "txt_p9_g0_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "Momo woke up. He saw a leopard right in front of him."
+    },
+    {
+      "text_id": "txt_p9_g1_t0",
+      "text_type": "page_number",
+      "text": "5"
+    },
+    {
+      "text_id": "txt_p9_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "Five."
+    },
+    {
+      "text_id": "txt_p9_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p9_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p10_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Momo shouted and pointed at the leopard."
+    },
+    {
+      "text_id": "txt_p10_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "Momo shouted. Momo pointed at the leopard."
+    },
+    {
+      "text_id": "txt_p10_g0_t1",
+      "text_type": "standalone_text",
+      "text": "The monkeys woke up and shouted."
+    },
+    {
+      "text_id": "txt_p10_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "The monkeys woke up and shouted."
+    },
+    {
+      "text_id": "txt_p10_g0_t2",
+      "text_type": "standalone_text",
+      "text": "They threw sticks at the mother leopard."
+    },
+    {
+      "text_id": "txt_p10_g0_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "Some people threw sticks at the mother leopard."
+    },
+    {
+      "text_id": "txt_p10_g0_t3",
+      "text_type": "standalone_text",
+      "text": "She jumped to the ground and ran into the forest."
+    },
+    {
+      "text_id": "txt_p10_g0_t3_easy_read",
+      "text_type": "standalone_text",
+      "text": "She jumped down and ran into the forest."
+    },
+    {
+      "text_id": "txt_p10_g1_t0",
+      "text_type": "page_number",
+      "text": "6"
+    },
+    {
+      "text_id": "txt_p10_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "The number is 6."
+    },
+    {
+      "text_id": "txt_p10_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p10_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "This is a reprint from 2023."
+    },
+    {
+      "text_id": "txt_p11_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Next night mother leopard came with baby leopard."
+    },
+    {
+      "text_id": "txt_p11_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The next night, the mother leopard came with her baby leopard."
+    },
+    {
+      "text_id": "txt_p11_g0_t1",
+      "text_type": "standalone_text",
+      "text": "The baby leopard was small but it could climb the trees."
+    },
+    {
+      "text_id": "txt_p11_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "The baby leopard was small. It could climb trees."
+    },
+    {
+      "text_id": "txt_p11_g1_t0",
+      "text_type": "page_number",
+      "text": "7"
+    },
+    {
+      "text_id": "txt_p11_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "This is the number seven."
+    },
+    {
+      "text_id": "txt_p11_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p11_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p12_g0_t0",
+      "text_type": "standalone_text",
+      "text": "The baby leopard climbed the tree."
+    },
+    {
+      "text_id": "txt_p12_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The baby leopard climbed up the tree."
+    },
+    {
+      "text_id": "txt_p12_g1_t0",
+      "text_type": "standalone_text",
+      "text": "It climbed very, very quietly."
+    },
+    {
+      "text_id": "txt_p12_g1_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "It climbed very quietly."
+    },
+    {
+      "text_id": "txt_p12_g1_t1",
+      "text_type": "standalone_text",
+      "text": "All the monkeys were sleeping."
+    },
+    {
+      "text_id": "txt_p12_g1_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "All the monkeys slept."
+    },
+    {
+      "text_id": "txt_p12_g2_t0",
+      "text_type": "page_number",
+      "text": "8"
+    },
+    {
+      "text_id": "txt_p12_g2_t0_easy_read",
+      "text_type": "page_number",
+      "text": "The number is 8 (eight)."
+    },
+    {
+      "text_id": "txt_p12_g3_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p12_g3_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p13_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Momo was sleeping on a very long branch."
+    },
+    {
+      "text_id": "txt_p13_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "Momo slept on a very long branch."
+    },
+    {
+      "text_id": "txt_p13_g1_t0",
+      "text_type": "standalone_text",
+      "text": "The baby leopard saw him and went very quietly onto the branch."
+    },
+    {
+      "text_id": "txt_p13_g1_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The baby leopard saw him. It climbed very quietly onto the branch."
+    },
+    {
+      "text_id": "txt_p13_g2_t0",
+      "text_type": "page_number",
+      "text": "9"
+    },
+    {
+      "text_id": "txt_p13_g2_t0_easy_read",
+      "text_type": "page_number",
+      "text": "Nine."
+    },
+    {
+      "text_id": "txt_p13_g3_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p13_g3_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "Print it again in 2023."
+    },
+    {
+      "text_id": "txt_p14_g0_t0",
+      "text_type": "standalone_text",
+      "text": "The branch was very, very long."
+    },
+    {
+      "text_id": "txt_p14_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The branch was very long."
+    },
+    {
+      "text_id": "txt_p14_g0_t1",
+      "text_type": "standalone_text",
+      "text": "The baby leopard came near Momo but the branch shook."
+    },
+    {
+      "text_id": "txt_p14_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "The baby leopard came close to Momo. The branch shook."
+    },
+    {
+      "text_id": "txt_p14_g0_t2",
+      "text_type": "standalone_text",
+      "text": "It shook and it shook and it woke Momo up."
+    },
+    {
+      "text_id": "txt_p14_g0_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "It shook again and again. It woke Momo up."
+    },
+    {
+      "text_id": "txt_p14_g1_t0",
+      "text_type": "page_number",
+      "text": "10"
+    },
+    {
+      "text_id": "txt_p14_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "The number is ten."
+    },
+    {
+      "text_id": "txt_p14_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p14_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p15_g0_t0",
+      "text_type": "standalone_text",
+      "text": "Momo jumped onto a bigger branch."
+    },
+    {
+      "text_id": "txt_p15_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "Momo jumped to a bigger branch."
+    },
+    {
+      "text_id": "txt_p15_g0_t1",
+      "text_type": "standalone_text",
+      "text": "The baby leopard jumped but he could not get Momo."
+    },
+    {
+      "text_id": "txt_p15_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "The baby leopard jumped. He could not catch Momo."
+    },
+    {
+      "text_id": "txt_p15_g1_t0",
+      "text_type": "page_number",
+      "text": "11"
+    },
+    {
+      "text_id": "txt_p15_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "Eleven."
+    },
+    {
+      "text_id": "txt_p15_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p15_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They made a new copy in 2023."
+    },
+    {
+      "text_id": "txt_p16_g0_t0",
+      "text_type": "section_heading",
+      "text": "Down went the baby leopard ..."
+    },
+    {
+      "text_id": "txt_p16_g0_t0_easy_read",
+      "text_type": "section_heading",
+      "text": "The baby leopard went down."
+    },
+    {
+      "text_id": "txt_p16_g1_t0",
+      "text_type": "page_number",
+      "text": "12"
+    },
+    {
+      "text_id": "txt_p16_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "This number is twelve."
+    },
+    {
+      "text_id": "txt_p16_g1_t1",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p16_g1_t1_easy_read",
+      "text_type": "footer_text",
+      "text": "Print it again in 2023."
+    },
+    {
+      "text_id": "txt_p16_g1_t2",
+      "text_type": "other",
+      "text": "T"
+    },
+    {
+      "text_id": "txt_p16_g1_t2_easy_read",
+      "text_type": "other",
+      "text": "T"
+    },
+    {
+      "text_id": "txt_p17_g0_t0",
+      "text_type": "standalone_text",
+      "text": "down ..."
+    },
+    {
+      "text_id": "txt_p17_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "Go down."
+    },
+    {
+      "text_id": "txt_p17_g0_t1",
+      "text_type": "standalone_text",
+      "text": "... on its mother."
+    },
+    {
+      "text_id": "txt_p17_g0_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "It is on its mother."
+    },
+    {
+      "text_id": "txt_p17_g1_t0",
+      "text_type": "page_number",
+      "text": "13"
+    },
+    {
+      "text_id": "txt_p17_g1_t0_easy_read",
+      "text_type": "page_number",
+      "text": "This is the number 13."
+    },
+    {
+      "text_id": "txt_p17_g2_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p17_g2_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p18_g0_t0",
+      "text_type": "standalone_text",
+      "text": "The monkeys woke up."
+    },
+    {
+      "text_id": "txt_p18_g0_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "The monkeys woke up."
+    },
+    {
+      "text_id": "txt_p18_g1_t0",
+      "text_type": "standalone_text",
+      "text": "They shouted and threw sticks."
+    },
+    {
+      "text_id": "txt_p18_g1_t0_easy_read",
+      "text_type": "standalone_text",
+      "text": "They yelled. They threw sticks."
+    },
+    {
+      "text_id": "txt_p18_g1_t1",
+      "text_type": "standalone_text",
+      "text": "The leopards ran into the forest."
+    },
+    {
+      "text_id": "txt_p18_g1_t1_easy_read",
+      "text_type": "standalone_text",
+      "text": "The leopards ran into the woods."
+    },
+    {
+      "text_id": "txt_p18_g1_t2",
+      "text_type": "standalone_text",
+      "text": "They did not have a monkey for dinner that night."
+    },
+    {
+      "text_id": "txt_p18_g1_t2_easy_read",
+      "text_type": "standalone_text",
+      "text": "They did not eat a monkey for dinner that night."
+    },
+    {
+      "text_id": "txt_p18_g2_t0",
+      "text_type": "page_number",
+      "text": "14"
+    },
+    {
+      "text_id": "txt_p18_g2_t0_easy_read",
+      "text_type": "page_number",
+      "text": "The number is fourteen."
+    },
+    {
+      "text_id": "txt_p18_g3_t0",
+      "text_type": "footer_text",
+      "text": "Reprint 2023"
+    },
+    {
+      "text_id": "txt_p18_g3_t0_easy_read",
+      "text_type": "footer_text",
+      "text": "They printed it again in 2023."
+    },
+    {
+      "text_id": "txt_p20_g0_t0",
+      "text_type": "boxed_text",
+      "text": "VISION"
+    },
+    {
+      "text_id": "txt_p20_g0_t0_easy_read",
+      "text_type": "boxed_text",
+      "text": "Vision means seeing. Your eyes help you see the world around you."
+    },
+    {
+      "text_id": "txt_p20_g0_t1",
+      "text_type": "boxed_text",
+      "text": "“An education and enlightened society of GNH, built and sustained on the unique Bhutanese values of Tha Dam-Tsig Ley Gju-Drey.”"
+    },
+    {
+      "text_id": "txt_p20_g0_t1_easy_read",
+      "text_type": "boxed_text",
+      "text": "We want a GNH society with good education and wise people. We build it and keep it strong with the special Bhutanese values called Tha Dam-Tsig and Ley Gju-Drey."
+    },
+    {
+      "text_id": "img_p1_r0",
+      "text_type": "image_caption",
+      "text": "A sleepy monkey curls on a tree branch under a starry night, an owl perched above near a crescent moon while a leopard watches from a lower limb."
+    },
+    {
+      "text_id": "img_p5_r0",
+      "text_type": "image_caption",
+      "text": "Three monkeys curl up to sleep on long, high branches under a starry night sky, with a crescent moon overhead and an owl perched nearby."
+    },
+    {
+      "text_id": "img_p6_r0",
+      "text_type": "image_caption",
+      "text": "At night in a snowy forest, a mother leopard walks beneath a tree where two monkeys sleep on the branches, while a gray rabbit hides beside a rock."
+    },
+    {
+      "text_id": "img_p7_r0",
+      "text_type": "image_caption",
+      "text": "Mother leopard quietly climbs a tall tree at dusk, reaching for a branch as a small rabbit watches from the snowy ground, with a sky fading from blue to pink and yellow behind dark shrubs."
+    },
+    {
+      "text_id": "img_p8_r0",
+      "text_type": "image_caption",
+      "text": "Under a starry night with a crescent moon, a yellow leopard creeps along a tree branch toward a sleeping baby monkey, Momo, while a small animal watches from a higher limb."
+    },
+    {
+      "text_id": "img_p9_r0",
+      "text_type": "image_caption",
+      "text": "At night, a spotted leopard climbs a tree and confronts a startled monkey clinging to a branch, under a dark blue sky sprinkled with stars."
+    },
+    {
+      "text_id": "img_p10_r0",
+      "text_type": "image_caption",
+      "text": "At night, four monkeys in the treetops hurl sticks as a yellow leopard leaps down from the branch under a crescent moon and stars."
+    },
+    {
+      "text_id": "img_p11_r0",
+      "text_type": "image_caption",
+      "text": "Under a starry night with a crescent moon, a mother leopard pads across a pale field with her small cub beside her, while a black rabbit peeks from under leafy purple flowers at the edge."
+    },
+    {
+      "text_id": "img_p12_r0",
+      "text_type": "image_caption",
+      "text": "At night, a baby leopard quietly climbs a tall tree while monkeys sleep on the branches and an adult leopard watches below."
+    },
+    {
+      "text_id": "img_p13_r0",
+      "text_type": "image_caption",
+      "text": "Under a crescent moon, a baby leopard creeps along a long tree branch toward a sleeping monkey while another leopard watches from the ground below."
+    },
+    {
+      "text_id": "img_p14_r0",
+      "text_type": "image_caption",
+      "text": "At night beneath a crescent moon and stars, an owl watches from an upper branch while Momo the monkey grips a higher limb, eyes wide, as a baby leopard on the long branch below slips and shakes the tree."
+    },
+    {
+      "text_id": "img_p15_r0",
+      "text_type": "image_caption",
+      "text": "At night, Momo the monkey holds a higher branch while a baby leopard leaps toward him but can’t reach, with an owl watching from a nearby limb against a starry sky."
+    },
+    {
+      "text_id": "img_p16_r0",
+      "text_type": "image_caption",
+      "text": "A baby leopard tumbles from a tree at night, paws flailing as leaves scatter beneath a sky of stars and a crescent moon."
+    },
+    {
+      "text_id": "img_p17_r0",
+      "text_type": "image_caption",
+      "text": "Under a crescent moon, a leopard cub falls from a tree branch and lands on its mother’s back."
+    },
+    {
+      "text_id": "img_p18_r0",
+      "text_type": "image_caption",
+      "text": "Under a starry night, two monkeys on tree branches shout and throw sticks, sending an adult leopard and its cub fleeing toward the forest."
+    },
+    {
+      "text_id": "sec_p1_s0_eli5",
+      "text_type": "explanation",
+      "text": "Think of a big tree as a cozy bunk bed in the forest at night.\n\n- Momo, a little monkey, is lying on a branch like a soft bed. He looks calm and ready to sleep.\n- The sky is dark blue with stars and a crescent moon. It’s nighttime.\n- An owl sits up high near the moon. Owls are birds that stay awake at night and watch quietly.\n- A leopard, a spotted big cat that can climb trees, is on a lower branch, looking around.\n\nEveryone shares the tree and keeps quiet in the night. Words to remember: Momo, leopard, owl, moon, stars, tree, branch, night, climb, sleep, quiet."
+    },
+    {
+      "text_id": "sec_p3_s0_eli5",
+      "text_type": "explanation",
+      "text": "ELI5 simplified explanation (English):\nI’m missing the section’s text and pictures. I only have a cover page for context. Please paste the exact section text and attach the section images you want me to use. Then I’ll turn them into a kid-friendly explanation with simple words, fun analogies, and the important key words kept from the original."
+    },
+    {
+      "text_id": "sec_p5_s0_eli5",
+      "text_type": "explanation",
+      "text": "Imagine bedtime in the jungle. Every night, the monkeys climb a tree, just like you climb up to a top bunk. They curl up and sleep on very long branches that are like big, safe beds. Because they are high up on those long branches, no animal can get them. The moon and stars shine while the monkeys rest safely in the tree."
+    },
+    {
+      "text_id": "sec_p6_s0_eli5",
+      "text_type": "explanation",
+      "text": "Key words to learn: night, mother leopard, monkeys’ tree.\n\nELI5 story: Think of the tree like the monkeys’ cozy house and the branches like their beds. One night, a mother leopard—a big, spotted cat—walks softly nearby. She looks and listens, because leopards are quiet hunters at night. The monkeys stay high in their tree where it’s safe, watching and keeping still. A little rabbit hides close to the ground like tucking under a blanket. The big idea: At night, different animals move in different ways—some, like the mother leopard, explore the ground, and others, like the monkeys, use their tree home to stay safe."
+    },
+    {
+      "text_id": "sec_p7_s0_eli5",
+      "text_type": "explanation",
+      "text": "Think of a big, spotty mom cat called a mother leopard. She wanted to go up a tall tree. She used her strong paws and sharp claws to climb the tree. She moved very, very quietly—like when you tiptoe so you don’t wake someone up. Being quiet helps her not scare other animals, like the little rabbit on the ground, and helps her stay safe. The main idea: Mother leopard climbed the tree very, very quietly."
+    },
+    {
+      "text_id": "sec_p8_s0_eli5",
+      "text_type": "explanation",
+      "text": "It is nighttime. A leopard sees a baby monkey. The baby monkey’s name is Momo. Momo is sleeping on a tree branch.\n\nThe leopard climbs onto the branch. She moves very, very quietly—like tiptoeing—because she does not want to wake Momo up. Think of how we go hush-hush when someone is sleeping. That’s what she is doing in the picture under the moon and stars."
+    },
+    {
+      "text_id": "sec_p9_s0_eli5",
+      "text_type": "explanation",
+      "text": "ELI5 explanation:\n- Momo the monkey was sleeping on a tree branch at night.\n- A big cat called a leopard came near Momo on the same branch.\n- Because the leopard was heavy, the branch shook. It shook and it shook—like when someone jumps on your bed and it wobbles.\n- The shaking made Momo woke up, and when he opened his eyes, he saw the leopard in front of him."
+    },
+    {
+      "text_id": "sec_p10_s0_eli5",
+      "text_type": "explanation",
+      "text": "Think of Momo and his monkey friends like a team on a playground tree. When Momo saw a leopard, he shouted and pointed to warn everyone. The monkeys woke up and shouted too—making a big, loud “Go away!” sound. They threw sticks at the mother leopard, like tossing small twigs to scare off a stray cat. The mother leopard didn’t want trouble, so she jumped to the ground and ran into the forest. Key ideas: warn (shouted and pointed), teamwork (monkeys woke up and shouted), action (threw sticks), result (mother leopard jumped to the ground and ran into the forest)."
+    },
+    {
+      "text_id": "sec_p11_s0_eli5",
+      "text_type": "explanation",
+      "text": "Think of a bedtime walk with your mom. Next night, a mother leopard comes with her baby leopard. The baby leopard is small, but it’s strong and clever—it can climb the trees, like you climbing a ladder on a playground. Climbing helps the baby stay safe and learn. In the picture, they walk together under the moon and stars, while a little rabbit hides by some flowers and watches. The big idea: even a small baby can practice big skills, like climb the trees, when the mother is there to help."
+    },
+    {
+      "text_id": "sec_p12_s0_eli5",
+      "text_type": "explanation",
+      "text": "Think of when you tiptoe past someone who is asleep so you don’t wake them. That’s what happened here.\n\nA baby leopard wanted to go up a big tree. It climbed the tree very, very quietly—like soft tiptoes—because all the monkeys in the branches were sleeping. The night was calm with the moon and stars, so the baby leopard moved slowly and made almost no sound. Being quiet helped it not to wake the sleeping monkeys.\n\nWords to remember: baby leopard, climbed the tree, very, very quietly, monkeys were sleeping."
+    },
+    {
+      "text_id": "sec_p13_s0_eli5",
+      "text_type": "explanation",
+      "text": "Imagine a tree branch is like a long, skinny bed. At night, under the moon and stars, Momo is sleeping on this very long branch. A baby leopard sees Momo. The baby leopard tiptoes very quietly and goes onto the branch, trying not to wake him."
+    },
+    {
+      "text_id": "sec_p14_s0_eli5",
+      "text_type": "explanation",
+      "text": "Imagine a tree’s arm (that’s a branch) that is very, very long, like a wobbly bridge. At night, Momo the monkey is on it, and a curious baby leopard crawls closer. Because two animals are on the same long branch, it wiggles—shake-shake-shake! The branch shook and shook so much that it woke Momo up. \n\nPicture clues: stars and the moon show it’s night; an owl watches; the baby leopard is hanging on while Momo notices the shaking.\n\nNew words:\n- branch: a tree’s arm.\n- shook: moved fast back and forth, like jelly jiggling.\n- woke up: stopped sleeping."
+    },
+    {
+      "text_id": "sec_p15_s0_eli5",
+      "text_type": "explanation",
+      "text": "Imagine you’re playing tag on a playground. You climb up to a higher platform so the tagger can’t reach you.\n\nThat’s what happens here:\n- Momo the monkey jumped onto a bigger branch (a tree’s “arm”).\n- A baby leopard jumped up to try to get Momo.\n- The baby leopard could not get Momo because Momo was higher on the bigger branch.\n- An owl watches and the stars shine in the night sky.\n\nKey words to remember: Momo, jumped, bigger branch, baby leopard, could not get."
+    },
+    {
+      "text_id": "sec_p16_s0_eli5",
+      "text_type": "explanation",
+      "text": "Think of climbing a playground ladder and then slipping—whoosh, you go down. \n\nThe sentence says: “Down went the baby leopard …” \n- Baby leopard = the little animal in the picture. \n- Went = it already happened (past tense). \n- Down = the direction it moved. \n\nThe picture helps us see it: the cub is tumbling from tree branches, with little leaves flying. It’s night—the sky is dark with a moon and stars. So this page shows a moment when the baby leopard slipped in the tree and fell down."
+    },
+    {
+      "text_id": "sec_p17_s0_eli5",
+      "text_type": "explanation",
+      "text": "ELI5 explanation:\n\n- Key words to learn: down, mother\n\n- What “down” means: When something goes from high to low. Like when you slide down a slide or jump off a small step to the floor.\n\n- What happens in the picture: A baby big cat (a cub) comes down from a tree at night and lands on its mother. The stars and moon show it’s nighttime. The mother is lying on the ground, and the cub ends up on its mother.\n\n- Big idea: “Down” tells the direction (from up to low). “On its mother” tells where the cub lands—right on its mother, who keeps it safe, like when you fall into a parent’s arms."
+    },
+    {
+      "text_id": "sec_p18_s0_eli5",
+      "text_type": "explanation",
+      "text": "ELI5 explanation:\n- Imagine some monkeys in their treehouse at night. They woke up and saw leopards below.\n- The monkeys worked together. They shouted, “Go away!” and threw sticks from the branches.\n- The loud noise and flying sticks scared the leopards.\n- The leopards ran into the forest.\n- So the leopards did not have a monkey for dinner that night.\nThink of it like friends teaming up to make a big, brave sound so trouble goes away."
+    },
+    {
+      "text_id": "sec_p20_s0_eli5",
+      "text_type": "explanation",
+      "text": "I’m ready to turn your textbook section into an ELI5 explanation, but I don’t have the section’s text or its images yet—only a full-page context image. To do this properly (keeping the important key words and using simple analogies), please send:\n- The exact section text (copy/paste or clear photo/scan)\n- The section’s images or screenshots\n\nOnce I have them, I’ll return:\n- A kid-friendly explanation that keeps the key words and concepts\n- Simple analogies and examples children can relate to\n- Short recap and a quick check-for-understanding"
+    }
+  ],
+  "glossary": [
+    {
+      "word": "Bhutan",
+      "variations": [
+        "Bhutan"
+      ],
+      "definition": "A country in South Asia.",
+      "emojis": [
+        "🇧🇹",
+        "🏔️"
+      ]
+    },
+    {
+      "word": "Bhutanese",
+      "variations": [
+        "Bhutanese",
+        "Bhutan",
+        "Bhutan’s"
+      ],
+      "definition": "Related to Bhutan—its people, culture, and traditions.",
+      "emojis": [
+        "🇧🇹",
+        "🏔️"
+      ]
+    },
+    {
+      "word": "Education",
+      "variations": [
+        "education",
+        "educational",
+        "educate",
+        "educating"
+      ],
+      "definition": "The process of teaching and learning to gain knowledge, skills, and good habits.",
+      "emojis": [
+        "🎓",
+        "📚"
+      ]
+    },
+    {
+      "word": "Enlightened",
+      "variations": [
+        "enlightened",
+        "enlighten",
+        "enlightenment",
+        "enlightening"
+      ],
+      "definition": "Having understanding and wisdom; guided by knowledge and kindness.",
+      "emojis": [
+        "💡",
+        "🕊️"
+      ]
+    },
+    {
+      "word": "GNH",
+      "variations": [
+        "GNH",
+        "Gross National Happiness",
+        "gross national happiness"
+      ],
+      "definition": "A Bhutanese way to measure progress by people’s happiness and well-being, not only by money or production.",
+      "emojis": [
+        "😊",
+        "🇧🇹",
+        "📈"
+      ]
+    },
+    {
+      "word": "Ley Gju-Drey",
+      "variations": [
+        "Ley Gju-Drey",
+        "Ley Judrey",
+        "Ley Gyudrey",
+        "ley judrey"
+      ],
+      "definition": "A Bhutanese principle of cause and effect (karma): our actions lead to matching results.",
+      "emojis": [
+        "🔁",
+        "⚖️"
+      ]
+    },
+    {
+      "word": "Society",
+      "variations": [
+        "society",
+        "societies"
+      ],
+      "definition": "A group of people living together under shared rules, culture, and institutions.",
+      "emojis": [
+        "🧑‍🤝‍🧑",
+        "🏘️"
+      ]
+    },
+    {
+      "word": "Tha Dam-Tsig",
+      "variations": [
+        "Tha Dam-Tsig",
+        "Tha Dam Tshig",
+        "Tha Dam-Tshig",
+        "tha dam-tshig"
+      ],
+      "definition": "A Bhutanese principle meaning a sacred promise or commitment—keeping one’s word with loyalty and respect.",
+      "emojis": [
+        "🤝",
+        "🙏"
+      ]
+    },
+    {
+      "word": "Thimphu",
+      "variations": [
+        "Thimphu"
+      ],
+      "definition": "The capital city of Bhutan.",
+      "emojis": [
+        "📍",
+        "🏔️"
+      ]
+    },
+    {
+      "word": "Values",
+      "variations": [
+        "values",
+        "value"
+      ],
+      "definition": "Important beliefs and principles that guide how people think and act.",
+      "emojis": [
+        "❤️",
+        "⚖️"
+      ]
+    },
+    {
+      "word": "Vision",
+      "variations": [
+        "vision",
+        "visions"
+      ],
+      "definition": "A clear picture of the future we want to create.",
+      "emojis": [
+        "👀",
+        "🔭"
+      ]
+    },
+    {
+      "word": "animal",
+      "variations": [
+        "animal",
+        "animals"
+      ],
+      "definition": "A living thing that moves and eats food; not a plant.",
+      "emojis": [
+        "🐾",
+        "🐻"
+      ]
+    },
+    {
+      "word": "baby",
+      "variations": [
+        "baby",
+        "babies"
+      ],
+      "definition": "A very young child or animal.",
+      "emojis": [
+        "👶",
+        "🐣"
+      ]
+    },
+    {
+      "word": "bigger",
+      "variations": [
+        "big",
+        "bigger",
+        "biggest"
+      ],
+      "definition": "More large than something else; larger in size.",
+      "emojis": [
+        "📏",
+        "⬆️"
+      ]
+    },
+    {
+      "word": "book",
+      "variations": [
+        "book",
+        "books"
+      ],
+      "definition": "Pages with writing or pictures that are bound together. People read books.",
+      "emojis": [
+        "📖",
+        "📚"
+      ]
+    },
+    {
+      "word": "branch",
+      "variations": [
+        "branch",
+        "branches"
+      ],
+      "definition": "A part of a tree that grows out from the trunk.",
+      "emojis": [
+        "🌿",
+        "🌳"
+      ]
+    },
+    {
+      "word": "class",
+      "variations": [
+        "class",
+        "classes"
+      ],
+      "definition": "A group of students who learn together, or the time when they learn.",
+      "emojis": [
+        "🏫",
+        "👩‍🏫"
+      ]
+    },
+    {
+      "word": "climb",
+      "variations": [
+        "climb",
+        "climbs",
+        "climbing",
+        "climbed"
+      ],
+      "definition": "To go up something using your hands and feet.",
+      "emojis": [
+        "🧗",
+        "⬆️"
+      ]
+    },
+    {
+      "word": "come",
+      "variations": [
+        "come",
+        "comes",
+        "came",
+        "coming"
+      ],
+      "definition": "To move toward a place or person.",
+      "emojis": [
+        "🚶",
+        "➡️"
+      ]
+    },
+    {
+      "word": "could",
+      "variations": [
+        "can",
+        "could",
+        "couldn't"
+      ],
+      "definition": "The past form of “can”; shows ability or possibility in the past (was able to).",
+      "emojis": [
+        "💭",
+        "✅"
+      ]
+    },
+    {
+      "word": "department",
+      "variations": [
+        "department",
+        "departments"
+      ],
+      "definition": "A smaller part of a big organization, like a school or government, that does a certain job.",
+      "emojis": [
+        "🗂️",
+        "🏢"
+      ]
+    },
+    {
+      "word": "development",
+      "variations": [
+        "development",
+        "develop",
+        "develops",
+        "developed",
+        "developing"
+      ],
+      "definition": "The process of growing or improving.",
+      "emojis": [
+        "🌱",
+        "📈"
+      ]
+    },
+    {
+      "word": "dinner",
+      "variations": [
+        "dinners"
+      ],
+      "definition": "The main meal in the evening.",
+      "emojis": [
+        "🍽️",
+        "🌙"
+      ]
+    },
+    {
+      "word": "down",
+      "variations": [
+        "downward",
+        "downwards"
+      ],
+      "definition": "Toward a lower place or level; from higher to lower.",
+      "emojis": [
+        "⬇️"
+      ]
+    },
+    {
+      "word": "education",
+      "variations": [
+        "education",
+        "educate",
+        "educated",
+        "educating",
+        "educational"
+      ],
+      "definition": "Learning knowledge and skills, often in school.",
+      "emojis": [
+        "📚",
+        "🎓"
+      ]
+    },
+    {
+      "word": "forest",
+      "variations": [
+        "forest",
+        "forests"
+      ],
+      "definition": "A large area with many trees and plants.",
+      "emojis": [
+        "🌳",
+        "🌲"
+      ]
+    },
+    {
+      "word": "government",
+      "variations": [
+        "government",
+        "governments",
+        "govern",
+        "governs",
+        "governed",
+        "governing"
+      ],
+      "definition": "The group of people who lead a country and make laws.",
+      "emojis": [
+        "🏛️",
+        "📜"
+      ]
+    },
+    {
+      "word": "ground",
+      "variations": [
+        "ground",
+        "grounds"
+      ],
+      "definition": "The surface of the earth you stand or walk on.",
+      "emojis": [
+        "🌍",
+        "🟫"
+      ]
+    },
+    {
+      "word": "in front of",
+      "variations": [
+        "in front of",
+        "in front"
+      ],
+      "definition": "In a position directly before someone or something, facing it.",
+      "emojis": [
+        "🧍",
+        "➡️",
+        "🧍"
+      ]
+    },
+    {
+      "word": "jump",
+      "variations": [
+        "jump",
+        "jumps",
+        "jumping",
+        "jumped"
+      ],
+      "definition": "To push yourself up off the ground.",
+      "emojis": [
+        "🦘",
+        "⬆️"
+      ]
+    },
+    {
+      "word": "leopard",
+      "variations": [
+        "leopard",
+        "leopards"
+      ],
+      "definition": "A large wild cat with dark spots. It runs fast and can climb trees.",
+      "emojis": [
+        "🐆",
+        "🌳"
+      ]
+    },
+    {
+      "word": "long",
+      "variations": [
+        "long",
+        "longer",
+        "longest"
+      ],
+      "definition": "Measuring a great distance from one end to the other.",
+      "emojis": [
+        "📏",
+        "↔️"
+      ]
+    },
+    {
+      "word": "ministry",
+      "variations": [
+        "ministry",
+        "ministries"
+      ],
+      "definition": "A main office of the government that looks after one area, like education or health.",
+      "emojis": [
+        "🏛️",
+        "📋"
+      ]
+    },
+    {
+      "word": "monkey",
+      "variations": [
+        "monkey",
+        "monkeys"
+      ],
+      "definition": "A small animal with a tail that often lives in trees.",
+      "emojis": [
+        "🐒",
+        "🌴"
+      ]
+    },
+    {
+      "word": "mother",
+      "variations": [
+        "mother",
+        "mothers"
+      ],
+      "definition": "A female parent; the woman who has a child or children.",
+      "emojis": [
+        "🤱",
+        "❤️"
+      ]
+    },
+    {
+      "word": "near",
+      "variations": [
+        "near",
+        "nearer",
+        "nearest",
+        "nearly"
+      ],
+      "definition": "Close in distance; not far away.",
+      "emojis": [
+        "📍📍",
+        "🤏"
+      ]
+    },
+    {
+      "word": "night",
+      "variations": [
+        "night",
+        "nights"
+      ],
+      "definition": "The dark time between sunset and sunrise.",
+      "emojis": [
+        "🌙",
+        "🌌"
+      ]
+    },
+    {
+      "word": "onto",
+      "variations": [
+        "onto",
+        "on to"
+      ],
+      "definition": "Moving to a position on top of something.",
+      "emojis": [
+        "⬆️",
+        "🧱"
+      ]
+    },
+    {
+      "word": "point",
+      "variations": [
+        "point",
+        "points",
+        "pointing",
+        "pointed"
+      ],
+      "definition": "To show something by using your finger or hand.",
+      "emojis": [
+        "👉",
+        "📍"
+      ]
+    },
+    {
+      "word": "quietly",
+      "variations": [
+        "quietly",
+        "quiet",
+        "quieter",
+        "quietest"
+      ],
+      "definition": "In a way that makes little or no noise.",
+      "emojis": [
+        "🤫",
+        "🔇"
+      ]
+    },
+    {
+      "word": "royal",
+      "variations": [
+        "royal",
+        "royals"
+      ],
+      "definition": "Related to a king, queen, or their family.",
+      "emojis": [
+        "👑",
+        "🏰"
+      ]
+    },
+    {
+      "word": "run",
+      "variations": [
+        "run",
+        "runs",
+        "running",
+        "ran"
+      ],
+      "definition": "To move quickly on your feet.",
+      "emojis": [
+        "🏃‍♀️",
+        "💨"
+      ]
+    },
+    {
+      "word": "saw",
+      "variations": [
+        "see",
+        "sees",
+        "seeing",
+        "seen"
+      ],
+      "definition": "Past tense of “see”; to use your eyes to notice something.",
+      "emojis": [
+        "👀",
+        "🔭"
+      ]
+    },
+    {
+      "word": "see",
+      "variations": [
+        "see",
+        "sees",
+        "saw",
+        "seen",
+        "seeing"
+      ],
+      "definition": "To use your eyes to look at something.",
+      "emojis": [
+        "👀",
+        "👁️"
+      ]
+    },
+    {
+      "word": "shake",
+      "variations": [
+        "shake",
+        "shakes",
+        "shaking",
+        "shook",
+        "shaken"
+      ],
+      "definition": "To move quickly back and forth or up and down. Past tense: shook.",
+      "emojis": [
+        "💫",
+        "🔄"
+      ]
+    },
+    {
+      "word": "shout",
+      "variations": [
+        "shout",
+        "shouts",
+        "shouting",
+        "shouted"
+      ],
+      "definition": "To speak very loudly.",
+      "emojis": [
+        "🗣️",
+        "🔊"
+      ]
+    },
+    {
+      "word": "skill",
+      "variations": [
+        "skill",
+        "skills",
+        "skilled"
+      ],
+      "definition": "An ability to do something well, learned by practice.",
+      "emojis": [
+        "🛠️",
+        "⭐"
+      ]
+    },
+    {
+      "word": "sleep",
+      "variations": [
+        "sleep",
+        "sleeps",
+        "sleeping",
+        "slept"
+      ],
+      "definition": "To rest with your eyes closed and your body and mind quiet.",
+      "emojis": [
+        "😴",
+        "🌙"
+      ]
+    },
+    {
+      "word": "sleeping",
+      "variations": [
+        "sleep",
+        "sleeps",
+        "slept"
+      ],
+      "definition": "Being asleep; resting with your eyes closed and your body still.",
+      "emojis": [
+        "😴",
+        "🛏️"
+      ]
+    },
+    {
+      "word": "small",
+      "variations": [
+        "small",
+        "smaller",
+        "smallest"
+      ],
+      "definition": "Little in size; not big.",
+      "emojis": [
+        "🐭",
+        "📏"
+      ]
+    },
+    {
+      "word": "stick",
+      "variations": [
+        "stick",
+        "sticks"
+      ],
+      "definition": "A small piece of wood from a tree branch.",
+      "emojis": [
+        "🪵",
+        "🌿"
+      ]
+    },
+    {
+      "word": "throw",
+      "variations": [
+        "throw",
+        "throws",
+        "throwing",
+        "threw",
+        "thrown"
+      ],
+      "definition": "To send something through the air with your hand.",
+      "emojis": [
+        "🤾‍♂️",
+        "🌀"
+      ]
+    },
+    {
+      "word": "tree",
+      "variations": [
+        "tree",
+        "trees"
+      ],
+      "definition": "A tall plant with a trunk, branches, and leaves.",
+      "emojis": [
+        "🌳",
+        "🌲"
+      ]
+    },
+    {
+      "word": "wake up",
+      "variations": [
+        "wake up",
+        "wakes up",
+        "woke up",
+        "woken up",
+        "waking up"
+      ],
+      "definition": "To stop sleeping and become awake.",
+      "emojis": [
+        "⏰",
+        "👀"
+      ]
+    },
+    {
+      "word": "went",
+      "variations": [
+        "go",
+        "goes",
+        "going",
+        "gone"
+      ],
+      "definition": "Past tense of “go”; to move from one place to another.",
+      "emojis": [
+        "🚶‍♂️",
+        "➡️"
+      ]
+    }
+  ]
+}

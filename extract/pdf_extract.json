@@ -1,0 +1,553 @@
+{
+  "pdf_metadata": {
+    "filename": "momo.pdf",
+    "total_pages": 20,
+    "extracted_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "extraction_timestamp": "2025-10-06T14:10:54.266882",
+    "start_page": 1,
+    "end_page": 20
+  },
+  "pages": [
+    {
+      "page_id": "p1",
+      "page_number": 1,
+      "page_image_path": "pages/page_1.png",
+      "text": "Momo and the Leopards\nClass I Book 11\n",
+      "images": [
+        {
+          "image_id": "img_p1_r0",
+          "page_id": "p1",
+          "index": 0,
+          "image_path": "images/img_p1_r0.png",
+          "chart_path": "images/img_p1_r0_chart.png",
+          "width": 974,
+          "height": 1241,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p1_v1",
+          "page_id": "p1",
+          "index": 1,
+          "image_path": "images/img_p1_v1.png",
+          "chart_path": "images/img_p1_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p2",
+      "page_number": 2,
+      "page_image_path": "pages/page_2.png",
+      "text": "",
+      "images": [
+        {
+          "image_id": "img_p2_v0",
+          "page_id": "p2",
+          "index": 0,
+          "image_path": "images/img_p2_v0.png",
+          "chart_path": "images/img_p2_v0_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p3",
+      "page_number": 3,
+      "page_image_path": "pages/page_3.png",
+      "text": "Momo and the Leopards\nClass I Book 11\nDepartment of School Education\nMinistry of Education and Skills Development\nRoyal Government of Bhutan\nThimphu\n",
+      "images": [
+        {
+          "image_id": "img_p3_r0",
+          "page_id": "p3",
+          "index": 0,
+          "image_path": "images/img_p3_r0.png",
+          "chart_path": "images/img_p3_r0_chart.png",
+          "width": 110,
+          "height": 114,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p3_v1",
+          "page_id": "p3",
+          "index": 1,
+          "image_path": "images/img_p3_v1.png",
+          "chart_path": "images/img_p3_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p4",
+      "page_number": 4,
+      "page_image_path": "pages/page_4.png",
+      "text": "Published by\nSchool Curriculum Division\nDepartment of School Education (DSE)\nMinistry of Education and Skills Development\nRoyal Government of Bhutan\nThimphu\nCopyright © 2022 Department of School Education, MoESD, Thimphu.\nAll rights reserved. No part of this book may be reproduced in \nany form without the permission from Department of School Education, \nMoESD,Thimphu.\nThis book remains the property of the Ministry of Education and Skills \nDevelopment and must not be taken out of the school at any time.\nPilot Edition 1991\nNew Edition 1992\nRevised 2007\nReprint 2023\nISBN 99936-0-128-4\n",
+      "images": [
+        {
+          "image_id": "img_p4_v0",
+          "page_id": "p4",
+          "index": 0,
+          "image_path": "images/img_p4_v0.png",
+          "chart_path": "images/img_p4_v0_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p5",
+      "page_number": 5,
+      "page_image_path": "pages/page_5.png",
+      "text": "1\nEvery night the monkeys climb a tree to \nsleep in.\nThey sleep on very long branches.\nThere, no animal can get them.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p5_r0",
+          "page_id": "p5",
+          "index": 0,
+          "image_path": "images/img_p5_r0.png",
+          "chart_path": "images/img_p5_r0_chart.png",
+          "width": 976,
+          "height": 1245,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p5_v1",
+          "page_id": "p5",
+          "index": 1,
+          "image_path": "images/img_p5_v1.png",
+          "chart_path": "images/img_p5_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p6",
+      "page_number": 6,
+      "page_image_path": "pages/page_6.png",
+      "text": "2\nOne night a mother \nleopard came to the \nmonkeys’ tree.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p6_r0",
+          "page_id": "p6",
+          "index": 0,
+          "image_path": "images/img_p6_r0.png",
+          "chart_path": "images/img_p6_r0_chart.png",
+          "width": 976,
+          "height": 1243,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p6_v1",
+          "page_id": "p6",
+          "index": 1,
+          "image_path": "images/img_p6_v1.png",
+          "chart_path": "images/img_p6_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p7",
+      "page_number": 7,
+      "page_image_path": "pages/page_7.png",
+      "text": "3\nMother leopard climbed the tree.\nShe climbed it very, very quietly.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p7_r0",
+          "page_id": "p7",
+          "index": 0,
+          "image_path": "images/img_p7_r0.png",
+          "chart_path": "images/img_p7_r0_chart.png",
+          "width": 977,
+          "height": 1244,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p7_v1",
+          "page_id": "p7",
+          "index": 1,
+          "image_path": "images/img_p7_v1.png",
+          "chart_path": "images/img_p7_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p8",
+      "page_number": 8,
+      "page_image_path": "pages/page_8.png",
+      "text": "4\nShe saw a baby monkey.\nIt was Momo.\nShe climbed onto the branch.\nShe moved very, very quietly.\nShe did not want to wake Momo up.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p8_r0",
+          "page_id": "p8",
+          "index": 0,
+          "image_path": "images/img_p8_r0.png",
+          "chart_path": "images/img_p8_r0_chart.png",
+          "width": 975,
+          "height": 1242,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p8_v1",
+          "page_id": "p8",
+          "index": 1,
+          "image_path": "images/img_p8_v1.png",
+          "chart_path": "images/img_p8_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p9",
+      "page_number": 9,
+      "page_image_path": "pages/page_9.png",
+      "text": "5\nShe came near Momo but \nthe branch shook.\nIt shook and it shook.\nMomo woke up and saw \nthe leopard in front of him.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p9_r0",
+          "page_id": "p9",
+          "index": 0,
+          "image_path": "images/img_p9_r0.png",
+          "chart_path": "images/img_p9_r0_chart.png",
+          "width": 977,
+          "height": 1244,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p9_v1",
+          "page_id": "p9",
+          "index": 1,
+          "image_path": "images/img_p9_v1.png",
+          "chart_path": "images/img_p9_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p10",
+      "page_number": 10,
+      "page_image_path": "pages/page_10.png",
+      "text": "6\nMomo shouted and pointed at the leopard.\nThe monkeys woke up and shouted.\nThey threw sticks at the mother leopard.\nShe jumped to the ground and ran into the \nforest.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p10_r0",
+          "page_id": "p10",
+          "index": 0,
+          "image_path": "images/img_p10_r0.png",
+          "chart_path": "images/img_p10_r0_chart.png",
+          "width": 975,
+          "height": 1243,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p10_v1",
+          "page_id": "p10",
+          "index": 1,
+          "image_path": "images/img_p10_v1.png",
+          "chart_path": "images/img_p10_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p11",
+      "page_number": 11,
+      "page_image_path": "pages/page_11.png",
+      "text": "7\nNext night mother leopard came \nwith baby leopard.\nThe baby leopard was small \nbut it could climb the trees.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p11_r0",
+          "page_id": "p11",
+          "index": 0,
+          "image_path": "images/img_p11_r0.png",
+          "chart_path": "images/img_p11_r0_chart.png",
+          "width": 975,
+          "height": 1244,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p11_v1",
+          "page_id": "p11",
+          "index": 1,
+          "image_path": "images/img_p11_v1.png",
+          "chart_path": "images/img_p11_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p12",
+      "page_number": 12,
+      "page_image_path": "pages/page_12.png",
+      "text": "The baby leopard \nclimbed the tree.\n8\nIt climbed very, very quietly.\nAll the monkeys were sleeping.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p12_r0",
+          "page_id": "p12",
+          "index": 0,
+          "image_path": "images/img_p12_r0.png",
+          "chart_path": "images/img_p12_r0_chart.png",
+          "width": 975,
+          "height": 1243,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p12_v1",
+          "page_id": "p12",
+          "index": 1,
+          "image_path": "images/img_p12_v1.png",
+          "chart_path": "images/img_p12_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p13",
+      "page_number": 13,
+      "page_image_path": "pages/page_13.png",
+      "text": "9\nMomo was sleeping on a very \nlong branch.\nThe baby leopard saw him \nand went very quietly onto the \nbranch.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p13_r0",
+          "page_id": "p13",
+          "index": 0,
+          "image_path": "images/img_p13_r0.png",
+          "chart_path": "images/img_p13_r0_chart.png",
+          "width": 977,
+          "height": 1245,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p13_v1",
+          "page_id": "p13",
+          "index": 1,
+          "image_path": "images/img_p13_v1.png",
+          "chart_path": "images/img_p13_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p14",
+      "page_number": 14,
+      "page_image_path": "pages/page_14.png",
+      "text": "The branch was very, very long.\nThe baby leopard came near Momo \nbut the branch shook.\nIt shook and it shook and it woke \nMomo up.\n10\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p14_r0",
+          "page_id": "p14",
+          "index": 0,
+          "image_path": "images/img_p14_r0.png",
+          "chart_path": "images/img_p14_r0_chart.png",
+          "width": 975,
+          "height": 1243,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p14_v1",
+          "page_id": "p14",
+          "index": 1,
+          "image_path": "images/img_p14_v1.png",
+          "chart_path": "images/img_p14_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p15",
+      "page_number": 15,
+      "page_image_path": "pages/page_15.png",
+      "text": "11\nMomo jumped onto a bigger branch.\nThe baby leopard jumped but he could \nnot get Momo.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p15_r0",
+          "page_id": "p15",
+          "index": 0,
+          "image_path": "images/img_p15_r0.png",
+          "chart_path": "images/img_p15_r0_chart.png",
+          "width": 977,
+          "height": 1244,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p15_v1",
+          "page_id": "p15",
+          "index": 1,
+          "image_path": "images/img_p15_v1.png",
+          "chart_path": "images/img_p15_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p16",
+      "page_number": 16,
+      "page_image_path": "pages/page_16.png",
+      "text": "Down went the baby leopard ...\n12\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p16_r0",
+          "page_id": "p16",
+          "index": 0,
+          "image_path": "images/img_p16_r0.png",
+          "chart_path": "images/img_p16_r0_chart.png",
+          "width": 976,
+          "height": 1245,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p16_v1",
+          "page_id": "p16",
+          "index": 1,
+          "image_path": "images/img_p16_v1.png",
+          "chart_path": "images/img_p16_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p17",
+      "page_number": 17,
+      "page_image_path": "pages/page_17.png",
+      "text": "13\ndown ...\n  ... on its mother.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p17_r0",
+          "page_id": "p17",
+          "index": 0,
+          "image_path": "images/img_p17_r0.png",
+          "chart_path": "images/img_p17_r0_chart.png",
+          "width": 974,
+          "height": 1242,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p17_v1",
+          "page_id": "p17",
+          "index": 1,
+          "image_path": "images/img_p17_v1.png",
+          "chart_path": "images/img_p17_v1_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p18",
+      "page_number": 18,
+      "page_image_path": "pages/page_18.png",
+      "text": "The monkeys woke up.\n14\nThey shouted and threw sticks.\nThe leopards ran into the forest.\nThey did not have a monkey for dinner \nthat night.\nReprint 2023\n",
+      "images": [
+        {
+          "image_id": "img_p18_r0",
+          "page_id": "p18",
+          "index": 0,
+          "image_path": "images/img_p18_r0.png",
+          "chart_path": "images/img_p18_r0_chart.png",
+          "width": 976,
+          "height": 1242,
+          "image_type": "raster"
+        },
+        {
+          "image_id": "img_p18_v1",
+          "page_id": "p18",
+          "index": 1,
+          "image_path": "images/img_p18_v1.png",
+          "chart_path": "images/img_p18_v1_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p19",
+      "page_number": 19,
+      "page_image_path": "pages/page_19.png",
+      "text": "",
+      "images": [
+        {
+          "image_id": "img_p19_v0",
+          "page_id": "p19",
+          "index": 0,
+          "image_path": "images/img_p19_v0.png",
+          "chart_path": "images/img_p19_v0_chart.png",
+          "width": 615,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    },
+    {
+      "page_id": "p20",
+      "page_number": 20,
+      "page_image_path": "pages/page_20.png",
+      "text": "VISION \n“An education and enlightened society of GNH, \nbuilt and sustained on the unique Bhutanese \nvalues of Tha Dam-Tsig Ley Gju-Drey.”\n",
+      "images": [
+        {
+          "image_id": "img_p20_v0",
+          "page_id": "p20",
+          "index": 0,
+          "image_path": "images/img_p20_v0.png",
+          "chart_path": "images/img_p20_v0_chart.png",
+          "width": 614,
+          "height": 862,
+          "image_type": "vector"
+        }
+      ]
+    }
+  ]
+}

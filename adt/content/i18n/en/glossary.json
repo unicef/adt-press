@@ -1,0 +1,554 @@
+{
+  "Bhutan": {
+    "word": "Bhutan",
+    "definition": "A country in South Asia.",
+    "variations": [
+      "Bhutan"
+    ],
+    "emoji": "\ud83c\udde7\ud83c\uddf9\ud83c\udfd4\ufe0f"
+  },
+  "Bhutanese": {
+    "word": "Bhutanese",
+    "definition": "Related to Bhutan\u2014its people, culture, and traditions.",
+    "variations": [
+      "Bhutanese",
+      "Bhutan",
+      "Bhutan\u2019s"
+    ],
+    "emoji": "\ud83c\udde7\ud83c\uddf9\ud83c\udfd4\ufe0f"
+  },
+  "Education": {
+    "word": "Education",
+    "definition": "The process of teaching and learning to gain knowledge, skills, and good habits.",
+    "variations": [
+      "education",
+      "educational",
+      "educate",
+      "educating"
+    ],
+    "emoji": "\ud83c\udf93\ud83d\udcda"
+  },
+  "Enlightened": {
+    "word": "Enlightened",
+    "definition": "Having understanding and wisdom; guided by knowledge and kindness.",
+    "variations": [
+      "enlightened",
+      "enlighten",
+      "enlightenment",
+      "enlightening"
+    ],
+    "emoji": "\ud83d\udca1\ud83d\udd4a\ufe0f"
+  },
+  "GNH": {
+    "word": "GNH",
+    "definition": "A Bhutanese way to measure progress by people\u2019s happiness and well-being, not only by money or production.",
+    "variations": [
+      "GNH",
+      "Gross National Happiness",
+      "gross national happiness"
+    ],
+    "emoji": "\ud83d\ude0a\ud83c\udde7\ud83c\uddf9\ud83d\udcc8"
+  },
+  "Ley Gju-Drey": {
+    "word": "Ley Gju-Drey",
+    "definition": "A Bhutanese principle of cause and effect (karma): our actions lead to matching results.",
+    "variations": [
+      "Ley Gju-Drey",
+      "Ley Judrey",
+      "Ley Gyudrey",
+      "ley judrey"
+    ],
+    "emoji": "\ud83d\udd01\u2696\ufe0f"
+  },
+  "Society": {
+    "word": "Society",
+    "definition": "A group of people living together under shared rules, culture, and institutions.",
+    "variations": [
+      "society",
+      "societies"
+    ],
+    "emoji": "\ud83e\uddd1\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udfd8\ufe0f"
+  },
+  "Tha Dam-Tsig": {
+    "word": "Tha Dam-Tsig",
+    "definition": "A Bhutanese principle meaning a sacred promise or commitment\u2014keeping one\u2019s word with loyalty and respect.",
+    "variations": [
+      "Tha Dam-Tsig",
+      "Tha Dam Tshig",
+      "Tha Dam-Tshig",
+      "tha dam-tshig"
+    ],
+    "emoji": "\ud83e\udd1d\ud83d\ude4f"
+  },
+  "Thimphu": {
+    "word": "Thimphu",
+    "definition": "The capital city of Bhutan.",
+    "variations": [
+      "Thimphu"
+    ],
+    "emoji": "\ud83d\udccd\ud83c\udfd4\ufe0f"
+  },
+  "Values": {
+    "word": "Values",
+    "definition": "Important beliefs and principles that guide how people think and act.",
+    "variations": [
+      "values",
+      "value"
+    ],
+    "emoji": "\u2764\ufe0f\u2696\ufe0f"
+  },
+  "Vision": {
+    "word": "Vision",
+    "definition": "A clear picture of the future we want to create.",
+    "variations": [
+      "vision",
+      "visions"
+    ],
+    "emoji": "\ud83d\udc40\ud83d\udd2d"
+  },
+  "animal": {
+    "word": "animal",
+    "definition": "A living thing that moves and eats food; not a plant.",
+    "variations": [
+      "animal",
+      "animals"
+    ],
+    "emoji": "\ud83d\udc3e\ud83d\udc3b"
+  },
+  "baby": {
+    "word": "baby",
+    "definition": "A very young child or animal.",
+    "variations": [
+      "baby",
+      "babies"
+    ],
+    "emoji": "\ud83d\udc76\ud83d\udc23"
+  },
+  "bigger": {
+    "word": "bigger",
+    "definition": "More large than something else; larger in size.",
+    "variations": [
+      "big",
+      "bigger",
+      "biggest"
+    ],
+    "emoji": "\ud83d\udccf\u2b06\ufe0f"
+  },
+  "book": {
+    "word": "book",
+    "definition": "Pages with writing or pictures that are bound together. People read books.",
+    "variations": [
+      "book",
+      "books"
+    ],
+    "emoji": "\ud83d\udcd6\ud83d\udcda"
+  },
+  "branch": {
+    "word": "branch",
+    "definition": "A part of a tree that grows out from the trunk.",
+    "variations": [
+      "branch",
+      "branches"
+    ],
+    "emoji": "\ud83c\udf3f\ud83c\udf33"
+  },
+  "class": {
+    "word": "class",
+    "definition": "A group of students who learn together, or the time when they learn.",
+    "variations": [
+      "class",
+      "classes"
+    ],
+    "emoji": "\ud83c\udfeb\ud83d\udc69\u200d\ud83c\udfeb"
+  },
+  "climb": {
+    "word": "climb",
+    "definition": "To go up something using your hands and feet.",
+    "variations": [
+      "climb",
+      "climbs",
+      "climbing",
+      "climbed"
+    ],
+    "emoji": "\ud83e\uddd7\u2b06\ufe0f"
+  },
+  "come": {
+    "word": "come",
+    "definition": "To move toward a place or person.",
+    "variations": [
+      "come",
+      "comes",
+      "came",
+      "coming"
+    ],
+    "emoji": "\ud83d\udeb6\u27a1\ufe0f"
+  },
+  "could": {
+    "word": "could",
+    "definition": "The past form of \u201ccan\u201d; shows ability or possibility in the past (was able to).",
+    "variations": [
+      "can",
+      "could",
+      "couldn't"
+    ],
+    "emoji": "\ud83d\udcad\u2705"
+  },
+  "department": {
+    "word": "department",
+    "definition": "A smaller part of a big organization, like a school or government, that does a certain job.",
+    "variations": [
+      "department",
+      "departments"
+    ],
+    "emoji": "\ud83d\uddc2\ufe0f\ud83c\udfe2"
+  },
+  "development": {
+    "word": "development",
+    "definition": "The process of growing or improving.",
+    "variations": [
+      "development",
+      "develop",
+      "develops",
+      "developed",
+      "developing"
+    ],
+    "emoji": "\ud83c\udf31\ud83d\udcc8"
+  },
+  "dinner": {
+    "word": "dinner",
+    "definition": "The main meal in the evening.",
+    "variations": [
+      "dinners"
+    ],
+    "emoji": "\ud83c\udf7d\ufe0f\ud83c\udf19"
+  },
+  "down": {
+    "word": "down",
+    "definition": "Toward a lower place or level; from higher to lower.",
+    "variations": [
+      "downward",
+      "downwards"
+    ],
+    "emoji": "\u2b07\ufe0f"
+  },
+  "education": {
+    "word": "education",
+    "definition": "Learning knowledge and skills, often in school.",
+    "variations": [
+      "education",
+      "educate",
+      "educated",
+      "educating",
+      "educational"
+    ],
+    "emoji": "\ud83d\udcda\ud83c\udf93"
+  },
+  "forest": {
+    "word": "forest",
+    "definition": "A large area with many trees and plants.",
+    "variations": [
+      "forest",
+      "forests"
+    ],
+    "emoji": "\ud83c\udf33\ud83c\udf32"
+  },
+  "government": {
+    "word": "government",
+    "definition": "The group of people who lead a country and make laws.",
+    "variations": [
+      "government",
+      "governments",
+      "govern",
+      "governs",
+      "governed",
+      "governing"
+    ],
+    "emoji": "\ud83c\udfdb\ufe0f\ud83d\udcdc"
+  },
+  "ground": {
+    "word": "ground",
+    "definition": "The surface of the earth you stand or walk on.",
+    "variations": [
+      "ground",
+      "grounds"
+    ],
+    "emoji": "\ud83c\udf0d\ud83d\udfeb"
+  },
+  "in front of": {
+    "word": "in front of",
+    "definition": "In a position directly before someone or something, facing it.",
+    "variations": [
+      "in front of",
+      "in front"
+    ],
+    "emoji": "\ud83e\uddcd\u27a1\ufe0f\ud83e\uddcd"
+  },
+  "jump": {
+    "word": "jump",
+    "definition": "To push yourself up off the ground.",
+    "variations": [
+      "jump",
+      "jumps",
+      "jumping",
+      "jumped"
+    ],
+    "emoji": "\ud83e\udd98\u2b06\ufe0f"
+  },
+  "leopard": {
+    "word": "leopard",
+    "definition": "A large wild cat with dark spots. It runs fast and can climb trees.",
+    "variations": [
+      "leopard",
+      "leopards"
+    ],
+    "emoji": "\ud83d\udc06\ud83c\udf33"
+  },
+  "long": {
+    "word": "long",
+    "definition": "Measuring a great distance from one end to the other.",
+    "variations": [
+      "long",
+      "longer",
+      "longest"
+    ],
+    "emoji": "\ud83d\udccf\u2194\ufe0f"
+  },
+  "ministry": {
+    "word": "ministry",
+    "definition": "A main office of the government that looks after one area, like education or health.",
+    "variations": [
+      "ministry",
+      "ministries"
+    ],
+    "emoji": "\ud83c\udfdb\ufe0f\ud83d\udccb"
+  },
+  "monkey": {
+    "word": "monkey",
+    "definition": "A small animal with a tail that often lives in trees.",
+    "variations": [
+      "monkey",
+      "monkeys"
+    ],
+    "emoji": "\ud83d\udc12\ud83c\udf34"
+  },
+  "mother": {
+    "word": "mother",
+    "definition": "A female parent; the woman who has a child or children.",
+    "variations": [
+      "mother",
+      "mothers"
+    ],
+    "emoji": "\ud83e\udd31\u2764\ufe0f"
+  },
+  "near": {
+    "word": "near",
+    "definition": "Close in distance; not far away.",
+    "variations": [
+      "near",
+      "nearer",
+      "nearest",
+      "nearly"
+    ],
+    "emoji": "\ud83d\udccd\ud83d\udccd\ud83e\udd0f"
+  },
+  "night": {
+    "word": "night",
+    "definition": "The dark time between sunset and sunrise.",
+    "variations": [
+      "night",
+      "nights"
+    ],
+    "emoji": "\ud83c\udf19\ud83c\udf0c"
+  },
+  "onto": {
+    "word": "onto",
+    "definition": "Moving to a position on top of something.",
+    "variations": [
+      "onto",
+      "on to"
+    ],
+    "emoji": "\u2b06\ufe0f\ud83e\uddf1"
+  },
+  "point": {
+    "word": "point",
+    "definition": "To show something by using your finger or hand.",
+    "variations": [
+      "point",
+      "points",
+      "pointing",
+      "pointed"
+    ],
+    "emoji": "\ud83d\udc49\ud83d\udccd"
+  },
+  "quietly": {
+    "word": "quietly",
+    "definition": "In a way that makes little or no noise.",
+    "variations": [
+      "quietly",
+      "quiet",
+      "quieter",
+      "quietest"
+    ],
+    "emoji": "\ud83e\udd2b\ud83d\udd07"
+  },
+  "royal": {
+    "word": "royal",
+    "definition": "Related to a king, queen, or their family.",
+    "variations": [
+      "royal",
+      "royals"
+    ],
+    "emoji": "\ud83d\udc51\ud83c\udff0"
+  },
+  "run": {
+    "word": "run",
+    "definition": "To move quickly on your feet.",
+    "variations": [
+      "run",
+      "runs",
+      "running",
+      "ran"
+    ],
+    "emoji": "\ud83c\udfc3\u200d\u2640\ufe0f\ud83d\udca8"
+  },
+  "saw": {
+    "word": "saw",
+    "definition": "Past tense of \u201csee\u201d; to use your eyes to notice something.",
+    "variations": [
+      "see",
+      "sees",
+      "seeing",
+      "seen"
+    ],
+    "emoji": "\ud83d\udc40\ud83d\udd2d"
+  },
+  "see": {
+    "word": "see",
+    "definition": "To use your eyes to look at something.",
+    "variations": [
+      "see",
+      "sees",
+      "saw",
+      "seen",
+      "seeing"
+    ],
+    "emoji": "\ud83d\udc40\ud83d\udc41\ufe0f"
+  },
+  "shake": {
+    "word": "shake",
+    "definition": "To move quickly back and forth or up and down. Past tense: shook.",
+    "variations": [
+      "shake",
+      "shakes",
+      "shaking",
+      "shook",
+      "shaken"
+    ],
+    "emoji": "\ud83d\udcab\ud83d\udd04"
+  },
+  "shout": {
+    "word": "shout",
+    "definition": "To speak very loudly.",
+    "variations": [
+      "shout",
+      "shouts",
+      "shouting",
+      "shouted"
+    ],
+    "emoji": "\ud83d\udde3\ufe0f\ud83d\udd0a"
+  },
+  "skill": {
+    "word": "skill",
+    "definition": "An ability to do something well, learned by practice.",
+    "variations": [
+      "skill",
+      "skills",
+      "skilled"
+    ],
+    "emoji": "\ud83d\udee0\ufe0f\u2b50"
+  },
+  "sleep": {
+    "word": "sleep",
+    "definition": "To rest with your eyes closed and your body and mind quiet.",
+    "variations": [
+      "sleep",
+      "sleeps",
+      "sleeping",
+      "slept"
+    ],
+    "emoji": "\ud83d\ude34\ud83c\udf19"
+  },
+  "sleeping": {
+    "word": "sleeping",
+    "definition": "Being asleep; resting with your eyes closed and your body still.",
+    "variations": [
+      "sleep",
+      "sleeps",
+      "slept"
+    ],
+    "emoji": "\ud83d\ude34\ud83d\udecf\ufe0f"
+  },
+  "small": {
+    "word": "small",
+    "definition": "Little in size; not big.",
+    "variations": [
+      "small",
+      "smaller",
+      "smallest"
+    ],
+    "emoji": "\ud83d\udc2d\ud83d\udccf"
+  },
+  "stick": {
+    "word": "stick",
+    "definition": "A small piece of wood from a tree branch.",
+    "variations": [
+      "stick",
+      "sticks"
+    ],
+    "emoji": "\ud83e\udeb5\ud83c\udf3f"
+  },
+  "throw": {
+    "word": "throw",
+    "definition": "To send something through the air with your hand.",
+    "variations": [
+      "throw",
+      "throws",
+      "throwing",
+      "threw",
+      "thrown"
+    ],
+    "emoji": "\ud83e\udd3e\u200d\u2642\ufe0f\ud83c\udf00"
+  },
+  "tree": {
+    "word": "tree",
+    "definition": "A tall plant with a trunk, branches, and leaves.",
+    "variations": [
+      "tree",
+      "trees"
+    ],
+    "emoji": "\ud83c\udf33\ud83c\udf32"
+  },
+  "wake up": {
+    "word": "wake up",
+    "definition": "To stop sleeping and become awake.",
+    "variations": [
+      "wake up",
+      "wakes up",
+      "woke up",
+      "woken up",
+      "waking up"
+    ],
+    "emoji": "\u23f0\ud83d\udc40"
+  },
+  "went": {
+    "word": "went",
+    "definition": "Past tense of \u201cgo\u201d; to move from one place to another.",
+    "variations": [
+      "go",
+      "goes",
+      "going",
+      "gone"
+    ],
+    "emoji": "\ud83d\udeb6\u200d\u2642\ufe0f\u27a1\ufe0f"
+  }
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="stylesheet" href="style.css" />
+    <title>Run Configuration - ADT Press</title>
+    
+    
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 w-64 h-screen bg-gray-800 text-white flex flex-col">
+            <a href="index.html"><div class="p-4 text-lg font-bold border-b border-gray-700">ADT Press</div></a>
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <ul>
+                    <li class="py-2"><a href="page_report.html" class="hover:text-gray-300">Pages</a></li>
+                    <li class="py-2"><a href="processed_images.html" class="hover:text-gray-300">Processed Images</a></li>
+                    <li class="py-2"><a href="pruned_images.html" class="hover:text-gray-300">Pruned Images</a></li>
+                    <li class="py-2"><a href="plate_report.html" class="hover:text-gray-300">Plate</a></li>
+                    <li class="py-2"><a href="translation_report.html" class="hover:text-gray-300">Translations & Speech</a></li>
+                    <li class="py-2"><a href="glossary_report.html" class="hover:text-gray-300">Glossary</a></li>
+                    <li class="py-2"><a href="web_report.html" class="hover:text-gray-300">Generated Web Pages</a></li>
+                    <li class="py-2"><a href="config.html" class="hover:text-gray-300">Config</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col ml-64">
+            <!-- Titlebar -->
+            <header class="bg-gray-200 shadow p-4">
+                <h1 class="text-xl font-semibold">Run Configuration</h1>
+            </header>
+
+            <!-- Content -->
+            <main class="flex-1 p-4">
+<div class="space-y-4">
+    <pre>label: momo
+pdf_path: ./assets/momo.pdf
+input_language: en
+plate_language: en
+output_languages:
+- en
+output_dir: output
+run_output_dir: ${output_dir}/${label}
+clear_cache: false
+print_available_models: false
+crop_strategy: llm
+glossary_strategy: llm
+explanation_strategy: llm
+easy_read_strategy: llm
+caption_strategy: llm
+speech_strategy: tts
+custom_plate_path: ''
+default_model: gpt-5
+render_strategy: dynamic
+layout_types:
+  single_column:
+    description: Single column layout with text and images flowing in one main column
+      across the page.
+    render_strategy: two_column
+  two_column:
+    description: Two column layout with text and images arranged in two distinct columns
+      side by side.
+    render_strategy: two_column
+  overlay:
+    description: Overlay layout with text overlaid on images, often with speech bubbles
+      or captions.
+    render_strategy: overlay
+  other:
+    description: 'Other layout type that does not fit any of the other categories. '
+    render_strategy: two_column
+render_strategies:
+  single_column:
+    render_type: template
+    config:
+      render_template_path: templates/single_column_render.html
+  two_column:
+    render_type: template
+    config:
+      render_template_path: templates/two_column_template_render.html
+  overlay:
+    render_type: html
+    config:
+      model: default
+      template_path: prompts/web_generation_html_fit_overlay.jinja2
+      max_retries: 25
+  html:
+    render_type: html
+    config:
+      model: default
+      template_path: prompts/web_generation_html.jinja2
+      max_retries: 25
+      example_dirs:
+      - assets/prompts/adt_examples/text_only_1
+      - assets/prompts/adt_examples/text_and_images_1
+      - assets/prompts/adt_examples/text_and_images_2
+      - assets/prompts/adt_examples/text_and_images_3
+  rows:
+    render_type: rows
+    config:
+      model: default
+      template_path: prompts/web_generation_rows.jinja2
+      render_template_path: templates/row_render.html
+page_range:
+  start: 0
+  end: 0
+image_filters:
+  size:
+    max_side: 3500
+    min_side: 150
+  blank:
+    threshold: 2
+text_filters:
+  pruned_text_types:
+  - footer_text
+  - page_number
+  - other
+section_filters:
+  pruned_section_types:
+  - back_cover
+  - credits
+  - inside_cover
+prompts:
+  text_extraction:
+    model: gpt-5
+    template_path: prompts/text_extraction_groups.jinja2
+  meaningfulness:
+    model: gpt-5
+    template_path: prompts/image_meaningfulness.jinja2
+  crop:
+    model: gpt-5
+    template_path: prompts/image_crop_storybook.jinja2
+    recrop_template_path: prompts/image_recrop_storybook.jinja2
+    recrops: 2
+  caption:
+    model: gpt-5
+    template_path: prompts/image_caption.jinja2
+  page_sectioning:
+    model: gpt-5
+    template_path: prompts/page_sectioning_by_page.jinja2
+    max_retries: 10
+  section_explanation:
+    model: gpt-5
+    template_path: prompts/section_explanation.jinja2
+  text_translation:
+    model: gpt-5
+    template_path: prompts/text_translation.jinja2
+  glossary_translation:
+    model: gpt-5
+    template_path: prompts/glossary_translation.jinja2
+  section_glossary:
+    model: gpt-5
+    template_path: prompts/section_glossary.jinja2
+  section_metadata:
+    model: gpt-5
+    template_path: prompts/section_metadata.jinja2
+  text_easy_read:
+    model: gpt-5
+    template_path: prompts/text_easy_read.jinja2
+  speech_generation:
+    model: gpt-4o-mini-tts
+    template_path: prompts/speech_generation.jinja2
+</pre>
+</div>
+</main>
+
+            <!-- Footer -->
+            
+            
+        </div>
+    </div>
+</body>
+</html>
