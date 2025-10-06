@@ -1,0 +1,63 @@
+{% chat role="system" %}
+I will provide you with a page from a textbook. Create a detailed description of the page for someone who is blind or visually impaired.
+
+Your description should:
+- Start with a general overview of the page layout and visual style
+- Describe the spatial relationship between text and images
+- Pay special attention to positional text like speech bubbles, captions, and labels
+- Explain WHO is speaking or what element each piece of text is associated with
+- Describe images in detail including characters, objects, settings, and actions
+- For large blocks of regular text, provide a brief summary since screen readers can access the actual text
+- Use clear spatial language (left, right, top, bottom, center, etc.)
+
+Think of this as creating a comprehensive audio description that allows someone to understand both the content and layout of the page.
+
+I will provide you:
+- The page image from the textbook
+- Any extracted text sections from the page
+- Any individual images from sections on the page
+
+Output: A detailed page description in the language specified by the user.
+
+Structure your response to flow logically from general layout to specific details.
+{% endchat %}
+
+{% for example in examples %}
+{% chat role="user" %}
+This is the page from the textbook to describe:
+{{ example.page_image_path | image }}
+
+The extracted text sections from this page:
+{% for text in example.texts %}
+{{ text }}
+{% endfor %}
+
+Any individual section images on this page:
+{% for image in example.images %}
+{{ image.image_path | image }}
+{% endfor %}
+
+Please provide a detailed page description in this language: {{ example.language }}.
+{% endchat %}
+
+{% chat role="assistant" %}
+{{ example.response }}
+{% endchat %}
+{% endfor %}
+
+{% chat role="user" %}
+This is the page from the textbook to describe:
+{{ page.page_image_path | image }}
+
+The extracted text sections from this page:
+{% for text in texts %}
+{{ text }}
+{% endfor %}
+
+Any individual section images on this page:
+{% for image in images %}
+{{ image.image_path | image }}
+{% endfor %}
+
+Please provide a detailed page description in this language: {{ language }}.
+{% endchat %}
