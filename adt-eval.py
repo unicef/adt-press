@@ -73,7 +73,7 @@ def load_config() -> Dict[str, Any]:
 
 def get_tasks_to_run(config: Dict[str, Any]) -> List[str]:
     """Determine which tasks to run based on configuration."""
-    tasks_to_run = config.get("tasks_to_run", [])
+    tasks_to_run = config.get("tasks", [])
 
     # If empty list, run all available tasks
     if not tasks_to_run:
@@ -91,10 +91,10 @@ def get_tasks_to_run(config: Dict[str, Any]) -> List[str]:
 
 def get_task_config(base_config: Dict[str, Any], task: str) -> Dict[str, Any]:
     """Extract task-specific configuration."""
-    if task not in base_config["eval"]["tasks"]:
+    if task not in base_config["eval"]["task_configs"]:
         raise ValueError(f"Task '{task}' not found in eval_config.yaml")
 
-    return base_config["eval"]["tasks"][task]
+    return base_config["eval"]["task_configs"][task]
 
 
 async def run_task(task: str, global_config: Dict[str, Any], output_dir: Path) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
