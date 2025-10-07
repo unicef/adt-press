@@ -93,8 +93,16 @@ export const gatherAudioElements = () => {
         .filter(el => {
             const isNavElement = el.closest('.nav__list') !== null;
             const isImage = el.tagName.toLowerCase() === 'img';
-            // Exclude ELI5 sections
-            return !isNavElement && !el.getAttribute('data-id')?.startsWith?.('sectioneli5');
+            const dataId = el.getAttribute('data-id');
+            
+            // Exclude ELI5 description elements unless ELI5 mode is active
+            const isEli5Description = dataId?.endsWith?.('_eli5');
+            if (isEli5Description && !state.eli5Mode) {
+                return false;
+            }
+            
+            // Exclude old sectioneli5 format (if any exist)
+            return !isNavElement && !dataId?.startsWith?.('sectioneli5');
         })
         .map(el => {
             const tagName = el.tagName.toLowerCase();

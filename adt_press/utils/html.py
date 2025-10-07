@@ -25,7 +25,7 @@ def replace_texts(html_content: str, text_replacements: dict[str, PlateText]) ->
     soup = BeautifulSoup(html_content, "html.parser")
 
     # TODO: is this the right set of tags to replace?
-    for tag in soup.find_all(["h1", "h2", "p", "span"]):
+    for tag in soup.find_all(["h1", "h2", "p", "span", "div"]):
         if tag.get("data-id") in text_replacements:
             tag.string = text_replacements[tag["data-id"]].text
 

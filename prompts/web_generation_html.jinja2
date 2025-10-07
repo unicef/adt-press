@@ -12,16 +12,18 @@ IMPORTANT, THE GENERATED HTML MUST:
 2. You may exclude text if it does not makes sense in the section. The entire text and its text id provided must be excluded.
 3. THERE MUST BE ONE AND ONLY ONE `<section />` IN THE HTML.
 4. There MUST be an id="content" attribute on the main content container, which is a div tag, and this div MUST have the "container" class.
-5. There MUST be a role="article" or role="activity" on the `<section />` in the html based on the section type.
-6. All elements with text MUST have "data-id" attribute that is set to the text id.
-7. All elements that you add a data-id="text-x-x" attribute to MUST have a string as their immediate children AND NOT ANY OTHER HTML TAGS. For example,
+5. IMMEDIATELY AFTER the opening container div tag, there MUST be a hidden ELI5 description div: `<div class="sr-only" data-id="{{ section.section_id }}_eli5" aria-label="Section description" aria-hidden="true"></div>`
+6. The `<section />` element MUST have a `data-eli5-id="{{ section.section_id }}_eli5"` attribute.
+7. There MUST be a role="article" or role="activity" on the `<section />` in the html based on the section type.
+8. All elements with text MUST have "data-id" attribute that is set to the text id.
+9. All elements that you add a data-id="text-x-x" attribute to MUST have a string as their immediate children AND NOT ANY OTHER HTML TAGS. For example,
     - <p data-id="txt-x-x">This is a paragraph</p> # OK
     - <strong><p data-id="txt-x-x">This is a paragraph</p></strong> # OK
     - <p data-id="txt-x-x"><strong>This is a paragraph</strong></p> # NOT OK
-8. DO NOT USE ANY PLACEHOLDER IMAGE TAGS IF I DID NOT PROVIDE IMAGES. YOU CAN ONLY INCLUDE IMAGE TAGS WHEN I PROVIDE YOU IMAGES.
-9. For `textarea` and `input` (with type=text) tags, you must generate an appropriate placeholder text where necessary. THIS PLACEHOLDER MUST BE IN THIS LANGUAGE: {{ language }}.
-10. You can change the text color, but make sure it is readable against the background color.
-11. DO NOT USE ANY OTHER DATA-IDS OTHER THAN THE ONES I PROVIDED.
+10. DO NOT USE ANY PLACEHOLDER IMAGE TAGS IF I DID NOT PROVIDE IMAGES. YOU CAN ONLY INCLUDE IMAGE TAGS WHEN I PROVIDE YOU IMAGES.
+11. For `textarea` and `input` (with type=text) tags, you must generate an appropriate placeholder text where necessary. THIS PLACEHOLDER MUST BE IN THIS LANGUAGE: {{ language }}.
+12. You can change the text color, but make sure it is readable against the background color.
+13. DO NOT USE ANY OTHER DATA-IDS OTHER THAN THE ONES I PROVIDED (except for the ELI5 div which uses `{{ section.section_id }}_eli5`).
 
 IMPORTANT NOTES FOR IMAGE TAGS:
 1. Do not include an image in the html if I did not provide an image with an id associated with it.
@@ -34,10 +36,12 @@ This is an example HTML output (YOU CAN REMOVE ANY ELEMENTS OR EDIT ANY ELEMENTS
 These is when I've provided images and text with the following ids: img-26-2, text-26-0, text-26-1, text-26-2, text-26-3, text-26-4
 
 <!-- The main div content container, EVERYTHING CAN BE EDITED, DELETED, OR ADDITIONAL ELEMENTS ADDED AS REQUIRED but there must always be a section tag -->
-<div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content"> 
-    <h1 class="text-4xl font-bold text-green-600 text-center mb-8" data-id="text-26-0">La bióloga keniana Wangari Maathai</h1>
+<div class="container content mx-auto bg-white max-w-5xl p-5 rounded-lg shadow-lg lg:px-24 md:px-12 sm:px-6" id="content">
+    <!-- Hidden ELI5 description div - REQUIRED as first child -->
+    <div class="sr-only" data-id="{{ section.section_id }}_eli5" aria-label="Section description" aria-hidden="false"></div>
     <!-- THERE MUST ALWAYS BE A SECTION TAG -->
-    <section id="simple-main" role="article" data-section-type="text-and-images">
+    <section id="simple-main" role="article" data-section-type="text-and-images" data-eli5-id="{{ section.section_id }}_eli5">
+        <h1 class="text-4xl font-bold text-green-600 text-center mb-8" data-id="text-26-0">La bióloga keniana Wangari Maathai</h1>
         <div class="flex flex-col md:flex-row items-start space-x-4" role="article">
             <div class="w-64 h-auto flex-shrink-0 object-cover mb-6 md:mb-0 md:mr-6">
                 <img data-id="img-26-2" alt="Placeholder" class="w-full h-auto rounded-lg"

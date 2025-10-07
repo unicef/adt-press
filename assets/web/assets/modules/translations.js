@@ -248,20 +248,26 @@ const applyTranslationToPlaceholders = (key, translationKey) => {
  * @private
  */
 const handleEli5Translation = () => {
-    if (state.eli5Mode) {
-        const mainSection = document.querySelector(
-            'section[data-id^="sectioneli5"]'
-        );
-        if (mainSection) {
-            const eli5Id = mainSection.getAttribute("data-id");
-            const eli5Text = state.translations[eli5Id];
+    // Find the section with data-eli5-id attribute
+    const mainSection = document.querySelector('section[data-eli5-id]');
+    if (!mainSection) {
+        return;
+    }
 
-            if (eli5Text) {
-                const eli5Container = document.getElementById("eli5-content-text");
-                if (eli5Container) {
-                    eli5Container.innerHTML = eli5Text;
-                }
-            }
+    const eli5Id = mainSection.getAttribute("data-eli5-id");
+    const eli5Text = state.translations[eli5Id];
+
+    if (eli5Text) {
+        // Find the hidden ELI5 description div
+        const eli5DescriptionDiv = document.querySelector(`div[data-id="${eli5Id}"]`);
+        if (eli5DescriptionDiv) {
+            eli5DescriptionDiv.textContent = eli5Text;
+        }
+
+        // Also update the old popup container if it exists (for backward compatibility)
+        const eli5Container = document.getElementById("eli5-content-text");
+        if (eli5Container) {
+            eli5Container.innerHTML = `<span data-id="${eli5Id}">${eli5Text}</span>`;
         }
     }
 };

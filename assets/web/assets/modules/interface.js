@@ -1129,6 +1129,26 @@ export const loadStateMode = () => {
 };
 
 /**
+ * Loads the ELI5 mode state from cookies and updates UI.
+ */
+export const loadEli5Mode = () => {
+  const eli5ModeCookie = getCookie("eli5Mode");
+  
+  // Only apply state if the cookie has a value
+  if (eli5ModeCookie !== "" && eli5ModeCookie !== null) {
+    const isEnabled = eli5ModeCookie === "true";
+    setState("eli5Mode", isEnabled);
+    setCookie("eli5Mode", isEnabled ? "true" : "false", 7);
+    toggleButtonState("toggle-eli5", isEnabled);
+  } else {
+    // Set default state - ELI5 disabled by default
+    setState("eli5Mode", false);
+    setCookie("eli5Mode", "false", 7);
+    toggleButtonState("toggle-eli5", false);
+  }
+};
+
+/**
  * Initializes the play bar based on state and cookies.
  * Shows or hides the play bar as needed.
  */

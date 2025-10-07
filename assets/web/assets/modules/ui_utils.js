@@ -488,6 +488,7 @@ export const toggleEli5Mode = () => {
 
 /**
  * Initializes ELI5 UI elements and ensures accessibility.
+ * Should be called after loadEli5Mode() to ensure state is loaded.
  */
 export const initializeEli5 = () => {
     // Show the explain-me-button if it exists and is hidden
@@ -512,6 +513,16 @@ export const initializeEli5 = () => {
         eli5Container.classList.remove("hidden");
         eli5Container.setAttribute('aria-hidden', 'false');
     }
+
+    // Set initial aria-hidden state for ELI5 description div based on current mode
+    // This will be correct because loadEli5Mode() is called before this function
+    const eli5DescriptionDiv = document.querySelector('div[data-id$="_eli5"]');
+    if (eli5DescriptionDiv) {
+        eli5DescriptionDiv.setAttribute('aria-hidden', state.eli5Mode ? 'false' : 'true');
+    }
+    
+    // Apply the ELI5 mode toggle to update content visibility
+    handleEli5ModeToggle();
 }
 
 /**
@@ -592,6 +603,12 @@ const handleEli5ModeToggle = () => {
         if (explainButton) {
             explainButton.classList.remove('hidden');
         }
+
+        // Make the ELI5 description div accessible when ELI5 mode is active
+        const eli5DescriptionDiv = document.querySelector(`div[data-id="${eli5Id}"]`);
+        if (eli5DescriptionDiv) {
+            eli5DescriptionDiv.setAttribute('aria-hidden', 'false');
+        }
     } else {
 
         clearEli5Content();
@@ -599,6 +616,12 @@ const handleEli5ModeToggle = () => {
 
         if (explainButton) {
             explainButton.classList.add('hidden');
+        }
+
+        // Hide the ELI5 description div from screen readers when ELI5 mode is off
+        const eli5DescriptionDiv = document.querySelector('div[data-id$="_eli5"]');
+        if (eli5DescriptionDiv) {
+            eli5DescriptionDiv.setAttribute('aria-hidden', 'true');
         }
     }
 };

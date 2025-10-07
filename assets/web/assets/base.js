@@ -36,6 +36,7 @@ import {
   initializeNavigation,
   toggleStateMode,
   loadStateMode,
+  loadEli5Mode,
   toggleSignLanguageMode,
   loadSignLanguageMode,
   adjustLayout,
@@ -630,6 +631,9 @@ async function initializeUIComponents() {
       if (isFeatureEnabled('easyRead')) stateInitTasks.push(loadEasyReadMode);
       // Always load state mode to maintain consistency, regardless of button visibility
       stateInitTasks.push(loadStateMode);
+      if (isFeatureEnabled('eli5')) {
+        stateInitTasks.push(loadEli5Mode);
+      }
       if (isFeatureEnabled('signLanguage')) {
         initializeSignLanguage();
         stateInitTasks.push(loadSignLanguageMode);

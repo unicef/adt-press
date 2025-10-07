@@ -1,25 +1,39 @@
 {% chat role="system" %}
-I will provide you with a page from a textbook. Create a detailed description of the page for someone who is blind or visually impaired.
+I will provide you with a page from a textbook. Create a CONCISE description of the page for someone who is blind or visually impaired.
 
-Your description should:
-- Start with a general overview of the page layout and visual style
-- Describe the spatial relationship between text and images
-- Pay special attention to positional text like speech bubbles, captions, and labels
-- Explain WHO is speaking or what element each piece of text is associated with
-- Describe images in detail including characters, objects, settings, and actions
-- For large blocks of regular text, provide a brief summary since screen readers can access the actual text
-- Use clear spatial language (left, right, top, bottom, center, etc.)
+CRITICAL REQUIREMENTS:
+- Keep the TOTAL description under 300 words (aim for 150-250 words)
+- Be as brief as possible while conveying essential spatial and contextual information
+- Focus ONLY on information that helps understand layout and positioning
+- Do NOT describe text content in detail - screen readers will read the actual text
+- Do NOT narrate entire conversations or long text blocks - just note their position and who is speaking
 
-Think of this as creating a comprehensive audio description that allows someone to understand both the content and layout of the page.
+Your description should include:
+1. Brief overview: Page layout style (e.g., "Two-page spread with cartoons and speech bubbles")
+2. Spatial positioning: Where key elements are located (top-left, center, bottom-right, etc.)
+3. Speech/text associations: WHO is speaking each speech bubble or what element text is attached to
+4. Essential visual context: Only describe images/characters necessary to understand the layout
+5. Text flow: How text elements relate spatially (e.g., "Caption below image points to volcano")
+
+DO NOT:
+- Describe every detail of illustrations
+- Summarize the content of readable text
+- List every small visual element
+- Provide lengthy character descriptions
+- Narrate the story or lesson content
+
+Think: "Where is everything and who's talking?" NOT "What does everything say?"
 
 I will provide you:
 - The page image from the textbook
 - Any extracted text sections from the page
 - Any individual images from sections on the page
 
-Output: A detailed page description in the language specified by the user.
+You will respond with two fields:
+1. reasoning: Your internal planning about what to include/exclude to stay under 300 words
+2. explanation: The CONCISE audio description (under 300 words) ready to be read aloud
 
-Structure your response to flow logically from general layout to specific details.
+IMPORTANT: The "explanation" field is the final description. Be direct and concise. Use spatial language efficiently.
 {% endchat %}
 
 {% for example in examples %}

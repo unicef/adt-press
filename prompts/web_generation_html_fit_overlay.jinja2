@@ -22,6 +22,8 @@ You receive:
 
 **Data Attributes:**
 - Main container: `id="content"` with `class="container"`
+- Hidden ELI5 div: MUST be first child of container with `class="sr-only"`, `data-id="{{ section.section_id }}_eli5"`, `aria-label="Section description"`, and `aria-hidden="true"` 
+- Section element: MUST include `data-eli5-id="{{ section.section_id }}_eli5"` attribute
 - All text elements: `data-id` attribute matching provided text IDs
 - All images: `data-id` attribute matching provided image IDs
 - Text elements with data-id must have string children only (no nested HTML tags)
@@ -137,7 +139,9 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **SIDE-BY-SIDE LAYOUT:**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-[70vh] max-h-[90vh] p-6 overflow-hidden bg-white" id="content">
-    <section id="simple-main" role="article" class="h-full flex flex-col lg:flex-row gap-6">
+    <!-- Hidden ELI5 description div - REQUIRED as first child -->
+    <div class="sr-only" data-id="{{ section.section_id }}_eli5" aria-label="Section description" aria-hidden="false"></div>
+    <section id="simple-main" role="article" data-eli5-id="{{ section.section_id }}_eli5" class="h-full flex flex-col lg:flex-row gap-6">
         <!-- IMAGE CONTAINER -->
         <div class="lg:w-3/5 flex-shrink-0 flex items-center justify-center">
             <img data-id="[IMAGE_ID]" alt="[ALT_TEXT]" 
@@ -156,7 +160,9 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **SINGLE-PAGE OVERLAY LAYOUT:**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-screen overflow-auto lg:min-h-[70vh] lg:max-h-[90vh] lg:overflow-hidden p-6 bg-white" id="content">
-    <section id="simple-main" role="article" class="h-full flex items-center justify-center">
+    <!-- Hidden ELI5 description div - REQUIRED as first child -->
+    <div class="sr-only" data-id="{{ section.section_id }}_eli5" aria-label="Section description" aria-hidden="true"></div>
+    <section id="simple-main" role="article" data-eli5-id="{{ section.section_id }}_eli5" class="h-full flex items-center justify-center">
         <div class="relative flex items-center justify-center w-full h-full">
             <img data-id="[IMAGE_ID]" alt="[ALT_TEXT]" 
                  class="w-full h-auto max-h-[90vh] object-contain rounded-lg"
@@ -181,7 +187,9 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **SINGLE-PAGE OVERLAY with TWO IMAGES (responsive):**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-screen overflow-auto lg:min-h-[70vh] lg:max-h-[90vh] lg:overflow-hidden p-6 bg-white" id="content">
-    <section id="simple-main" role="article" class="h-full flex items-center justify-center">
+    <!-- Hidden ELI5 description div - REQUIRED as first child -->
+    <div class="sr-only" data-id="{{ section.section_id }}_eli5" aria-label="Section description" aria-hidden="true"></div>
+    <section id="simple-main" role="article" data-eli5-id="{{ section.section_id }}_eli5" class="h-full flex items-center justify-center">
         <div class="relative w-full h-full">
             <div class="flex flex-col md:flex-row items-center justify-center w-full h-full">
                 <div class="w-full md:w-1/2 h-full flex items-center justify-center">
