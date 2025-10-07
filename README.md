@@ -95,13 +95,13 @@ Once the environment is set, you can run the adt-eval.py tool the same as the ad
 uv run adt-eval.py
 ```
 
-This will create new reports under `output/eval`, start at `output/index.html`
+This will create new reports with results against the gold standard in the output directory. Start at `index.html`.
 
 Alternatively, you can configure various options from the command line, look in `config/eval_config.yml` for a full list. (as well as `config/config.yml` for global options)
 
 ```bash
 // limit to only run the first 10 test cases and only the text_extraction task
-uv run adt-eval.py label=eval3 eval.limit=10 tasks=text_extraction
+uv run adt-eval.py label=eval3 eval.limit=10 eval.tasks=text_extraction
 ```
 
 ## Development
