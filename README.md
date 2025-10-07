@@ -78,6 +78,32 @@ The application generates the following outputs in the `output/[your label]` dir
 - HTML reports with analysis results
 - Visualization of the processing pipeline
 
+## Evalation Framework
+
+adt-press includes an evaluation tool used for measuring performance of the various LLM tasks against a gold standard. To run the tool make sure you have the following environment variables set:
+
+```bash
+LABEL_STUDIO_URL=https://[Your LabelStudio endpoint]
+LABEL_STUDIO_KEY=[Your LabelStudio API key]
+AZURE_STORAGE_ACCOUNT_NAME=[Azure storage account name]
+AZURE_STORAGE_ACCOUNT_KEY=[Azure storage account key]
+MLFLOW_TRACKING_URI=https://[MLFlow endpoint URL] (optional)
+```
+
+Once the environment is set, you can run the adt-eval.py tool the same as the adt-press.py tool, by default, output is put in `output/eval`
+```bash
+uv run adt-eval.py
+```
+
+This will create new reports under `output/eval`, start at `output/index.html`
+
+Alternatively, you can configure various options from the command line, look in `config/eval_config.yml` for a full list. (as well as `config/config.yml` for global options)
+
+```bash
+// limit to only run the first 10 test cases and only the text_extraction task
+uv run adt-eval.py label=eval3 eval.limit=10 tasks=text_extraction
+```
+
 ## Development
 
 ### Code Style
