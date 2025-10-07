@@ -1,0 +1,3 @@
+{% for task in tasks %}
+{% with task_metrics = metrics[task] %}{% with task_results = results[task] %}{{ task }} - {{ task_results|list|length }} tests - {{ (task_metrics.score * 100) | round | int }}%
+{% endwith %}{% endwith %}{% endfor %}

@@ -23,6 +23,8 @@ from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
 from adt_eval.text_extraction import TextExtractionEvaluator
+from adt_press.models.config import TemplateConfig
+from adt_press.utils.html import render_template
 
 # Registry of available evaluators
 EVALUATORS = {
@@ -139,6 +141,15 @@ async def main():
             all_metrics[task] = metrics
 
             print(f"✓ {task}: {len(results)} cases, {metrics['score']:.1%} score")
+
+        context = {
+            "tasks": tasks_to_run,
+            "metrics": all_metrics,
+            "results": all_results,
+        }
+
+        render_template(TemplateConfig(output_dir=str(output_dir)), "eval/index.html", context)
+        render_template(TemplateConfig(output_dir=str(output_dir)), "eval/results.txt", context)
 
         print("\nAll evaluations complete!")
         print(f"Reports generated in: {output_dir}")
