@@ -26,7 +26,7 @@ def copy_interface_translations(run_output_dir_config: str, languages: list[str]
 def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> None:
     """Install only the required language dictionaries to the output directory using npm."""
     adt_dir = os.path.join(run_output_dir_config, "adt")
-    dictionaries_dir = os.path.join(adt_dir, "assets", "dictionaries")
+    dictionaries_dir = os.path.join(adt_dir, "assets", "libs", "dictionaries")
 
     # Remove existing dictionaries
     if os.path.exists(dictionaries_dir):
@@ -64,11 +64,15 @@ def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> No
         except subprocess.CalledProcessError as e:
             print(f"Warning: Could not install dictionary for language '{language}': {e}")
             # Fallback to copying from local assets if npm install fails
-            source_lang_dir = os.path.join("assets", "web", "assets", "dictionaries", language)
+            source_lang_dir = os.path.join(
+                "assets", "web", "assets", "libs", "dictionaries", language
+            )
             target_lang_dir = os.path.join(dictionaries_dir, language)
             
             if os.path.exists(source_lang_dir):
-                shutil.copytree(source_lang_dir, target_lang_dir, dirs_exist_ok=True)
+                shutil.copytree(
+                    source_lang_dir, target_lang_dir, dirs_exist_ok=True
+                )
 
 def copy_web_assets(run_output_dir_config: str) -> None:
     """Copy web assets to the output directory, excluding interface_translations and not overwriting config.json."""
