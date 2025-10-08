@@ -82,6 +82,10 @@ layout_types:
   textbook_activity:
     description: "Activity or workbook pages with interactive elements, fill-in-blanks, exercises, and structured activity layouts."
     render_strategy: html
+  
+  other:
+    description: "Pages that do not fit into the other defined layout types, requiring custom handling."
+    render_strategy: html
 
 render_strategies:
   single_column:
