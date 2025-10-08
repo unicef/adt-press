@@ -94,8 +94,8 @@
     <button id="play-pause-button"
         class="bg-white rounded-full p-3 shadow-md w-12 h-12 flex items-center justify-center text-gray-700 hover:text-gray-900"
         aria-label="Activate text to speech">
-        <i class="fas fa-play text-xl ml-1" id="read-aloud-play-icon"></i>
-        <i class="fas fa-pause text-xl hidden" id="read-aloud-pause-icon"></i>
+        <i class="fas fa-play text-xl ml-1" id="read-aloud-play-icon" aria-hidden="false"></i>
+        <i class="fas fa-pause text-xl" id="read-aloud-pause-icon" style="display: none;" aria-hidden="true"></i>
     </button>
 
     <button type="button" id="audio-next" class="text-gray-700 hover:text-gray-900" aria-label="Go to next audio"
