@@ -64,6 +64,10 @@ addopts = ["-v", "--tb=short"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+filterwarnings = [
+    "ignore::UserWarning:pydantic.*",
+    "ignore::pytest.PytestReturnNotNoneWarning"
+]
 
 [tool.coverage.run]
 omit = ["config.py", "config-3.py"]
