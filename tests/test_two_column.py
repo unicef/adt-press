@@ -11,7 +11,7 @@ def test_single_column_validation():
     # Create a single column layout with image
     single_column_data = {
         "rows": [{"columns": [{"span": 5, "background_color": "#ffffff", "color": "#000000", "parts": ["img_1"]}]}],
-        "reasoning": "Single column layout is acceptable for image-only content"
+        "reasoning": "Single column layout is acceptable for image-only content",
     }
 
     # Create validation context with only image IDs (no text)
@@ -32,7 +32,7 @@ def test_single_column_with_text_should_fail():
     # Create a single column layout
     single_column_data = {
         "rows": [{"columns": [{"span": 5, "background_color": "#ffffff", "color": "#000000", "parts": ["img_1"]}]}],
-        "reasoning": "Single column layout should be rejected when text is present"
+        "reasoning": "Single column layout should be rejected when text is present",
     }
 
     # Create validation context WITH text IDs - should fail

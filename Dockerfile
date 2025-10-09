@@ -3,18 +3,14 @@ FROM python:3.13-slim
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies for graphviz, opencv, cairo, and arrow
+# Install system dependencies for graphviz, opencv, cairo
 RUN apt-get update && apt-get install -y \
     graphviz \
     libgl1 \
     gcc \
-    build-essential \
     libcairo2-dev \
     pkg-config \
     python3-dev \
-    libarrow-dev \
-    libarrow-glib-dev \
-    libparquet-dev \
     npm \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
