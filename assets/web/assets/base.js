@@ -653,7 +653,7 @@ async function initializeUIComponents() {
       } else {
         updateTtsOptionsContainerVisibility(false);
       }
-      // if (isFeatureEnabled('glossary')) stateInitTasks.push(loadGlossaryState);
+      if (isFeatureEnabled('glossary')) stateInitTasks.push(loadGlossaryState);
       if (isFeatureEnabled('eli5')) {
         handleEli5Popup();
       }
