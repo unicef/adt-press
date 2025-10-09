@@ -6,7 +6,7 @@ from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateSection
-from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionQuiz
 from adt_press.models.speech import SpeechFile
 from adt_press.models.text import EasyReadText, OutputText, PageText, PageTextGroup, PageTexts
 from adt_press.models.web import WebPage
@@ -24,6 +24,22 @@ def report_processed_images(template_config: TemplateConfig, processed_images: l
 def report_pruned_images(template_config: TemplateConfig, pruned_images: list[PrunedImage]) -> str:
     return render_template(template_config, "templates/pruned_images.html", dict(images=pruned_images))
 
+@cache(behavior="recompute")
+def report_quizzes(
+    template_config: TemplateConfig,
+    pdf_pages: list[Page],
+    sections_by_page_id: dict[str, PageSections],
+    quizzes_by_section_id: dict[str, SectionQuiz],
+) -> str:
+    return render_template(
+        template_config,
+        "templates/quiz_report.html",
+        dict(
+            pages=pdf_pages,
+            quizzes=quizzes_by_section_id,
+            sections=sections_by_page_id,
+        ),
+    )
 
 @cache(behavior="recompute")
 def report_pages(

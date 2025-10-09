@@ -43,3 +43,10 @@ class PageSections(BaseModel):
     page_id: str
     sections: list[PageSection]
     reasoning: str
+
+class SectionQuiz(BaseModel):
+    section_id: str | None
+    question: str
+    options: list[str]
+    answer: str
+    explanations: list[str]
