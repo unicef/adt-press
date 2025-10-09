@@ -1,9 +1,9 @@
-label: "momo-storybook"
-pdf_path: "assets/momo.pdf"
+label: "???"
+pdf_path: "???"
 
 input_language: en
 plate_language: en
-output_languages: [en, fr]
+output_languages: [en]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -12,31 +12,31 @@ clear_cache: false
 print_available_models: false
 
 # our strategy for cropping, either llm or none
-crop_strategy: none
+crop_strategy: llm
 
 # our glossary strategy, either llm or none
-glossary_strategy: none
+glossary_strategy: llm
 
 # our explanation strategy, either llm or none
-explanation_strategy: none
+explanation_strategy: llm
 
 # our easy read strategy, either llm or none
-easy_read_strategy: none
+easy_read_strategy: llm
 
 # our caption strategy, either llm or none
-caption_strategy: none
+caption_strategy: llm
 
 # our TTS / speech strategy, either tts or none
-speech_strategy: none
+speech_strategy: tts
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
 # the default model used for all prompts, unless overridden in a specific prompt config
-default_model: gpt-4o
+default_model: gpt-5
 
 # what strategy is used to render sections into web pages, dynamic will choose based on layout type
-render_strategy: two_column
+render_strategy: dynamic
 
 layout_types:
   single_column:
@@ -95,7 +95,7 @@ render_strategies:
 
 page_range:
   start: 0
-  end: 5
+  end: 0
 
 image_filters:
   size:
