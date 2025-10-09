@@ -86,5 +86,9 @@
     "notepad-save-button": "Save notes",
     "notepad-save-success": "Notes saved successfully!",
     "notepad-close-label": "Close notepad",
-    "eli5-no-content": "No explanation available."
+    "eli5-no-content": "No explanation available.",
+    "validation-inappropriate-language": "Inappropriate language",
+    "validation-check-spelling": "Check your spelling",
+    "validation-write-appropriate": "Please write in English and use appropriate language",
+    "validation-error": "Validation error"
 }

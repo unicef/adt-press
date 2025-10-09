@@ -357,7 +357,7 @@ const provideFeedbackForProfanity = (input) => {
     // Create feedback element
     const feedback = createFeedbackElement();
     feedback.classList.add("text-red-600");
-    feedback.textContent = translateText("Lenguaje inapropiado") || "Lenguaje inapropiado";
+    feedback.textContent = translateText("validation-inappropriate-language") || "Inappropriate language";
     feedback.style.display = "block";
     feedback.style.width = "100%";
     feedback.style.textAlign = "left";
@@ -374,7 +374,7 @@ const provideFeedbackForProfanity = (input) => {
     
     // Add ARIA attributes for accessibility
     input.setAttribute("aria-invalid", "true");
-    input.setAttribute("aria-label", `${input.value} - ${translateText("Lenguaje inapropiado") || "Lenguaje inapropiado"}`);
+    input.setAttribute("aria-label", `${input.value} - ${translateText("validation-inappropriate-language") || "Inappropriate language"}`);
     input.setAttribute("data-has-profanity-feedback", "true");
 
     // Ensure input has proper padding if we're going to add an icon
@@ -493,7 +493,7 @@ const provideFeedbackForGibberish = (input) => {
 
     const feedback = createFeedbackElement();
     feedback.classList.add("text-orange-500");
-    feedback.textContent = translateText("Revisa las palabras") || "Revisa las palabras";
+    feedback.textContent = translateText("validation-check-spelling") || "Check your spelling";
     feedback.style.display = "block";
     feedback.style.width = "100%";
     feedback.style.textAlign = "left";
@@ -507,7 +507,7 @@ const provideFeedbackForGibberish = (input) => {
     
     // Add ARIA attributes for accessibility
     input.setAttribute("aria-invalid", "true");
-    input.setAttribute("aria-label", `${input.value} - ${translateText("Revisa las palabras") || "Revisa las palabras"}`);
+    input.setAttribute("aria-label", `${input.value} - ${translateText("validation-check-spelling") || "Check your spelling"}`);
     input.setAttribute("data-has-gibberish-feedback", "true"); // Mark this input as having gibberish feedback
     
     // Ensure input has proper padding if we're going to add an icon
@@ -770,8 +770,8 @@ const updateActivityFeedback = (isValid, unfilledCount, hasInappropriateContent)
             toast.classList.add("text-orange-700");
 
             // Since both gibberish and profanity are merged into one flag now
-            toast.textContent = translateText("Por favor, escribe en español y usa lenguaje apropiado") ||
-                "Por favor, escribe en español y usa lenguaje apropiado";
+            toast.textContent = translateText("validation-write-appropriate") ||
+                "Please use appropriate language";
 
             setTimeout(() => {
                 toast.classList.add("hidden");
