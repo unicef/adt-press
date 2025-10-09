@@ -38,7 +38,7 @@ class TextExtractionEvaluator(BaseEvaluator):
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
         # Call the LLM for text extraction
-        page_texts = await get_page_text(self.prompt_config, page)
+        page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
         result["page_texts"] = page_texts.model_dump()
 
         # Index actual results by text content

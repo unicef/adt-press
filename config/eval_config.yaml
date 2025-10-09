@@ -5,16 +5,16 @@ label: eval
 eval:
 
   # limit to only this many tests per task
-  limit: 10
+  limit: 9999
 
   # our rate limit (per minute) on calls to the LLM
   rate_limit: 300
 
   # Tasks to run (empty list means run all available tasks)
-  tasks_to_run: []
+  tasks: []
 
   # Task-specific configurations
-  tasks:
+  task_configs:
     text_extraction:
       label_studio_project_name: "A2: Text Type"
       model: ${default_model}
