@@ -17,13 +17,10 @@ def test_single_column_validation():
         "image_ids": ["img_1"],
     }
 
-    try:
-        GenerationResponse.model_validate(single_column_data, context=validation_context)
-        print("✅ Single column validation PASSED")
-        return True
-    except Exception as e:
-        print(f"❌ Single column validation FAILED: {e}")
-        return False
+    # Should not raise an exception
+    result = GenerationResponse.model_validate(single_column_data, context=validation_context)
+    assert result is not None
+    print("✅ Single column validation PASSED")
 
 
 def test_single_column_with_text_should_fail():
@@ -38,21 +35,17 @@ def test_single_column_with_text_should_fail():
         "image_ids": ["img_1"],
     }
 
+    # Should raise a validation exception
     try:
         GenerationResponse.model_validate(single_column_data, context=validation_context)
-        print("❌ Single column with text validation FAILED - should have been rejected")
-        return False
+        assert False, "Single column with text should have been rejected"
     except Exception as e:
         print(f"✅ Single column with text correctly REJECTED: {e}")
-        return True
+        assert True  # Expected to fail
 
 
 if __name__ == "__main__":
     print("Testing single column validation...")
-    test1 = test_single_column_validation()
-    test2 = test_single_column_with_text_should_fail()
-
-    if test1 and test2:
-        print("\n🎉 All validation tests passed!")
-    else:
-        print("\n💥 Some validation tests failed!")
+    test_single_column_validation()
+    test_single_column_with_text_should_fail()
+    print("\n🎉 All validation tests passed!")
