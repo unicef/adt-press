@@ -25,7 +25,10 @@ jobs:
       uses: astral-sh/setup-uv@v6
 
     - name: Install dependencies
-      run: sudo apt install libcairo2-dev pkg-config python3-dev build-essential
+      run: |
+          sudo apt update
+          sudo apt install -y libcairo2-dev pkg-config python3-dev build-essential
+          sudo apt install -y libarrow-dev libarrow-glib-dev libparquet-dev
 
     - name: Update lockfile
       run: uv lock
