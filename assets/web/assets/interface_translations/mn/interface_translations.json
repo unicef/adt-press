@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "шинэ хүртээмжтэй форматаар!",
   "tutorial-welcome-emoji-label": "Гараа даллах эможи",
   "tutorial-welcome-title": "Хүртээмжтэй дижитал сурах бичигт тавтай морилно уу",
-  "username-label": "Хэрэглэгчийн нэр"
+  "username-label": "Хэрэглэгчийн нэр",
+  "validation-inappropriate-language": "Тохиромжгүй хэллэг",
+  "validation-check-spelling": "Тэмдэглэлийн алдааг шалгана уу",
+  "validation-write-appropriate": "Тохиромжтой хэлээр бичиж, тохиромжтой хэллэг ашиглана уу",
+  "validation-error": "Баталгаажуулалтын алдаа"
 }

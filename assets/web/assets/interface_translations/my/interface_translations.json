@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "၎င်း၏ လက်လှမ်းမီမှု ပုံစံသစ်တွင်!",
   "tutorial-welcome-emoji-label": "လက်လှမ်းပြ emoji",
   "tutorial-welcome-title": "လက်လှမ်းမီမှုရှိသော ဒစ်ဂျစ်တယ် စာအုပ်သို့ ကြိုဆိုပါသည်",
-  "username-label": "အသုံးပြုသူအမည်"
+  "username-label": "အသုံးပြုသူအမည်",
+  "validation-inappropriate-language": "မသင့်လျော်သောဘာသာစကား",
+  "validation-check-spelling": "သင်၏စာလုံးပေါင်းကိုစစ်ဆေးပါ",
+  "validation-write-appropriate": "သင့်လျော်သောဘာသာစကားဖြင့်ရေးပါ",
+  "validation-error": "အတည်ပြုချက်အမှား"
 }

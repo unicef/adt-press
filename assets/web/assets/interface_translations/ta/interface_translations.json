@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "அதன் புதிய அணுகல் வடிவத்தில்!",
   "tutorial-welcome-emoji-label": "கை அசைக்கும் எமோஜி",
   "tutorial-welcome-title": "அணுகக்கூடிய டிஜிட்டல் பாடநூலுக்கு வரவேற்கிறோம்",
-  "username-label": "பயனர் பெயர்"
+  "username-label": "பயனர் பெயர்",
+  "validation-inappropriate-language": "சரியல்லாத மொழி",
+  "validation-check-spelling": "உங்கள் எழுத்துப்பிழைகளை சரிபார்க்கவும்",
+  "validation-write-appropriate": "சரியான மொழியில் எழுதவும் மற்றும் சரியான மொழியைப் பயன்படுத்தவும்",
+  "validation-error": "சரிபார்ப்பு பிழை"
 }

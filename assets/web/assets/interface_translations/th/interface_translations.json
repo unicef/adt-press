@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "ในรูปแบบใหม่ที่เข้าถึงได้!",
   "tutorial-welcome-emoji-label": "อิโมจิโบกมือ",
   "tutorial-welcome-title": "ยินดีต้อนรับสู่หนังสือเรียนดิจิทัลที่เข้าถึงได้",
-  "username-label": "ชื่อผู้ใช้"
+  "username-label": "ชื่อผู้ใช้",
+  "validation-inappropriate-language": "ภาษาไม่เหมาะสม",
+  "validation-check-spelling": "ตรวจสอบการสะกด",
+  "validation-write-appropriate": "กรุณาเขียนด้วยภาษาที่เหมาะสม",
+  "validation-error": "ข้อผิดพลาดในการตรวจสอบ"
 }

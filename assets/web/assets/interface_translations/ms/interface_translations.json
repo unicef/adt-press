@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "dalam format kebolehcapaian baru!",
   "tutorial-welcome-emoji-label": "Emoji tangan melambai",
   "tutorial-welcome-title": "Selamat datang ke buku teks digital yang boleh diakses",
-  "username-label": "Nama pengguna"
+  "username-label": "Nama pengguna",
+  "validation-inappropriate-language": "Bahasa tidak sesuai",
+  "validation-check-spelling": "Semak ejaan anda",
+  "validation-write-appropriate": "Sila tulis dalam bahasa yang sesuai dan gunakan bahasa yang sesuai",
+  "validation-error": "Ralat pengesahan"
 }

@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "selle uues juurdepääsetavas formaadis!",
   "tutorial-welcome-emoji-label": "Käe lehvitamise emoji",
   "tutorial-welcome-title": "Tere tulemast juurdepääsetavasse digitaalsesse õpikusse",
-  "username-label": "Kasutajanimi"
+  "username-label": "Kasutajanimi",
+  "validation-inappropriate-language": "Sobimatu keel",
+  "validation-check-spelling": "Kontrolli oma õigekirja",
+  "validation-write-appropriate": "Palun kirjuta sobivas keeles ja kasuta sobivat keelt",
+  "validation-error": "Kehtivuse viga"
 }

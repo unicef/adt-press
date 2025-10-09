@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "оның жаңа қолжетімді форматында!",
   "tutorial-welcome-emoji-label": "Қол бұлғау эмодзиі",
   "tutorial-welcome-title": "Қолжетімді сандық оқулыққа қош келдіңіз",
-  "username-label": "Пайдаланушы аты"
+  "username-label": "Пайдаланушы аты",
+  "validation-inappropriate-language": "Қате тіл",
+  "validation-check-spelling": "Емлеңізді тексеріңіз",
+  "validation-write-appropriate": "Сәйкес тілде жазыңыз және дұрыс тіл қолданыңыз",
+  "validation-error": "Тексеру қатесі"
 }

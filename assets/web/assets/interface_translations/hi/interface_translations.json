@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "इसके नए सुलभ प्रारूप में!",
   "tutorial-welcome-emoji-label": "हाथ हिलाते हुए इमोजी",
   "tutorial-welcome-title": "सुलभ डिजिटल पाठ्यपुस्तक में आपका स्वागत है",
-  "username-label": "उपयोगकर्ता नाम"
+  "username-label": "उपयोगकर्ता नाम",
+  "validation-inappropriate-language": "अनुचित भाषा",
+  "validation-check-spelling": "अपनी वर्तनी जांचें",
+  "validation-write-appropriate": "कृपया उचित भाषा में लिखें और उचित भाषा का उपयोग करें",
+  "validation-error": "मान्यता त्रुटि"
 }

@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "во неговиот нов достапен формат!",
   "tutorial-welcome-emoji-label": "Емоџи со рака што мавта",
   "tutorial-welcome-title": "Добредојдовте во достапниот дигитален учебник",
-  "username-label": "Корисничко име"
+  "username-label": "Корисничко име",
+  "validation-inappropriate-language": "Неприфатлив јазик",
+  "validation-check-spelling": "Проверете ја правописа",
+  "validation-write-appropriate": "Ве молиме пишувајте на соодветен јазик и користете соодветен јазик",
+  "validation-error": "Грешка при валидација"
 }

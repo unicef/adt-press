@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "ಇದನ್ನು ಹೊಸ ಪ್ರವೇಶಾರ್ಹ ರೂಪದಲ್ಲಿ!",
   "tutorial-welcome-emoji-label": "ಕೈ ಬೀಸುವ ಇಮೋಜಿ",
   "tutorial-welcome-title": "ಪ್ರವೇಶಾರ್ಹ ಡಿಜಿಟಲ್ ಪಠ್ಯಪುಸ್ತಕಕ್ಕೆ ಸ್ವಾಗತ",
-  "username-label": "ಬಳಕೆದಾರ ಹೆಸರು"
+  "username-label": "ಬಳಕೆದಾರ ಹೆಸರು",
+  "validation-inappropriate-language": "ಅಸಮರ್ಥ ಭಾಷೆ",
+  "validation-check-spelling": "ನಿಮ್ಮ ಉಲ್ಲೇಖವನ್ನು ಪರಿಶೀಲಿಸಿ",
+  "validation-write-appropriate": "ದಯವಿಟ್ಟು ಸೂಕ್ತ ಭಾಷೆಯಲ್ಲಿ ಬರೆಯಿರಿ ಮತ್ತು ಸೂಕ್ತ ಭಾಷೆ ಬಳಸಿರಿ",
+  "validation-error": "ಮಾನ್ಯತೆ ದೋಷ"
 }

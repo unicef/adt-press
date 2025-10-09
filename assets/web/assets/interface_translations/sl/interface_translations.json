@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "v njegovem novem dostopnem formatu!",
   "tutorial-welcome-emoji-label": "Emoji mahanja z roko",
   "tutorial-welcome-title": "Dobrodošli v dostopnem digitalnem učbeniku",
-  "username-label": "Uporabniško ime"
+  "username-label": "Uporabniško ime",
+  "validation-inappropriate-language": "Neprimeren jezik",
+  "validation-check-spelling": "Preverite črkovanje",
+  "validation-write-appropriate": "Prosimo, pišite v ustreznem jeziku in uporabljajte primeren jezik",
+  "validation-error": "Napaka pri validaciji"
 }

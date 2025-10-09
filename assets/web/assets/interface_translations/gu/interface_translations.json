@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "તેના નવા સુલભ સ્વરૂપમાં!",
   "tutorial-welcome-emoji-label": "હાથ હલાવતો ઇમોજી",
   "tutorial-welcome-title": "સુલભ ડિજિટલ પાઠ્યપુસ્તકમાં આપનું સ્વાગત છે",
-  "username-label": "વપરાશકર્તા નામ"
+  "username-label": "વપરાશકર્તા નામ",
+  "validation-inappropriate-language": "અયોગ્ય ભાષા",
+  "validation-check-spelling": "તમારી વાક્યરચના તપાસો",
+  "validation-write-appropriate": "કૃપા કરીને યોગ્ય ભાષામાં લખો અને યોગ્ય ભાષાનો ઉપયોગ કરો",
+  "validation-error": "માન્યતા ભૂલ"
 }

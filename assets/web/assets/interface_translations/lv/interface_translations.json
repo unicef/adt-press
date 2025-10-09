@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "tās jaunajā pieejamajā formātā!",
   "tutorial-welcome-emoji-label": "Rokas mājiena emocijzīme",
   "tutorial-welcome-title": "Laipni lūdzam pieejamajā digitālajā mācību grāmatā",
-  "username-label": "Lietotājvārds"
+  "username-label": "Lietotājvārds",
+  "validation-inappropriate-language": "Nepiemērota valoda",
+  "validation-check-spelling": "Pārbaudiet pareizrakstību",
+  "validation-write-appropriate": "Lūdzu, rakstiet piemērotā valodā un izmantojiet atbilstošu valodu",
+  "validation-error": "Validācijas kļūda"
 }

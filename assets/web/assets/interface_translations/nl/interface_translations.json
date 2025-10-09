@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "in zijn nieuwe toegankelijke formaat!",
   "tutorial-welcome-emoji-label": "Hand zwaaiende emoji",
   "tutorial-welcome-title": "Welkom bij het toegankelijke digitale leerboek",
-  "username-label": "Gebruikersnaam"
+  "username-label": "Gebruikersnaam",
+  "validation-inappropriate-language": "Ongepaste taal",
+  "validation-check-spelling": "Controleer je spelling",
+  "validation-write-appropriate": "Schrijf in de juiste taal en gebruik gepaste taal",
+  "validation-error": "Validatiefout"
 }

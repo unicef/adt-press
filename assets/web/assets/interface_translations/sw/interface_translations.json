@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "katika muundo wake mpya wa ufikivu!",
   "tutorial-welcome-emoji-label": "Emoji ya mkono unaopunga",
   "tutorial-welcome-title": "Karibu kwenye kitabu cha kidijitali kinachofikika",
-  "username-label": "Jina la mtumiaji"
+  "username-label": "Jina la mtumiaji",
+  "validation-inappropriate-language": "Lugha isiyofaa",
+  "validation-check-spelling": "Angalia tahajia yako",
+  "validation-write-appropriate": "Tafadhali andika kwa lugha inayofaa na tumia lugha inayofaa",
+  "validation-error": "Kosa la uthibitishaji"
 }

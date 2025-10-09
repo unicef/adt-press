@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "nan nouvo fòma aksesib li!",
   "tutorial-welcome-emoji-label": "Emoji men kap salye",
   "tutorial-welcome-title": "Byenveni nan liv dijital aksesib la",
-  "username-label": "Non itilizatè"
+  "username-label": "Non itilizatè",
+  "validation-inappropriate-language": "Langaj ki pa apwopriye",
+  "validation-check-spelling": "Tcheke òtograf ou",
+  "validation-write-appropriate": "Tanpri ekri nan lang apwopriye a epi itilize lang apwopriye",
+  "validation-error": "Erè validasyon"
 }

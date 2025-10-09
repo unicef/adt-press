@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "അതിന്റെ പുതിയ പ്രവേശന സൗകര്യ ഫോർമാറ്റിൽ!",
   "tutorial-welcome-emoji-label": "കൈ വീശുന്ന ഇമോജി",
   "tutorial-welcome-title": "പ്രവേശന സൗകര്യമുള്ള ഡിജിറ്റൽ പാഠപുസ്തകത്തിലേക്ക് സ്വാഗതം",
-  "username-label": "ഉപയോക്തൃനാമം"
+  "username-label": "ഉപയോക്തൃനാമം",
+  "validation-inappropriate-language": "അനുചിതമായ ഭാഷ",
+  "validation-check-spelling": "നിങ്ങളുടെ ഉച്ചാരണം പരിശോധിക്കുക",
+  "validation-write-appropriate": "ദയവായി അനുചിതമായ ഭാഷയിൽ എഴുതുക",
+  "validation-error": "വാലിഡേഷൻ പിശക്"
 }
