@@ -22,11 +22,15 @@ def pdf_images(pdf_pages: list[Page]) -> list[Image]:
     return pdf_images
 
 
-def pdf_texts(pdf_pages: list[Page], text_extraction_prompt_config: PromptConfig) -> dict[str, PageTexts]:
+def pdf_texts(
+    run_output_dir_config: str,
+    pdf_pages: list[Page],
+    text_extraction_prompt_config: PromptConfig,
+) -> dict[str, PageTexts]:
     async def extract_text():
         text = []
         for page in pdf_pages:
-            text.append(get_page_text(text_extraction_prompt_config, page))
+            text.append(get_page_text(run_output_dir_config, f"page_{page.page_id}", text_extraction_prompt_config, page))
 
         return await gather_with_limit(text, text_extraction_prompt_config.rate_limit)
 
