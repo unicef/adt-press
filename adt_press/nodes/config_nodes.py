@@ -10,6 +10,7 @@ from adt_press.models.config import (
     LayoutType,
     PageRangeConfig,
     PromptConfig,
+    QuizPromptConfig,
     RenderPromptConfig,
     RenderStrategy,
 )
@@ -126,6 +127,11 @@ def text_extraction_prompt_config(config: DictConfig) -> PromptConfig:
 @cache(behavior="recompute")
 def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["page_sectioning"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def quiz_prompt_config(config: DictConfig) -> QuizPromptConfig:
+    return QuizPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_quiz"], config["default_model"]))
 
 
 @cache(behavior="recompute")

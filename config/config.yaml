@@ -145,6 +145,11 @@ prompts:
   section_explanation:
     model: default
     template_path: prompts/section_explanation.jinja2
+
+  section_quiz:
+    model: default
+    template_path: prompts/section_quiz.jinja2
+    sections_per_quiz: 3
    
   text_translation:
     model: default
