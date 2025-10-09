@@ -9,7 +9,7 @@ import {
   initializeTtsQuickToggle,
 } from "./modules/audio.js";
 import { initializeWordByWordHighlighter } from "./modules/tts_highlighter.js";
-import { getCookie } from "./modules/cookies.js";
+import { getCookie, eraseCookie, setCookie } from "./modules/cookies.js";
 import {
   handleInitializationError,
   showMainContent,
@@ -294,13 +294,17 @@ async function initializeCoreFunctionality() {
       });
     }
 
-    // Initialize language before other components
+    // Set initial language (without validation since config not loaded yet)
     initializeLanguage();
   loadMerriweatherFont();
     initCharacterDisplay();
 
     // Initialize components after HTML is definitely loaded
     await fetchAndInjectComponents();
+
+    // IMPORTANT: Validate and correct language AFTER config is loaded
+    // This must happen before translations/glossary are fetched
+    initializeLanguage();
 
     // Try to initialize language dropdown
     const dropdownInitialized = await initializeLanguageDropdown();
@@ -323,12 +327,28 @@ async function initializeCoreFunctionality() {
 }
 
 function initializeLanguage() {
-  let languageCookie = getCookie("currentLanguage");
-  setState(
-    "currentLanguage",
-    languageCookie ||
-      document.getElementsByTagName("html")[0].getAttribute("lang")
-  );
+  const cookieLanguage = getCookie("currentLanguage");
+  const htmlLang = document.getElementsByTagName("html")[0].getAttribute("lang");
+  const defaultLanguage = window.appConfig?.languages?.default || htmlLang || "en";
+  const availableLanguages = window.appConfig?.languages?.available || [];
+
+  // Simple validation: check if cookie language exists in available languages
+  let selectedLanguage = cookieLanguage;
+  
+  if (cookieLanguage && availableLanguages.length > 0 && !availableLanguages.includes(cookieLanguage)) {
+    console.warn(`Cookie language "${cookieLanguage}" not available. Available languages:`, availableLanguages);
+    // Clear invalid cookie on root path
+    eraseCookie("currentLanguage", "/");
+    // Also clear cookie on current page path (in case it was set with specific path)
+    const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1);
+    if (currentPath !== "/") {
+      eraseCookie("currentLanguage", currentPath);
+    }
+    // Use default instead
+    selectedLanguage = defaultLanguage;
+  }
+
+  setState("currentLanguage", selectedLanguage || defaultLanguage);
 }
 
 const handleResponse = async (response) => {
