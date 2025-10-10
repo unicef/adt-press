@@ -49,7 +49,7 @@
 | adt\_press/utils/logging.py                     |       73 |       26 |     64% |16-23, 49, 85-87, 100-107, 115-134, 142 |
 | adt\_press/utils/pdf.py                         |       42 |        3 |     93% | 79-80, 85 |
 | adt\_press/utils/sync.py                        |       14 |        0 |    100% |           |
-| adt\_press/utils/web\_assets.py                 |       74 |        7 |     91% | 13, 59-66 |
+| adt\_press/utils/web\_assets.py                 |       98 |       13 |     87% |13, 59-66, 119, 144-149 |
 | tests/test\_clear\_cache.py                     |       45 |        0 |    100% |           |
 | tests/test\_page\_sectioning\_validator.py      |       46 |        0 |    100% |           |
 | tests/test\_parameter\_validation.py            |       30 |        0 |    100% |           |
@@ -57,7 +57,7 @@
 | tests/test\_two\_column.py                      |       21 |        5 |     76% | 47, 54-57 |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **2088** |  **111** | **95%** |           |
+|                                       **TOTAL** | **2112** |  **117** | **94%** |           |
 
 
 ## Setup coverage badge
