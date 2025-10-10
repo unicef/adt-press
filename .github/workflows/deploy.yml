@@ -70,7 +70,6 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              inlineScript: |
               az storage blob upload-batch \
                 -d '$web' \
                 -s output/momo/ \
