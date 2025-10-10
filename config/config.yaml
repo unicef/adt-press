@@ -35,7 +35,7 @@ custom_plate_path: ""
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
 
-# what strategy is used to render sections into web pages, dynamic will choose based on layout type
+# what strategy is used to render sections into web pages, dynamic will choose based on layout type 
 render_strategy: dynamic
 
 layout_types:
