@@ -1,8 +1,9 @@
 import functools
 import json
 from datetime import datetime
+from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, cast
 
 from pydantic import BaseModel
 
@@ -137,8 +138,8 @@ def io_logger(
         import inspect
 
         if inspect.iscoroutinefunction(func):
-            return async_wrapper
+            return cast(F, async_wrapper)
         else:
-            return sync_wrapper
+            return cast(F, sync_wrapper)
 
     return decorator
