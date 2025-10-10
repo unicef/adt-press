@@ -112,9 +112,7 @@ def copy_build_files(run_output_dir_config: str) -> None:
 def install_fontawesome(run_output_dir_config: str) -> None:
     """Install Font Awesome via npm and copy to standard structure."""
     adt_dir = os.path.join(run_output_dir_config, "adt")
-    fontawesome_dir = os.path.join(
-        adt_dir, "assets", "libs", "fontawesome"
-    )
+    fontawesome_dir = os.path.join(adt_dir, "assets", "libs", "fontawesome")
 
     # Remove existing fontawesome
     if os.path.exists(fontawesome_dir):
@@ -125,28 +123,17 @@ def install_fontawesome(run_output_dir_config: str) -> None:
 
     try:
         # Install Font Awesome via npm
-        subprocess.run(
-            ["npm", "install", "@fortawesome/fontawesome-free"],
-            cwd=adt_dir,
-            check=True,
-            capture_output=True,
-            text=True
-        )
+        subprocess.run(["npm", "install", "@fortawesome/fontawesome-free"], cwd=adt_dir, check=True, capture_output=True, text=True)
 
         # Get Font Awesome source directory
-        fa_source = os.path.join(
-            adt_dir, "node_modules", "@fortawesome", "fontawesome-free"
-        )
+        fa_source = os.path.join(adt_dir, "node_modules", "@fortawesome", "fontawesome-free")
 
         # Copy only the minified CSS file we need
         css_source_file = os.path.join(fa_source, "css", "all.min.css")
         css_target_dir = os.path.join(fontawesome_dir, "css")
         os.makedirs(css_target_dir, exist_ok=True)
         if os.path.exists(css_source_file):
-            shutil.copy2(
-                css_source_file,
-                os.path.join(css_target_dir, "all.min.css")
-            )
+            shutil.copy2(css_source_file, os.path.join(css_target_dir, "all.min.css"))
 
         # Copy webfonts directory (maintains standard structure)
         webfonts_source_dir = os.path.join(fa_source, "webfonts")
@@ -157,9 +144,7 @@ def install_fontawesome(run_output_dir_config: str) -> None:
     except subprocess.CalledProcessError as e:
         print(f"Warning: Could not install Font Awesome: {e}")
         # Fallback to copying from local assets if npm install fails
-        source_fa_dir = os.path.join(
-            "assets", "web", "assets", "libs", "fontawesome"
-        )
+        source_fa_dir = os.path.join("assets", "web", "assets", "libs", "fontawesome")
         if os.path.exists(source_fa_dir):
             shutil.copytree(source_fa_dir, fontawesome_dir, dirs_exist_ok=True)
 
@@ -172,14 +157,7 @@ def run_npm_build(run_output_dir_config: str) -> None:
     subprocess.run(["npm", "install"], cwd=adt_dir, check=True)
 
     # Run tailwindcss build
-    subprocess.run(
-        [
-            "npx", "tailwindcss", "-i", "assets/tailwind_css.css",
-            "-o", "content/tailwind_output.css"
-        ],
-        cwd=adt_dir,
-        check=True
-    )
+    subprocess.run(["npx", "tailwindcss", "-i", "assets/tailwind_css.css", "-o", "content/tailwind_output.css"], cwd=adt_dir, check=True)
 
 
 def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:
