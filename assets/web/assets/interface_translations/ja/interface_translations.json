@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "新しいアクセシブルな形式で！",
   "tutorial-welcome-emoji-label": "手を振る絵文字",
   "tutorial-welcome-title": "アクセシブルなデジタル教科書へようこそ",
-  "username-label": "ユーザー名"
+  "username-label": "ユーザー名",
+  "validation-inappropriate-language": "不適切な言葉",
+  "validation-check-spelling": "スペルを確認してください",
+  "validation-write-appropriate": "適切な言葉で書いてください",
+  "validation-error": "検証エラー"
 }

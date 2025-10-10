@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "in seinem neuen barrierefreien Format!",
   "tutorial-welcome-emoji-label": "Handwinkendes Emoji",
   "tutorial-welcome-title": "Willkommen beim barrierefreien digitalen Lehrbuch",
-  "username-label": "Benutzername"
+  "username-label": "Benutzername",
+  "validation-inappropriate-language": "Unangemessene Sprache",
+  "validation-check-spelling": "Überprüfen Sie Ihre Rechtschreibung",
+  "validation-write-appropriate": "Bitte verwenden Sie die angemessene Sprache",
+  "validation-error": "Validierungsfehler"
 }

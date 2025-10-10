@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "v jejím novém přístupném formátu!",
   "tutorial-welcome-emoji-label": "Emoji mávající rukou",
   "tutorial-welcome-title": "Vítejte v přístupné digitální učebnici",
-  "username-label": "Uživatelské jméno"
+  "username-label": "Uživatelské jméno",
+  "validation-inappropriate-language": "Nevhodný jazyk",
+  "validation-check-spelling": "Zkontrolujte pravopis",
+  "validation-write-appropriate": "Prosím, pište v odpovídajícím jazyce a používejte vhodný jazyk",
+  "validation-error": "Chyba validace"
 }

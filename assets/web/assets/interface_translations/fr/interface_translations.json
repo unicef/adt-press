@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "dans son nouveau format accessible !",
   "tutorial-welcome-emoji-label": "Emoji de la main qui salue",
   "tutorial-welcome-title": "Bienvenue dans le manuel numérique accessible",
-  "username-label": "Nom d'utilisateur"
+  "username-label": "Nom d'utilisateur",
+  "validation-inappropriate-language": "Langage inapproprié",
+  "validation-check-spelling": "Vérifiez votre orthographe",
+  "validation-write-appropriate": "Veuillez écrire dans la langue appropriée et utiliser un langage approprié",
+  "validation-error": "Erreur de validation"
 }

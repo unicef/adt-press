@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "qaabkiisa cusub ee la heli karo!",
   "tutorial-welcome-emoji-label": "Emoji gacanta lulaya",
   "tutorial-welcome-title": "Ku soo dhawoow buugga dijitaalka ah ee la heli karo",
-  "username-label": "Magaca isticmaale"
+  "username-label": "Magaca isticmaale",
+  "validation-inappropriate-language": "Luuqad aan habboonayn",
+  "validation-check-spelling": "Hubi higgaaddaada",
+  "validation-write-appropriate": "Fadlan ku qor luuqad habboon oo isticmaal luuqad habboon",
+  "validation-error": "Khalad xaqiijin"
 }

@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "sa kanyang bagong accessible na format!",
   "tutorial-welcome-emoji-label": "Kaway na emoji",
   "tutorial-welcome-title": "Maligayang pagdating sa accessible na digital na aklat",
-  "username-label": "Username"
+  "username-label": "Username",
+  "validation-inappropriate-language": "Hindi angkop na wika",
+  "validation-check-spelling": "Suriin ang iyong baybay",
+  "validation-write-appropriate": "Mangyaring sumulat sa wastong wika at gumamit ng angkop na wika",
+  "validation-error": "Maling pag-validate"
 }

@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "بصيغته الجديدة الميسرة!",
   "tutorial-welcome-emoji-label": "رمز تعبيري لليد الملوحة",
   "tutorial-welcome-title": "مرحبًا بك في الكتاب الرقمي الميسر",
-  "username-label": "اسم المستخدم"
+  "username-label": "اسم المستخدم",
+  "validation-inappropriate-language": "لغة غير مناسبة",
+  "validation-check-spelling": "تحقق من تهجئة الكلمات",
+  "validation-write-appropriate": "يرجى الكتابة بلغة مناسبة واستخدام لغة ملائمة",
+  "validation-error": "خطأ في التحقق"
 }

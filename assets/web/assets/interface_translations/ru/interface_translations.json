@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "в его новом доступном формате!",
   "tutorial-welcome-emoji-label": "Эмодзи машущей руки",
   "tutorial-welcome-title": "Добро пожаловать в доступный цифровой учебник",
-  "username-label": "Имя пользователя"
+  "username-label": "Имя пользователя",
+  "validation-inappropriate-language": "Неприемлемый язык",
+  "validation-check-spelling": "Проверьте орфографию",
+  "validation-write-appropriate": "Пожалуйста, пишите на соответствующем языке и используйте корректные выражения",
+  "validation-error": "Ошибка валидации"
 }
