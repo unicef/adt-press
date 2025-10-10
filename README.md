@@ -205,3 +205,8 @@ The folder `.devcontainer` needs to be in the root of your project, containing a
 >   docker run --rm -e OPENAI_API_KEY=your-key-here adt-press
 >   ```
 > - When using VS Code "Reopen in Container", you can add the variable to your `.env` file or set it in the container terminal before running your scripts.
+
+**License**
+
+This project is licensed under the [Apache License 2.0](LICENSE).
+
