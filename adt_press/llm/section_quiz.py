@@ -15,6 +15,39 @@ class QuizResponse(BaseModel):
     quiz: SectionQuiz
     reasoning: str
 
+class Quiz(BaseModel):
+    question: str
+    options: list[str]
+    explanations: list[str]
+    answer_index: str
+
+    @field_validator("question")
+    @classmethod
+    def validate_question(cls, v: str, info: ValidationInfo) -> str:
+        if len(v) > 200:
+            raise ValueError(f"question '{v}' is too long")
+        return v
+    
+    @field_validator("options")
+    @classmethod
+    def validate_options(cls, v: list[str], info: ValidationInfo) -> list[str]:
+        if not v:
+            raise ValueError("options list is empty")
+        if len(v) > 4:
+            raise ValueError(f"options list '{v}' is too long")
+        for option in v:
+            if len(option) > 50:
+                raise ValueError(f"option '{option}' is too long")
+        return v
+    
+    @field_validator("answer_index")
+    @classmethod
+    def validate_answer_index(cls, v: int, info: ValidationInfo) -> int:
+        options = info.context.get("options", [])
+        if v < 0 or v >= len(options):
+            raise ValueError(f"answer_index '{v}' is out of range for options list of length {len(options)}")
+        return v
+
 async def generate_quiz(
     config: QuizPromptConfig, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]) -> SectionQuiz:
     context = dict(
@@ -33,7 +66,14 @@ async def generate_quiz(
         context={},
     )
 
-    quiz = response.quiz
-    quiz.section_id = sections[0].section_id if sections else None
+    after_section = sections[-1]
 
-    return quiz
+    return SectionQuiz(
+        quiz_id="qiz_" + after_section.section_id, 
+        section_id=after_section.section_id, 
+        question=response.quiz.question, 
+        options=response.quiz.options,
+        explanations=response.quiz.explanations,
+        answer_index=response.quiz.answer_index,
+        reasoning=response.reasoning
+    )

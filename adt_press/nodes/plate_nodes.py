@@ -8,7 +8,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateSection, PlateText
-from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata, SectionQuiz
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.sync import gather_with_limit, run_async_task
@@ -159,6 +159,7 @@ def plate_output_texts_by_id(
     easy_reads_by_text_id: dict[str, EasyReadText],
     image_captions_by_id: dict[str, ImageCaption],
     explanations_by_section_id: dict[str, SectionExplanation],
+    quizzes_by_section_id: dict[str, SectionQuiz],
     input_language_config: str,
     plate_language_config: str,
 ) -> dict[str, OutputText]:
@@ -183,6 +184,14 @@ def plate_output_texts_by_id(
     # Explanations
     for explanation in explanations_by_section_id.values():
         texts_to_process.append((explanation.explanation_id, "explanation", explanation.explanation))
+
+    # Quizzes
+    for quiz in quizzes_by_section_id.values():      
+        texts_to_process.append((quiz.quiz_id + "_question", "quiz_question", quiz.question))
+        for idx, option in enumerate(quiz.options):
+            texts_to_process.append((quiz.quiz_id + "_option_" + str(idx), "quiz_option", option))
+        for idx, explanation in enumerate(quiz.explanations):
+            texts_to_process.append((quiz.quiz_id + "_explanation_" + str(idx), "quiz_explanation", explanation))
 
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:

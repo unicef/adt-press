@@ -69,8 +69,10 @@ class PageSections(BaseModel):
     reasoning: str
 
 class SectionQuiz(BaseModel):
-    section_id: str | None
+    quiz_id: str
+    section_id: str
     question: str
     options: list[str]
-    answer: str
     explanations: list[str]
+    answer_index: int
+    reasoning: str

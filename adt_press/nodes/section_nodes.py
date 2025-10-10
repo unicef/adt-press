@@ -90,6 +90,10 @@ def quizzes_by_section_id(
         pdf_text_groups_by_id: dict[str, PageTextGroup],
         quiz_prompt_config: QuizPromptConfig) -> dict[str, SectionQuiz]:
 
+    # noop if your config says 0 sections per quiz
+    if quiz_prompt_config.sections_per_quiz < 1:
+        return {}
+
     async def get_quizzes():
         tasks = []
         sections = []
