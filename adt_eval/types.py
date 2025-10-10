@@ -35,8 +35,8 @@ class EvaluationConfig(BaseModel):
 class LabelStudioConfig(BaseModel):
     """Configuration for Label Studio integration."""
 
-    url: str
-    key: str
+    host: str
+    token: str
 
 
 class AzureStorageConfig(BaseModel):
