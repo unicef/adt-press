@@ -96,11 +96,16 @@ export const loadSyllablesState = () => {
 /**
  * Loads the glossary state from cookies and updates UI.
  */
-export const loadGlossaryState = () => {
+export const loadGlossaryState = async () => {
     const glossaryModeCookie = getCookie("glossaryMode");
     if (glossaryModeCookie !== null) {
         setState('glossaryMode', glossaryModeCookie === "true");
         toggleButtonState("toggle-glossary", state.glossaryMode);
+        
+        if (state.glossaryMode) {
+            await loadGlossaryTerms();
+            highlightGlossaryTerms();
+        }
     }
 };
 
@@ -372,11 +377,15 @@ export const updatePlayPauseIcon = (isPlaying) => {
     const playIcon = document.getElementById("read-aloud-play-icon");
     const pauseIcon = document.getElementById("read-aloud-pause-icon");
     if (isPlaying) {
-        playIcon.classList.add("hidden");
-        pauseIcon.classList.remove("hidden");
+        playIcon.style.display = "none";
+        playIcon.setAttribute("aria-hidden", "true");
+        pauseIcon.style.display = "";
+        pauseIcon.setAttribute("aria-hidden", "false");
     } else {
-        playIcon.classList.remove("hidden");
-        pauseIcon.classList.add("hidden");
+        playIcon.style.display = "";
+        playIcon.setAttribute("aria-hidden", "false");
+        pauseIcon.style.display = "none";
+        pauseIcon.setAttribute("aria-hidden", "true");
     }
 };
 

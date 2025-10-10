@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "새로운 접근 가능한 형식으로!",
   "tutorial-welcome-emoji-label": "손 흔드는 이모지",
   "tutorial-welcome-title": "접근 가능한 디지털 교과서에 오신 것을 환영합니다",
-  "username-label": "사용자 이름"
+  "username-label": "사용자 이름",
+  "validation-inappropriate-language": "부적절한 언어",
+  "validation-check-spelling": "철자를 확인하세요",
+  "validation-write-appropriate": "적절한 언어로 작성하고 적절한 언어를 사용하세요",
+  "validation-error": "검증 오류"
 }

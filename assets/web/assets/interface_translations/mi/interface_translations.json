@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "i tōna hōputu urutau hou!",
   "tutorial-welcome-emoji-label": "Emohi ringa e ngunguru ana",
   "tutorial-welcome-title": "Nau mai ki te pukapuka matihiko urutau",
-  "username-label": "Ingoa kaiwhakamahi"
+  "username-label": "Ingoa kaiwhakamahi",
+  "validation-inappropriate-language": "Kōrero kāore e tika",
+  "validation-check-spelling": "Tirohia tō tuhinga",
+  "validation-write-appropriate": "Tēnā tuhia ki te reo tika me te whakamahi i te reo e tika ana",
+  "validation-error": "Hē whakatau"
 }

@@ -83,8 +83,8 @@ The application generates the following outputs in the `output/[your label]` dir
 adt-press includes an evaluation tool used for measuring performance of the various LLM tasks against a gold standard. To run the tool make sure you have the following environment variables set:
 
 ```bash
-LABEL_STUDIO_URL=https://[Your LabelStudio endpoint]
-LABEL_STUDIO_KEY=[Your LabelStudio API key]
+LABEL_STUDIO_HOST=[Your LabelStudio Hostname]
+LABEL_STUDIO_TOKEN=[Your LabelStudio API Token]
 AZURE_STORAGE_ACCOUNT_NAME=[Azure storage account name]
 AZURE_STORAGE_ACCOUNT_KEY=[Azure storage account key]
 MLFLOW_TRACKING_URI=https://[MLFlow endpoint URL] (optional)
@@ -205,3 +205,8 @@ The folder `.devcontainer` needs to be in the root of your project, containing a
 >   docker run --rm -e OPENAI_API_KEY=your-key-here adt-press
 >   ```
 > - When using VS Code "Reopen in Container", you can add the variable to your `.env` file or set it in the container terminal before running your scripts.
+
+**License**
+
+This project is licensed under the [Apache License 2.0](LICENSE).
+

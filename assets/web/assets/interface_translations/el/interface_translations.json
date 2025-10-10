@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "στη νέα του προσβάσιμη μορφή!",
   "tutorial-welcome-emoji-label": "Emoji χαιρετισμού με το χέρι",
   "tutorial-welcome-title": "Καλώς ήρθατε στο προσβάσιμο ψηφιακό εγχειρίδιο",
-  "username-label": "Όνομα χρήστη"
+  "username-label": "Όνομα χρήστη",
+  "validation-inappropriate-language": "Ακατάλληλη γλώσσα",
+  "validation-check-spelling": "Ελέγξτε την ορθογραφία σας",
+  "validation-write-appropriate": "Παρακαλώ γράψτε στη σωστή γλώσσα και χρησιμοποιήστε κατάλληλη γλώσσα",
+  "validation-error": "Σφάλμα επικύρωσης"
 }

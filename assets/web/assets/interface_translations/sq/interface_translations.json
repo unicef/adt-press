@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "në formatin e tij të ri të aksesueshëm!",
   "tutorial-welcome-emoji-label": "Emoja e dorës që përshëndet",
   "tutorial-welcome-title": "Mirë se vini në librin dixhital të aksesueshëm",
-  "username-label": "Emri i përdoruesit"
+  "username-label": "Emri i përdoruesit",
+  "validation-inappropriate-language": "Gjuha e papërshtatshme",
+  "validation-check-spelling": "Kontrolloni shkrimin",
+  "validation-write-appropriate": "Ju lutem shkruani në gjuhën e përshtatshme dhe përdorni gjuhë të përshtatshme",
+  "validation-error": "Gabim validimi"
 }

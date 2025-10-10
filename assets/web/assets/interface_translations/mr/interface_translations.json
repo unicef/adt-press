@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "त्याच्या नवीन प्रवेशयोग्य स्वरूपात!",
   "tutorial-welcome-emoji-label": "हात हलवणारा इमोजी",
   "tutorial-welcome-title": "प्रवेशयोग्य डिजिटल पाठ्यपुस्तकात आपले स्वागत आहे",
-  "username-label": "वापरकर्तानाव"
+  "username-label": "वापरकर्तानाव",
+  "validation-inappropriate-language": "अयोग्य भाषा",
+  "validation-check-spelling": "तुमच्या शब्दलेखनाची तपासणी करा",
+  "validation-write-appropriate": "कृपया योग्य भाषेत आणि योग्य भाषेचा वापर करा",
+  "validation-error": "मान्यता त्रुटी"
 }

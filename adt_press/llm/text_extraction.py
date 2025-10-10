@@ -7,6 +7,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.utils.file import cached_read_text_file
+from adt_press.utils.logging import io_logger
 
 
 class Text(BaseModel):
@@ -24,7 +25,8 @@ class TextResponse(BaseModel):
     groups: list[TextGroup]
 
 
-async def get_page_text(config: PromptConfig, page: Page) -> PageTexts:
+@io_logger(label="text_extraction")
+async def get_page_text(output_dir: str, task_id: str, config: PromptConfig, page: Page) -> PageTexts:
     context = dict(
         page=page,
         examples=config.examples,

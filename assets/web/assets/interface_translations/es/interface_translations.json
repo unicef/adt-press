@@ -82,5 +82,9 @@
   "sign-language-quick-toggle-label": "Botón de activación rápida de lengua de señas",
   "character-profile-emoji": "Emoji de perfil",
   "notepad-open-label": "Abrir el bloc de notas",
-  "notepad-close-label": "Cerrar bloc de notas"
+  "notepad-close-label": "Cerrar bloc de notas",
+  "validation-inappropriate-language": "Lenguaje inapropiado",
+  "validation-check-spelling": "Revisa las palabras",
+  "validation-write-appropriate": "Por favor, escribe en español y usa lenguaje apropiado",
+  "validation-error": "Error de validación"
 }

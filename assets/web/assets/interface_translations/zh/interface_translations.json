@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "以其新的无障碍格式！",
   "tutorial-welcome-emoji-label": "挥手表情符号",
   "tutorial-welcome-title": "欢迎使用无障碍数字教科书",
-  "username-label": "用户名"
+  "username-label": "用户名",
+  "validation-inappropriate-language": "不当语言",
+  "validation-check-spelling": "检查拼写",
+  "validation-write-appropriate": "请使用适当的语言",
+  "validation-error": "验证错误"
 }

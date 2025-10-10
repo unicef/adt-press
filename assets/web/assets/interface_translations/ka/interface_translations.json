@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "მის ახალ ხელმისაწვდომ ფორმატში!",
   "tutorial-welcome-emoji-label": "ხელის მუქარის ემოჯი",
   "tutorial-welcome-title": "მოგესალმებით ხელმისაწვდომი ციფრული სახელმძღვანელოში",
-  "username-label": "მომხმარებლის სახელი"
+  "username-label": "მომხმარებლის სახელი",
+  "validation-inappropriate-language": "არასწორი ენა",
+  "validation-check-spelling": "გთხოვთ შეამოწმოთ მართლწერა",
+  "validation-write-appropriate": "გთხოვთ დაწეროთ შესაბამის ენაზე და გამოიყენოთ შესაბამისი ენა",
+  "validation-error": "ვალიდაციის შეცდომა"
 }

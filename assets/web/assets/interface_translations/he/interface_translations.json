@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "בפורמט הנגיש החדש שלו!",
   "tutorial-welcome-emoji-label": "אימוג'י של יד מנפנפת",
   "tutorial-welcome-title": "ברוך הבא לספר הלימוד הדיגיטלי הנגיש",
-  "username-label": "שם משתמש"
+  "username-label": "שם משתמש",
+  "validation-inappropriate-language": "שפה לא הולמת",
+  "validation-check-spelling": "בדוק את האיות שלך",
+  "validation-write-appropriate": "אנא כתוב בשפה הולמת והשתמש בשפה מתאימה",
+  "validation-error": "שגיאת אימות"
 }

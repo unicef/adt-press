@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "w jego nowym dostępnym formacie!",
   "tutorial-welcome-emoji-label": "Emoji machającej ręki",
   "tutorial-welcome-title": "Witamy w dostępnym podręczniku cyfrowym",
-  "username-label": "Nazwa użytkownika"
+  "username-label": "Nazwa użytkownika",
+  "validation-inappropriate-language": "Nieodpowiedni język",
+  "validation-check-spelling": "Sprawdź pisownię",
+  "validation-write-appropriate": "Proszę pisać w odpowiednim języku i używać odpowiedniego języka",
+  "validation-error": "Błąd walidacji"
 }

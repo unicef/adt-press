@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "ཐུན་མོང་གི་རྣམ་གྲངས་གསརཔ་ནང་!",
   "tutorial-welcome-emoji-label": "ལག་འཁྱེར་བསྐོར་བའི་ཨི་མོ་ཇི་",
   "tutorial-welcome-title": "འཛིན་གྲྭའི་དྲ་ཐོག་དེབ་སྟོན་རྒྱུའི་ཕན་ཐོག་ལུ་ཕེབས་ཨོཾ།",
-  "username-label": "ལག་ཁྱེར་མིང་།"
+  "username-label": "ལག་ཁྱེར་མིང་།",
+  "validation-inappropriate-language": "བདེན་འབྱོར་མེད་པའི་སྐད་ཡིག",
+  "validation-check-spelling": "བརྗེ་བ་བརྒྱབ་པ་རེད",
+  "validation-write-appropriate": "བདེན་འབྱོར་འབྱོར་ནི་དགོས་ཡོད།",
+  "validation-error": "བརྗེ་བ་འབྱོར་མེད་པ"
 }

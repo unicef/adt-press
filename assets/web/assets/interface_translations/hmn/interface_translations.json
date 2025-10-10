@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "nyob rau hauv nws daim ntawv nkag tau tshiab!",
   "tutorial-welcome-emoji-label": "Cim tes tsaug",
   "tutorial-welcome-title": "Zoo siab txais tos rau phau ntawv kawm digital nkag tau",
-  "username-label": "Lub npe siv"
+  "username-label": "Lub npe siv",
+  "validation-inappropriate-language": "Hmoob tsis haum",
+  "validation-check-spelling": "Thov xyuas koj cov ntawv",
+  "validation-write-appropriate": "Thov sau hauv hom lus haum thiab siv hom lus haum",
+  "validation-error": "Tsis raug cai"
 }

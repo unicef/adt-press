@@ -27,7 +27,7 @@ class TextExtractionEvaluator(BaseEvaluator):
         truth = tc["annotations"][0]["result"]
         result = {
             "id": tc["id"],
-            "label_studio_url": f"{self.label_studio_config.url}/projects/{tc['project']}/data?task={tc['id']}",
+            "label_studio_url": f"https://{self.label_studio_config.host}/projects/{tc['project']}/data?task={tc['id']}",
             "page_text": text,
             "page_image_path": str(page_image_path.relative_to(self.output_dir)),
         }
@@ -38,7 +38,7 @@ class TextExtractionEvaluator(BaseEvaluator):
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
         # Call the LLM for text extraction
-        page_texts = await get_page_text(self.prompt_config, page)
+        page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
         result["page_texts"] = page_texts.model_dump()
 
         # Index actual results by text content

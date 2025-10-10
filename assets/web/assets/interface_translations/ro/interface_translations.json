@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "în noul său format accesibil!",
   "tutorial-welcome-emoji-label": "Emoji mână care salută",
   "tutorial-welcome-title": "Bine ai venit la manualul digital accesibil",
-  "username-label": "Nume utilizator"
+  "username-label": "Nume utilizator",
+  "validation-inappropriate-language": "Limbaj inadecvat",
+  "validation-check-spelling": "Verifică-ți ortografia",
+  "validation-write-appropriate": "Te rugăm să scrii în limba corespunzătoare și să folosești un limbaj adecvat",
+  "validation-error": "Eroare de validare"
 }
