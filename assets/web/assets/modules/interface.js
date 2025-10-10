@@ -1096,6 +1096,7 @@ export const loadEasyReadMode = async () => {
       "currentLanguage",
       document.getElementById("language-dropdown").value
     );*/
+    await fetchTranslations();
   }
 };
 

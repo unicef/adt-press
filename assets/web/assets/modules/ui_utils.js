@@ -96,11 +96,16 @@ export const loadSyllablesState = () => {
 /**
  * Loads the glossary state from cookies and updates UI.
  */
-export const loadGlossaryState = () => {
+export const loadGlossaryState = async () => {
     const glossaryModeCookie = getCookie("glossaryMode");
     if (glossaryModeCookie !== null) {
         setState('glossaryMode', glossaryModeCookie === "true");
         toggleButtonState("toggle-glossary", state.glossaryMode);
+        
+        if (state.glossaryMode) {
+            await loadGlossaryTerms();
+            highlightGlossaryTerms();
+        }
     }
 };
 
