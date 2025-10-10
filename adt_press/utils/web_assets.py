@@ -24,6 +24,48 @@ def copy_interface_translations(run_output_dir_config: str, languages: list[str]
             shutil.copytree(source_lang_dir, target_lang_dir, dirs_exist_ok=True)
 
 
+def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> None:
+    """Install only the required language dictionaries to the output directory using npm."""
+    adt_dir = os.path.join(run_output_dir_config, "adt")
+    dictionaries_dir = os.path.join(adt_dir, "assets", "libs", "dictionaries")
+
+    # Remove existing dictionaries
+    if os.path.exists(dictionaries_dir):
+        shutil.rmtree(dictionaries_dir)
+
+    # Create dictionaries directory
+    os.makedirs(dictionaries_dir, exist_ok=True)
+
+    # Install dictionaries via npm for each language
+    for language in languages:
+        try:
+            # Install the dictionary package (e.g., dictionary-en, dictionary-es, etc.)
+            package_name = f"dictionary-{language}"
+            subprocess.run(["npm", "install", package_name], cwd=adt_dir, check=True, capture_output=True, text=True)
+
+            # Copy the dictionary files from node_modules to our dictionaries directory
+            source_dict_dir = os.path.join(adt_dir, "node_modules", package_name)
+            target_lang_dir = os.path.join(dictionaries_dir, language)
+
+            if os.path.exists(source_dict_dir):
+                os.makedirs(target_lang_dir, exist_ok=True)
+
+                # Copy the main dictionary files (.aff, .dic, index.js)
+                for filename in ["index.aff", "index.dic", "index.js"]:
+                    source_file = os.path.join(source_dict_dir, filename)
+                    if os.path.exists(source_file):
+                        shutil.copy2(source_file, os.path.join(target_lang_dir, filename))
+
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Could not install dictionary for language '{language}': {e}")
+            # Fallback to copying from local assets if npm install fails
+            source_lang_dir = os.path.join("assets", "web", "assets", "libs", "dictionaries", language)
+            target_lang_dir = os.path.join(dictionaries_dir, language)
+
+            if os.path.exists(source_lang_dir):
+                shutil.copytree(source_lang_dir, target_lang_dir, dirs_exist_ok=True)
+
+
 def copy_web_assets(run_output_dir_config: str) -> None:
     """Copy web assets to the output directory, excluding interface_translations and not overwriting config.json."""
     adt_dir = os.path.join(run_output_dir_config, "adt")
@@ -151,6 +193,7 @@ def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:
     # Copy only required language translations
     if languages:
         copy_interface_translations(run_output_dir_config, languages)
+        install_dictionaries(run_output_dir_config, languages)
 
     # Install Font Awesome
     install_fontawesome(run_output_dir_config)
