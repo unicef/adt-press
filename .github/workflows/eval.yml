@@ -53,8 +53,8 @@ jobs:
           uv run adt-eval.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          LABEL_STUDIO_URL: ${{ secrets.LABEL_STUDIO_URL }}
-          LABEL_STUDIO_KEY: ${{ secrets.LABEL_STUDIO_KEY }}
+          LABEL_STUDIO_HOST: ${{ secrets.LABEL_STUDIO_HOST }}
+          LABEL_STUDIO_TOKEN: ${{ secrets.LABEL_STUDIO_TOKEN }}
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_LABEL_STUDIO_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_LABEL_STUDIO_STORAGE_ACCOUNT_KEY }}
 
