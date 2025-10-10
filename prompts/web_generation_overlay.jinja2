@@ -22,6 +22,7 @@ You receive:
 
 **Data Attributes:**
 - Main container: `id="content"` with `class="container"`
+- Section element: `data-section-type` attribute with the section type value (e.g., data-section-type="text-and-images")
 - All text elements: `data-id` attribute matching provided text IDs
 - All images: `data-id` attribute matching provided image IDs
 - Text elements with data-id must have string children only (no nested HTML tags)
@@ -137,7 +138,7 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **SIDE-BY-SIDE LAYOUT:**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-[70vh] max-h-[90vh] p-6 overflow-hidden bg-white" id="content">
-    <section id="simple-main" role="article" class="h-full flex flex-col lg:flex-row gap-6">
+    <section id="simple-main" role="article" data-section-type="text-and-images" class="h-full flex flex-col lg:flex-row gap-6">
         <!-- IMAGE CONTAINER -->
         <div class="lg:w-3/5 flex-shrink-0 flex items-center justify-center">
             <img data-id="[IMAGE_ID]" alt="[ALT_TEXT]" 
@@ -156,7 +157,7 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **SINGLE-PAGE OVERLAY LAYOUT:**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-screen overflow-auto lg:min-h-[70vh] lg:max-h-[90vh] lg:overflow-hidden p-6 bg-white" id="content">
-    <section id="simple-main" role="article" class="h-full flex items-center justify-center">
+    <section id="simple-main" role="article" data-section-type="text-and-images" class="h-full flex items-center justify-center">
         <div class="relative flex items-center justify-center w-full h-full">
             <img data-id="[IMAGE_ID]" alt="[ALT_TEXT]" 
                  class="w-full h-auto max-h-[90vh] object-contain rounded-lg"
@@ -181,7 +182,7 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **SINGLE-PAGE OVERLAY with TWO IMAGES (responsive):**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-screen overflow-auto lg:min-h-[70vh] lg:max-h-[90vh] lg:overflow-hidden p-6 bg-white" id="content">
-    <section id="simple-main" role="article" class="h-full flex items-center justify-center">
+    <section id="simple-main" role="article" data-section-type="text-and-images" class="h-full flex items-center justify-center">
         <div class="relative w-full h-full">
             <div class="flex flex-col md:flex-row items-center justify-center w-full h-full">
                 <div class="w-full md:w-1/2 h-full flex items-center justify-center">
@@ -210,7 +211,7 @@ For textarea and input elements, provide placeholders in {{ language }}.
 **TEXT-ONLY LAYOUT:**
 ```html
 <div class="container content mx-auto max-w-6xl min-h-[70vh] max-h-[90vh] p-6 overflow-hidden bg-gradient-to-br from-white-50 to-white-100" id="content">
-    <section id="simple-main" role="article" class="h-full flex flex-col justify-center space-y-6">
+    <section id="simple-main" role="article" data-section-type="text-only" class="h-full flex flex-col justify-center space-y-6">
         <div class="space-y-4 max-w-4xl mx-auto">
             <p class="text-xl leading-relaxed text-gray-800" data-id="[TEXT_ID]">[TEXT_CONTENT]</p>
         </div>

@@ -13,15 +13,16 @@ IMPORTANT, THE GENERATED HTML MUST:
 3. THERE MUST BE ONE AND ONLY ONE `<section />` IN THE HTML.
 4. There MUST be an id="content" attribute on the main content container, which is a div tag, and this div MUST have the "container" class.
 5. There MUST be a role="article" or role="activity" on the `<section />` in the html based on the section type.
-6. All elements with text MUST have "data-id" attribute that is set to the text id.
-7. All elements that you add a data-id="text-x-x" attribute to MUST have a string as their immediate children AND NOT ANY OTHER HTML TAGS. For example,
+6. There MUST be a data-section-type attribute on the `<section />` with the value of the section type provided (e.g., data-section-type="text-and-images").
+7. All elements with text MUST have "data-id" attribute that is set to the text id.
+8. All elements that you add a data-id="text-x-x" attribute to MUST have a string as their immediate children AND NOT ANY OTHER HTML TAGS. For example,
     - <p data-id="txt-x-x">This is a paragraph</p> # OK
     - <strong><p data-id="txt-x-x">This is a paragraph</p></strong> # OK
     - <p data-id="txt-x-x"><strong>This is a paragraph</strong></p> # NOT OK
-8. DO NOT USE ANY PLACEHOLDER IMAGE TAGS IF I DID NOT PROVIDE IMAGES. YOU CAN ONLY INCLUDE IMAGE TAGS WHEN I PROVIDE YOU IMAGES.
-9. For `textarea` and `input` (with type=text) tags, you must generate an appropriate placeholder text where necessary. THIS PLACEHOLDER MUST BE IN THIS LANGUAGE: {{ language }}.
-10. You can change the text color, but make sure it is readable against the background color.
-11. DO NOT USE ANY OTHER DATA-IDS OTHER THAN THE ONES I PROVIDED.
+9. DO NOT USE ANY PLACEHOLDER IMAGE TAGS IF I DID NOT PROVIDE IMAGES. YOU CAN ONLY INCLUDE IMAGE TAGS WHEN I PROVIDE YOU IMAGES.
+10. For `textarea` and `input` (with type=text) tags, you must generate an appropriate placeholder text where necessary. THIS PLACEHOLDER MUST BE IN THIS LANGUAGE: {{ language }}.
+11. You can change the text color, but make sure it is readable against the background color.
+12. DO NOT USE ANY OTHER DATA-IDS OTHER THAN THE ONES I PROVIDED.
 
 IMPORTANT NOTES FOR IMAGE TAGS:
 1. Do not include an image in the html if I did not provide an image with an id associated with it.
