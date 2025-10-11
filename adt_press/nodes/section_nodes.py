@@ -84,12 +84,12 @@ def section_metadata_by_id(
 
 
 def quizzes_by_section_id(
-        plate_language_config: str,
-        pdf_pages: list[Page],
-        filtered_sections_by_page_id: dict[str, PageSections],
-        pdf_text_groups_by_id: dict[str, PageTextGroup],
-        quiz_prompt_config: QuizPromptConfig) -> dict[str, SectionQuiz]:
-
+    plate_language_config: str,
+    pdf_pages: list[Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    pdf_text_groups_by_id: dict[str, PageTextGroup],
+    quiz_prompt_config: QuizPromptConfig,
+) -> dict[str, SectionQuiz]:
     # noop if your config says 0 sections per quiz
     if quiz_prompt_config.sections_per_quiz < 1:
         return {}
@@ -114,9 +114,10 @@ def quizzes_by_section_id(
                     count = 0
 
         return await gather_with_limit(tasks, quiz_prompt_config.rate_limit)
-        
+
     results = run_async_task(get_quizzes)
     return {quiz.section_id: quiz for quiz in results}
+
 
 @config.when(explanation_strategy="llm")
 def explanations_by_section_id__llm(

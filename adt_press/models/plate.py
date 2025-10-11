@@ -31,7 +31,7 @@ class PlateSection(BaseModel):
     text_color: str
     layout_type: str
 
-    
+
 class PlateQuiz(BaseModel):
     quiz_id: str
     section_id: str

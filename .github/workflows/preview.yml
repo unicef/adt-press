@@ -74,15 +74,17 @@ jobs:
           name: preview-${{ github.run_id }}
           path: output/momo/
 
+      - name: Install azcopy
+        run: |
+          wget https://aka.ms/downloadazcopy-v10-linux
+          tar -xvf downloadazcopy-v10-linux
+          sudo cp ./azcopy_linux_amd64_*/azcopy /usr/bin/
+          sudo chmod +x /usr/bin/azcopy
+
       - name: Upload to blob storage
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/preview/*" || true
-              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite --destination-path actions/prs/${{ github.event.number }}/preview/
-        env:
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+        run: |
+          azcopy remove "https://${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/\$web/actions/prs/${{ github.event.number }}/preview/*?${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" --recursive || true
+          azcopy copy "output/momo/*" "https://${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/\$web/actions/prs/${{ github.event.number }}/preview/?${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" --recursive
 
       - name: Comment PR with preview URL
         uses: marocchino/sticky-pull-request-comment@v2
@@ -101,11 +103,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'closed'
     steps:
+      - name: Install azcopy
+        run: |
+          wget https://aka.ms/downloadazcopy-v10-linux
+          tar -xvf downloadazcopy-v10-linux
+          sudo cp ./azcopy_linux_amd64_*/azcopy /usr/bin/
+          sudo chmod +x /usr/bin/azcopy
+
       - name: Delete eval preview from blob storage
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-              az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/preview/*"
-        env:
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+        run: |
+          azcopy remove "https://${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/\$web/actions/prs/${{ github.event.number }}/preview/*?${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" --recursive
