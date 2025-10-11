@@ -8,7 +8,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
-from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, PlateSection, PlateText
+from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, PlateQuiz, PlateSection, PlateText
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionQuiz
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
@@ -25,6 +25,7 @@ def generated_plate(
     plate_groups: list[PlateGroup],
     plate_output_texts_by_id: dict[str, OutputText],
     explanations_by_section_id: dict[str, SectionExplanation],
+    quizzes_by_section_id: dict[str, SectionQuiz],
     plate_glossary: list[GlossaryItem],
 ) -> Plate:
     plate_sections: list[PlateSection] = []
@@ -55,6 +56,20 @@ def generated_plate(
                 )
             )
 
+    # build our quizzes
+    quizzes: list[PlateQuiz] = []
+    for quiz in quizzes_by_section_id.values():
+        quizzes.append(
+            PlateQuiz(
+                quiz_id=quiz.quiz_id,
+                section_id=quiz.section_id,
+                question_id=quiz.question_id,
+                option_ids=quiz.option_ids,
+                explanation_ids=quiz.explanation_ids,
+                answer_index=quiz.answer_index,
+            )
+        )
+
     # build our plate texts and images from our output texts and processed images
     texts = [PlateText(text_id=t.text_id, text_type=t.text_type, text=t.text) for t in plate_output_texts_by_id.values()]
     images = [PlateImage(image_id=i.image_id, image_path=i.crop.image_path, caption_id=i.image_id) for i in processed_images_by_id.values()]
@@ -82,6 +97,7 @@ def generated_plate(
         images=images,
         groups=plate_groups,
         texts=texts,
+        quizzes=quizzes,
         glossary=plate_glossary if plate_glossary else [],
     )
 
@@ -211,11 +227,11 @@ def plate_output_texts_by_id(
 
     # Quizzes
     for quiz in quizzes_by_section_id.values():      
-        texts_to_process.append((quiz.quiz_id + "_question", "quiz_question", quiz.question))
+        texts_to_process.append((quiz.question_id, "quiz_question", quiz.question))
         for idx, option in enumerate(quiz.options):
-            texts_to_process.append((quiz.quiz_id + "_option_" + str(idx), "quiz_option", option))
+            texts_to_process.append((quiz.option_ids[idx], "quiz_option", option))
         for idx, explanation in enumerate(quiz.explanations):
-            texts_to_process.append((quiz.quiz_id + "_explanation_" + str(idx), "quiz_explanation", explanation))
+            texts_to_process.append((quiz.explanation_ids[idx], "quiz_explanation", explanation))
 
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:

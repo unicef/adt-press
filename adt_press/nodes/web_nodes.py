@@ -6,6 +6,7 @@ from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation_activity import generate_web_page_activity
 from adt_press.llm.web_generation_html import generate_web_page_html
+from adt_press.llm.web_generation_quiz import generate_web_quiz
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
@@ -39,6 +40,7 @@ def web_pages(
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
+    quizzes_by_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
     cached_configs: dict[str, Any] = {}
 
@@ -111,6 +113,20 @@ def web_pages(
                     )
                 )
 
+            # should we insert a quiz after this section?
+            quiz = quizzes_by_id.get(section.section_id)
+            if quiz:
+                texts: list[PlateText] = []
+                texts.append(texts_by_id[quiz.question_id])
+                for option_id in quiz.option_ids:
+                    texts.append(texts_by_id[option_id])
+                for explanation_id in quiz.explanation_ids:
+                    texts.append(texts_by_id[explanation_id])
+
+                strategy = render_strategies_config.get("section_quiz")
+                config = TemplateRenderConfig.model_validate(strategy.config)
+                web_pages.append(generate_web_quiz("section_quiz", config, plate_language_config, quiz, texts))
+
         return await gather_with_limit(web_pages, 300)
 
     pages: list[WebPage] = run_async_task(generate_pages)
@@ -163,7 +179,7 @@ def package_adt_web(
     page_list = []
 
     for webpage_index, webpage in enumerate(web_pages):
-        section = sections_by_id[webpage.section_id]
+        section = sections_by_id.get(webpage.section_id)
 
         # copy the images to the output directory
         images = {}
