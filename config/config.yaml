@@ -1,9 +1,9 @@
-label: "???"
-pdf_path: "???"
+label: "katko_new_2"
+pdf_path: "assets/katko_new.pdf"
 
-input_language: en
-plate_language: en
-output_languages: [en]
+input_language: fi
+plate_language: fi
+output_languages: [fi, sv, en]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -36,7 +36,7 @@ custom_plate_path: ""
 default_model: gpt-5
 
 # what strategy is used to render sections into web pages, dynamic will choose based on layout type 
-render_strategy: dynamic
+render_strategy: html
 
 layout_types:
   cover_page:
@@ -112,11 +112,7 @@ render_strategies:
       template_path: prompts/web_generation_html.jinja2
       max_retries: 25
 
-      example_dirs:
-        - assets/prompts/adt_examples/text_only_1
-        - assets/prompts/adt_examples/text_and_images_1
-        - assets/prompts/adt_examples/text_and_images_2
-        - assets/prompts/adt_examples/text_and_images_3
+      example_dirs: []
 
   rows:
     render_type: rows
@@ -127,12 +123,12 @@ render_strategies:
 
 page_range:
   start: 0
-  end: 0
+  end: 9
 
 image_filters:
   size:
-    max_side: 3500
-    min_side: 150
+    max_side: 4000
+    min_side: 40
 
   blank:
     threshold: 2
@@ -144,10 +140,7 @@ text_filters:
     - other
 
 section_filters:
-  pruned_section_types:
-    - back_cover
-    - credits
-    - inside_cover
+  pruned_section_types: []
    
 
 prompts:
@@ -182,6 +175,10 @@ prompts:
     model: default
     template_path: prompts/text_translation.jinja2
 
+  text_translation_group:
+    model: default
+    template_path: prompts/text_translation_group.jinja2
+
   glossary_translation:
     model: default
     template_path: prompts/glossary_translation.jinja2
@@ -200,4 +197,4 @@ prompts:
 
   speech_generation:
     model: gpt-4o-mini-tts
-    template_path: prompts/speech_generation.jinja2
+    template_path: prompts/speech_generation_accents.jinja2

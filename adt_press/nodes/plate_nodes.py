@@ -155,6 +155,7 @@ def plate_groups(processed_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
 
 def plate_output_texts_by_id(
     text_translation_prompt_config: PromptConfig,
+    text_translation_group_prompt_config: PromptConfig,
     processed_pdf_texts: dict[str, PageTexts],
     easy_reads_by_text_id: dict[str, EasyReadText],
     image_captions_by_id: dict[str, ImageCaption],
@@ -162,30 +163,39 @@ def plate_output_texts_by_id(
     input_language_config: str,
     plate_language_config: str,
 ) -> dict[str, OutputText]:
-    # Collect all texts that need processing
-    texts_to_process = list[tuple[str, str, str]]()
+    # Collect texts grouped by their page groups for better translation
+    text_groups = []
+    standalone_texts = []
 
-    # Page texts and easy reads
+    # Page texts grouped by page group
     for page_texts in processed_pdf_texts.values():
         for page_group in page_texts.groups:
+            group_texts = []
             for text in page_group.texts:
-                texts_to_process.append((text.text_id, text.text_type, text.text))
+                group_texts.append((text.text_id, text.text_type, text.text))
 
                 easy_read = easy_reads_by_text_id.get(text.text_id, None)
                 if easy_read:
-                    texts_to_process.append((easy_read.easy_read_id, text.text_type, easy_read.easy_read))
+                    group_texts.append((easy_read.easy_read_id, text.text_type, easy_read.easy_read))
 
-    # Image captions
+            text_groups.append(group_texts)
+
+    # Image captions as standalone texts
     for key, caption in image_captions_by_id.items():
         if caption.caption:
-            texts_to_process.append((key, "image_caption", caption.caption))
+            standalone_texts.append((key, "image_caption", caption.caption))
 
-    # Explanations
+    # Explanations as standalone texts
     for explanation in explanations_by_section_id.values():
-        texts_to_process.append((explanation.explanation_id, "explanation", explanation.explanation))
+        standalone_texts.append((explanation.explanation_id, "explanation", explanation.explanation))
 
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:
+        all_texts = []
+        for group in text_groups:
+            all_texts.extend(group)
+        all_texts.extend(standalone_texts)
+
         return {
             text_id: OutputText(
                 text_id=text_id,
@@ -194,23 +204,50 @@ def plate_output_texts_by_id(
                 language_code=plate_language_config,
                 reasoning="",
             )
-            for text_id, text_type, text_content in texts_to_process
+            for text_id, text_type, text_content in all_texts
         }
 
     # Handle translation case
     async def translate_texts():
-        tasks = [
-            get_text_translation(
-                text_translation_prompt_config,
-                text_id,
-                text_type,
-                text_content,
-                input_language_config,
-                plate_language_config,
+        from adt_press.llm.text_translation import get_group_text_translation
+
+        tasks = []
+
+        # Translate groups together
+        for group in text_groups:
+            tasks.append(
+                get_group_text_translation(
+                    text_translation_group_prompt_config,
+                    group,
+                    input_language_config,
+                    plate_language_config,
+                )
             )
-            for text_id, text_type, text_content in texts_to_process
-        ]
-        return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
+
+        # Translate standalone texts individually
+        for text_id, text_type, text_content in standalone_texts:
+            tasks.append(
+                get_text_translation(
+                    text_translation_prompt_config,
+                    text_id,
+                    text_type,
+                    text_content,
+                    input_language_config,
+                    plate_language_config,
+                )
+            )
+
+        results = await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
+
+        # Flatten group results
+        all_texts = []
+        for result in results:
+            if isinstance(result, list):
+                all_texts.extend(result)
+            else:
+                all_texts.append(result)
+
+        return all_texts
 
     texts = run_async_task(translate_texts)
     return {t.text_id: t for t in texts}
@@ -218,13 +255,31 @@ def plate_output_texts_by_id(
 
 def plate_translations(
     text_translation_prompt_config: PromptConfig,
+    text_translation_group_prompt_config: PromptConfig,
     plate_language_config: str,
     plate_texts: list[PlateText],
+    plate_groups: list[PlateGroup],
     output_languages_config: list[str],
 ) -> dict[str, dict[str, str]]:
     plate_translations: dict[str, dict[str, str]] = {}
 
+    # Build a map of text_id to PlateText for quick lookup
+    texts_by_id = {t.text_id: t for t in plate_texts}
+
+    # Organize texts into groups
+    text_groups_list = []
+    for group in plate_groups:
+        group_texts = []
+        for text_id in group.text_ids:
+            if text_id in texts_by_id:
+                text = texts_by_id[text_id]
+                group_texts.append((text.text_id, text.text_type, text.text))
+        if group_texts:
+            text_groups_list.append(group_texts)
+
     async def translate_texts():
+        from adt_press.llm.text_translation import get_group_text_translation
+
         tasks = []
         for output_language in output_languages_config:
             if output_language == plate_language_config:
@@ -232,19 +287,29 @@ def plate_translations(
                 continue
 
             plate_translations[output_language] = {}
-            for text in plate_texts:
+
+            # Translate each group together
+            for group_texts in text_groups_list:
                 tasks.append(
-                    get_text_translation(
-                        text_translation_prompt_config,
-                        text.text_id,
-                        text.text_type,
-                        text.text,
+                    get_group_text_translation(
+                        text_translation_group_prompt_config,
+                        group_texts,
                         plate_language_config,
                         output_language,
                     )
                 )
 
-        return await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
+        results = await gather_with_limit(tasks, text_translation_prompt_config.rate_limit)
+
+        # Flatten group results
+        all_texts = []
+        for result in results:
+            if isinstance(result, list):
+                all_texts.extend(result)
+            else:
+                all_texts.append(result)
+
+        return all_texts
 
     texts = run_async_task(translate_texts)
     for text in texts:

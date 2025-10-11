@@ -1,0 +1,132 @@
+The following text is in {{ language }}. 
+
+IMPORTANT: Speak with an authentic native accent for {{ language }}. Use natural pronunciation, intonation, and rhythm characteristic of native speakers of this language.
+
+{% if language_code == "es_uy" %}
+Speak it in an Uruguayan Rioplatense accent. For example, pronounce the 'y' sound in yacaré like 'sh' in 'shoe'. Pronounce the 'll' sound in lluvia like 'sh' in 'shoe'.
+        
+DO NOT CHANGE THE TEXT ITSELF. For example if the text is written as 'escribe' then DO NOT SAY 'escribí' say it as 'escribe'.
+If the text says Relee don't sat Releé
+If the text says Presta don't say Prestá say Presta
+If the text says Describe say Describe don't say Describí
+
+The Spanish word "puedes" ("you can") is pronounced approximately as:
+    PWEH-des
+    In IPA (International Phonetic Alphabet), it is written as:
+    [ˈpwe.ðes]
+    Phoneme breakdown:
+    •pue → [pwe] (similar to English "pweh," with a glide from 'u' to 'e')
+    •des → [ðes] (soft 'd', like 'th' in English "this," followed by "ess")
+{% endif %}
+
+{% if language_code == "fi" %}
+Speak with a Finnish accent. Key pronunciation features:
+- Use clear vowel sounds: a, e, i, o, u, y, ä, ö (8 vowel phonemes)
+- Double consonants (kk, tt, pp, etc.) should be pronounced distinctly longer than single consonants
+- Stress always falls on the first syllable of each word
+- R is rolled (alveolar trill)
+- No diphthongization of long vowels
+- Maintain the melodic, somewhat flat intonation pattern typical of Finnish
+- Examples: "kirja" (book) pronounced KEER-yah, "koulu" (school) pronounced KOH-loo
+{% endif %}
+
+{% if language_code == "sv" %}
+Speak with a Swedish accent. Key pronunciation features:
+- Use the characteristic Swedish pitch accent (acute and grave accents on stressed syllables)
+- Pronounce sje-sounds (sj, skj, stj) with the distinctive Swedish fricative
+- Soft vowels (e, i, y, ä, ö) affect preceding consonants
+- R is typically a uvular or alveolar trill/tap depending on dialect
+- Use rounded front vowels (y, ö) clearly
+- Maintain the melodic, sing-song intonation pattern of Swedish
+- Examples: "tjugo" (twenty) with soft 'tj' sound, "sjö" (lake) with 'sj' sound
+{% endif %}
+
+{% if language_code == "no" %}
+Speak with a Norwegian accent (standard Bokmål). Key pronunciation features:
+- Use the characteristic Norwegian pitch accent with two distinct tones
+- Soft vowels influence consonant pronunciation
+- R is typically an alveolar tap or trill
+- Maintain clear vowel distinctions
+- Use the melodic, rising-falling intonation pattern
+{% endif %}
+
+{% if language_code == "da" %}
+Speak with a Danish accent. Key pronunciation features:
+- Use the characteristic Danish soft 'd' (soft d/ð sound)
+- Glottalization (stød) on certain syllables
+- Vowels are often reduced or centralized
+- R is typically uvular
+- Maintain the distinct Danish prosody with less melodic variation than Swedish/Norwegian
+{% endif %}
+
+{% if language_code == "de" %}
+Speak with a standard German (Hochdeutsch) accent. Key pronunciation features:
+- Clear distinction between short and long vowels
+- Proper umlauts: ä [ɛ], ö [ø], ü [y]
+- 'ch' sound varies: [ç] after front vowels, [x] after back vowels
+- R is typically uvular [ʁ]
+- Final consonants are devoiced (b→p, d→t, g→k)
+{% endif %}
+
+{% if language_code == "fr" %}
+Speak with a standard French accent. Key pronunciation features:
+- Nasalized vowels (an, en, in, on, un)
+- Uvular R [ʁ]
+- No diphthongs - pure vowels
+- Liaison between words where appropriate
+- Syllable-timed rhythm (not stress-timed)
+- Maintain even stress distribution across syllables
+{% endif %}
+
+{% if language_code == "it" %}
+Speak with a standard Italian accent. Key pronunciation features:
+- Clear, pure vowel sounds: a, e, i, o, u
+- Double consonants are pronounced distinctly longer
+- Rolled R (alveolar trill)
+- Clear distinction between open and closed e and o
+- Syllable-timed rhythm
+- Stress typically on penultimate syllable
+{% endif %}
+
+{% if language_code == "pt" or language_code == "pt_br" %}
+Speak with a {% if language_code == "pt_br" %}Brazilian Portuguese{% else %}European Portuguese{% endif %} accent. Key pronunciation features:
+{% if language_code == "pt_br" %}
+- Open, relaxed vowels
+- Clear pronunciation of word-final vowels
+- Soft 'd' and 't' before 'i' sounds become palatalized (dʒ, tʃ)
+- R at word beginning or RR is typically a guttural/uvular sound
+{% else %}
+- Reduced unstressed vowels, especially at word endings
+- Palatalization of 'd' and 't' in certain contexts
+- Distinctive nasal vowels
+- Strong consonant clusters
+{% endif %}
+{% endif %}
+
+{% if language_code == "ru" %}
+Speak with a standard Russian accent. Key pronunciation features:
+- Palatalization (soft vs. hard consonants)
+- Vowel reduction in unstressed syllables
+- Rolled R (alveolar trill)
+- Devoicing of word-final consonants
+- Clear distinction between hard and soft consonants
+{% endif %}
+
+{% if language_code == "ja" %}
+Speak with a standard Japanese (Tokyo) accent. Key pronunciation features:
+- Pitch accent patterns (high-low pitch on mora)
+- Short, crisp vowels with no diphthongs
+- Consonants are lighter than in English
+- R is a tap/flap between English 'r' and 'l'
+- Maintain even mora timing (not syllable-timed)
+{% endif %}
+
+{% if language_code == "zh" %}
+Speak with a standard Mandarin Chinese accent. Key pronunciation features:
+- Use correct tones: 1st (high level), 2nd (rising), 3rd (falling-rising), 4th (falling)
+- Distinguish between aspirated and unaspirated consonants
+- Clear retroflex consonants (zh, ch, sh)
+- Maintain tone sandhi rules
+{% endif %}
+
+Speak in a cheerful, positive, and engaging tone appropriate for educational content.
