@@ -105,6 +105,11 @@ render_strategies:
       template_path: prompts/web_generation_html_fit_overlay.jinja2
       max_retries: 25
 
+  section_quiz:
+    render_type: template
+    config:
+      render_template_path: templates/quiz_render.html
+
   html:
     render_type: html
     config:

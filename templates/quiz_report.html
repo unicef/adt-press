@@ -27,7 +27,7 @@
                                 {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] }}
                             </div>
                             <div class="flex-1">
-                                <div class="text-sm text-gray-800 p-2 rounded border {% if 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] == quiz.answer.strip() %}bg-green-200 border-green-300{% else %}bg-white{% endif %}">
+                                <div class="text-sm text-gray-800 p-2 rounded border {% if loop.index0 == quiz.answer_index %}bg-green-200 border-green-300{% else %}bg-white{% endif %}">
                                     {{ option }}
                                 </div>
                                 {% if quiz.explanations and quiz.explanations[loop.index0] %}

@@ -31,6 +31,15 @@ class PlateSection(BaseModel):
     text_color: str
     layout_type: str
 
+    
+class PlateQuiz(BaseModel):
+    quiz_id: str
+    section_id: str
+    question_id: str
+    option_ids: list[str]
+    explanation_ids: list[str]
+    answer_index: int
+
 
 class Plate(BaseModel):
     title: str
@@ -38,5 +47,6 @@ class Plate(BaseModel):
     sections: list[PlateSection]
     images: list[PlateImage]
     groups: list[PlateGroup]
+    quizzes: list[PlateQuiz]
     texts: list[PlateText]
     glossary: list[GlossaryItem]

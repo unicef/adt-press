@@ -1,0 +1,14 @@
+<div class="container content mx-auto w-full min-h-screen px-8 py-8 flex items-center justify-center" id="content">
+    <section id="simple-main" role="article" data-section-type="quiz" data-id="{{ quiz.quiz_id }}">
+    <div class="flex flex-col lg:flex-row px-8 items-start gap-8 max-w-none w-full">
+            <!-- Single column layout for image-only or text-only pages -->
+            <div class="basis-full p-4 flex flex-col justify-center items-center">
+                <p data-id="{{ quiz.question_id }}">{{ texts[quiz.question_id].text }}</p>
+
+                {% for option_id in quiz.option_ids %}
+                    <p data-id="{{ option_id }}">{{ texts[option_id].text }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
