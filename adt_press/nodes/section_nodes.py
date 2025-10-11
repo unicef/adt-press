@@ -98,7 +98,6 @@ def quizzes_by_section_id(
         tasks = []
         sections = []
         count = 0
-        quizzes: dict[str, SectionQuiz] = {}
         for page in pdf_pages:
             page_sections = filtered_sections_by_page_id[page.page_id]
             for section in page_sections.sections:
