@@ -24,6 +24,7 @@ def report_processed_images(template_config: TemplateConfig, processed_images: l
 def report_pruned_images(template_config: TemplateConfig, pruned_images: list[PrunedImage]) -> str:
     return render_template(template_config, "templates/pruned_images.html", dict(images=pruned_images))
 
+
 @cache(behavior="recompute")
 def report_quizzes(
     template_config: TemplateConfig,
@@ -40,6 +41,7 @@ def report_quizzes(
             sections=sections_by_page_id,
         ),
     )
+
 
 @cache(behavior="recompute")
 def report_pages(

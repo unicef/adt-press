@@ -4,16 +4,16 @@ from banks import Prompt
 from litellm import acompletion
 from pydantic import BaseModel, ValidationInfo, field_validator
 
-from adt_press.models.config import LayoutType, PromptConfig, QuizPromptConfig
-from adt_press.models.pdf import Page
-from adt_press.models.section import PageSection, SectionMetadata, SectionQuiz
-from adt_press.models.text import PageText, PageTextGroup
+from adt_press.models.config import QuizPromptConfig
+from adt_press.models.section import PageSection, SectionQuiz
+from adt_press.models.text import PageTextGroup
 from adt_press.utils.file import cached_read_text_file
 
 
 class QuizResponse(BaseModel):
     quiz: SectionQuiz
     reasoning: str
+
 
 class Quiz(BaseModel):
     question: str
@@ -27,7 +27,7 @@ class Quiz(BaseModel):
         if len(v) > 200:
             raise ValueError(f"question '{v}' is too long")
         return v
-    
+
     @field_validator("options")
     @classmethod
     def validate_options(cls, v: list[str], info: ValidationInfo) -> list[str]:
@@ -39,7 +39,7 @@ class Quiz(BaseModel):
             if len(option) > 50:
                 raise ValueError(f"option '{option}' is too long")
         return v
-    
+
     @field_validator("answer_index")
     @classmethod
     def validate_answer_index(cls, v: int, info: ValidationInfo) -> int:
@@ -48,8 +48,8 @@ class Quiz(BaseModel):
             raise ValueError(f"answer_index '{v}' is out of range for options list of length {len(options)}")
         return v
 
-async def generate_quiz(
-    config: QuizPromptConfig, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]) -> SectionQuiz:
+
+async def generate_quiz(config: QuizPromptConfig, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]) -> SectionQuiz:
     context = dict(
         sections=sections,
         text_groups=text_groups_by_id,
@@ -69,11 +69,11 @@ async def generate_quiz(
     after_section = sections[-1]
 
     return SectionQuiz(
-        quiz_id="qiz_" + after_section.section_id, 
-        section_id=after_section.section_id, 
-        question=response.quiz.question, 
+        quiz_id="qiz_" + after_section.section_id,
+        section_id=after_section.section_id,
+        question=response.quiz.question,
         options=response.quiz.options,
         explanations=response.quiz.explanations,
         answer_index=response.quiz.answer_index,
-        reasoning=response.reasoning
+        reasoning=response.reasoning,
     )

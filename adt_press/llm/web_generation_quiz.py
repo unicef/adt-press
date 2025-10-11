@@ -1,8 +1,8 @@
 # mypy: ignore-errors
 
 from adt_press.models.config import TemplateRenderConfig
-from adt_press.models.plate import PlateImage, PlateQuiz, PlateSection, PlateText
-from adt_press.models.web import RenderTextGroup, WebPage
+from adt_press.models.plate import PlateQuiz, PlateText
+from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import LANGUAGE_MAP
 

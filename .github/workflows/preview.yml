@@ -20,7 +20,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: preview-${{ github.head_ref || github.run_id }}
+  group: preview
   cancel-in-progress: true
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
         uses: ts-graphviz/setup-graphviz@v2
 
       - name: Install dependencies
-        run: sudo apt install libcairo2-dev pkg-config python3-dev ffmpeg
+        run: sudo apt install libcairo2-dev pkg-config python3-dev
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -52,7 +52,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/raven.pdf label=raven input_language=en page_range.end=5
+          uv run adt-press.py pdf_path=./assets/momo.pdf label=momo page_range.end=5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: preview-${{ github.run_id }}
-          path: output/raven/
+          path: output/momo/
 
   push-azure:
     needs: build-preview
@@ -72,15 +72,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: preview-${{ github.run_id }}
-          path: output/raven/
+          path: output/momo/
 
       - name: Install azcopy
-        run: sudo apt install azcopy
+        run: |
+          wget https://aka.ms/downloadazcopy-v10-linux
+          tar -xvf downloadazcopy-v10-linux
+          sudo cp ./azcopy_linux_amd64_*/azcopy /usr/bin/
+          sudo chmod +x /usr/bin/azcopy
 
       - name: Upload to blob storage
         run: |
-            azcopy remove 'https://adtpress.blob.core.windows.net/$web/actions/prs/${{ github.event.number }}/preview?${{ secrets.AZURE_STORAGE_SAS_TOKEN }}' --recursive || true
-            azcopy copy 'output/raven/*' 'https://adtpress.blob.core.windows.net/$web/actions/prs/${{ github.event.number }}/preview/?${{ secrets.AZURE_STORAGE_SAS_TOKEN }}' --recursive --overwrite=true
+          azcopy remove "https://${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/\$web/actions/prs/${{ github.event.number }}/preview/*?${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" --recursive || true
+          azcopy copy "output/momo/*" "https://${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/\$web/actions/prs/${{ github.event.number }}/preview/?${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" --recursive
 
       - name: Comment PR with preview URL
         uses: marocchino/sticky-pull-request-comment@v2
@@ -100,8 +104,12 @@ jobs:
     if: github.event.action == 'closed'
     steps:
       - name: Install azcopy
-        run: sudo apt install azcopy
+        run: |
+          wget https://aka.ms/downloadazcopy-v10-linux
+          tar -xvf downloadazcopy-v10-linux
+          sudo cp ./azcopy_linux_amd64_*/azcopy /usr/bin/
+          sudo chmod +x /usr/bin/azcopy
 
       - name: Delete eval preview from blob storage
         run: |
-              azcopy remove 'https://adtpress.blob.core.windows.net/$web/actions/prs/${{ github.event.number }}/preview?${{ secrets.AZURE_STORAGE_SAS_TOKEN }}' --recursive || true
+          azcopy remove "https://${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net/\$web/actions/prs/${{ github.event.number }}/preview/*?${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" --recursive

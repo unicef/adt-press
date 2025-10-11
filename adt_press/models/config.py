@@ -136,6 +136,7 @@ class QuizPromptConfig(PromptConfig):
     """
     Prompt config for generating quizzes from sections.
     """
+
     sections_per_quiz: int = 3
 
 

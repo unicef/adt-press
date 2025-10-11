@@ -226,12 +226,12 @@ def plate_output_texts_by_id(
         texts_to_process.append((chapter.chapter_id, "chapter_title", chapter.title))
 
     # Quizzes
-    for quiz in quizzes_by_section_id.values():      
+    for quiz in quizzes_by_section_id.values():
         texts_to_process.append((quiz.question_id, "quiz_question", quiz.question))
-        for idx, option in enumerate(quiz.options):
-            texts_to_process.append((quiz.option_ids[idx], "quiz_option", option))
-        for idx, explanation in enumerate(quiz.explanations):
-            texts_to_process.append((quiz.explanation_ids[idx], "quiz_explanation", explanation))
+        for idx, quiz_option in enumerate(quiz.options):
+            texts_to_process.append((quiz.option_ids[idx], "quiz_option", quiz_option))
+        for idx, quiz_explanation in enumerate(quiz.explanations):
+            texts_to_process.append((quiz.explanation_ids[idx], "quiz_explanation", quiz_explanation))
 
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:
