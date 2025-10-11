@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "በአዲሱ ቀላል መገኛ ቅርጽ ውስጥ!",
   "tutorial-welcome-emoji-label": "እጅ ማወዝ ኢሞጂ",
   "tutorial-welcome-title": "እንኳን ወደ አስተዳደራዊ ዲጂታል ቴክስት መፅሐፍ በደህና መጡ",
-  "username-label": "የተጠቃሚ ስም"
+  "username-label": "የተጠቃሚ ስም",
+  "validation-inappropriate-language": "የማይገባ ቋንቋ",
+  "validation-check-spelling": "እባክህ እንደተጻፈ ይመልከቱ",
+  "validation-write-appropriate": "እባክህ በደረጃ የሚገባ ቋንቋ ጻፍ",
+  "validation-error": "የማረጋገጫ ስህተት"
 }

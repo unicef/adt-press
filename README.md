@@ -8,7 +8,7 @@
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
-The [sample report](https://unicef.github.io/adt-press/) can help in better understanding the process and outputs or you can view the final [ADT (Accessible Digital Textbook)](https://unicef.github.io/adt-press/adt/sec_p1_s0.html).
+The [sample report](https://adtpress.z1.web.core.windows.net/sample/) can help in better understanding the process and outputs or you can view the final [ADT (Accessible Digital Textbook)](https://adtpress.z1.web.core.windows.net/sample/adt/sec_p1_s0.html).
 
 ## Features
 
@@ -83,8 +83,8 @@ The application generates the following outputs in the `output/[your label]` dir
 adt-press includes an evaluation tool used for measuring performance of the various LLM tasks against a gold standard. To run the tool make sure you have the following environment variables set:
 
 ```bash
-LABEL_STUDIO_URL=https://[Your LabelStudio endpoint]
-LABEL_STUDIO_KEY=[Your LabelStudio API key]
+LABEL_STUDIO_HOST=[Your LabelStudio Hostname]
+LABEL_STUDIO_TOKEN=[Your LabelStudio API Token]
 AZURE_STORAGE_ACCOUNT_NAME=[Azure storage account name]
 AZURE_STORAGE_ACCOUNT_KEY=[Azure storage account key]
 MLFLOW_TRACKING_URI=https://[MLFlow endpoint URL] (optional)
@@ -205,3 +205,8 @@ The folder `.devcontainer` needs to be in the root of your project, containing a
 >   docker run --rm -e OPENAI_API_KEY=your-key-here adt-press
 >   ```
 > - When using VS Code "Reopen in Container", you can add the variable to your `.env` file or set it in the container terminal before running your scripts.
+
+**License**
+
+This project is licensed under the [Apache License 2.0](LICENSE).
+

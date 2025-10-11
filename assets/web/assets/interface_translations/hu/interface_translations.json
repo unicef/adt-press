@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "új akadálymentes formátumában!",
   "tutorial-welcome-emoji-label": "Integető kéz emoji",
   "tutorial-welcome-title": "Üdvözlünk az akadálymentes digitális tankönyvben",
-  "username-label": "Felhasználónév"
+  "username-label": "Felhasználónév",
+  "validation-inappropriate-language": "Nem megfelelő nyelvezet",
+  "validation-check-spelling": "Ellenőrizze a helyesírást",
+  "validation-write-appropriate": "Kérjük, megfelelő nyelven írjon és használjon megfelelő kifejezéseket",
+  "validation-error": "Érvényesítési hiba"
 }

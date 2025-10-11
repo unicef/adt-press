@@ -35,25 +35,57 @@ custom_plate_path: ""
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
 
-# what strategy is used to render sections into web pages, dynamic will choose based on layout type
+# what strategy is used to render sections into web pages, dynamic will choose based on layout type 
 render_strategy: dynamic
 
 layout_types:
-  single_column:
-    description: "Single column layout with text and images flowing in one main column across the page."    
+  cover_page:
+    description: "Cover page of the book, typically includes title, author, and publisher information."
     render_strategy: two_column
 
-  two_column: 
-    description: "Two column layout with text and images arranged in two distinct columns side by side."
+  divider_page:
+    description: "Divider or chapter title pages that separate sections or chapters within the book."
+    render_strategy: single_column
+
+  novel_text_and_images:
+    description: "Novel pages with text and embedded images, including poetry. Text flows around images, or text and images would be best laid out in two column format."
     render_strategy: two_column
 
-  overlay:
-    description: "Overlay layout with text overlaid on images, often with speech bubbles or captions."
+  novel_text_only:
+    description: "Novel pages with only text content, including poetry. Simple flowing text layout."
+    render_strategy: two_column
+
+  novel_images_only:
+    description: "Novel pages with only images, including spreads, such as illustrated novels or photo essays."
+    render_strategy: two_column
+
+  mathbook:
+    description: "Math textbook pages with equations, diagrams, and structured layouts typical of educational math content."
+    render_strategy: html
+
+  storybook_text_images:
+    description: "Storybook pages with integrated text and illustrations. Often text is overlapping, however it will work in a two column format. If the overlapping is too complex like speech bubbles, the comic_overlay strategy will be used instead."
+    render_strategy: two_column
+
+  storybook_images_only:
+    description: "Storybook pages with only illustrations, no text content."
+    render_strategy: two_column
+
+  comic_overlay:
+    description: "Visually rich layouts that are image focused with text overlayed positionally. For examples comics, storybooks, graphic novels features pages with speech bubbles, captions, and text overlays on images. Complex spatial relationships between text and visuals."
     render_strategy: overlay
 
+  textbook_complex:
+    description: "Textbook pages with complex multi-element layouts including sidebars, callout boxes, diagrams, and non-linear reading flow."
+    render_strategy: html
+
+  textbook_activity:
+    description: "Activity or workbook pages with interactive elements, fill-in-blanks, exercises, and structured activity layouts."
+    render_strategy: html
+  
   other:
-    description: "Other layout type that does not fit any of the other categories. "
-    render_strategy: two_column
+    description: "Pages that do not fit into the other defined layout types, requiring custom handling."
+    render_strategy: html
 
 render_strategies:
   single_column:

@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "sen uudessa saavutettavassa muodossa!",
   "tutorial-welcome-emoji-label": "Käsi heiluttaa emoji",
   "tutorial-welcome-title": "Tervetuloa saavutettavaan digitaaliseen oppikirjaan",
-  "username-label": "Käyttäjänimi"
+  "username-label": "Käyttäjänimi",
+  "validation-inappropriate-language": "Sopimaton kieli",
+  "validation-check-spelling": "Tarkista oikeinkirjoitus",
+  "validation-write-appropriate": "Kirjoita sopivalla kielellä ja käytä sopivaa kieltä",
+  "validation-error": "Vahvistusvirhe"
 }

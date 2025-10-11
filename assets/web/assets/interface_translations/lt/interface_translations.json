@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "jo naujame prieinamame formate!",
   "tutorial-welcome-emoji-label": "Rankos mojuojantis jaustukas",
   "tutorial-welcome-title": "Sveiki atvykę į prieinamą skaitmeninį vadovėlį",
-  "username-label": "Vartotojo vardas"
+  "username-label": "Vartotojo vardas",
+  "validation-inappropriate-language": "Netinkama kalba",
+  "validation-check-spelling": "Patikrinkite rašybą",
+  "validation-write-appropriate": "Prašome rašyti tinkama kalba ir naudoti tinkamą kalbą",
+  "validation-error": "Validacijos klaida"
 }

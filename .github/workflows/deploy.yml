@@ -23,6 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
 
@@ -65,7 +70,12 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite --destination-path sample/
+              az storage blob upload-batch \
+                -d '$web' \
+                -s output/momo/ \
+                --overwrite \
+                --destination-path sample/ \
+                --max-connections 16
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}

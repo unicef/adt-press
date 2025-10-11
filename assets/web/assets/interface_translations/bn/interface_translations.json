@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "তার নতুন অ্যাক্সেসযোগ্য ফরম্যাটে!",
   "tutorial-welcome-emoji-label": "হাত নাড়ানো ইমোজি",
   "tutorial-welcome-title": "অ্যাক্সেসযোগ্য ডিজিটাল পাঠ্যবইতে স্বাগতম",
-  "username-label": "ব্যবহারকারীর নাম"
+  "username-label": "ব্যবহারকারীর নাম",
+  "validation-inappropriate-language": "অযাচিত ভাষা",
+  "validation-check-spelling": "আপনার বানান পরীক্ষা করুন",
+  "validation-write-appropriate": "দয়া করে উপযুক্ত ভাষায় লিখুন এবং উপযুক্ত ভাষা ব্যবহার করুন",
+  "validation-error": "যাচাইকরণ ত্রুটি"
 }

@@ -26,8 +26,8 @@ class BaseEvaluator(ABC):
 
         # populate our keys from the environment
         self.label_studio_config = LabelStudioConfig(
-            url=os.environ.get("LABEL_STUDIO_URL", "MISSING_LABEL_STUDIO_URL"),
-            key=os.environ.get("LABEL_STUDIO_KEY", "MISSING_LABEL_STUDIO_KEY"),
+            host=os.environ.get("LABEL_STUDIO_HOST", "MISSING_LABEL_STUDIO_HOST"),
+            token=os.environ.get("LABEL_STUDIO_TOKEN", "MISSING_LABEL_STUDIO_TOKEN"),
         )
 
         self.azure_storage_config = AzureStorageConfig(
@@ -45,7 +45,7 @@ class BaseEvaluator(ABC):
 
     def load_data(self) -> List[Dict[str, Any]]:
         """Load test cases from Label Studio."""
-        ls_client = LabelStudio(base_url=self.label_studio_config.url, api_key=self.label_studio_config.key)
+        ls_client = LabelStudio(base_url=f"https://{self.label_studio_config.host}", api_key=self.label_studio_config.token)
 
         response = ls_client.projects.list()
         project_ids = {i.title: i.id for i in response.items}

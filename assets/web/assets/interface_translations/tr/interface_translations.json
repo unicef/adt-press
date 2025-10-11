@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "yeni erişilebilir formatında!",
   "tutorial-welcome-emoji-label": "El sallayan emoji",
   "tutorial-welcome-title": "Erişilebilir dijital ders kitabına hoş geldiniz",
-  "username-label": "Kullanıcı adı"
+  "username-label": "Kullanıcı adı",
+  "validation-inappropriate-language": "Uygun olmayan dil",
+  "validation-check-spelling": "Yazımınızı kontrol edin",
+  "validation-write-appropriate": "Lütfen uygun dilde yazın ve uygun dil kullanın",
+  "validation-error": "Doğrulama hatası"
 }

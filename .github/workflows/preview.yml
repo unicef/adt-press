@@ -30,6 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
 
@@ -83,7 +88,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
-            ## ADT Preview
+            ## 🖼 ADT Preview
 
             [View Report](https://adtpress.z1.web.core.windows.net/actions/prs/${{ github.event.number }}/preview/index.html)
 

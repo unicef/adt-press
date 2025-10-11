@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "իր նոր մատչելի ձևաչափով!",
   "tutorial-welcome-emoji-label": "Ձեռք թափահարող էմոջի",
   "tutorial-welcome-title": "Բարի գալուստ մատչելի թվային դասագրքին",
-  "username-label": "Օգտագործողի անուն"
+  "username-label": "Օգտագործողի անուն",
+  "validation-inappropriate-language": "Անհամապատասխան լեզու",
+  "validation-check-spelling": "Ստուգեք ձեր գրությունը",
+  "validation-write-appropriate": "Խնդրում ենք գրել համապատասխան լեզվով և օգտագործել համապատասխան լեզու",
+  "validation-error": "Վավերացման սխալ"
 }

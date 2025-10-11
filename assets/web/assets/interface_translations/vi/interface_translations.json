@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "ở định dạng truy cập mới!",
   "tutorial-welcome-emoji-label": "Biểu tượng cảm xúc vẫy tay",
   "tutorial-welcome-title": "Chào mừng bạn đến với sách giáo khoa kỹ thuật số truy cập",
-  "username-label": "Tên người dùng"
+  "username-label": "Tên người dùng",
+  "validation-inappropriate-language": "Ngôn ngữ không phù hợp",
+  "validation-check-spelling": "Kiểm tra chính tả của bạn",
+  "validation-write-appropriate": "Vui lòng viết bằng ngôn ngữ phù hợp và sử dụng ngôn ngữ thích hợp",
+  "validation-error": "Lỗi xác thực"
 }

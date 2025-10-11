@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "en el seu nou format accessible!",
   "tutorial-welcome-emoji-label": "Emoji de mà saludant",
   "tutorial-welcome-title": "Benvingut al llibre de text digital accessible",
-  "username-label": "Nom d'usuari"
+  "username-label": "Nom d'usuari",
+  "validation-inappropriate-language": "Llenguatge inapropiat",
+  "validation-check-spelling": "Comprova l'ortografia",
+  "validation-write-appropriate": "Si us plau, escriu en la llengua adequada i utilitza un llenguatge apropiat",
+  "validation-error": "Error de validació"
 }

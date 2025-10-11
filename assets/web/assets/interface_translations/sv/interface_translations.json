@@ -86,5 +86,9 @@
   "tutorial-welcome-content": "i dess nya tillgängliga format!",
   "tutorial-welcome-emoji-label": "Handvinkande emoji",
   "tutorial-welcome-title": "Välkommen till den tillgängliga digitala läroboken",
-  "username-label": "Användarnamn"
+  "username-label": "Användarnamn",
+  "validation-inappropriate-language": "Oanständigt språk",
+  "validation-check-spelling": "Kontrollera din stavning",
+  "validation-write-appropriate": "Vänligen skriv på lämpligt språk och använd korrekt språk",
+  "validation-error": "Valideringsfel"
 }
