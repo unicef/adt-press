@@ -7,6 +7,7 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 from adt_press.models.config import QuizPromptConfig
 from adt_press.models.section import PageSection, SectionQuiz
 from adt_press.models.text import PageTextGroup
+from adt_press.utils.encoding import starts_with_emoji
 from adt_press.utils.file import cached_read_text_file
 
 
@@ -26,6 +27,8 @@ class Quiz(BaseModel):
     def validate_question(cls, v: str, info: ValidationInfo) -> str:
         if len(v) > 200:
             raise ValueError(f"question '{v}' is too long")
+        if not starts_with_emoji(v):
+            raise ValueError(f"question '{v}' does not start with an emoji")
         return v
 
     @field_validator("options")
@@ -38,7 +41,11 @@ class Quiz(BaseModel):
         for option in v:
             if len(option) > 50:
                 raise ValueError(f"option '{option}' is too long")
+            if not starts_with_emoji(option):
+                raise ValueError(f"option '{option}' does not start with an emoji")
         return v
+    
+
 
     @field_validator("answer_index")
     @classmethod
