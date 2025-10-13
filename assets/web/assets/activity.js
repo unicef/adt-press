@@ -101,6 +101,21 @@ export const updateResetButtonVisibility = () => {
     const resetButton = document.getElementById("reset-button");
     if (!resetButton) return;
     
+    const activitySection = document.querySelector('section[role="activity"]');
+    const activityType = activitySection?.dataset.sectionType;
+    const resetSupportedTypes = new Set([
+        ActivityTypes.OPEN_ENDED_ANSWER,
+        ActivityTypes.FILL_IN_THE_BLANK,
+        ActivityTypes.SORTING,
+        ActivityTypes.FILL_IN_A_TABLE,
+        ActivityTypes.MATCHING
+    ]);
+
+    if (!resetSupportedTypes.has(activityType)) {
+        resetButton.classList.add("hidden");
+        return;
+    }
+
     // Check if there's any user data for this activity
     const hasUserData = checkForUserData();
     
@@ -143,6 +158,67 @@ const resetSelectionInputs = (radioButtons) => {
     });
 };
 
+const submitActivityClasses = [
+    'min-w-[180px]',
+    'px-8',
+    'py-3',
+    'rounded-2xl',
+    'text-lg',
+    'font-semibold',
+    'shadow-lg'
+];
+
+const resetActivityClasses = [
+    'px-6',
+    'py-3',
+    'rounded-2xl',
+    'text-lg',
+    'font-medium'
+];
+
+const relocateActionButtons = (section) => {
+    const target = section?.querySelector('[data-submit-target]');
+    const submitButton = document.getElementById('submit-button');
+    const resetButton = document.getElementById('reset-button');
+    const originalContainer = document.getElementById('submit-reset-container');
+
+    if (!submitButton || !originalContainer) {
+        return;
+    }
+
+    const applyActivityStyles = () => {
+        submitActivityClasses.forEach(cls => submitButton.classList.add(cls));
+        resetButton && resetActivityClasses.forEach(cls => resetButton.classList.add(cls));
+        submitButton.dataset.submitLocation = 'activity';
+    };
+
+    const removeActivityStyles = () => {
+        submitActivityClasses.forEach(cls => submitButton.classList.remove(cls));
+        resetButton && resetActivityClasses.forEach(cls => resetButton.classList.remove(cls));
+        submitButton.dataset.submitLocation = 'interface';
+    };
+
+    if (target) {
+        if (!target.contains(submitButton)) {
+            target.appendChild(submitButton);
+            if (resetButton) {
+                target.appendChild(resetButton);
+            }
+            applyActivityStyles();
+        }
+        originalContainer.classList.add('hidden');
+    } else {
+        if (!originalContainer.contains(submitButton)) {
+            originalContainer.appendChild(submitButton);
+            if (resetButton) {
+                originalContainer.appendChild(resetButton);
+            }
+        }
+        removeActivityStyles();
+        originalContainer.classList.remove('hidden');
+    }
+};
+
 // Clear localStorage for an activity
 const clearActivityLocalStorage = (activityId) => {
     Object.keys(localStorage)
@@ -157,6 +233,7 @@ const resetSubmitButton = () => {
         submitButton.textContent = translateText("submit-text");
         submitButton.setAttribute("aria-label", translateText("submit-text"));
         submitButton.removeEventListener("click", nextPage);
+        submitButton.dataset.submitState = 'submit';
 
         if (state.validateHandler) {
             submitButton.addEventListener("click", state.validateHandler);
@@ -428,6 +505,8 @@ const setupActivitySection = (section, activityType, submitButton) => {
         submitButton.removeEventListener("click", state.validateHandler);
         submitButton.addEventListener("click", state.validateHandler);
     }
+
+    relocateActionButtons(section);
 };
 
 // Main activity preparation function - make sure this is at the end of the file

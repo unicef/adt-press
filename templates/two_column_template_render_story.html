@@ -1,0 +1,114 @@
+{% set container_bg = section.background_color if section.background_color else '#fef6ed' %}
+{% set content_color = section.text_color if section.text_color else '#2d2a26' %}
+{% set aggregates = namespace(images=[], text_parts=[], text_length=0) %}
+
+{% for pid in section.part_ids %}
+    {% if images[pid] %}
+        {% set aggregates.images = aggregates.images + [pid] %}
+    {% elif groups is defined and groups[pid] %}
+        {% set aggregates.text_parts = aggregates.text_parts + [pid] %}
+        {% for text in groups[pid].texts %}
+            {% set aggregates.text_length = aggregates.text_length + text.text|length %}
+        {% endfor %}
+    {% elif texts[pid] %}
+        {% set aggregates.text_parts = aggregates.text_parts + [pid] %}
+        {% set aggregates.text_length = aggregates.text_length + texts[pid].text|length %}
+    {% endif %}
+{% endfor %}
+
+{% set has_images = aggregates.images|length > 0 %}
+{% set has_text = aggregates.text_parts|length > 0 %}
+{% set body_text_class = 'text-2xl md:text-[28px] leading-relaxed tracking-tight' if aggregates.text_length > 500 else 'text-[32px] md:text-[36px] leading-relaxed tracking-tight' %}
+
+<div
+    id="content"
+    class="container content mx-auto flex min-h-screen w-full items-center justify-center px-6 py-12"
+    data-background-color="{{ container_bg }}"
+>
+    <section
+        id="simple-main"
+        role="article"
+        data-section-type="{{ section.section_type.name }}"
+        data-id="{{ section.section_id }}"
+        {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}"{% endif %}
+        class="w-full"
+        data-text-color="{{ content_color }}"
+    >
+    <div class="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 rounded-[32px] bg-white/70 px-6 py-10 lg:flex-row lg:items-stretch lg:px-10 lg:py-16">
+            {% if has_images %}
+                <div class="flex w-full max-w-xl flex-shrink-0 items-center justify-center">
+                    {% if aggregates.images|length == 1 %}
+                        {% set img_id = aggregates.images[0] %}
+                        <img
+                            data-id="{{ img_id }}"
+                            class="h-auto w-full rounded-[28px] object-cover shadow-lg"
+                            style="max-height: 29rem;"
+                        >
+                    {% else %}
+                        <div class="grid w-full gap-6 sm:grid-cols-{{ 2 if aggregates.images|length > 1 else 1 }}">
+                            {% for img_id in aggregates.images %}
+                                <img
+                                    data-id="{{ img_id }}"
+                                    class="h-auto w-full rounded-[24px] object-cover shadow-md"
+                                    style="max-height: 26rem;"
+                                >
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if has_text %}
+                <div class="flex w-full flex-col justify-center">
+                    <div class="space-y-8 text-center lg:text-left">
+                        {% for part in aggregates.text_parts %}
+                            {% if groups is defined and groups[part] %}
+                                {% set group = groups[part] %}
+                                {% set line_style = 'inline' %}
+                                {% if group.group_type in ['stanza', 'list', 'heading'] %}
+                                    {% set line_style = 'block' %}
+                                {% endif %}
+                                <div class="space-y-4">
+                                    {% for text in group.texts %}
+                                        {% if text.text_type in ['book_title', 'chapter_title'] %}
+                                            <h1 class="font-bold text-4xl md:text-[44px]" data-id="{{ text.text_id }}">{{ text.text }}</h1>
+                                        {% elif text.text_type == 'section_heading' %}
+                                            <h2 class="font-bold text-3xl" data-id="{{ text.text_id }}">{{ text.text }}</h2>
+                                        {% elif text.text_type == 'book_subtitle' %}
+                                            <h3 class="font-semibold text-2xl" data-id="{{ text.text_id }}">{{ text.text }}</h3>
+                                        {% else %}
+                                            <span class="{{ body_text_class }} {{ line_style }} font-medium" data-id="{{ text.text_id }}">{{ text.text }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% elif texts[part] %}
+                                <p class="{{ body_text_class }} font-medium" data-id="{{ part }}">{{ texts[part].text }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+    (function () {
+        const container = document.getElementById('content');
+        const section = container?.querySelector('#simple-main');
+
+        if (container) {
+            const bg = container.getAttribute('data-background-color');
+            if (bg) {
+                container.style.backgroundColor = bg;
+            }
+        }
+
+        if (section) {
+            const textColor = section.getAttribute('data-text-color');
+            if (textColor) {
+                section.style.color = textColor;
+            }
+        }
+    })();
+</script>

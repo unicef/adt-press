@@ -97,6 +97,7 @@ export const updateSubmitButtonAndToast = (
     const submitButton = document.getElementById("submit-button");
     const resetButton = document.getElementById("reset-button");
     const toast = document.getElementById("toast");
+    const shouldShowToast = activityType !== ActivityTypes.MULTIPLE_CHOICE;
     
     // Default options
     const defaultOptions = {
@@ -140,9 +141,10 @@ export const updateSubmitButtonAndToast = (
             
         trackActivityCompletion(activityId, activityType);
         
-        submitButton.textContent = buttonText;
+    submitButton.textContent = buttonText;
+    submitButton.dataset.submitState = (buttonText === translateText("next-activity")) ? 'next' : 'submit';
         
-        if (toast) {
+                if (shouldShowToast && toast) {
             // Determine message and emoji based on options or defaults
             const message = mergedOptions.message || 
                            ((activityType === ActivityTypes.OPEN_ENDED_ANSWER || 
@@ -174,18 +176,33 @@ export const updateSubmitButtonAndToast = (
         }
 
         // Set timeout to hide toast
-        setTimeout(() => {
+        if (shouldShowToast) {
+            setTimeout(() => {
+                toast?.classList.add("hidden");
+            }, mergedOptions.timeout || 6000);
+        } else {
             toast?.classList.add("hidden");
-        }, mergedOptions.timeout || 6000);
+        }
     } else {
-        // Handle incorrect submission with enhanced options
-        handleIncorrectSubmission(
-            submitButton, 
-            toast, 
-            activityType, 
-            unfilledCount, 
-            mergedOptions
-        );
+        if (shouldShowToast) {
+            // Handle incorrect submission with enhanced options
+            handleIncorrectSubmission(
+                submitButton, 
+                toast, 
+                activityType, 
+                unfilledCount, 
+                mergedOptions
+            );
+        } else {
+            handleIncorrectSubmission(
+                submitButton,
+                toast,
+                activityType,
+                unfilledCount,
+                mergedOptions
+            );
+            toast?.classList.add("hidden");
+        }
     }
 };
 
@@ -225,15 +242,22 @@ const handleIncorrectSubmission = (submitButton, toast, activityType, unfilledCo
     if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
         submitButton.textContent = translateText("retry");
         submitButton.setAttribute("aria-label", translateText("retry"));
+        submitButton.dataset.submitState = 'retry';
         state.retryHandler = retryActivity;
         submitButton.addEventListener("click", state.retryHandler);
     } else {
         submitButton.textContent = translateText("submit-text");
         submitButton.setAttribute("aria-label", translateText("submit-text"));
+        submitButton.dataset.submitState = 'submit';
         // Make sure we're adding the current validateHandler
         if (state.validateHandler) {
             submitButton.addEventListener("click", state.validateHandler);
         }
+    }
+
+    if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
+        toast?.classList.add("hidden");
+        return;
     }
 
     updateToastForIncorrectSubmission(toast, activityType, unfilledCount, options);
@@ -630,6 +654,7 @@ const resetButtonState = () => {
         submitButton.removeEventListener("click", state.retryHandler);
         submitButton.removeEventListener("click", state.validateHandler);
         submitButton.addEventListener("click", state.validateHandler);
+        submitButton.dataset.submitState = 'submit';
         console.log("Restored validation handler");
     }
 };
