@@ -44,8 +44,6 @@ class Quiz(BaseModel):
             if not starts_with_emoji(option):
                 raise ValueError(f"option '{option}' does not start with an emoji")
         return v
-    
-
 
     @field_validator("answer_index")
     @classmethod
