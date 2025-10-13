@@ -5,6 +5,27 @@ import { translateText } from '../translations.js';
 import { executeMail } from './send-email.js';
 import { updateResetButtonVisibility } from '../../activity.js';
 
+const restoreSubmitButtonToValidate = () => {
+    const submitButton = document.getElementById("submit-button");
+    if (!submitButton || submitButton.dataset.submitState !== 'retry') {
+        return;
+    }
+
+    submitButton.textContent = translateText("submit-text");
+    submitButton.setAttribute("aria-label", translateText("submit-text"));
+    submitButton.dataset.submitState = 'submit';
+
+    if (state.retryHandler) {
+        submitButton.removeEventListener("click", state.retryHandler);
+        state.retryHandler = null;
+    }
+
+    if (state.validateHandler) {
+        submitButton.removeEventListener("click", state.validateHandler);
+        submitButton.addEventListener("click", state.validateHandler);
+    }
+};
+
 export const prepareMultipleChoice = (section) => {
     restorePreviousSelection(section); // Restaurar selección previa
 
@@ -114,6 +135,38 @@ const restorePreviousSelection = (section) => {
     }
 };
 
+const isLetterHidden = (option) => {
+    const letterElement = option.querySelector('.option-letter');
+    const wrapper = letterElement?.parentElement;
+    return (
+        letterElement?.dataset.letterHidden === 'true' ||
+        wrapper?.dataset.letterHidden === 'true'
+    );
+};
+
+const setLetterAppearance = (option, circleClasses, letterClasses) => {
+    const letterElement = option.querySelector('.option-letter');
+    const circle = letterElement?.parentElement;
+
+    if (!letterElement || !circle) {
+        return;
+    }
+
+    if (isLetterHidden(option)) {
+        circle.className = 'option-letter-wrapper sr-only';
+        letterElement.className = 'option-letter sr-only';
+        return;
+    }
+
+    if (circleClasses) {
+        circle.className = circleClasses;
+    }
+
+    if (letterClasses) {
+        letterElement.className = letterClasses;
+    }
+};
+
 
 const selectOption = (option) => {
     console.log("=== Selecting option ===");
@@ -152,6 +205,8 @@ const selectOption = (option) => {
 
     // Guardar en localStorage
     saveSelectionState(option);
+
+    restoreSubmitButtonToValidate();
 };
 
 // New function to clear all validation styling
@@ -187,17 +242,14 @@ const clearAllValidationStyling = () => {
             }
         }
         
-        // Reset letter circle styling
-        const letterCircle = option.querySelector('.option-letter')?.parentElement;
-        if (letterCircle) {
-            letterCircle.className = 'w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center';
-        }
-        
-        // Reset the letter color
-        const letter = option.querySelector('.option-letter');
-        if (letter) {
-            letter.className = 'option-letter text-gray-500';
-        }
+        // Reset the letter appearance
+        setLetterAppearance(
+            option,
+            'w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center',
+            'option-letter text-gray-500'
+        );
+
+        option.classList.remove('selected-option');
     });
     
     // Announce change to screen readers
@@ -214,20 +266,15 @@ const resetOptions = (radioGroup) => {
         // Reset aria attributes
         opt.setAttribute('aria-checked', 'false');
 
-        // Reset letter circle styling
-        const letterCircle = opt.querySelector('.option-letter')?.parentElement;
-        if (letterCircle) {
-            letterCircle.className = 'w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center';
-        }
-
-        // Reset the letter color
-        const letter = opt.querySelector('.option-letter');
-        if (letter) {
-            letter.className = 'option-letter text-gray-500';
-        }
+        setLetterAppearance(
+            opt,
+            'w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center',
+            'option-letter text-gray-500'
+        );
 
         // Reset option container
         opt.classList.remove('bg-green-50', 'bg-red-50');
+    opt.classList.remove('selected-option');
 
         // Hide feedback
         const feedback = opt.querySelector('.feedback-container');
@@ -246,17 +293,13 @@ const selectClickedOption = (option) => {
     // Update ARIA state
     option.setAttribute('aria-checked', 'true');
 
-    // Style the letter circle as selected
-    const letterCircle = option.querySelector('.option-letter')?.parentElement;
-    if (letterCircle) {
-        letterCircle.className = 'w-8 h-8 rounded-full border-2 border-blue-500 bg-blue-500 flex items-center justify-center';
-    }
+    setLetterAppearance(
+        option,
+        'w-8 h-8 rounded-full border-2 border-blue-500 bg-blue-500 flex items-center justify-center',
+        'option-letter text-white'
+    );
 
-    // Change the letter color to white
-    const letter = option.querySelector('.option-letter');
-    if (letter) {
-        letter.className = 'option-letter text-white';
-    }
+    option.classList.add('selected-option');
 };
 
 const getActivityItem = (element) => {
@@ -317,11 +360,16 @@ export const checkMultipleChoice = () => {
 };
 
 const styleSelectedOption = (option, isCorrect) => {
-    const letterCircle = option.querySelector('.option-letter').parentElement;
-    letterCircle.className = `w-8 h-8 rounded-full border-2 flex items-center justify-center ${isCorrect
-        ? 'border-green-500 bg-green-500 text-white'
-        : 'border-red-500 bg-red-500 text-white'
-        }`;
+    option.classList.remove('selected-option');
+
+    setLetterAppearance(
+        option,
+        `w-8 h-8 rounded-full border-2 flex items-center justify-center ${isCorrect
+            ? 'border-green-500 bg-green-500 text-white'
+            : 'border-red-500 bg-red-500 text-white'
+            }`,
+        'option-letter text-white'
+    );
 
     option.classList.add(isCorrect ? 'bg-green-50' : 'bg-red-50');
 
@@ -351,11 +399,20 @@ const showFeedback = (option, isCorrect) => {
         intentCount++;
         localStorage.setItem(key, intentCount.toString()); 
 
+    const dataExplanation = option.getAttribute('data-explanation');
+    const globalExplanation = window?.multipleChoiceExplanations?.[getActivityItem(option)];
+    const explanation = dataExplanation || globalExplanation;
+
     if (isCorrect) {
-        feedbackIcon.className = 'feedback-icon w-5 h-5 rounded-full flex items-center justify-center text-sm bg-green-100 text-green-700';
-        feedbackIcon.textContent = '✓';
-        feedbackText.className = 'feedback-text text-sm font-medium text-green-700';
-        feedbackText.textContent = translateText('multiple-choice-correct-answer');
+        feedbackIcon.className = 'feedback-icon hidden';
+        feedbackIcon.textContent = '';
+
+        feedbackText.className = 'feedback-text text-lg font-semibold text-green-800';
+        if (explanation) {
+            feedbackText.textContent = explanation;
+        } else {
+            feedbackText.textContent = translateText('multiple-choice-correct-answer');
+        }
         
         // Set ARIA attributes for feedback
         feedbackContainer.setAttribute('role', 'status');
@@ -383,10 +440,14 @@ const showFeedback = (option, isCorrect) => {
         localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
         executeMail(ActivityTypes.MULTIPLE_CHOICE);
     } else {
-        feedbackIcon.className = 'feedback-icon w-5 h-5 rounded-full flex items-center justify-center text-sm bg-red-100 text-red-700';
-        feedbackIcon.textContent = '✗';
-        feedbackText.className = 'feedback-text text-sm font-medium text-red-700';
-        feedbackText.textContent = translateText('multiple-choice-try-again');
+        feedbackIcon.className = 'feedback-icon hidden';
+        feedbackIcon.textContent = '';
+        feedbackText.className = 'feedback-text text-lg font-semibold text-red-800';
+        if (explanation) {
+            feedbackText.textContent = explanation;
+        } else {
+            feedbackText.textContent = translateText('multiple-choice-try-again');
+        }
         
         // Set ARIA attributes for feedback
         feedbackContainer.setAttribute('role', 'alert');

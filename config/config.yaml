@@ -65,11 +65,11 @@ layout_types:
 
   storybook_text_images:
     description: "Storybook pages with integrated text and illustrations. Often text is overlapping, however it will work in a two column format. If the overlapping is too complex like speech bubbles, the comic_overlay strategy will be used instead."
-    render_strategy: two_column
+    render_strategy: two_column_story
 
   storybook_images_only:
     description: "Storybook pages with only illustrations, no text content."
-    render_strategy: two_column
+    render_strategy: two_column_story
 
   comic_overlay:
     description: "Visually rich layouts that are image focused with text overlayed positionally. For examples comics, storybooks, graphic novels features pages with speech bubbles, captions, and text overlays on images. Complex spatial relationships between text and visuals."
@@ -82,6 +82,10 @@ layout_types:
   textbook_activity:
     description: "Activity or workbook pages with interactive elements, fill-in-blanks, exercises, and structured activity layouts."
     render_strategy: html
+
+  section_quiz:
+    description: "Quiz or assessment pages that include questions, multiple-choice options, and answer sections."
+    render_strategy: section_quiz
   
   other:
     description: "Pages that do not fit into the other defined layout types, requiring custom handling."
@@ -97,6 +101,11 @@ render_strategies:
     render_type: template
     config:
       render_template_path: templates/two_column_template_render.html
+
+  two_column_story:
+    render_type: template
+    config:
+      render_template_path: templates/two_column_template_render_story.html
 
   overlay:
     render_type: html
