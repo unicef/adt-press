@@ -132,6 +132,47 @@
 
         
     </div>
+
+    {% with quiz = quizzes_by_section_id[section.section_id] %}
+    {% if quiz %}
+    <div class="bg-white border overflow-hidden rounded">
+        <!-- Quiz Header -->
+        <div class="bg-purple-600 text-white px-3 py-2 text-sm font-medium">
+            <span class="float-right ml-2 px-2 py-1 bg-purple-800 text-white text-xs font-semibold rounded">{{ section.section_id }}</span>
+            <span class="float-right ml-2 px-2 py-1 bg-purple-800 text-white text-xs font-semibold rounded">{{ quiz.quiz_id }}</span>
+            Section Quiz
+            <div class="clear-both"></div>
+        </div>
+
+        <!-- Quiz Question -->
+        <div class="px-3 py-2 border-b border-gray-200">
+            <div class="text-sm text-gray-800 p-3">{{ texts_by_id[quiz.question_id].text }}</div>
+        </div>
+
+        <!-- Quiz Options with Explanations -->
+        <div class="px-3 py-4">
+            <div class="space-y-2">
+                {% for option_id in quiz.option_ids %}
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-600 font-medium">
+                        {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[loop.index0] }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm text-gray-800 p-2 rounded border {% if loop.index0 == quiz.answer_index %}bg-green-200 border-green-300{% else %}bg-white{% endif %}">
+                            {{ texts_by_id[option_id].text }}
+                        </div>
+                        <div class="text-sm text-gray-600 bg-blue-50 p-2 rounded border border-blue-200 mt-1">
+                            {{ texts_by_id[quiz.explanation_ids[loop.index0]].text }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
     {% endfor %}
 
     <div class="rounded border bg-yellow-50 overflow-hidden">

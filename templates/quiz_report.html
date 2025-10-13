@@ -5,16 +5,17 @@
     {% if quizzes %}
         <div class="space-y-4">
             {% for section_id, quiz in quizzes.items() %}
-            <div class="bg-white border-b border-gray-200 overflow-hidden">
-                <!-- Section Header -->
+            <div class="bg-white border overflow-hidden rounded">
+                <!-- Quiz Header -->
                 <div class="bg-purple-600 text-white px-3 py-2 text-sm font-medium">
                     <span class="float-right ml-2 px-2 py-1 bg-purple-800 text-white text-xs font-semibold rounded">{{ section_id }}</span>
+                    <span class="float-right ml-2 px-2 py-1 bg-purple-800 text-white text-xs font-semibold rounded">{{ quiz.quiz_id }}</span>
                     Section Quiz
                     <div class="clear-both"></div>
                 </div>
 
                 <!-- Quiz Question -->
-                <div class="px-3 py-4 border-b border-purple-200">
+                <div class="px-3 py-2 border-b border-gray-200">
                     <div class="text-sm text-gray-800 p-3">{{ quiz.question }}</div>
                 </div>
 
