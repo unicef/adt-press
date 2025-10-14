@@ -19,6 +19,7 @@ import { updateResetButtonVisibility } from '../activity.js';
  */
 export const ActivityTypes = Object.freeze({
     MULTIPLE_CHOICE: "activity_multiple_choice",
+    QUIZ: "activity_quiz",
     FILL_IN_THE_BLANK: "activity_fill_in_the_blank",
     SORTING: "activity_sorting",
     OPEN_ENDED_ANSWER: "activity_open_ended_answer",
@@ -97,7 +98,9 @@ export const updateSubmitButtonAndToast = (
     const submitButton = document.getElementById("submit-button");
     const resetButton = document.getElementById("reset-button");
     const toast = document.getElementById("toast");
-    const shouldShowToast = activityType !== ActivityTypes.MULTIPLE_CHOICE;
+    const isMultipleChoiceLike =
+        activityType === ActivityTypes.MULTIPLE_CHOICE || activityType === ActivityTypes.QUIZ;
+    const shouldShowToast = !isMultipleChoiceLike;
     
     // Default options
     const defaultOptions = {
@@ -239,7 +242,9 @@ export const checkCurrentActivityCompletion = (isCorrect) => {
  * @private
  */
 const handleIncorrectSubmission = (submitButton, toast, activityType, unfilledCount, options = {}) => {
-    if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
+    const isMultipleChoiceLike = activityType === ActivityTypes.MULTIPLE_CHOICE || activityType === ActivityTypes.QUIZ;
+    
+    if (isMultipleChoiceLike) {
         submitButton.textContent = translateText("retry");
         submitButton.setAttribute("aria-label", translateText("retry"));
         submitButton.dataset.submitState = 'retry';
@@ -255,7 +260,7 @@ const handleIncorrectSubmission = (submitButton, toast, activityType, unfilledCo
         }
     }
 
-    if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
+    if (isMultipleChoiceLike) {
         toast?.classList.add("hidden");
         return;
     }

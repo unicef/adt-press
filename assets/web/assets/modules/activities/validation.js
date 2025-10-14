@@ -23,6 +23,7 @@ export const validateInputs = (activityType) => {
     try {
         switch (activityType) {
             case ActivityTypes.MULTIPLE_CHOICE:
+            case ActivityTypes.QUIZ:
                 checkMultipleChoice();
                 break;
 

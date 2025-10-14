@@ -81,6 +81,7 @@ import {
   initializeNotepad
 } from "./modules/notepad.js";
 import { prepareActivity } from "./activity.js";
+import { initializeQuizActivity } from "./modules/activities/quiz.js";
 import { initCharacterDisplay } from "./modules/character-display.js"
 import { initMatomo } from "./modules/analytics.js";
 
@@ -691,6 +692,7 @@ async function initializeUIComponents() {
     
     // Activities should be initialized after UI components
     if (isFeatureEnabled('activities', true)) {
+      initializeQuizActivity();
       prepareActivity();
     }
     loadToggleButtonState();

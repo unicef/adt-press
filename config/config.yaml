@@ -1,9 +1,9 @@
-label: "???"
-pdf_path: "???"
+label: "momo-v3"
+pdf_path: "assets/momo.pdf"
 
 input_language: en
 plate_language: en
-output_languages: [en]
+output_languages: [en, es]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -15,19 +15,19 @@ print_available_models: false
 crop_strategy: llm
 
 # our glossary strategy, either llm or none
-glossary_strategy: llm
+glossary_strategy: none
 
 # our explanation strategy, either llm or none
-explanation_strategy: llm
+explanation_strategy: none
 
 # our easy read strategy, either llm or none
-easy_read_strategy: llm
+easy_read_strategy: none
 
 # our caption strategy, either llm or none
-caption_strategy: llm
+caption_strategy: none
 
 # our TTS / speech strategy, either tts or none
-speech_strategy: tts
+speech_strategy: none
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
@@ -36,7 +36,7 @@ custom_plate_path: ""
 default_model: gpt-5
 
 # what strategy is used to render sections into web pages, dynamic will choose based on layout type 
-render_strategy: dynamic
+render_strategy: two_column_story
 
 layout_types:
   cover_page:

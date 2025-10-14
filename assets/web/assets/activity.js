@@ -29,6 +29,7 @@ const SELECTORS = {
     FILL_IN_BLANK: 'section[data-section-type="activity_fill_in_the_blank"]',
     FILL_IN_TABLE: 'section[data-section-type="activity_fill_in_a_table"]',
     MULTIPLE_CHOICE: 'section[data-section-type="activity_multiple_choice"]',
+    QUIZ: 'section[data-section-type="activity_quiz"]',
     TRUE_FALSE: 'section[data-section-type="activity_true_false"]',
     OPEN_ENDED: 'section[data-section-type="activity_open_ended_answer"]'
 };
@@ -67,7 +68,7 @@ const activityHasUserData = (activityType) => {
         else if (activityType === 'activity_fill_in_a_table') {
             return hasNonEmptyInputs('section td input[type="text"], section td textarea');
         }
-        else if (activityType === 'activity_multiple_choice') {
+        else if (activityType === 'activity_multiple_choice' || activityType === 'activity_quiz') {
             return document.querySelectorAll('section input[type="radio"]:checked').length > 0;
         }
         else if (activityType === 'activity_true_false') {
@@ -362,6 +363,9 @@ function initializeActivityHandlers() {
         localStorage.removeItem(`${activityId}_selectedOption`);
     };
 
+    // Quiz uses the same reset handler as multiple choice
+    activityResetHandlers[ActivityTypes.QUIZ] = activityResetHandlers[ActivityTypes.MULTIPLE_CHOICE];
+
     activityResetHandlers[ActivityTypes.TRUE_FALSE] = (activityId) => {
         const activitySection = document.querySelector(SELECTORS.TRUE_FALSE);
         const radioButtons = activitySection ?
@@ -412,6 +416,12 @@ function initializeActivityHandlers() {
     const activityHandlers = {};
 
     activityHandlers[ActivityTypes.MULTIPLE_CHOICE] = {
+        setup: prepareMultipleChoice,
+        validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
+    };
+
+    // Quiz uses the same handlers as multiple choice
+    activityHandlers[ActivityTypes.QUIZ] = {
         setup: prepareMultipleChoice,
         validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
     };
