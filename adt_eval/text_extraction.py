@@ -45,6 +45,13 @@ class TextExtractionEvaluator(BaseEvaluator):
         actual_type_by_text = {}
         for group in page_texts.groups:
             for text_item in group.texts:
+
+                # Some mild cleaning on the text content to match the Gold Standard
+                text_item.text=text_item.text.replace("’", "'")
+                text_item.text=text_item.text.replace("”", '"')
+                text_item.text=text_item.text.replace("‘", "'")
+                text_item.text=text_item.text.replace("“", '"')
+
                 if text_item.text not in actual_type_by_text.keys():
                     # If text does not yet appear in dictionary, insert as a 1-item list
                     actual_type_by_text[text_item.text] = [text_item.text_type.value]
@@ -58,6 +65,16 @@ class TextExtractionEvaluator(BaseEvaluator):
         for tt in truth:
             text_content = tt["value"]["text"]
             text_type = tt["value"]["taxonomy"][0][0]
+
+            # Some mild cleaning on the text content to match the Gold Standard
+            text_content=text_content.replace("\/","/")
+            text_content=text_content.replace("\\n","\n")
+            text_content=text_content.replace("  "," ")
+            text_content=text_content.replace("’", "'")
+            text_content=text_content.replace("”", '"')
+            text_content=text_content.replace("‘", "'")
+            text_content=text_content.replace("“", '"')
+            text_content=text_content.replace("\xad", "")
 
             # Implement match between ground truth TT and actual LLM result, greedily taking the first text type in the list
             if (text_content in actual_type_by_text):
@@ -76,7 +93,6 @@ class TextExtractionEvaluator(BaseEvaluator):
                     "actual": actual_type,
                 }
             )
-
 
         # Add unmatched actual results
         for text_content, actual_type in actual_type_by_text.items():
