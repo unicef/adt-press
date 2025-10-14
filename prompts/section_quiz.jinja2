@@ -46,7 +46,6 @@ Guidelines:
 Please analyze these textbook sections and create a comprehension quiz question based on the content.
 
 The sections to analyze:
-{{ text_groups }}
 {% for section in sections %}
 Section Type: {{ section.section_type }}
 Section Text: {% for part in section.part_ids %}{{ part }}{% if text_groups[part] %}{% for text in text_groups[part].texts %}{{ text.text }} {% endfor %}{% endif %}{% endfor %}
