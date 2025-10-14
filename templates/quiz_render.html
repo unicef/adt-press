@@ -30,7 +30,7 @@
     <section
         id="simple-main"
         role="activity"
-        data-section-type="activity_multiple_choice"
+        data-section-type="activity_quiz"
         data-id="{{ quiz.quiz_id }}"
         data-area-id="{{ quiz.quiz_id }}"
         data-correct-answers='{{ answers.mapping | tojson }}'
@@ -101,49 +101,9 @@
     </section>
 </div>
 
-<script>
-    (function () {
-        document.body.style.backgroundColor = '#FFFAF5';
-
-        const script = document.currentScript;
-        const activitySection = script?.previousElementSibling?.matches?.('section[role="activity"]')
-            ? script.previousElementSibling
-            : document.querySelector('section[role="activity"][data-section-type="activity_multiple_choice"]');
-
-        if (!activitySection) {
-            return;
-        }
-
-        const rawAnswers = activitySection.getAttribute('data-correct-answers');
-        if (rawAnswers) {
-            try {
-                const parsedAnswers = JSON.parse(rawAnswers);
-                window.correctAnswers = Object.assign(window.correctAnswers || {}, parsedAnswers);
-            } catch (error) {
-                console.warn('Unable to parse multiple choice answers', error);
-            }
-        }
-
-        const rawExplanations = activitySection.getAttribute('data-option-explanations');
-        if (rawExplanations) {
-            try {
-                const parsedExplanations = JSON.parse(rawExplanations);
-                window.multipleChoiceExplanations = Object.assign(
-                    window.multipleChoiceExplanations || {},
-                    parsedExplanations
-                );
-            } catch (error) {
-                console.warn('Unable to parse multiple choice explanations', error);
-            }
-        }
-
-        if (!document.getElementById('validation-results-announcement')) {
-            const announcement = document.createElement('div');
-            announcement.id = 'validation-results-announcement';
-            announcement.className = 'sr-only';
-            announcement.setAttribute('role', 'status');
-            announcement.setAttribute('aria-live', 'polite');
-            document.body.appendChild(announcement);
-        }
-    })();
+<script type="application/json" id="quiz-correct-answers">
+{{ answers.mapping | tojson(ensure_ascii=False) }}
+</script>
+<script type="application/json" id="quiz-explanations">
+{{ explanations.mapping | tojson(ensure_ascii=False) }}
 </script>

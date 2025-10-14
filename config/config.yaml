@@ -1,5 +1,5 @@
-label: "???"
-pdf_path: "???"
+label: "momo-v3"
+pdf_path: "assets/momo.pdf"
 
 input_language: null
 plate_language: "${input_language}"
