@@ -211,3 +211,8 @@ output/
 outputs/
 .hamilton_cache/
 .DS_Store
+
+# output from testruns
+mlruns/
+traces/
+aca-unidata-adt-mlflow.bravesand-2f993e9b.eastus2.azurecontainerapps.io/
