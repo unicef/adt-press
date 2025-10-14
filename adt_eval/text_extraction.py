@@ -1,4 +1,12 @@
-"""Text extraction evaluation implementation."""
+"""Text extraction evaluation implementation.
+    
+Some notes on the scoring of matches:
+- The LabelStudio text_type dataset sometimes had errors in the text_transcript that were later corrected. Thus, in this script, we correct some of these errors as well (for example, removing double spaces).
+- Mismatches are often introduced by mismatched directional quotations, e.g. ’,”,‘,“. These are replaced by non-directional quotations in both the LLM output and the Gold Standard.
+- The match strategy implemented is a greedy one. 
+    - For each line in the LLM output, a list of labels is created (where each item in the list is the text type corresponding to one repetition of the line in the LLM output).
+    - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
+"""
 
 from pathlib import Path
 from typing import Any, Dict
