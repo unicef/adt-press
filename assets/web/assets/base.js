@@ -14,7 +14,7 @@ import {
   handleInitializationError,
   showMainContent,
 } from "./modules/error_utils.js";
-import { loadMerriweatherFont } from "./modules/font_utils.js";
+import { loadAtkinsonFont } from "./modules/font_utils.js";
 import {
   initializeLanguageDropdown,
   cacheInterfaceElements,
@@ -298,7 +298,7 @@ async function initializeCoreFunctionality() {
 
     // Set initial language (without validation since config not loaded yet)
     initializeLanguage();
-  loadMerriweatherFont();
+  loadAtkinsonFont();
     initCharacterDisplay();
 
     // Initialize components after HTML is definitely loaded
