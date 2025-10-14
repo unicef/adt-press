@@ -196,11 +196,13 @@ const selectOption = (option) => {
 
     // Announce selection to screen readers
     const optionLetter = option.querySelector('.option-letter')?.textContent || '';
-    const liveRegion = document.getElementById('toast');
+    const liveRegion = document.getElementById('validation-results-announcement');
     if (liveRegion) {
         liveRegion.setAttribute('aria-live', 'polite');
         liveRegion.textContent = `Option ${optionLetter} selected`;
-        setTimeout(() => { liveRegion.textContent = ''; }, 1000);
+        setTimeout(() => {
+            liveRegion.textContent = '';
+        }, 1000);
     }
 
     // Guardar en localStorage
@@ -329,13 +331,12 @@ export const checkMultipleChoice = () => {
         console.log("No option selected");
         
         // Add announcement for screen readers
-        const liveRegion = document.getElementById('toast');
-        if (liveRegion) {
-            liveRegion.setAttribute('aria-live', 'assertive');
-            liveRegion.textContent = translateText("select-option-first");
-            liveRegion.classList.remove('hidden');
+        const announcement = document.getElementById('validation-results-announcement');
+        if (announcement) {
+            announcement.setAttribute('aria-live', 'assertive');
+            announcement.textContent = translateText("select-option-first");
             setTimeout(() => {
-                liveRegion.classList.add('hidden');
+                announcement.textContent = '';
             }, 3000);
         }
         
@@ -379,8 +380,19 @@ const styleSelectedOption = (option, isCorrect) => {
 
 const showFeedback = (option, isCorrect) => {
     const feedbackContainer = option.querySelector('.feedback-container');
+
+    if (!feedbackContainer) {
+        console.warn('Feedback container not found for option:', option);
+        return;
+    }
+
     const feedbackIcon = feedbackContainer.querySelector('.feedback-icon');
     const feedbackText = feedbackContainer.querySelector('.feedback-text');
+
+    if (!feedbackIcon || !feedbackText) {
+        console.warn('Feedback children missing for option:', option);
+        return;
+    }
 
     feedbackContainer.classList.remove('hidden');
 
@@ -437,7 +449,10 @@ const showFeedback = (option, isCorrect) => {
         // Guardar en localStorage
         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
     
-        localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+        const heading = document.querySelector('h1');
+        if (heading) {
+            localStorage.setItem("namePage", heading.innerText);
+        }
         executeMail(ActivityTypes.MULTIPLE_CHOICE);
     } else {
         feedbackIcon.className = 'feedback-icon hidden';

@@ -1,4 +1,4 @@
-{% set container_bg = section.background_color if section.background_color else '#fef6ed' %}
+{% set container_bg = '#FFFAF5' %}
 {% set content_color = section.text_color if section.text_color else '#2d2a26' %}
 {% set aggregates = namespace(images=[], text_parts=[], text_length=0) %}
 
@@ -34,15 +34,14 @@
         class="w-full"
         data-text-color="{{ content_color }}"
     >
-    <div class="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 rounded-[32px] bg-white/70 px-6 py-10 lg:flex-row lg:items-stretch lg:px-10 lg:py-16">
+    <div class="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 rounded-[32px] px-6 py-10 lg:flex-row lg:items-stretch lg:px-10 lg:py-16">
             {% if has_images %}
                 <div class="flex w-full max-w-xl flex-shrink-0 items-center justify-center">
                     {% if aggregates.images|length == 1 %}
                         {% set img_id = aggregates.images[0] %}
                         <img
                             data-id="{{ img_id }}"
-                            class="h-auto w-full rounded-[28px] object-cover shadow-lg"
-                            style="max-height: 29rem;"
+                            class="h-auto w-full rounded-[28px] object-contain shadow-lg"
                         >
                     {% else %}
                         <div class="grid w-full gap-6 sm:grid-cols-{{ 2 if aggregates.images|length > 1 else 1 }}">
@@ -94,6 +93,8 @@
 
 <script>
     (function () {
+        document.body.style.backgroundColor = '#FFFAF5';
+
         const container = document.getElementById('content');
         const section = container?.querySelector('#simple-main');
 

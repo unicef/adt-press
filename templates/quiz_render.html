@@ -37,7 +37,7 @@
     data-option-explanations='{{ explanations.mapping | tojson }}'
     >
         <div class="flex w-full flex-col items-center gap-10 px-6 py-10">
-            <div class="w-full max-w-3xl rounded-3xl bg-white/95 p-10">
+            <div class="w-full max-w-3xl rounded-3xl p-10">
                 <header class="text-center">
                     <p
                         id="{{ quiz.quiz_id }}-question-label"
@@ -57,7 +57,7 @@
                         {% set option_letter = option_letters[loop.index0] if loop.index0 < option_letters|length else loop.index %}
                         {% set option_explanation = explanations.mapping.get(option_id, '') %}
                         <label
-                            class="activity-option w-full max-w-xl cursor-pointer rounded-2xl border-2 border-gray-900 bg-[#fef9f2] px-8 py-6 text-center text-xl font-medium text-gray-900 shadow-[0_6px_0_0_rgba(0,0,0,0.65)] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300 hover:translate-y-[-2px] hover:shadow-[0_8px_0_0_rgba(0,0,0,0.55)]"
+                            class="activity-option w-full max-w-xl cursor-pointer rounded-2xl border-2 border-gray-900 bg-[#FFFAF5] px-8 py-6 text-center text-xl font-medium text-gray-900 shadow-[0_6px_0_0_rgba(0,0,0,0.65)] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300 hover:translate-y-[-2px] hover:shadow-[0_8px_0_0_rgba(0,0,0,0.55)]"
                             data-activity-item="{{ option_id }}"
                             data-explanation="{{ option_explanation | e }}"
                             tabindex="0"
@@ -103,6 +103,8 @@
 
 <script>
     (function () {
+        document.body.style.backgroundColor = '#FFFAF5';
+
         const script = document.currentScript;
         const activitySection = script?.previousElementSibling?.matches?.('section[role="activity"]')
             ? script.previousElementSibling
