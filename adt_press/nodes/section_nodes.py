@@ -82,6 +82,7 @@ def section_metadata_by_id(
     results = run_async_task(get_metadata)
     return {metadata.section_id: metadata for metadata in results}
 
+
 @config.when(quiz_strategy="llm")
 def quizzes_by_section_id__llm(
     plate_language_config: str,
