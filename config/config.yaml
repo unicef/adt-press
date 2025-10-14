@@ -26,6 +26,9 @@ easy_read_strategy: llm
 # our caption strategy, either llm or none
 caption_strategy: llm
 
+# our quiz strategy, either llm or none
+quiz_strategy: llm
+
 # our TTS / speech strategy, either tts or none
 speech_strategy: tts
 

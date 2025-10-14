@@ -82,8 +82,8 @@ def section_metadata_by_id(
     results = run_async_task(get_metadata)
     return {metadata.section_id: metadata for metadata in results}
 
-
-def quizzes_by_section_id(
+@config.when(quiz_strategy="llm")
+def quizzes_by_section_id__llm(
     plate_language_config: str,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
@@ -116,6 +116,17 @@ def quizzes_by_section_id(
 
     results = run_async_task(get_quizzes)
     return {quiz.section_id: quiz for quiz in results}
+
+
+@config.when(quiz_strategy="none")
+def quizzes_by_section_id__none(
+    plate_language_config: str,
+    pdf_pages: list[Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    pdf_text_groups_by_id: dict[str, PageTextGroup],
+    quiz_prompt_config: QuizPromptConfig,
+) -> dict[str, SectionQuiz]:
+    return {}
 
 
 @config.when(explanation_strategy="llm")
