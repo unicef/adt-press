@@ -1,5 +1,5 @@
 [![Ruff](https://github.com/unicef/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/ruff.yml)
-[![Unit Tests](https://github.com/unicef/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/test.yml)
+<!-- [![Unit Tests](https://github.com/unicef/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/test.yml) -->
 [![Deploy Sample](https://github.com/unicef/adt-press/actions/workflows/deploy.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/deploy.yml)
 [![Coverage badge](https://github.com/unicef/adt-press/raw/python-coverage-comment-action-data/badge.svg)](https://github.com/unicef/adt-press/tree/python-coverage-comment-action-data)
 
@@ -52,7 +52,7 @@ uv sync
 Run the main script with the default configuration:
 
 ```bash
-uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf
+uv run adt-press.py label=raven pdf_path=assets/raven.pdf
 ```
 
 ### Configuration
@@ -170,7 +170,7 @@ docker run --rm adt-press
 To run a specific command inside the container (for example, to execute `uv run adt-press.py` with a PDF file):
 
 ```bash
-docker run --rm adt-press uv run adt-press.py label=mydocument pdf_path=/data/document.pdf
+docker run --rm adt-press uv run adt-press.py label=raven pdf_path=assets/raven.pdf
 ```
 
 Replace `/data/yourfile.pdf` with the path to your PDF file inside the container.
