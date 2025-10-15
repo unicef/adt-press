@@ -52,7 +52,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/momo.pdf label=momo page_range.end=5
+          uv run adt-press.py pdf_path=./assets/raven.pdf label=raven page_range.end=5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: preview-${{ github.run_id }}
-          path: output/momo/
+          path: output/raven/
 
   push-azure:
     needs: build-preview
@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: preview-${{ github.run_id }}
-          path: output/momo/
+          path: output/raven/
 
       - name: Install azcopy
         run: |
@@ -86,7 +86,7 @@ jobs:
         with:
           inlineScript: |
               az storage blob delete-batch -s '$web' --pattern "actions/prs/${{ github.event.number }}/preview/*" || true
-              az storage blob upload-batch -d '$web' -s output/momo/ --overwrite --destination-path actions/prs/${{ github.event.number }}/preview/
+              az storage blob upload-batch -d '$web' -s output/raven/ --overwrite --destination-path actions/prs/${{ github.event.number }}/preview/
         env:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}

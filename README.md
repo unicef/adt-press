@@ -10,6 +10,11 @@ A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
 The [sample report](https://adtpress.z1.web.core.windows.net/sample/) can help in better understanding the process and outputs or you can view the final [ADT (Accessible Digital Textbook)](https://adtpress.z1.web.core.windows.net/sample/adt/sec_p1_s0.html).
 
+Other demos of ADTs created from the output of ADT Press:
+ * [Queremos](https://unicef.github.io/adt-queremos-participar/) - Informative reader from Uruguay. 
+ * [Cuaderno5 Chapter 1](https://unicef.github.io/ADT-cuaderno5-chapter1/) - Uruguay Grade 5 textbook with Activities. 
+ * [Momo Multilingual](https://unicef.github.io/adt-momo-storybook/) - Momo and the Leopards, multi-lingual reader from Bhutan.
+
 ## Features
 
 - PDF document processing and image extraction
@@ -68,6 +73,11 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
 - `output_dir`: Base directory to store outputs
 - `template_dir`: Directory containing HTML templates
 - `clear_cache`: Whether to clear the processing cache before the run
+- `render_strategy`: Controls which strategy to use for layout generation
+  - `dynamic` (by default) - detects `layout_types` and routes them to render strategies
+  - `two_column` works best for novels and storybooks
+  - `html` works best for textbooks
+  - `overlay` works best for comic books
 
 ## Output
 
@@ -78,7 +88,7 @@ The application generates the following outputs in the `output/[your label]` dir
 - HTML reports with analysis results
 - Visualization of the processing pipeline
 
-## Evalation Framework
+## Evaluation Framework
 
 adt-press includes an evaluation tool used for measuring performance of the various LLM tasks against a gold standard. To run the tool make sure you have the following environment variables set:
 
