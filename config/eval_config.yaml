@@ -15,8 +15,8 @@ eval:
 
   # Task-specific configurations
   task_configs:
-    text_extraction:
+    text_type:
       label_studio_project_name: "A2: Text Type"
       model: ${default_model}
       prompt: ${prompts.text_extraction}
-      report_template_path: templates/eval/text_extraction_report.html
+      report_template_path: templates/eval/text_type_report.html
