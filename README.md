@@ -1,6 +1,6 @@
 # Repository Coverage
 
-
+[Full report](https://htmlpreview.github.io/?https://github.com/unicef/adt-press/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
 | Name                                            |    Stmts |     Miss |   Cover |   Missing |
 |------------------------------------------------ | -------: | -------: | ------: | --------: |
@@ -35,9 +35,9 @@
 | adt\_press/nodes/config\_nodes.py               |      122 |        4 |     97% |87, 168, 173, 178 |
 | adt\_press/nodes/image\_nodes.py                |      109 |        0 |    100% |           |
 | adt\_press/nodes/pdf\_nodes.py                  |       73 |        0 |    100% |           |
-| adt\_press/nodes/plate\_nodes.py                |      110 |        0 |    100% |           |
+| adt\_press/nodes/plate\_nodes.py                |      110 |        2 |     98% |   36, 103 |
 | adt\_press/nodes/report\_nodes.py               |       44 |        0 |    100% |           |
-| adt\_press/nodes/section\_nodes.py              |       84 |        0 |    100% |           |
+| adt\_press/nodes/section\_nodes.py              |       84 |        1 |     99% |        31 |
 | adt\_press/nodes/speech\_nodes.py               |       24 |        0 |    100% |           |
 | adt\_press/nodes/web\_nodes.py                  |      130 |       10 |     92% |58, 66, 71, 74, 76, 78, 82, 86, 90, 92 |
 | adt\_press/pipeline.py                          |       35 |        0 |    100% |           |
@@ -53,11 +53,11 @@
 | tests/test\_clear\_cache.py                     |       45 |        0 |    100% |           |
 | tests/test\_page\_sectioning\_validator.py      |       46 |        0 |    100% |           |
 | tests/test\_parameter\_validation.py            |       30 |        0 |    100% |           |
-| tests/test\_pipeline.py                         |       75 |        0 |    100% |           |
+| tests/test\_pipeline.py                         |       78 |        0 |    100% |           |
 | tests/test\_two\_column.py                      |       21 |        5 |     76% | 47, 54-57 |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **2112** |  **117** | **94%** |           |
+|                                       **TOTAL** | **2115** |  **120** | **94%** |           |
 
 
 ## Setup coverage badge
@@ -66,11 +66,22 @@ Below are examples of the badges you can use in your main branch `README` file.
 
 ### Direct image
 
-[![Coverage badge](https://github.com/unicef/adt-press/raw/python-coverage-comment-action-data/badge.svg)](https://github.com/unicef/adt-press/tree/python-coverage-comment-action-data)
+[![Coverage badge](https://raw.githubusercontent.com/unicef/adt-press/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/unicef/adt-press/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
 This is the one to use if your repository is private or if you don't want to customize anything.
 
+### [Shields.io](https://shields.io) Json Endpoint
 
+[![Coverage badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/unicef/adt-press/python-coverage-comment-action-data/endpoint.json)](https://htmlpreview.github.io/?https://github.com/unicef/adt-press/blob/python-coverage-comment-action-data/htmlcov/index.html)
+
+Using this one will allow you to [customize](https://shields.io/endpoint) the look of your badge.
+It won't work with private repositories. It won't be refreshed more than once per five minutes.
+
+### [Shields.io](https://shields.io) Dynamic Badge
+
+[![Coverage badge](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=%24.message&url=https%3A%2F%2Fraw.githubusercontent.com%2Funicef%2Fadt-press%2Fpython-coverage-comment-action-data%2Fendpoint.json)](https://htmlpreview.github.io/?https://github.com/unicef/adt-press/blob/python-coverage-comment-action-data/htmlcov/index.html)
+
+This one will always be the same color. It won't work for private repos. I'm not even sure why we included it.
 
 ## What is that?
 
