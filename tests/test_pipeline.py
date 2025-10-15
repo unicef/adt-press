@@ -61,7 +61,7 @@ class PipelineTest(unittest.TestCase):
 
             print("Files in images directory:")
             for file in (Path(self.run_dir) / "images").iterdir():
-                print(file)                
+                print(file)
 
             # assert that our output report was created
             output_files = [
