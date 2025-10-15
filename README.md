@@ -82,7 +82,7 @@ The application generates the following outputs in the `output/[your label]` dir
 - HTML reports with analysis results
 - Visualization of the processing pipeline
 
-## Evalation Framework
+## Evaluation Framework
 
 adt-press includes an evaluation tool used for measuring performance of the various LLM tasks against a gold standard. To run the tool make sure you have the following environment variables set:
 
