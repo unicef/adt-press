@@ -5,11 +5,11 @@ A general-purpose evaluation framework for testing various ADT Press components.
 
 Usage:
     uv run adt-eval                                    # Run all tasks
-    uv run adt-eval tasks_to_run=[text_extraction]     # Run specific task
-    uv run adt-eval tasks_to_run=[text_extraction] eval.limit=50 # Limit to first 50
+    uv run adt-eval tasks_to_run=[text_type]     # Run specific task
+    uv run adt-eval tasks_to_run=[text_type] eval.limit=50 # Limit to first 50
 
 Available tasks:
-    - text_extraction: Evaluate text extraction and classification accuracy
+    - text_type: Evaluate text type accuracy
 """
 
 import asyncio

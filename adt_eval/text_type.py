@@ -1,4 +1,4 @@
-"""Text extraction evaluation implementation.
+"""Text type evaluation implementation.
     
 Some notes on the scoring of matches:
 - The LabelStudio text_type dataset sometimes had errors in the text_transcript that were later corrected. Thus, in this script, we correct some of these errors as well (for example, removing double spaces).
@@ -45,7 +45,7 @@ class TextTypeEvaluator(BaseEvaluator):
 
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
-        # Call the LLM for text extraction
+        # Call the LLM for text type classification
         page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
         result["page_texts"] = page_texts.model_dump()
 
