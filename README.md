@@ -72,6 +72,7 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
 - `output_dir`: Base directory to store outputs
 - `template_dir`: Directory containing HTML templates
 - `clear_cache`: Whether to clear the processing cache before the run
+- `render_strategy`: dynamic by default. Chooses which render strategy to employ. Two_column works best for novels and storybooks, Html works best for textbooks and Overlay works best for comic books.
 
 ## Output
 
