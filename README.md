@@ -12,7 +12,7 @@ The [sample report](https://adtpress.z1.web.core.windows.net/sample/) can help i
 
 Examples ADTs created using the ADT Press. [Queremos](https://unicef.github.io/adt-queremos-participar/) - Informative reader from Uruguay. 
 [Cuaderno5 Chapter 1](https://unicef.github.io/ADT-cuaderno5-chapter1/) - Uruguay Grade 5 textbook with Activities. 
-[Momo Multilingual]
+[Momo Multilingual](https://unicef.github.io/adt-momo-storybook/) - Momo and the Leopards, multi-lingual reader from Bhutan
 
 ## Features
 
