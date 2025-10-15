@@ -10,7 +10,7 @@ A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
 
 The [sample report](https://adtpress.z1.web.core.windows.net/sample/) can help in better understanding the process and outputs or you can view the final [ADT (Accessible Digital Textbook)](https://adtpress.z1.web.core.windows.net/sample/adt/sec_p1_s0.html).
 
-Examples of ADTs created from the output of ADT Press:
+Other demos of ADTs created from the output of ADT Press:
  * [Queremos](https://unicef.github.io/adt-queremos-participar/) - Informative reader from Uruguay. 
  * [Cuaderno5 Chapter 1](https://unicef.github.io/ADT-cuaderno5-chapter1/) - Uruguay Grade 5 textbook with Activities. 
  * [Momo Multilingual](https://unicef.github.io/adt-momo-storybook/) - Momo and the Leopards, multi-lingual reader from Bhutan.
