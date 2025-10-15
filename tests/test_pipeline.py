@@ -31,7 +31,7 @@ class PipelineTest(unittest.TestCase):
         self.assertNotIn(content, file_content, msg)
 
     def test_pipeline_integration_first_five_pages(self):
-        """Test the entire pipeline with first 6 pages using default config values."""
+        """Test the entire pipeline with first pages using default config values."""
 
         # Create a temporary output directory for this test
         with tempfile.TemporaryDirectory() as self.temp_dir:
@@ -43,6 +43,7 @@ class PipelineTest(unittest.TestCase):
                 "output_dir": self.temp_dir,
                 "web_strategy": "rows",
                 "crop_strategy": "llm",
+                "quiz_strategy": "llm",
                 "label": "raven",
                 "pdf_path": "assets/raven.pdf",
                 "page_range": dict(start=0, end=5),
@@ -67,6 +68,7 @@ class PipelineTest(unittest.TestCase):
                 "config.html",
                 "index.html",
                 "plate_report.html",
+                "quiz_report.html",
                 "web_report.html",
                 "glossary_report.html",
                 "translation_report.html",
@@ -109,6 +111,7 @@ class PipelineTest(unittest.TestCase):
                 "explanation_strategy": "none",
                 "easy_read_strategy": "none",
                 "speech_strategy": "none",
+                "quiz_strategy": "none",
                 "label": "raven",
                 "pdf_path": "assets/raven.pdf",
                 "page_range": dict(start=0, end=5),
@@ -129,6 +132,7 @@ class PipelineTest(unittest.TestCase):
                 "processed_images.html",
                 "pruned_images.html",
                 "page_report.html",
+                "quiz_report.html",
                 "config.html",
                 "index.html",
                 "plate_report.html",
