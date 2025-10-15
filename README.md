@@ -1,3 +1,8 @@
+[![Ruff](https://github.com/unicef/adt-press/actions/workflows/ruff.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/ruff.yml)
+[![Unit Tests](https://github.com/unicef/adt-press/actions/workflows/test.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/test.yml)
+[![Deploy Sample](https://github.com/unicef/adt-press/actions/workflows/deploy.yml/badge.svg)](https://github.com/unicef/adt-press/actions/workflows/deploy.yml)
+[![Coverage badge](https://github.com/unicef/adt-press/raw/python-coverage-comment-action-data/badge.svg)](https://github.com/unicef/adt-press/tree/python-coverage-comment-action-data)
+
 # ADT Press
 
 A tool for converting PDF files into Accessible Digital Textbooks, ADTs.
