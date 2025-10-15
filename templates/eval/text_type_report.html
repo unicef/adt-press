@@ -1,5 +1,5 @@
 {% extends "eval/base.html" %}
-{% block title %}Text Extraction Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (score * 100) | round | int }}%</span>{% endblock %}
+{% block title %}Text Type Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (score * 100) | round | int }}%</span>{% endblock %}
 
 {% block content %}
 {% for result in results %}

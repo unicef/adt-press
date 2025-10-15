@@ -18,8 +18,8 @@ from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.pdf import Page
 
 
-class TextExtractionEvaluator(BaseEvaluator):
-    """Evaluator for text extraction accuracy."""
+class TextTypeEvaluator(BaseEvaluator):
+    """Evaluator for text type accuracy."""
 
     def __init__(self, global_config: Dict[str, Any], task_config: Dict[str, Any], output_dir: Path):
         super().__init__(global_config, task_config, output_dir)
@@ -71,6 +71,9 @@ class TextExtractionEvaluator(BaseEvaluator):
         # Compare with truth annotations
         matches = []
         for tt in truth:
+            if tt["from_name"] == "notes":
+                continue
+            
             text_content = tt["value"]["text"]
             text_type = tt["value"]["taxonomy"][0][0]
 

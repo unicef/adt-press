@@ -22,13 +22,13 @@ from typing import Any, Dict, List
 from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
-from adt_eval.text_extraction import TextExtractionEvaluator
+from adt_eval.text_type import TextTypeEvaluator
 from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
 
 # Registry of available evaluators
 EVALUATORS = {
-    "text_extraction": TextExtractionEvaluator,
+    "text_type": TextTypeEvaluator,
 }
 
 
