@@ -7,11 +7,12 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, SectionExplanation
+from adt_press.utils.encoding import CleanTextMixin
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
-class ExplanationResponse(BaseModel):
+class ExplanationResponse(CleanTextMixin, BaseModel):
     reasoning: str
     explanation: str
 

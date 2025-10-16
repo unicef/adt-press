@@ -4,7 +4,6 @@ from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
 from pydantic import BaseModel
 
-from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.models.config import (
     HTMLPromptConfig,
     LayoutType,
@@ -12,6 +11,7 @@ from adt_press.models.config import (
     PromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    CropPromptConfig
 )
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash

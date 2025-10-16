@@ -8,11 +8,12 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
+from adt_press.utils.encoding import CleanTextMixin
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
-class GenerationResponse(BaseModel):
+class GenerationResponse(CleanTextMixin, BaseModel):
     reasoning: str
     content: str
 

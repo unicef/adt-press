@@ -5,11 +5,12 @@ from pydantic import BaseModel
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.text import EasyReadText, PageText
+from adt_press.utils.encoding import CleanTextMixin
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
-class EasyReadResponse(BaseModel):
+class EasyReadResponse(CleanTextMixin, BaseModel):
     data: str
     reasoning: str
 

@@ -7,10 +7,11 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, SectionMetadata
+from adt_press.utils.encoding import CleanTextMixin
 from adt_press.utils.file import cached_read_text_file
 
 
-class MetadataResponse(BaseModel):
+class MetadataResponse(CleanTextMixin, BaseModel):
     background_color: str
     text_color: str
     layout_type: str

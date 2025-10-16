@@ -6,10 +6,11 @@ from pydantic import BaseModel
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import Image, ImageMeaningfulness
 from adt_press.models.pdf import Page
+from adt_press.utils.encoding import CleanTextMixin
 from adt_press.utils.file import cached_read_text_file
 
 
-class MeaningfulnessResponse(BaseModel):
+class MeaningfulnessResponse(CleanTextMixin, BaseModel):
     is_meaningful: bool
     reasoning: str
 
