@@ -9,7 +9,7 @@ def base64_encode(data: bytes) -> str:
     return base64.b64encode(data).decode("utf-8")
 
 
-def _clean(obj: Any):
+def _clean(obj: Any) -> Any:
     if isinstance(obj, str):
         return fix_text(obj)
     if isinstance(obj, list):
