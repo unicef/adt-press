@@ -102,7 +102,7 @@ render_strategies:
     render_type: html
     config:
       model: default
-      template_path: prompts/web_generation_html_fit_overlay.jinja2
+      template_path: prompts/web_generation_overlay.jinja2
       max_retries: 25
 
   html:

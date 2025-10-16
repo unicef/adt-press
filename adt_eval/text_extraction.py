@@ -51,7 +51,11 @@ class TextExtractionEvaluator(BaseEvaluator):
         matches = []
         for tt in truth:
             text_content = tt["value"]["text"]
-            text_type = tt["value"]["taxonomy"][0][0]
+            taxonomy = tt["value"].get("taxonomy")
+            if not taxonomy:
+                continue
+
+            text_type = taxonomy[0][0]
 
             actual_type = actual_type_by_text.get(text_content)
 
