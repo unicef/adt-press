@@ -5,9 +5,9 @@ from pydantic import BaseModel
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.section import GlossaryItem
+from adt_press.utils.encoding import CleanTextMixin
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
-from adt_press.utils.encoding import CleanTextMixin
 
 
 class TranslationResponse(CleanTextMixin, BaseModel):

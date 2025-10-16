@@ -5,13 +5,13 @@ from omegaconf import DictConfig
 from pydantic import BaseModel
 
 from adt_press.models.config import (
+    CropPromptConfig,
     HTMLPromptConfig,
     LayoutType,
     PageRangeConfig,
     PromptConfig,
     RenderPromptConfig,
     RenderStrategy,
-    CropPromptConfig
 )
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash

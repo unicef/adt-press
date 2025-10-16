@@ -24,7 +24,7 @@ class Row(BaseModel):
     columns: list[Column]
 
 
-class GenerationResponse(CleanTextMixin,BaseModel):
+class GenerationResponse(CleanTextMixin, BaseModel):
     rows: list[Row]
     reasoning: str
 
