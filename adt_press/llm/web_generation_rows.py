@@ -7,7 +7,7 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 from adt_press.models.config import RenderPromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
-from adt_press.utils.encoding import CleanTextMixin
+from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -24,7 +24,7 @@ class Row(BaseModel):
     columns: list[Column]
 
 
-class GenerationResponse(CleanTextMixin, BaseModel):
+class GenerationResponse(CleanTextBaseModel):
     reasoning: str
     rows: list[Row]
 

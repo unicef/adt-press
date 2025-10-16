@@ -19,8 +19,8 @@ def _clean(obj: Any):
     return obj
 
 
-class CleanTextMixin(BaseModel):
-    """Mixing for base models used with the LLM to clean up text fields to not include spurious unicode."""
+class CleanTextBaseModel(BaseModel):
+    """Mixin for base models used with the LLM to clean up text fields to not include spurious unicode."""
 
     @model_validator(mode="before")
     @classmethod
