@@ -39,7 +39,7 @@ def cached_read_file(file_path: str) -> bytes:
 def read_text_file(file_path: str) -> str:
     """Read the content of a text file."""
     with open(file_path, "r", encoding="utf-8") as file:
-        return str(file.read())
+        return file.read()
 
 
 @cache
