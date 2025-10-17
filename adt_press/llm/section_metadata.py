@@ -2,15 +2,16 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from pydantic import BaseModel, ValidationInfo, field_validator
+from pydantic import ValidationInfo, field_validator
 
 from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, SectionMetadata
+from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 
 
-class MetadataResponse(BaseModel):
+class MetadataResponse(CleanTextBaseModel):
     background_color: str
     text_color: str
     layout_type: str

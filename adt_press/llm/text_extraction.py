@@ -1,26 +1,26 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from pydantic import BaseModel
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
+from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.logging import io_logger
 
 
-class Text(BaseModel):
+class Text(CleanTextBaseModel):
     text_type: TextType
     text: str
 
 
-class TextGroup(BaseModel):
+class TextGroup(CleanTextBaseModel):
     group_type: TextGroupType
     texts: list[Text]
 
 
-class TextResponse(BaseModel):
+class TextResponse(CleanTextBaseModel):
     reasoning: str
     groups: list[TextGroup]
 

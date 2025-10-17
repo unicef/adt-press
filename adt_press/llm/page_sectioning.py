@@ -8,6 +8,7 @@ from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionType
 from adt_press.models.text import PageTextGroup
+from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 
 
@@ -16,7 +17,7 @@ class Section(BaseModel):
     part_ids: list[str]
 
 
-class SectionResponse(BaseModel):
+class SectionResponse(CleanTextBaseModel):
     reasoning: str
     data: list[Section]
 
