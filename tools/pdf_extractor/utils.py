@@ -152,17 +152,19 @@ def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshol
         root = find(i)
         if root not in groups:
             groups[root] = []
-        groups[root].append((i, drawings[i]))  # Store index to preserve order
+        # Store seqno (if available) or index for z-order preservation
+        seqno = drawings[i].get('seqno', i)
+        groups[root].append((seqno, drawings[i]))
 
-    # Sort each group by original index to maintain z-order within the group
-    # Then sort groups by their minimum index to maintain z-order between groups
+    # Sort each group by seqno to maintain z-order within the group
+    # Then sort groups by their minimum seqno to maintain z-order between groups
     sorted_groups = []
     for group_items in groups.values():
-        group_items.sort(key=lambda x: x[0])  # Sort by original index
-        min_index = group_items[0][0]  # Get minimum index for this group
-        sorted_groups.append((min_index, [item[1] for item in group_items]))
+        group_items.sort(key=lambda x: x[0])  # Sort by seqno
+        min_seqno = group_items[0][0]  # Get minimum seqno for this group
+        sorted_groups.append((min_seqno, [item[1] for item in group_items]))
     
-    # Sort groups by their minimum index
+    # Sort groups by their minimum seqno
     sorted_groups.sort(key=lambda x: x[0])
     
     return [group[1] for group in sorted_groups]  # Extract just the drawings
@@ -233,18 +235,35 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
     min_y = min(box[1] for box in bounding_boxes)
     max_x = max(box[2] for box in bounding_boxes)
     max_y = max(box[3] for box in bounding_boxes)
+    
+    # Sanity check: if bounding box is too large, something is wrong
+    # Typical PDF page is ~600x800 points, so anything over 10000 is suspicious
+    bbox_width = max_x - min_x
+    bbox_height = max_y - min_y
+    if bbox_width > 10000 or bbox_height > 10000 or bbox_width <= 0 or bbox_height <= 0:
+        # Return a minimal empty image
+        return RenderedVectorImage(image=b'', width=0, height=0)
 
     # Scale factor: PDF points are 72 DPI, scale to 150 DPI
     scale = 150.0 / 72.0
     
-    width = int(math.ceil((max_x - min_x) * scale))
-    height = int(math.ceil((max_y - min_y) * scale))
+    width = int(math.ceil(bbox_width * scale))
+    height = int(math.ceil(bbox_height * scale))
 
     # Ensure minimum dimensions
     if width <= 0:
         width = 10
     if height <= 0:
         height = 10
+    
+    # Cairo has a maximum surface size (typically 32767x32767)
+    # If dimensions are too large, scale down
+    MAX_DIMENSION = 32000
+    if width > MAX_DIMENSION or height > MAX_DIMENSION:
+        scale_down = min(MAX_DIMENSION / width, MAX_DIMENSION / height)
+        width = int(width * scale_down)
+        height = int(height * scale_down)
+        scale = scale * scale_down
 
     # Create a Cairo surface and context for the group
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
@@ -253,10 +272,11 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
     # Set tolerance for curve rendering (lower = smoother curves, matches PyMuPDF better)
     ctx.set_tolerance(0.1)
 
-    # Fill the background with white
-    ctx.set_source_rgb(1, 1, 1)  # White
-    ctx.rectangle(0, 0, width, height)
-    ctx.fill()
+    # Clear the surface to fully transparent
+    ctx.set_source_rgba(0, 0, 0, 0)  # Transparent
+    ctx.set_operator(cairo.OPERATOR_SOURCE)  # Replace everything (including alpha)
+    ctx.paint()
+    ctx.set_operator(cairo.OPERATOR_OVER)  # Reset to normal compositing
 
     # Apply scaling and translation
     ctx.scale(scale, scale)
@@ -278,7 +298,8 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
         
         if has_fill:  # Filled Path
             fill_color = convert_color_cairo(drawing.get("fill")) if drawing.get("fill") else (0, 0, 0)
-            ctx.set_source_rgb(*fill_color)
+            fill_opacity = drawing.get("fill_opacity", 1.0)
+            ctx.set_source_rgba(*fill_color, fill_opacity)
             if has_stroke:
                 ctx.fill_preserve()  # Preserve the path for stroking
             else:
@@ -287,7 +308,8 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
         if has_stroke:  # Stroked Path
             stroke_color = convert_color_cairo(drawing.get("color")) if drawing.get("color") else (0, 0, 0)
             stroke_width = drawing.get("width", 1)
-            ctx.set_source_rgb(*stroke_color)
+            stroke_opacity = drawing.get("stroke_opacity", 1.0)
+            ctx.set_source_rgba(*stroke_color, stroke_opacity)
             ctx.set_line_width(stroke_width)
             ctx.stroke()
 
