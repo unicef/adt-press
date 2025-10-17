@@ -12,6 +12,7 @@ Usage:
 import argparse
 import os
 import sys
+import traceback
 from datetime import datetime
 
 import pymupdf  # PyMuPDF
@@ -231,7 +232,9 @@ Examples:
             print(f"  - Results saved to: {results_path}")
 
     except Exception as e:
-        print(f"Error during extraction: {e}", file=sys.stderr)
+        print(f"\nError during extraction: {e}", file=sys.stderr)
+        print("\nFull traceback:", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
 
