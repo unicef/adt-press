@@ -11,9 +11,9 @@ def base64_encode(data: bytes) -> str:
 
 def _clean(obj: Any) -> Any:
     if isinstance(obj, str):
-        fixed = ftfy.fix_text(obj, normalization='NFKC')
-        fixed = fixed.replace('–', '-')
-        fixed = fixed.replace('‐', '-')
+        fixed = ftfy.fix_text(obj, normalization="NFKC")
+        fixed = fixed.replace("–", "-")
+        fixed = fixed.replace("‐", "-")
         return fixed
     if isinstance(obj, list):
         return [_clean(x) for x in obj]
