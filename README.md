@@ -42,7 +42,7 @@
 | adt\_press/nodes/web\_nodes.py                  |      130 |       10 |     92% |58, 66, 71, 74, 76, 78, 82, 86, 90, 92 |
 | adt\_press/pipeline.py                          |       35 |        0 |    100% |           |
 | adt\_press/utils/\_\_init\_\_.py                |        0 |        0 |    100% |           |
-| adt\_press/utils/encoding.py                    |       19 |        1 |     95% |         9 |
+| adt\_press/utils/encoding.py                    |       22 |        1 |     95% |         9 |
 | adt\_press/utils/file.py                        |       30 |        0 |    100% |           |
 | adt\_press/utils/html.py                        |       34 |        0 |    100% |           |
 | adt\_press/utils/image.py                       |       50 |       13 |     74% |     49-65 |
@@ -52,14 +52,14 @@
 | adt\_press/utils/sync.py                        |       14 |        0 |    100% |           |
 | adt\_press/utils/web\_assets.py                 |       98 |       13 |     87% |13, 59-66, 119, 144-149 |
 | tests/test\_clear\_cache.py                     |       45 |        0 |    100% |           |
-| tests/test\_encoding.py                         |       34 |        1 |     97% |        58 |
+| tests/test\_encoding.py                         |       39 |        1 |     97% |        64 |
 | tests/test\_page\_sectioning\_validator.py      |       46 |        0 |    100% |           |
 | tests/test\_parameter\_validation.py            |       30 |        0 |    100% |           |
 | tests/test\_pipeline.py                         |       78 |        0 |    100% |           |
 | tests/test\_two\_column.py                      |       21 |        5 |     76% | 47, 54-57 |
 | tests/test\_web\_generation\_rows\_validator.py |       55 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py       |       84 |        0 |    100% |           |
-|                                       **TOTAL** | **2172** |  **122** | **94%** |           |
+|                                       **TOTAL** | **2180** |  **122** | **94%** |           |
 
 
 ## Setup coverage badge
