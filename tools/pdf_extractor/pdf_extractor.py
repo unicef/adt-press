@@ -12,6 +12,7 @@ Usage:
 import argparse
 import os
 import sys
+import traceback
 from datetime import datetime
 
 import pymupdf  # PyMuPDF
@@ -121,9 +122,9 @@ def extract_pages_from_pdf(output_dir: str, pdf_path: str, start_page: int, end_
             pix_rgb = None
             pix = None
 
-        # Extract vector drawings
-        drawings = fitz_page.get_drawings()
-        vector_images = render_drawings(drawings, margin_allowance=2, overlap_threshold=400)
+        # Extract vector drawings (extended=True to get clipping info)
+        drawings = fitz_page.get_drawings(extended=True)
+        vector_images = render_drawings(drawings, margin_allowance=0, overlap_threshold=400)
 
         for vector_img in vector_images:
             img_id = f"img_{page_id}_v{image_index}"
@@ -231,7 +232,9 @@ Examples:
             print(f"  - Results saved to: {results_path}")
 
     except Exception as e:
-        print(f"Error during extraction: {e}", file=sys.stderr)
+        print(f"\nError during extraction: {e}", file=sys.stderr)
+        print("\nFull traceback:", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
 
