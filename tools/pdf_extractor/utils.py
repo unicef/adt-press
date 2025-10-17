@@ -67,33 +67,181 @@ def convert_color_cairo(color: list[float]) -> tuple:
     return tuple(c for c in color) if color else (0, 0, 0)
 
 
+def _cubic_bezier_bounds(p0, p1, p2, p3, coord_attr):
+    """Calculate the min/max of a cubic Bezier curve for a given coordinate (x or y).
+    
+    A cubic Bezier is defined as: B(t) = (1-t)³P0 + 3(1-t)²tP1 + 3(1-t)t²P2 + t³P3
+    The extrema occur at t=0, t=1, or where the derivative = 0.
+    Derivative: B'(t) = 3(1-t)²(P1-P0) + 6(1-t)t(P2-P1) + 3t²(P3-P2)
+    Setting to 0 and solving gives us a quadratic equation: at² + bt + c = 0
+    """
+    # Get the coordinate values (x or y)
+    c0 = getattr(p0, coord_attr)
+    c1 = getattr(p1, coord_attr)
+    c2 = getattr(p2, coord_attr)
+    c3 = getattr(p3, coord_attr)
+    
+    # Start with endpoints
+    bounds = [c0, c3]
+    
+    # Coefficients for the derivative quadratic equation
+    a = 3 * (-c0 + 3*c1 - 3*c2 + c3)
+    b = 6 * (c0 - 2*c1 + c2)
+    c = 3 * (c1 - c0)
+    
+    # Solve quadratic equation at² + bt + c = 0
+    if abs(a) > 1e-10:  # Not a degenerate case
+        discriminant = b*b - 4*a*c
+        if discriminant >= 0:
+            sqrt_disc = math.sqrt(discriminant)
+            t1 = (-b + sqrt_disc) / (2*a)
+            t2 = (-b - sqrt_disc) / (2*a)
+            
+            # Check if t values are in valid range [0, 1]
+            for t in [t1, t2]:
+                if 0 < t < 1:
+                    # Evaluate Bezier at this t
+                    s = 1 - t
+                    val = s*s*s*c0 + 3*s*s*t*c1 + 3*s*t*t*c2 + t*t*t*c3
+                    bounds.append(val)
+    elif abs(b) > 1e-10:  # Linear case
+        t = -c / b
+        if 0 < t < 1:
+            s = 1 - t
+            val = s*s*s*c0 + 3*s*s*t*c1 + 3*s*t*t*c2 + t*t*t*c3
+            bounds.append(val)
+    
+    return min(bounds), max(bounds)
+
+
+def _quadratic_bezier_bounds(p0, p1, p2, coord_attr):
+    """Calculate the min/max of a quadratic Bezier curve for a given coordinate.
+    
+    Quadratic Bezier: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
+    Derivative: B'(t) = 2(1-t)(P1-P0) + 2t(P2-P1)
+    Setting to 0: t = (P0-P1)/(P0-2P1+P2)
+    """
+    c0 = getattr(p0, coord_attr)
+    c1 = getattr(p1, coord_attr)
+    c2 = getattr(p2, coord_attr)
+    
+    bounds = [c0, c2]
+    
+    denominator = c0 - 2*c1 + c2
+    if abs(denominator) > 1e-10:
+        t = (c0 - c1) / denominator
+        if 0 < t < 1:
+            # Evaluate Bezier at this t
+            s = 1 - t
+            val = s*s*c0 + 2*s*t*c1 + t*t*c2
+            bounds.append(val)
+    
+    return min(bounds), max(bounds)
+
+
 def compute_bounding_box(drawing) -> tuple:
-    """Compute the bounding box of a drawing."""
+    """Compute the accurate bounding box of a drawing.
+    
+    For curves, this calculates the actual mathematical bounds, not just the
+    control points, which prevents false overlaps from control points that
+    extend beyond the visible curve.
+    """
+    # Skip group elements (from extended=True mode) - they don't have items
+    if drawing.get("type") == "group" or "items" not in drawing:
+        # Use rect if available, otherwise return empty bounds
+        rect = drawing.get("rect")
+        if rect:
+            return (rect.x0, rect.y0, rect.x1, rect.y1)
+        return (0, 0, 0, 0)
+    
     min_x = min_y = float("inf")
     max_x = max_y = float("-inf")
+    
+    # Track current position for curves that draw from current point
+    current_x = current_y = 0.0
 
     for item in drawing["items"]:
         cmd = item[0]
 
-        if cmd == "re":
+        if cmd == "m":  # Move
+            p = item[1]
+            current_x, current_y = p.x, p.y
+            min_x = min(min_x, p.x)
+            min_y = min(min_y, p.y)
+            max_x = max(max_x, p.x)
+            max_y = max(max_y, p.y)
+            
+        elif cmd == "l":  # Line
+            if len(item) == 3:
+                start_p, end_p = item[1], item[2]
+                current_x, current_y = end_p.x, end_p.y
+                min_x = min(min_x, start_p.x, end_p.x)
+                min_y = min(min_y, start_p.y, end_p.y)
+                max_x = max(max_x, start_p.x, end_p.x)
+                max_y = max(max_y, start_p.y, end_p.y)
+            else:
+                p = item[1]
+                current_x, current_y = p.x, p.y
+                min_x = min(min_x, p.x)
+                min_y = min(min_y, p.y)
+                max_x = max(max_x, p.x)
+                max_y = max(max_y, p.y)
+                
+        elif cmd == "c":  # Cubic Bezier
+            if len(item) == 5:
+                start_p, cp1, cp2, end_p = item[1], item[2], item[3], item[4]
+                # Calculate actual curve bounds
+                x_min, x_max = _cubic_bezier_bounds(start_p, cp1, cp2, end_p, 'x')
+                y_min, y_max = _cubic_bezier_bounds(start_p, cp1, cp2, end_p, 'y')
+                min_x = min(min_x, x_min)
+                max_x = max(max_x, x_max)
+                min_y = min(min_y, y_min)
+                max_y = max(max_y, y_max)
+                current_x, current_y = end_p.x, end_p.y
+            else:
+                # Fallback for different structure
+                for point in item[1:]:
+                    if hasattr(point, "x"):
+                        min_x = min(min_x, point.x)
+                        max_x = max(max_x, point.x)
+                        min_y = min(min_y, point.y)
+                        max_y = max(max_y, point.y)
+                        
+        elif cmd == "v":  # Quadratic Bezier
+            if len(item) == 3:
+                p0_x, p0_y = current_x, current_y
+                cp, end_p = item[1], item[2]
+                # Create Point-like objects for the calculation
+                class P:
+                    def __init__(self, x, y):
+                        self.x = x
+                        self.y = y
+                p0 = P(p0_x, p0_y)
+                x_min, x_max = _quadratic_bezier_bounds(p0, cp, end_p, 'x')
+                y_min, y_max = _quadratic_bezier_bounds(p0, cp, end_p, 'y')
+                min_x = min(min_x, x_min)
+                max_x = max(max_x, x_max)
+                min_y = min(min_y, y_min)
+                max_y = max(max_y, y_max)
+                current_x, current_y = end_p.x, end_p.y
+            else:
+                for point in item[1:]:
+                    if hasattr(point, "x"):
+                        min_x = min(min_x, point.x)
+                        max_x = max(max_x, point.x)
+                        min_y = min(min_y, point.y)
+                        max_y = max(max_y, point.y)
+                        
+        elif cmd == "re":  # Rectangle
             rect = item[1]
             min_x = min(min_x, rect.x0, rect.x1)
             min_y = min(min_y, rect.y0, rect.y1)
             max_x = max(max_x, rect.x0, rect.x1)
             max_y = max(max_y, rect.y0, rect.y1)
-        elif cmd == "qu":
-            # Quadrilateral - check all 4 points
+            
+        elif cmd == "qu":  # Quadrilateral
             quad = item[1]
             for point in quad:
-                if hasattr(point, "x") and hasattr(point, "y"):
-                    min_x = min(min_x, point.x)
-                    min_y = min(min_y, point.y)
-                    max_x = max(max_x, point.x)
-                    max_y = max(max_y, point.y)
-        elif cmd in ["m", "l", "c", "v"]:
-            # Move, line, cubic curve, or quadratic curve - check all points
-            points = item[1:]
-            for point in points:
                 if hasattr(point, "x") and hasattr(point, "y"):
                     min_x = min(min_x, point.x)
                     min_y = min(min_y, point.y)
@@ -284,10 +432,13 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
 
     # Draw each drawing in the group
     for drawing in group_drawings:
-        # Handle filling and stroking based on the drawing type
         drawing_type = drawing.get("type", "")
         
-        # Set fill rule BEFORE creating the path (always use winding to match PyMuPDF)
+        # Skip non-drawable types (shouldn't happen since we filter, but be safe)
+        if drawing_type in ["group", "clip"]:
+            continue
+        
+        # Set fill rule BEFORE creating the path
         ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
         
         ctx.new_path()  # Start a new path for each drawing
@@ -362,6 +513,15 @@ def render_single_drawing(ctx: cairo.Context, drawing):
 
 def render_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> list[RenderedVectorImage]:
     """Renders the passed in PDF drawings to images, grouping overlapping drawings."""
-    groups = group_overlapping_drawings(drawings, margin_allowance, overlap_threshold)
+    # When using extended=True, we get clips and groups that we need to preserve
+    # We can't just filter to drawable items and group them - we lose the clip hierarchy
+    # For now, let's filter to only actual drawable items for grouping
+    # TODO: Handle clip hierarchy properly when grouping
+    drawable_items = [d for d in drawings if d.get("type") not in ["group", "clip"] and "items" in d]
+    
+    if not drawable_items:
+        return []
+    
+    groups = group_overlapping_drawings(drawable_items, margin_allowance, overlap_threshold)
     results = [render_group_to_image(group) for group in groups]
     return [r for r in results if r.width > 0 and r.height > 0]  # Filter out empty images
