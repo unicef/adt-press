@@ -262,7 +262,7 @@ def boxes_overlap(
     """Check if two bounding boxes overlap."""
     min_x1, min_y1, max_x1, max_y1 = box1
     min_x2, min_y2, max_x2, max_y2 = box2
-    # if one of the boxes is larger than 800 px, we consider it as a full page and return no.
+    # if one of the boxes is larger than overlap_threshold, we consider it as a full page and return no.
     if max_x1 - min_x1 > overlap_threshold or max_x2 - min_x2 > overlap_threshold:
         return False
     if max_y1 - min_y1 > overlap_threshold or max_y2 - min_y2 > overlap_threshold:
