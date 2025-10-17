@@ -1,16 +1,16 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from pydantic import BaseModel
 
 from adt_press.models.config import CropPromptConfig
 from adt_press.models.image import CropCoordinates, Image
 from adt_press.models.pdf import Page
+from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_file, cached_read_text_file, write_file
 from adt_press.utils.image import visualize_crop_extents
 
 
-class CropResponse(BaseModel):
+class CropResponse(CleanTextBaseModel):
     top_left_x: int
     top_left_y: int
     bottom_right_x: int

@@ -18,7 +18,7 @@ def write_file(output_path: str, bs: bytes, suffix: str = "") -> str:
 
 
 def write_text_file(output_path: str, content: str) -> str:
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(content)
 
     return output_path
@@ -38,7 +38,7 @@ def cached_read_file(file_path: str) -> bytes:
 
 def read_text_file(file_path: str) -> str:
     """Read the content of a text file."""
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         return str(file.read())
 
 

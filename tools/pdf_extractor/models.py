@@ -53,5 +53,5 @@ class PDFExtract(BaseModel):
 
     def save_to_file(self, filepath: str) -> None:
         """Save extraction result to JSON file."""
-        with open(filepath, "w") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(self.to_json())

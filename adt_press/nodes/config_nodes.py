@@ -4,8 +4,8 @@ from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
 from pydantic import BaseModel
 
-from adt_press.llm.image_crop import CropPromptConfig
 from adt_press.models.config import (
+    CropPromptConfig,
     HTMLPromptConfig,
     LayoutType,
     PageRangeConfig,

@@ -3,16 +3,17 @@ import instructor
 from banks import Prompt
 from bs4 import BeautifulSoup
 from litellm import acompletion
-from pydantic import BaseModel, ValidationInfo, field_validator
+from pydantic import ValidationInfo, field_validator
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
+from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
-class GenerationResponse(BaseModel):
+class GenerationResponse(CleanTextBaseModel):
     reasoning: str
     content: str
 
