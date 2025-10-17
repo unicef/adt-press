@@ -35,7 +35,7 @@ def matplotlib_chart(img_bytes: bytes) -> bytes:
     """Generates a matplotlib chart from the image bytes and returns it as PNG bytes."""
 
     image = PIL.Image.open(io.BytesIO(img_bytes))
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=200)
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=150)
 
     ax.imshow(image)
 
@@ -462,10 +462,32 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
                 ctx.clip()
             continue
         
-        # Skip group elements - they're just structural markers
+        # Handle group elements - they may set blend modes and opacity
         if drawing_type == "group":
             ctx.save()
             current_level += 1
+            
+            # Apply blend mode if specified
+            blendmode = drawing.get("blendmode")
+            if blendmode:
+                # Map PDF blend modes to Cairo operators
+                blend_map = {
+                    "Normal": cairo.OPERATOR_OVER,
+                    "Multiply": cairo.OPERATOR_MULTIPLY,
+                    "Screen": cairo.OPERATOR_SCREEN,
+                    "Overlay": cairo.OPERATOR_OVERLAY,
+                    "Darken": cairo.OPERATOR_DARKEN,
+                    "Lighten": cairo.OPERATOR_LIGHTEN,
+                    "ColorDodge": cairo.OPERATOR_COLOR_DODGE,
+                    "ColorBurn": cairo.OPERATOR_COLOR_BURN,
+                    "HardLight": cairo.OPERATOR_HARD_LIGHT,
+                    "SoftLight": cairo.OPERATOR_SOFT_LIGHT,
+                    "Difference": cairo.OPERATOR_DIFFERENCE,
+                    "Exclusion": cairo.OPERATOR_EXCLUSION,
+                }
+                operator = blend_map.get(blendmode, cairo.OPERATOR_OVER)
+                ctx.set_operator(operator)
+            
             continue
         
         # Render drawable elements
@@ -479,9 +501,12 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
         has_fill = "f" in drawing_type
         has_stroke = "s" in drawing_type
         
+        # Get general opacity (affects both fill and stroke)
+        general_opacity = drawing.get("opacity") or 1.0
+        
         if has_fill:
             fill_color = convert_color_cairo(drawing.get("fill")) if drawing.get("fill") else (0, 0, 0)
-            fill_opacity = drawing.get("fill_opacity", 1.0)
+            fill_opacity = (drawing.get("fill_opacity") or 1.0) * general_opacity
             ctx.set_source_rgba(*fill_color, fill_opacity)
             if has_stroke:
                 ctx.fill_preserve()
@@ -491,7 +516,7 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
         if has_stroke:
             stroke_color = convert_color_cairo(drawing.get("color")) if drawing.get("color") else (0, 0, 0)
             stroke_width = drawing.get("width", 1)
-            stroke_opacity = drawing.get("stroke_opacity", 1.0)
+            stroke_opacity = (drawing.get("stroke_opacity") or 1.0) * general_opacity
             ctx.set_source_rgba(*stroke_color, stroke_opacity)
             ctx.set_line_width(stroke_width)
             ctx.stroke()
