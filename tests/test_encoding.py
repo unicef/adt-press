@@ -41,6 +41,7 @@ class TestCleanTextBaseModel(unittest.TestCase):
         """Test that text in nested dictionaries is cleaned."""
         model = SampleModel(data={"key": "â€œvalueâ€\x9d", "nested": {"text": "hello"}})
         self.assertIsInstance(model.data["key"], str)
+        self.assertEqual(model.data["key"], "\"value\"")
         self.assertEqual(model.data["nested"]["text"], "hello")
 
     def test_clean_list(self):
@@ -48,6 +49,7 @@ class TestCleanTextBaseModel(unittest.TestCase):
         model = SampleModel(items=["normal", "â€œtextâ€\x9d", "clean"])
         self.assertEqual(len(model.items), 3)
         self.assertEqual(model.items[0], "normal")
+        self.assertEqual(model.items[1], "\"text\"")
         self.assertEqual(model.items[2], "clean")
 
     def test_clean_mixed_types(self):
