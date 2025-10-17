@@ -1,7 +1,7 @@
 import base64
 from typing import Any
 
-from ftfy import fix_text
+import ftfy
 from pydantic import BaseModel, model_validator
 
 
@@ -11,7 +11,10 @@ def base64_encode(data: bytes) -> str:
 
 def _clean(obj: Any) -> Any:
     if isinstance(obj, str):
-        return fix_text(obj)
+        fixed = ftfy.fix_text(obj, normalization='NFKC')
+        fixed = fixed.replace('–', '-')
+        fixed = fixed.replace('‐', '-')
+        return fixed
     if isinstance(obj, list):
         return [_clean(x) for x in obj]
     if isinstance(obj, dict):

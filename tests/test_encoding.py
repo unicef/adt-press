@@ -31,7 +31,11 @@ class TestCleanTextBaseModel(unittest.TestCase):
         model = SampleModel(text="â€œHelloâ€\x9d")
         # ftfy should clean this to something more readable
         self.assertIsInstance(model.text, str)
-        self.assertNotEqual(model.text, "")
+        self.assertEqual(model.text, "\"Hello\"")
+
+        model = SampleModel(text="sansâ€‘serif 1â€“3")
+        self.assertIsInstance(model.text, str)
+        self.assertEqual(model.text, "sans-serif 1-3")        
 
     def test_clean_nested_dict(self):
         """Test that text in nested dictionaries is cleaned."""
