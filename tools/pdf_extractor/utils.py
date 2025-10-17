@@ -378,7 +378,12 @@ def parse_items_and_draw_cairo(ctx, items):  # pragma: no cover
 
 def render_group_to_image(group_drawings) -> RenderedVectorImage:
     # Compute the overall bounding box for the group
-    bounding_boxes = [compute_bounding_box(d) for d in group_drawings]
+    # Only use drawable elements (not clips/groups) for bounding box calculation
+    drawable_items = [d for d in group_drawings if d.get("type") not in ["clip", "group"]]
+    if not drawable_items:
+        return RenderedVectorImage(image=b'', width=0, height=0)
+    
+    bounding_boxes = [compute_bounding_box(d) for d in drawable_items]
     min_x = min(box[0] for box in bounding_boxes)
     min_y = min(box[1] for box in bounding_boxes)
     max_x = max(box[2] for box in bounding_boxes)
@@ -430,39 +435,71 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
     ctx.scale(scale, scale)
     ctx.translate(-min_x, -min_y)
 
-    # Draw each drawing in the group
+    # Draw each element in the group, handling clips and level changes
+    current_level = 0
+    
     for drawing in group_drawings:
         drawing_type = drawing.get("type", "")
+        drawing_level = drawing.get("level", 0)
         
-        # Skip non-drawable types (shouldn't happen since we filter, but be safe)
-        if drawing_type in ["group", "clip"]:
+        # When level decreases, restore context states
+        while current_level > drawing_level:
+            ctx.restore()
+            current_level -= 1
+        
+        # Handle clip elements - they define clipping regions
+        if drawing_type == "clip":
+            ctx.save()
+            current_level += 1
+            
+            if "items" in drawing:
+                ctx.new_path()
+                parse_items_and_draw_cairo(ctx, drawing["items"])
+                if drawing.get("even_odd", False):
+                    ctx.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
+                else:
+                    ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
+                ctx.clip()
             continue
         
-        # Set fill rule BEFORE creating the path
-        ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
+        # Skip group elements - they're just structural markers
+        if drawing_type == "group":
+            ctx.save()
+            current_level += 1
+            continue
         
-        ctx.new_path()  # Start a new path for each drawing
+        # Render drawable elements
+        if "items" not in drawing:
+            continue
+        
+        ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
+        ctx.new_path()
         parse_items_and_draw_cairo(ctx, drawing["items"])
 
         has_fill = "f" in drawing_type
         has_stroke = "s" in drawing_type
         
-        if has_fill:  # Filled Path
+        if has_fill:
             fill_color = convert_color_cairo(drawing.get("fill")) if drawing.get("fill") else (0, 0, 0)
             fill_opacity = drawing.get("fill_opacity", 1.0)
             ctx.set_source_rgba(*fill_color, fill_opacity)
             if has_stroke:
-                ctx.fill_preserve()  # Preserve the path for stroking
+                ctx.fill_preserve()
             else:
-                ctx.fill()  # Consume the path since there's no stroke
+                ctx.fill()
 
-        if has_stroke:  # Stroked Path
+        if has_stroke:
             stroke_color = convert_color_cairo(drawing.get("color")) if drawing.get("color") else (0, 0, 0)
             stroke_width = drawing.get("width", 1)
             stroke_opacity = drawing.get("stroke_opacity", 1.0)
             ctx.set_source_rgba(*stroke_color, stroke_opacity)
             ctx.set_line_width(stroke_width)
             ctx.stroke()
+    
+    # Restore any remaining saved states
+    while current_level > 0:
+        ctx.restore()
+        current_level -= 1
 
     # Get the final image width and height.
     width, height = surface.get_width(), surface.get_height()
@@ -511,17 +548,79 @@ def render_single_drawing(ctx: cairo.Context, drawing):
         pass
 
 
-def render_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> list[RenderedVectorImage]:
-    """Renders the passed in PDF drawings to images, grouping overlapping drawings."""
-    # When using extended=True, we get clips and groups that we need to preserve
-    # We can't just filter to drawable items and group them - we lose the clip hierarchy
-    # For now, let's filter to only actual drawable items for grouping
-    # TODO: Handle clip hierarchy properly when grouping
-    drawable_items = [d for d in drawings if d.get("type") not in ["group", "clip"] and "items" in d]
+def group_by_pdf_structure(drawings):
+    """Group drawings using PDF's built-in group structure from extended mode.
     
-    if not drawable_items:
+    Returns groups where each group is a list of elements (clips, groups, drawables)
+    that belong together based on the PDF's level/group hierarchy.
+    """
+    if not drawings:
         return []
     
+    # Build groups based on level changes
+    # Only split into new groups when returning to level 5 or below
+    # This keeps related paths within the same clip region together
+    groups = []
+    current_group = []
+    prev_level = -1
+    GROUP_SPLIT_THRESHOLD = 5  # Only split when returning to this level or below
+    
+    for drawing in drawings:
+        level = drawing.get("level", 0)
+        dtype = drawing.get("type", "")
+        
+        # Start a new group when we return to level 4 or below after being deeper
+        if level <= GROUP_SPLIT_THRESHOLD and level <= prev_level and current_group:
+            # Check if current group has any drawable content
+            has_drawable = any(d.get("type") not in ["group", "clip"] for d in current_group)
+            if has_drawable:
+                groups.append(current_group)
+            current_group = []
+        
+        current_group.append(drawing)
+        prev_level = level
+    
+    # Add the final group
+    if current_group:
+        has_drawable = any(d.get("type") not in ["group", "clip"] for d in current_group)
+        if has_drawable:
+            groups.append(current_group)
+    
+    return groups
+
+
+def render_drawings(drawings, margin_allowance: int, overlap_threshold: int) -> list[RenderedVectorImage]:
+    """Renders the passed in PDF drawings to images, using bounding box overlap grouping."""
+    # Filter to only drawable elements (not clips/groups which are structural)
+    drawable_items = [d for d in drawings if d.get("type") not in ["clip", "group"]]
+    
+    # Group by bounding box overlap
     groups = group_overlapping_drawings(drawable_items, margin_allowance, overlap_threshold)
-    results = [render_group_to_image(group) for group in groups]
+    
+    # For each group, include relevant clip/group elements from the original drawings
+    # by finding clips/groups that affect the drawable items in each group
+    enriched_groups = []
+    for group in groups:
+        # Get seqnos of drawables in this group
+        group_seqnos = {d.get('seqno', -1) for d in group}
+        
+        # Find all elements (including clips/groups) that should be part of this group
+        # Include clips/groups that come before the first drawable in this group
+        min_seqno = min(group_seqnos) if group_seqnos else float('inf')
+        
+        enriched_group = []
+        for drawing in drawings:
+            seqno = drawing.get('seqno', -1)
+            dtype = drawing.get('type', '')
+            
+            # Include this drawing if:
+            # 1. It's in the drawable group, OR
+            # 2. It's a clip/group that comes before the group's drawables
+            if seqno in group_seqnos or (dtype in ["clip", "group"] and seqno < min_seqno):
+                enriched_group.append(drawing)
+        
+        if enriched_group:
+            enriched_groups.append(enriched_group)
+    
+    results = [render_group_to_image(group) for group in enriched_groups]
     return [r for r in results if r.width > 0 and r.height > 0]  # Filter out empty images
