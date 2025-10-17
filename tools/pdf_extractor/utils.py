@@ -81,7 +81,17 @@ def compute_bounding_box(drawing) -> tuple:
             min_y = min(min_y, rect.y0, rect.y1)
             max_x = max(max_x, rect.x0, rect.x1)
             max_y = max(max_y, rect.y0, rect.y1)
-        elif cmd in ["m", "l", "c"]:
+        elif cmd == "qu":
+            # Quadrilateral - check all 4 points
+            quad = item[1]
+            for point in quad:
+                if hasattr(point, "x") and hasattr(point, "y"):
+                    min_x = min(min_x, point.x)
+                    min_y = min(min_y, point.y)
+                    max_x = max(max_x, point.x)
+                    max_y = max(max_y, point.y)
+        elif cmd in ["m", "l", "c", "v"]:
+            # Move, line, cubic curve, or quadratic curve - check all points
             points = item[1:]
             for point in points:
                 if hasattr(point, "x") and hasattr(point, "y"):
@@ -89,10 +99,6 @@ def compute_bounding_box(drawing) -> tuple:
                     min_y = min(min_y, point.y)
                     max_x = max(max_x, point.x)
                     max_y = max(max_y, point.y)
-
-    # If no valid coordinates were found, return a default minimal bounding box
-    if math.isinf(min_x) or math.isinf(max_x) or math.isinf(min_y) or math.isinf(max_y):
-        return (0, 0, 1, 1)
 
     return (min_x, min_y, max_x, max_y)
 
@@ -146,9 +152,20 @@ def group_overlapping_drawings(drawings, margin_allowance: int, overlap_threshol
         root = find(i)
         if root not in groups:
             groups[root] = []
-        groups[root].append(drawings[i])
+        groups[root].append((i, drawings[i]))  # Store index to preserve order
 
-    return list(groups.values())
+    # Sort each group by original index to maintain z-order within the group
+    # Then sort groups by their minimum index to maintain z-order between groups
+    sorted_groups = []
+    for group_items in groups.values():
+        group_items.sort(key=lambda x: x[0])  # Sort by original index
+        min_index = group_items[0][0]  # Get minimum index for this group
+        sorted_groups.append((min_index, [item[1] for item in group_items]))
+    
+    # Sort groups by their minimum index
+    sorted_groups.sort(key=lambda x: x[0])
+    
+    return [group[1] for group in sorted_groups]  # Extract just the drawings
 
 
 def parse_items_and_draw_cairo(ctx, items):  # pragma: no cover
@@ -159,11 +176,40 @@ def parse_items_and_draw_cairo(ctx, items):  # pragma: no cover
             p = item[1]
             ctx.move_to(p.x, p.y)
         elif cmd == "l":  # Line to
-            p = item[1]
-            ctx.line_to(p.x, p.y)
-        elif cmd == "c":  # Curve to
-            p1, p2, p3 = item[1], item[2], item[3]
-            ctx.curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+            # PyMuPDF 'l' command has [cmd, start_point, end_point]
+            if len(item) == 3:
+                start_p, end_p = item[1], item[2]
+                # Ensure we're at the start point
+                ctx.line_to(start_p.x, start_p.y)
+                ctx.line_to(end_p.x, end_p.y)
+            else:
+                # Fallback for single point
+                p = item[1]
+                ctx.line_to(p.x, p.y)
+        elif cmd == "c":  # Cubic Bezier curve
+            # PyMuPDF 'c' command has [cmd, start_point, cp1, cp2, end_point]
+            if len(item) == 5:
+                start_p, cp1, cp2, end_p = item[1], item[2], item[3], item[4]
+                # Ensure we're at the start point (curve_to draws from current point)
+                ctx.line_to(start_p.x, start_p.y)
+                ctx.curve_to(cp1.x, cp1.y, cp2.x, cp2.y, end_p.x, end_p.y)
+            else:
+                # Fallback for different structure (3 points: 2 control + 1 end)
+                p1, p2, p3 = item[1], item[2], item[3]
+                ctx.curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+        elif cmd == "v":  # Quadratic Bezier curve (v command)
+            # PyMuPDF quadratic curve: control point + end point
+            # Cairo doesn't have native quadratic curves, so convert to cubic
+            # Get current point
+            current_x, current_y = ctx.get_current_point()
+            p1, p2 = item[1], item[2]  # control point, end point
+            # Convert quadratic to cubic Bezier
+            # Cubic control points are at 2/3 from start/end toward quadratic control
+            cp1_x = current_x + 2.0/3.0 * (p1.x - current_x)
+            cp1_y = current_y + 2.0/3.0 * (p1.y - current_y)
+            cp2_x = p2.x + 2.0/3.0 * (p1.x - p2.x)
+            cp2_y = p2.y + 2.0/3.0 * (p1.y - p2.y)
+            ctx.curve_to(cp1_x, cp1_y, cp2_x, cp2_y, p2.x, p2.y)
         elif cmd == "h":  # Close path
             ctx.close_path()
         elif cmd == "re":  # Rectangle
@@ -204,6 +250,9 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     ctx = cairo.Context(surface)
 
+    # Set tolerance for curve rendering (lower = smoother curves, matches PyMuPDF better)
+    ctx.set_tolerance(0.1)
+
     # Fill the background with white
     ctx.set_source_rgb(1, 1, 1)  # White
     ctx.rectangle(0, 0, width, height)
@@ -215,27 +264,31 @@ def render_group_to_image(group_drawings) -> RenderedVectorImage:
 
     # Draw each drawing in the group
     for drawing in group_drawings:
+        # Handle filling and stroking based on the drawing type
+        drawing_type = drawing.get("type", "")
+        
+        # Set fill rule BEFORE creating the path (always use winding to match PyMuPDF)
+        ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
+        
         ctx.new_path()  # Start a new path for each drawing
         parse_items_and_draw_cairo(ctx, drawing["items"])
 
-        # Handle filling and stroking based on the drawing type
-        drawing_type = drawing.get("type", "")
-
-        if "f" in drawing_type:  # Filled Path
+        has_fill = "f" in drawing_type
+        has_stroke = "s" in drawing_type
+        
+        if has_fill:  # Filled Path
             fill_color = convert_color_cairo(drawing.get("fill")) if drawing.get("fill") else (0, 0, 0)
             ctx.set_source_rgb(*fill_color)
-            fill_rule = cairo.FILL_RULE_EVEN_ODD if drawing.get("even_odd", False) else cairo.FILL_RULE_WINDING
-            ctx.set_fill_rule(fill_rule)
-            ctx.fill_preserve()  # Preserve the path for potential stroking
+            if has_stroke:
+                ctx.fill_preserve()  # Preserve the path for stroking
+            else:
+                ctx.fill()  # Consume the path since there's no stroke
 
-        if "s" in drawing_type:  # Stroked Path
+        if has_stroke:  # Stroked Path
             stroke_color = convert_color_cairo(drawing.get("color")) if drawing.get("color") else (0, 0, 0)
             stroke_width = drawing.get("width", 1)
             ctx.set_source_rgb(*stroke_color)
             ctx.set_line_width(stroke_width)
-            ctx.stroke()
-        elif "f" in drawing_type:
-            # If only filling, optionally stroke the path after filling
             ctx.stroke()
 
     # Get the final image width and height.
