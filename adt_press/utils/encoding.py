@@ -8,12 +8,16 @@ from pydantic import BaseModel, model_validator
 def base64_encode(data: bytes) -> str:
     return base64.b64encode(data).decode("utf-8")
 
+# ftfy doesn't deal with m dashes, so we add some manual fixes
+ENCODING_FIXES = str.maketrans({
+    '–': '-', 
+    '‐': '-'
+})
 
 def _clean(obj: Any) -> Any:
     if isinstance(obj, str):
         fixed = ftfy.fix_text(obj, normalization="NFKC")
-        fixed = fixed.replace("–", "-")
-        fixed = fixed.replace("‐", "-")
+        fixed = fixed.translate(ENCODING_FIXES)
         return fixed
     if isinstance(obj, list):
         return [_clean(x) for x in obj]
