@@ -236,11 +236,16 @@ def plate_translations(
     plate_groups: list[PlateGroup],
     plate_texts: list[PlateText],
     output_languages_config: list[str],
+    activity_generated_texts: dict[str, PlateText],
 ) -> dict[str, dict[str, str]]:
     plate_translations: dict[str, dict[str, str]] = {}
 
+    # Combine base texts with newly generated activity texts
+    combined_texts = list(plate_texts)
+    combined_texts.extend(activity_generated_texts.values())
+
     # Create a lookup for plate texts by ID
-    plate_texts_by_id = {t.text_id: t for t in plate_texts}
+    plate_texts_by_id = {t.text_id: t for t in combined_texts}
 
     # Identify which text IDs are in groups
     text_ids_in_groups = set()
@@ -254,7 +259,9 @@ def plate_translations(
         tasks = []
         for output_language in output_languages_config:
             if output_language == plate_language_config:
-                plate_translations[output_language] = {t.text_id: t.text for t in plate_texts}
+                plate_translations[output_language] = {
+                    t.text_id: t.text for t in combined_texts
+                }
                 continue
 
             plate_translations[output_language] = {}

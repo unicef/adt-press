@@ -4,9 +4,17 @@ from typing import Any
 
 from hamilton.function_modifiers import cache
 
+from adt_press.llm.activity_answers import generate_activity_answers
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_template import generate_web_page_template
-from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderStrategy, TemplateConfig, TemplateRenderConfig
+from adt_press.models.config import (
+    HTMLPromptConfig,
+    LayoutType,
+    PromptConfig,
+    RenderStrategy,
+    TemplateConfig,
+    TemplateRenderConfig,
+)
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
@@ -24,6 +32,7 @@ def web_pages(
     layout_types_config: dict[str, LayoutType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
+    activity_answers_config: PromptConfig,
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -95,7 +104,58 @@ def web_pages(
     for page in pages:
         page.content = replace_images(page.content, image_urls, texts_by_id)
 
+    # Generate answers for activity sections
+    activity_types = [
+        "activity_sorting",
+        "activity_multiple_choice",
+        "activity_quiz",  # Quiz uses same logic as multiple choice
+        "activity_true_false",
+        "activity_fill_in_the_blank",
+        "activity_matching",
+        "activity_fill_in_a_table"
+    ]
+
+    async def generate_answers():
+        answer_tasks = []
+        section_by_id = {s.section_id: s for s in plate.sections}
+
+        for page in pages:
+            section = section_by_id.get(page.section_id)
+            if section and section.section_type in activity_types:
+                # Get texts for this section
+                section_texts = [
+                    t for t in plate.texts if t.text_id in page.text_ids
+                ]
+
+                answer_tasks.append(
+                    (
+                        page,
+                        generate_activity_answers(
+                            activity_answers_config,
+                            section,
+                            section_texts,
+                            page.content,
+                            plate_language_config,
+                        ),
+                    )
+                )
+
+        # Generate all answers in parallel
+        for page, answer_coro in answer_tasks:
+            answer_response = await answer_coro
+            page.activity_answers = answer_response.answers
+
+    run_async_task(generate_answers)
+
     return pages
+
+
+def activity_generated_texts(web_pages: list[WebPage]) -> dict[str, PlateText]:
+    generated: dict[str, PlateText] = {}
+    for page in web_pages:
+        for text in page.generated_texts:
+            generated[text.text_id] = text
+    return generated
 
 
 @cache(behavior="recompute")
@@ -109,6 +169,7 @@ def package_adt_web(
     plate_glossary_translations: dict[str, list[GlossaryItem]],
     speech_files: dict[str, dict[str, SpeechFile]],
     web_pages: list[WebPage],
+    activity_generated_texts: dict[str, PlateText],
     strategy_config: dict[str, str],
 ) -> str:
     default_language = list(plate_translations.keys())[0]
@@ -129,7 +190,11 @@ def package_adt_web(
 
     plate_images = {img.image_id: img for img in plate.images}
     plate_texts = {txt.text_id: txt for txt in plate.texts}
-    sections_by_id = {section.section_id: section for section in plate.sections}
+    plate_texts.update(activity_generated_texts)
+    sections_by_id = {
+        section.section_id: section
+        for section in plate.sections
+    }
 
     for webpage_index, webpage in enumerate(web_pages):
         section = sections_by_id[webpage.section_id]
@@ -138,18 +203,45 @@ def package_adt_web(
         images = {}
         for image_id in webpage.image_ids:
             image = plate_images[image_id]
-            images[image_id] = PlateImage(image_id=image.image_id, image_path=f"images/{image_id}.png", caption_id=image.caption_id)
+            images[image_id] = PlateImage(
+                image_id=image.image_id,
+                image_path=f"images/{image_id}.png",
+                caption_id=image.caption_id,
+            )
 
-            shutil.copy(image.image_path, os.path.join(image_dir, f"{image_id}.png"))
+            shutil.copy(
+                image.image_path,
+                os.path.join(image_dir, f"{image_id}.png"),
+            )
 
         content = webpage.content
         content = replace_images(content, images, plate_texts)
         content = replace_texts(content, plate_texts)
 
+        # Add answer script if this is an activity with answers
+        if webpage.activity_answers:
+            answers_json = json.dumps(webpage.activity_answers, indent=2)
+            answer_script = (
+                f'<script type="text/javascript">\n'
+                f'  window.correctAnswers = {answers_json};\n'
+                f'</script>\n'
+            )
+            # Insert before closing body tag
+            if '</body>' in content:
+                content = content.replace('</body>', f'{answer_script}</body>')
+            else:
+                content += answer_script
+
         render_template(
             template_config,
             "webpage.html",
-            dict(content=content, webpage=webpage, section=section, language=plate_language_config, webpage_number=webpage_index + 1),
+            dict(
+                content=content,
+                webpage=webpage,
+                section=section,
+                language=plate_language_config,
+                webpage_number=webpage_index + 1,
+            ),
             output_name=f"adt/{webpage.section_id}.html",
         )
 
@@ -160,7 +252,12 @@ def package_adt_web(
     # create our navigation directory
     nav_dir = os.path.join(adt_dir, "content", "navigation")
     os.makedirs(nav_dir, exist_ok=True)
-    render_template(template_config, "nav.html", dict(webpages=web_pages, texts=plate_texts), output_name="adt/content/navigation/nav.html")
+    render_template(
+        template_config,
+        "nav.html",
+        dict(webpages=web_pages, texts=plate_texts),
+        output_name="adt/content/navigation/nav.html",
+    )
 
     for language, translations in plate_translations.items():
         # speech files
@@ -184,8 +281,11 @@ def package_adt_web(
             filename = f"{speech.text_id}.mp3"
             audio_map[text_id] = filename
 
-            # copy the audio file over
-            shutil.copy(os.path.join(run_output_dir_config, speech.speech_path), os.path.join(audio_dir, filename))
+                # copy the audio file over
+                shutil.copy(
+                    os.path.join(run_output_dir_config, speech.speech_path),
+                    os.path.join(audio_dir, filename),
+                )
 
         write_json_file(os.path.join(locale_dir, "audios.json"), audio_map)
 
@@ -194,11 +294,23 @@ def package_adt_web(
 
         # write our glossary
         glossary = {
-            i.word: dict(word=i.word, definition=i.definition, variations=i.variations, emoji="".join(i.emojis))
+            i.word: dict(
+                word=i.word,
+                definition=i.definition,
+                variations=i.variations,
+                emoji="".join(i.emojis),
+            )
             for i in plate_glossary_translations[language]
         }
+        write_json_file(os.path.join(locale_dir, "glossary.json"), glossary)
 
         write_json_file(os.path.join(locale_dir, "glossary.json"), glossary)
+    # write our config file
+    config_output_path = "adt/assets/config.json"
+    config_dir = os.path.dirname(
+        os.path.join(run_output_dir_config, config_output_path)
+    )
+    os.makedirs(config_dir, exist_ok=True)
 
     build_config_json(
         template_config,
