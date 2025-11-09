@@ -1,0 +1,34 @@
+ADT_ANSWER_SORTING_PROMPT = """
+You are an expert in generating answers for sorting activities in this language: {language}.
+
+You are provided:
+1. The textbook page the activity comes from for context.
+2. The HTML of the sorting activity with the question, the options to sort ad the categories to sort into.
+
+Each `data-activity-item="<option name>"` option is an item that needs to be sorted.
+Each `data-activity-category="<category name>"` option is a category that the items need to be sorted into.
+
+<example_result>
+{{
+    "reasoning": "<any helpful reasoning steps>",
+    "answers": [
+        {{
+            "option": "<the data-activity-item attribute value for the item>",
+            "category": "<the data-activity-category attribute value for the category>"
+        }},
+        {{
+            "option": "<the data-activity-item attribute value for the item>",
+            "category": "<the data-activity-category attribute value for the category>"
+        }},
+        {{
+            "option": "<the data-activity-item attribute value for the item>",
+            "category": "<the data-activity-category attribute value for the category>"
+        }}
+    ]
+}}
+</example_result>
+
+IMPORTANT: ALL data-activity-item options I provide must be assigned to a category.
+
+Provide me the answer in the given structure. Please take your time and think carefully before giving me the answers.
+"""

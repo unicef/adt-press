@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 import os
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment, NavigableString
 
 from adt_press.models.config import TemplateConfig
 from adt_press.models.plate import PlateImage, PlateText
@@ -46,6 +46,51 @@ def basename(text):
 
 
 # given the passed in dict and template, render using jinja2
+
+
+def sanitize_generated_html(html_content: str) -> str:
+    """
+    Strip outer document wrappers and duplicated shell elements from LLM HTML
+    output.
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Prefer <body> contents when present, then <html>, otherwise the soup root
+    root = soup.body or soup.find("html") or soup
+
+    # Remove nested body/html wrappers within the selected root
+    for nested_body in list(root.find_all("body")):
+        nested_body.unwrap()
+    for nested_html in list(root.find_all("html")):
+        nested_html.unwrap()
+
+    # Drop interface/nav containers – the app injects them separately
+    shell_ids = {"interface-container", "nav-container"}
+
+    def is_shell(tag_id: str | None) -> bool:
+        return bool(tag_id and tag_id in shell_ids)
+
+    for disallowed in list(root.find_all(id=is_shell)):
+        disallowed.decompose()
+
+    ensure_required_activity_elements(root)
+
+    fragments: list[str] = []
+    for child in list(root.children):
+        if isinstance(child, Comment):
+            continue
+        if isinstance(child, NavigableString):
+            if not child.strip():
+                continue
+            fragments.append(str(child))
+        else:
+            fragments.append(str(child))
+
+    fragment_html = "".join(fragments).strip()
+
+    return fragment_html or html_content.strip()
+
+
 def render_template_to_string(template_path: str, context: dict) -> str:
     from jinja2 import Environment, FileSystemLoader
 
@@ -54,6 +99,44 @@ def render_template_to_string(template_path: str, context: dict) -> str:
     template = env.get_template(template_path)
 
     return template.render(context)
+
+
+def ensure_required_activity_elements(root) -> None:
+    """Ensure required nodes exist for supported activities."""
+
+    for section in root.find_all("section"):
+        section_type = section.get("data-section-type")
+        if section_type == "activity_sorting":
+            # Look for an existing feedback element in this section
+            feedback = section.find(id="feedback")
+            if feedback:
+                continue
+
+            # Reuse a feedback element defined elsewhere if one exists
+            global_feedback = root.find(id="feedback")
+            if global_feedback and global_feedback not in section.descendants:
+                global_feedback.extract()
+                section.append(global_feedback)
+                continue
+
+            new_feedback = root.new_tag("div")
+            new_feedback["id"] = "feedback"
+            new_feedback["class"] = ["mt-4", "text-center"]
+            new_feedback["aria-live"] = "polite"
+            section.append(new_feedback)
+
+        elif section_type == "activity_open_ended_answer":
+            inputs = section.select('input[type="text"], textarea')
+            for index, field in enumerate(inputs, start=1):
+                data_aria_id = field.get("data-aria-id")
+                field_id = field.get("id")
+                field_name = field.get("name")
+
+                if data_aria_id or field_id or field_name:
+                    continue
+
+                generated_id = f"open-ended-input-{index}"
+                field["data-aria-id"] = generated_id
 
 
 # given the passed in dict and template, render using jinja2

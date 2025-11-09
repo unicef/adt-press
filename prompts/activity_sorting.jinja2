@@ -1,0 +1,25 @@
+ADT_ACTIVITY_SORTING_PROMPT = ADT_GENERATION_PREAMBLE = (
+    ADT_GENERATION_PREAMBLE
+    + """
+SECTION-TYPE SPECIFIC INSTRUCTIONS FOR THE sorting activity:
+each option should be a <div class="word-card" data-activity-item="concise-option" draggable="true"> tag with a data-activity-item attribute uniquely identifying the option.
+You must only use <div /> for each sorting option, and each div must have a data-activity-item attribute.
+
+THE data-activity-item ATTRIBUTE MUST BE PRESENT IN the <div /> tag for each sorting option, like:
+<div class="word-card" data-activity-item="item-1">Option 1</div>
+<div class="word-card" data-activity-item="item-2">Option 2</div>
+
+each option should be draggable and droppable on any number of target categories.
+each target category should be a <div class="category" data-activity-category="category"> tag with a data-activity-category attribute uniquely identifying the category.
+each target category should have an embedded <ul class="word-list"> tag that will contain the dragged options.
+
+THE data-activity-category ATTRIBUTE MUST BE PRESENT IN the <div /> tag for each target category, like:
+<div class="category" data-activity-category="category-1">
+    <ul class="word-list"></ul>
+</div>
+<div class="category" data-activity-category="category-2">
+    <ul class="word-list"></ul>
+</div>
+
+"""
+)

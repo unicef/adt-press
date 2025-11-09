@@ -388,7 +388,7 @@ export const resetActivity = () => {
     // Remove any visual feedback
     const feedbackElement = document.getElementById("feedback");
     if (feedbackElement) {
-      feedbackElement.textContent = "";
+      feedbackElement.innerHTML = "";
       feedbackElement.classList.remove("text-red-500", "text-green-500");
     }
 
@@ -942,7 +942,18 @@ export const dropSort = (event) => {
 
 
 export function checkSorting() {
-  const feedbackElement = document.getElementById("feedback");
+  let feedbackElement = document.getElementById("feedback");
+  if (!feedbackElement) {
+    feedbackElement = document.createElement("div");
+    feedbackElement.id = "feedback";
+    feedbackElement.classList.add("mt-4", "text-center");
+    feedbackElement.setAttribute("aria-live", "polite");
+
+    const section = document.querySelector('section[data-section-type="activity_sorting"]');
+    if (section) {
+      section.appendChild(feedbackElement);
+    }
+  }
   const toast = document.getElementById("toast");
   const activityId = location.pathname
     .substring(location.pathname.lastIndexOf("/") + 1)
@@ -1123,7 +1134,7 @@ export function checkSorting() {
     const message = translateText("sorting-not-complete", { cardsPlaced: totalPlacedWords, totalCards: totalWords });
 
     // Update feedback element
-    feedbackElement.textContent = message;
+    feedbackElement.innerHTML = message;
     feedbackElement.classList.remove("text-green-500");
     feedbackElement.classList.add("text-red-500");
 
@@ -1191,7 +1202,7 @@ export function checkSorting() {
   
   
   // Update feedback element
-  feedbackElement.textContent = feedbackMessage;
+  feedbackElement.innerHTML = feedbackMessage;
   feedbackElement.classList.remove("text-red-500", "text-green-500");
   feedbackElement.classList.add(allCorrect ? "text-green-500" : "text-red-500");
 

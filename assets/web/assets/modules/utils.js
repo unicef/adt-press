@@ -25,6 +25,7 @@ export const ActivityTypes = Object.freeze({
     MATCHING: "activity_matching",
     TRUE_FALSE: "activity_true_false",
     FILL_IN_A_TABLE: "activity_fill_in_a_table",
+    QUIZ: "activity_quiz",
 });
 
 window.utils = {
@@ -97,6 +98,9 @@ export const updateSubmitButtonAndToast = (
     const submitButton = document.getElementById("submit-button");
     const resetButton = document.getElementById("reset-button");
     const toast = document.getElementById("toast");
+    const isMultipleChoiceLike =
+        activityType === ActivityTypes.MULTIPLE_CHOICE || activityType === ActivityTypes.QUIZ;
+    const shouldShowToast = !isMultipleChoiceLike;
     
     // Default options
     const defaultOptions = {
@@ -222,7 +226,9 @@ export const checkCurrentActivityCompletion = (isCorrect) => {
  * @private
  */
 const handleIncorrectSubmission = (submitButton, toast, activityType, unfilledCount, options = {}) => {
-    if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
+    const isMultipleChoiceLike = activityType === ActivityTypes.MULTIPLE_CHOICE || activityType === ActivityTypes.QUIZ;
+    
+    if (isMultipleChoiceLike) {
         submitButton.textContent = translateText("retry");
         submitButton.setAttribute("aria-label", translateText("retry"));
         state.retryHandler = retryActivity;

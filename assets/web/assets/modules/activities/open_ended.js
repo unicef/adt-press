@@ -61,9 +61,15 @@ const saveInputState = (input) => {
     const activityId = location.pathname
         .substring(location.pathname.lastIndexOf("/") + 1)
         .split(".")[0];
-    const inputId = input.getAttribute("data-aria-id");
+    // Try data-aria-id first, fall back to id attribute
+    const inputId = input.getAttribute("data-aria-id") || input.id || input.name;
+    
+    if (!inputId) {
+        console.warn('Input has no data-aria-id, id, or name attribute:', input);
+        return;
+    }
+    
     const localStorageKey = `${activityId}_${inputId}`;
-
     localStorage.setItem(localStorageKey, input.value);
 };
 
@@ -72,7 +78,14 @@ export const loadInputState = (inputs) => {
         const activityId = location.pathname
             .substring(location.pathname.lastIndexOf("/") + 1)
             .split(".")[0];
-        const inputId = input.getAttribute("data-aria-id");
+        // Try data-aria-id first, fall back to id attribute
+        const inputId = input.getAttribute("data-aria-id") || input.id || input.name;
+        
+        if (!inputId) {
+            console.warn('Input has no data-aria-id, id, or name attribute:', input);
+            return;
+        }
+        
         const localStorageKey = `${activityId}_${inputId}`;
 
         // Only replace content if there's a saved value in localStorage
@@ -82,7 +95,12 @@ export const loadInputState = (inputs) => {
         }
         // Otherwise, keep the pre-filled content
     });
-    localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+    
+    // Safely get page name from h1 if it exists
+    const h1Element = document.querySelector("h1");
+    if (h1Element && h1Element.innerText) {
+        localStorage.setItem("namePage", h1Element.innerText);
+    }
 };
 
 export const countUnfilledInputs = (inputs) => {

@@ -29,6 +29,7 @@ const SELECTORS = {
     FILL_IN_BLANK: 'section[data-section-type="activity_fill_in_the_blank"]',
     FILL_IN_TABLE: 'section[data-section-type="activity_fill_in_a_table"]',
     MULTIPLE_CHOICE: 'section[data-section-type="activity_multiple_choice"]',
+    QUIZ: 'section[data-section-type="activity_quiz"]',
     TRUE_FALSE: 'section[data-section-type="activity_true_false"]',
     OPEN_ENDED: 'section[data-section-type="activity_open_ended_answer"]'
 };
@@ -67,7 +68,7 @@ const activityHasUserData = (activityType) => {
         else if (activityType === 'activity_fill_in_a_table') {
             return hasNonEmptyInputs('section td input[type="text"], section td textarea');
         }
-        else if (activityType === 'activity_multiple_choice') {
+        else if (activityType === 'activity_multiple_choice' || activityType === 'activity_quiz') {
             return document.querySelectorAll('section input[type="radio"]:checked').length > 0;
         }
         else if (activityType === 'activity_true_false') {
@@ -175,7 +176,14 @@ const clearAllFeedback = () => {
         ".sr-only"
     ].join(", ");
     
-    document.querySelectorAll(elementsToRemove).forEach(el => el.remove());
+    document.querySelectorAll(elementsToRemove).forEach(el => {
+        if (el.id === "feedback") {
+            // Preserve the persistent feedback container; just clear it.
+            el.textContent = "";
+            return;
+        }
+        el.remove();
+    });
     
     // Elements to clear content
     document.querySelectorAll(".feedback-container").forEach(container => {
@@ -253,6 +261,14 @@ function initializeActivityHandlers() {
         });
     };
 
+    // Labeling activities reset like fill in the blank
+    activityResetHandlers['activity_labeling'] = (activityId) => {
+        resetActivityBase(activityId, {
+            sectionSelector: 'section[data-section-type="activity_labeling"]',
+            inputSelector: 'input[type="text"]:not(#filter-input)'
+        });
+    };
+
     activityResetHandlers[ActivityTypes.FILL_IN_A_TABLE] = (activityId) => {
         resetActivityBase(activityId, {
             sectionSelector: SELECTORS.FILL_IN_TABLE,
@@ -284,6 +300,9 @@ function initializeActivityHandlers() {
 
         localStorage.removeItem(`${activityId}_selectedOption`);
     };
+
+    // Quiz uses the same reset handler as multiple choice
+    activityResetHandlers[ActivityTypes.QUIZ] = activityResetHandlers[ActivityTypes.MULTIPLE_CHOICE];
 
     activityResetHandlers[ActivityTypes.TRUE_FALSE] = (activityId) => {
         const activitySection = document.querySelector(SELECTORS.TRUE_FALSE);
@@ -339,7 +358,19 @@ function initializeActivityHandlers() {
         validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
     };
 
+    // Quiz uses the same handlers as multiple choice
+    activityHandlers[ActivityTypes.QUIZ] = {
+        setup: prepareMultipleChoice,
+        validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
+    };
+
     activityHandlers[ActivityTypes.FILL_IN_THE_BLANK] = {
+        setup: preparefillInBlank,
+        validate: () => validateInputs(ActivityTypes.FILL_IN_THE_BLANK)
+    };
+
+    // Labeling activities work like fill in the blank (text inputs with validation)
+    activityHandlers['activity_labeling'] = {
         setup: preparefillInBlank,
         validate: () => validateInputs(ActivityTypes.FILL_IN_THE_BLANK)
     };

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from adt_press.models.plate import PlateText
 
@@ -17,3 +17,5 @@ class WebPage(BaseModel):
     text_ids: list[str]
     image_ids: list[str]
     render_strategy: str
+    activity_answers: dict[str, str] | None = None
+    generated_texts: list[PlateText] = Field(default_factory=list)

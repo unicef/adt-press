@@ -1,0 +1,65 @@
+name: text_and_images_4
+page_image_path: c3_p14.png
+section:
+  type: text_and_images
+  parts:
+    - id: text-13-0
+      type: section_heading
+      text: ¿QUIÉN CORRE CONMIGO?
+    - id: text-13-1
+      type: section_text
+      text: A Elena le encantaba correr carreras.
+    - id: text-13-2
+      type: section_text
+      text: Corría contra su hermano que gateaba.
+    - id: text-13-3
+      type: section_text
+      text: ¡Gané!
+    - id: text-13-4
+      type: section_text
+      text: También corría contra su perro.
+    - id: text-13-5
+      type: section_text
+      text: ¡Perdí!
+    - id: text-13-6
+      type: section_text
+      text: Desafiaba a su tortuga.
+    - id: text-13-7
+      type: section_text
+      text: ¡Gané!
+    - id: text-13-8
+      type: section_text
+      text: Y no tenía miedo de correr contra su papá.
+    - id: text-13-9
+      type: section_text
+      text: ¡Perdí!
+    - id: img-13-3
+      type: image
+      image_path: 13_img-13-3.png
+    - id: text-13-10
+      type: section_text
+      text: No había nada en el mundo que le gustara más que correr carreras.
+    - id: text-13-11
+      type: section_text
+      text: Ni la tele.
+    - id: text-13-12
+      type: section_text
+      text: Ni los helados.
+    - id: text-13-13
+      type: section_text
+      text: Ni los libros dibujados.
+    - id: text-13-14
+      type: section_text
+      text: >
+        Quizás fue por eso que Elena hizo pucheros cuando la mamá y el papá le
+        dijeron que tenía que pasar toda la tarde y la noche en casa del abuelo
+        Enrique.
+    - id: text-13-15
+      type: section_text
+      text: —No quiero ir a lo del abuelo —dijo Elena—. Me aburro.
+    - id: text-13-16
+      type: section_text
+      text: —Pero si tiene una casa con un jardín precioso —contestó el papá.
+
+response:
+  html_path: 13_0_adt.html
