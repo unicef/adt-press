@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     npm \
     nodejs \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
