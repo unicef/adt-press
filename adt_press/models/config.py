@@ -126,12 +126,8 @@ class HTMLPromptConfig(PromptConfig):
                 )
                 for part in example["section"]["parts"]
             ]
-            example["response"]["html_path"] = map_image_path(
-                example_dir, example["response"]["html_path"]
-            )
-            example["response"]["content"] = read_text_file(
-                example["response"]["html_path"]
-            )
+            example["response"]["html_path"] = map_image_path(example_dir, example["response"]["html_path"])
+            example["response"]["content"] = read_text_file(example["response"]["html_path"])
             examples.append(example)
 
         self.examples = examples
