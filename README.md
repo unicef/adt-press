@@ -30,9 +30,9 @@
 | adt\_press/models/text.py                   |       35 |        0 |    100% |           |
 | adt\_press/models/web.py                    |        4 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py            |        0 |        0 |    100% |           |
-| adt\_press/nodes/config\_nodes.py           |      121 |        4 |     97% |88, 169, 174, 179 |
+| adt\_press/nodes/config\_nodes.py           |      123 |        4 |     97% |92, 173, 178, 183 |
 | adt\_press/nodes/image\_nodes.py            |      109 |        2 |     98% |   49, 100 |
-| adt\_press/nodes/pdf\_nodes.py              |       73 |        0 |    100% |           |
+| adt\_press/nodes/pdf\_nodes.py              |       74 |        0 |    100% |           |
 | adt\_press/nodes/plate\_nodes.py            |      127 |        3 |     98% |36, 103, 259 |
 | adt\_press/nodes/report\_nodes.py           |       44 |        0 |    100% |           |
 | adt\_press/nodes/section\_nodes.py          |       84 |        1 |     99% |        31 |
@@ -46,7 +46,7 @@
 | adt\_press/utils/image.py                   |       50 |       13 |     74% |     49-65 |
 | adt\_press/utils/languages.py               |        3 |        0 |    100% |           |
 | adt\_press/utils/logging.py                 |       73 |       26 |     64% |16-23, 49, 85-87, 100-107, 115-134, 142 |
-| adt\_press/utils/pdf.py                     |       42 |        3 |     93% | 79-80, 85 |
+| adt\_press/utils/pdf.py                     |       44 |        4 |     91% |79, 84-85, 90 |
 | adt\_press/utils/sync.py                    |       14 |        0 |    100% |           |
 | adt\_press/utils/web\_assets.py             |       98 |       13 |     87% |13, 59-66, 119, 144-149 |
 | tests/test\_clear\_cache.py                 |       45 |        0 |    100% |           |
@@ -55,7 +55,7 @@
 | tests/test\_parameter\_validation.py        |       30 |        0 |    100% |           |
 | tests/test\_pipeline.py                     |       76 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py   |       84 |        0 |    100% |           |
-|                                   **TOTAL** | **1871** |   **89** | **95%** |           |
+|                                   **TOTAL** | **1876** |   **90** | **95%** |           |
 
 
 ## Setup coverage badge
