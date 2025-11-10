@@ -1,7 +1,10 @@
 # mypy: ignore-errors
+import re
+
 import instructor
 from banks import Prompt
 from bs4 import BeautifulSoup
+from bs4.element import Doctype
 from litellm import acompletion
 from pydantic import ValidationInfo, field_validator
 
@@ -20,7 +23,7 @@ class GenerationResponse(CleanTextBaseModel):
     @field_validator("content")
     @classmethod
     def validate_html_data_ids(cls, v: str, info: ValidationInfo) -> str:
-        """Ensure all HTML nodes with text have data-id attributes that reference valid IDs."""
+        """Ensure nodes with inline text declare valid data-id attributes."""
         soup = BeautifulSoup(v, "html.parser")
 
         # Get valid IDs from context
@@ -33,32 +36,102 @@ class GenerationResponse(CleanTextBaseModel):
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
             # Check if element has direct text content (not just whitespace)
-            direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
+            direct_text = "".join(
+                element.find_all(string=True, recursive=False)
+            ).strip()
 
             if direct_text:
                 data_id = element.get("data-id")
                 if not data_id:
                     raise ValueError(
-                        f"HTML element '{element.name}' contains text but is missing required data-id attribute. "
-                        f"Text content: '{direct_text[:50]}...'"
+                        (
+                            "HTML element "
+                            f"'{element.name}' contains text but is missing "
+                            "required data-id attribute. "
+                            f"Text content: '{direct_text[:50]}...'"
+                        )
                     )
 
                 if text_ids and data_id not in text_ids:
                     raise ValueError(
-                        f"HTML element '{element.name}' has invalid data-id='{data_id}'. "
-                        f"Must be one of text IDs: {', '.join(sorted(text_ids))}"
+                        (
+                            f"HTML element '{element.name}' has invalid "
+                            f"data-id='{data_id}'. Must be one of text IDs: "
+                            f"{', '.join(sorted(text_ids))}"
+                        )
                     )
 
         # Validate image elements
         for img_element in soup.find_all("img"):
             data_id = img_element.get("data-id")
             if not data_id:
-                raise ValueError(f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}")
+                raise ValueError(
+                    (
+                        "Image element is missing required data-id attribute. "
+                        f"Image attributes: {dict(img_element.attrs)}"
+                    )
+                )
 
             if image_ids and data_id not in image_ids:
-                raise ValueError(f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
+                raise ValueError(
+                    (
+                        "Image element has invalid data-id="
+                        f"'{data_id}'. Must be one of image IDs: "
+                        f"{', '.join(sorted(image_ids))}"
+                    )
+                )
 
         return v
+
+
+def sanitize_generated_html(html: str) -> str:
+    """Strip outer document wrappers and remote scripts from generated HTML."""
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Remove top-level doctypes that confuse downstream HTML injection.
+    for element in list(soup.contents):
+        if isinstance(element, Doctype):
+            element.extract()
+
+    # Drop script tags pointing to external CDNs; unsupported by the reader.
+    for script in soup.find_all("script"):
+        src = script.get("src", "")
+        if src.startswith("http://") or src.startswith("https://"):
+            script.decompose()
+
+    # If a body node exists, return only its direct children to avoid nesting.
+    if soup.body:
+        fragment = "".join(str(child) for child in soup.body.contents)
+        fragment = re.sub(
+            r"<!DOCTYPE html>",
+            "",
+            fragment,
+            flags=re.IGNORECASE,
+        )
+        fragment = re.sub(
+            r"^\s*html\s*$",
+            "",
+            fragment,
+            flags=re.IGNORECASE | re.MULTILINE,
+        )
+        fragment_soup = BeautifulSoup(fragment, "html.parser")
+
+        for element in list(fragment_soup.contents):
+            if isinstance(element, Doctype):
+                element.extract()
+
+        for head in fragment_soup.find_all("head"):
+            head.decompose()
+
+        for wrapper in fragment_soup.find_all(["html", "body"]):
+            wrapper.unwrap()
+
+        cleaned = "".join(str(child) for child in fragment_soup.contents)
+
+        return cleaned.strip()
+
+    # Default to the cleaned soup when no explicit body is present.
+    return str(soup).strip()
 
 
 async def generate_web_page_html(
@@ -93,19 +166,25 @@ async def generate_web_page_html(
         "image_ids": [i.image_id for i in images],
     }
 
+    messages = [
+        m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)
+    ]
+
     response: GenerationResponse = await client.chat.completions.create(
         model=config.model,
         response_model=GenerationResponse,
-        messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
+        messages=messages,
         max_retries=config.max_retries,
         context=validation_context,
     )
+
+    sanitized_content = sanitize_generated_html(response.content)
 
     return WebPage(
         text_id=texts[0].text_id if texts else "",
         section_id=section.section_id,
         reasoning=response.reasoning,
-        content=response.content,
+        content=sanitized_content,
         image_ids=[i.image_id for i in images],
         text_ids=[t.text_id for t in texts],
         render_strategy=render_strategy,
