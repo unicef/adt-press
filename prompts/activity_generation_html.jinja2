@@ -70,51 +70,18 @@ When section type is `activity_sorting`, you MUST use this exact structure:
 
 Example sorting activity:
 ```html
-<section class="bg-white mx-auto p-4" data-section-type="activity_sorting" role="activity">
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <!-- Image column (if applicable) -->
-    <div class="bg-white rounded-lg p-0 lg:col-span-1">
-      <img alt="Description" class="w-full mx-auto rounded-lg" data-id="img-17-1" src="images/image.png">
-    </div>
-    
-    <!-- Word bank column -->
-    <div class="bg-white rounded-lg p-0 lg:col-span-1">
-      <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mt-6" role="listbox">
-        <p class="word-card text-center border border-gray-300 bg-gray-50 p-2 rounded-md hover:bg-gray-100 cursor-pointer transition duration-300 hover:bg-yellow-300 transform hover:scale-105" 
-           data-activity-item="word1" draggable="true" tabindex="0" role="option">
-          <span data-id="text-17-8">🖼️ Word 1</span>
-        </p>
-        <!-- More word cards... -->
-      </div>
-    </div>
+<!-- Word bank -->
+<div class="flex flex-wrap gap-3">
+  <div class="word-card bg-yellow-100 p-2 px-4 rounded-full cursor-move" 
+       data-activity-item="word-1" data-id="text-1" draggable="true">Word 1</div>
+</div>
 
-    <!-- Categories column -->
-    <div class="grid gap-3 activity-text" role="listbox">
-      <div class="category bg-yellow-200 border border-yellow-300 rounded p-2 min-h-[3rem]" 
-           data-activity-category="category1" tabindex="0" role="listbox">
-        <label class="font-semibold text-center" data-id="text-17-12">Category 1</label>
-        <ul class="word-list flex flex-wrap"></ul>
-      </div>
-      
-      <div class="category bg-blue-200 border border-blue-300 rounded p-2 min-h-[3rem]" 
-           data-activity-category="category2" tabindex="0" role="listbox">
-        <label class="font-semibold text-center" data-id="text-17-13">Category 2</label>
-        <ul class="word-list flex flex-wrap"></ul>
-      </div>
-      <!-- More categories... -->
-    </div>
-  </div>
-</section>
+<!-- Categories -->
+<div class="category border p-4 rounded-lg" data-activity-category="cat-1">
+  <h3 class="font-bold mb-2">Category 1</h3>
+  <ul class="word-list"></ul>
+</div>
 ```
-
-**Key requirements:**
-- Word cards use `word-card` class, NOT `activity-item`
-- Each word card needs both `data-activity-item` AND `data-id` attributes
-- Categories must have `category` class and `data-activity-category` attribute
-- Each category must contain empty `<ul class="word-list"></ul>` for JavaScript functionality
-- Use color-coded category backgrounds for visual differentiation
-- Include proper ARIA labels and roles for accessibility
-- Text content should be wrapped in `<span data-id="...">` within word cards
 
 ### **CRITICAL: Multiple Matching Activity Structure (activity_multiple_matching)**
 When section type is `activity_multiple_matching`, you MUST use this exact structure:
@@ -240,6 +207,76 @@ Example fill in table activity:
 - Labels must have `data-id` attributes matching provided text IDs
 - Use appropriate input widths (`w-full`, `w-24`, `sm:w-32`) based on expected content length
 - Maintain consistent spacing with `mb-6` between sections
+
+### **CRITICAL: Sorting Activity Structure (activity_sorting)**
+When section type is `activity_sorting`, you MUST use this exact structure:
+
+**Word Cards (draggable items):**
+- Class: `word-card` (NOT `activity-item`) - REQUIRED
+- Attribute: `data-activity-item="unique-id"` - REQUIRED
+- Attribute: `data-id="text-id"` - REQUIRED  
+- Attribute: `draggable="true"`
+- Base styling: `text-center border border-gray-300 bg-gray-50 p-2 rounded-md hover:bg-gray-100 cursor-pointer transition duration-300 hover:bg-yellow-300 transform hover:scale-105`
+
+**Categories (drop zones):**
+- Class: `category` - REQUIRED
+- Attribute: `data-activity-category="category-name"` - REQUIRED
+- Must contain: `<ul class="word-list"></ul>` - REQUIRED (empty initially)
+- Color-coded backgrounds: `bg-yellow-200`, `bg-blue-200`, `bg-green-200`, `bg-red-200`, `bg-purple-200`
+
+**Layout structure:**
+- Use 3-column grid: `grid grid-cols-1 lg:grid-cols-3 gap-4`
+- Image column (if present): `lg:col-span-1`
+- Word bank column: `lg:col-span-1` with `grid grid-cols-2 gap-4` for items
+- Categories column: `lg:col-span-1` with `grid gap-3`
+
+Example sorting activity:
+```html
+<section class="bg-white mx-auto p-4" data-section-type="activity_sorting" role="activity">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Image column (if applicable) -->
+    <div class="bg-white rounded-lg p-0 lg:col-span-1">
+      <img alt="Description" class="w-full mx-auto rounded-lg" data-id="img-17-1" src="images/image.png">
+    </div>
+    
+    <!-- Word bank column -->
+    <div class="bg-white rounded-lg p-0 lg:col-span-1">
+      <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mt-6" role="listbox">
+        <p class="word-card text-center border border-gray-300 bg-gray-50 p-2 rounded-md hover:bg-gray-100 cursor-pointer transition duration-300 hover:bg-yellow-300 transform hover:scale-105" 
+           data-activity-item="word1" draggable="true" tabindex="0" role="option">
+          <span data-id="text-17-8">🖼️ Word 1</span>
+        </p>
+        <!-- More word cards... -->
+      </div>
+    </div>
+
+    <!-- Categories column -->
+    <div class="grid gap-3 activity-text" role="listbox">
+      <div class="category bg-yellow-200 border border-yellow-300 rounded p-2 min-h-[3rem]" 
+           data-activity-category="category1" tabindex="0" role="listbox">
+        <label class="font-semibold text-center" data-id="text-17-12">Category 1</label>
+        <ul class="word-list flex flex-wrap"></ul>
+      </div>
+      
+      <div class="category bg-blue-200 border border-blue-300 rounded p-2 min-h-[3rem]" 
+           data-activity-category="category2" tabindex="0" role="listbox">
+        <label class="font-semibold text-center" data-id="text-17-13">Category 2</label>
+        <ul class="word-list flex flex-wrap"></ul>
+      </div>
+      <!-- More categories... -->
+    </div>
+  </div>
+</section>
+```
+
+**Key requirements:**
+- Word cards use `word-card` class, NOT `activity-item`
+- Each word card needs both `data-activity-item` AND `data-id` attributes
+- Categories must have `category` class and `data-activity-category` attribute
+- Each category must contain empty `<ul class="word-list"></ul>` for JavaScript functionality
+- Use color-coded category backgrounds for visual differentiation
+- Include proper ARIA labels and roles for accessibility
+- Text content should be wrapped in `<span data-id="...">` within word cards
 
 ### **CRITICAL: True/False Activity Structure (activity_true_false)**
 When section type is `activity_true_false`, you MUST use this exact structure:

@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from typing import Any
@@ -220,7 +221,7 @@ def package_adt_web(
 
         # Add answer script if this is an activity with answers
         if webpage.activity_answers:
-            answers_json = json.dumps(webpage.activity_answers, indent=2)
+            answers_json = json.dumps(webpage.activity_answers, indent=2, ensure_ascii=False)
             answer_script = (
                 f'<script type="text/javascript">\n'
                 f'  window.correctAnswers = {answers_json};\n'
@@ -281,11 +282,11 @@ def package_adt_web(
             filename = f"{speech.text_id}.mp3"
             audio_map[text_id] = filename
 
-                # copy the audio file over
-                shutil.copy(
-                    os.path.join(run_output_dir_config, speech.speech_path),
-                    os.path.join(audio_dir, filename),
-                )
+        # copy the audio file over
+        shutil.copy(
+            os.path.join(run_output_dir_config, speech.speech_path),
+            os.path.join(audio_dir, filename),
+        )
 
         write_json_file(os.path.join(locale_dir, "audios.json"), audio_map)
 
