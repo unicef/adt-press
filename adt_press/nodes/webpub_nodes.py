@@ -10,6 +10,7 @@ from adt_press.models.plate import Plate
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import WebPage
+from adt_press.utils.web_assets import build_config_json
 
 
 @cache(behavior="recompute")
@@ -26,7 +27,8 @@ def package_webpub(
     strategy_config: dict[str, str],
     package_adt_web: str,
 ) -> str:
-    default_language = list(plate_translations.keys())[0]
+    languages = list(plate_translations.keys())
+    default_language = languages[0]
 
     reading_order: list[dict[str, str]] = []
     resources: list[dict[str, str]] = []
@@ -66,18 +68,19 @@ def package_webpub(
     adt_dir = os.path.join(run_output_dir_config, "adt")
     shutil.copytree(adt_dir, webpub_dir)
 
-    # Adjust packaged config to disable UI affordances not needed offline.
-    config_path = os.path.join(webpub_dir, "assets", "config.json")
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as config_file:
-            web_config = json.load(config_file)
-
-        features = web_config.setdefault("features", {})
-        features["showNavigationControls"] = False
-        features["showTutorial"] = False
-
-        with open(config_path, "w", encoding="utf-8") as config_file:
-            json.dump(web_config, config_file, ensure_ascii=False, indent=2)
+    build_config_json(
+        template_config,
+        run_output_dir_config,
+        book_title=pdf_title_config,
+        languages=languages,
+        default_language=default_language,
+        strategy_config=strategy_config,
+        output_subdir="webpub",
+        feature_overrides={
+            "showNavigationControls": False,
+            "showTutorial": False,
+        },
+    )
 
     # now add all our resources to the manifest
     for root, dirs, files in os.walk(webpub_dir):

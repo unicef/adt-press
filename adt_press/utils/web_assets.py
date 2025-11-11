@@ -1,6 +1,11 @@
+import json
 import os
 import shutil
 import subprocess
+from typing import Any
+
+from adt_press.models.config import TemplateConfig
+from adt_press.utils.html import render_template
 
 
 def copy_interface_translations(run_output_dir_config: str, languages: list[str]) -> None:
@@ -166,6 +171,50 @@ def run_npm_build(run_output_dir_config: str) -> None:
         cwd=build_dir,
         check=True,
     )
+
+
+def build_config_json(
+    template_config: TemplateConfig,
+    run_output_dir_config: str,
+    *,
+    book_title: str,
+    languages: list[str],
+    default_language: str,
+    strategy_config: dict[str, Any],
+    output_subdir: str = "adt",
+    feature_overrides: dict[str, Any] | None = None,
+) -> str:
+    """Render config.json for the requested output and apply feature overrides if provided."""
+
+    relative_path = os.path.join(output_subdir, "assets", "config.json")
+    absolute_path = os.path.join(run_output_dir_config, relative_path)
+
+    os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
+
+    render_template(
+        template_config,
+        "config.json",
+        dict(
+            languages=languages,
+            default_language=default_language,
+            book_title=book_title,
+            config=strategy_config,
+        ),
+        output_name=relative_path,
+    )
+
+    if feature_overrides:
+        with open(absolute_path, "r", encoding="utf-8") as config_file:
+            config_data = json.load(config_file)
+
+        features = config_data.setdefault("features", {})
+        for key, value in feature_overrides.items():
+            features[key] = value
+
+        with open(absolute_path, "w", encoding="utf-8") as config_file:
+            json.dump(config_data, config_file, ensure_ascii=False, indent=2)
+
+    return absolute_path
 
 
 def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:

@@ -1,4 +1,3 @@
-import json
 import os
 
 from hamilton.function_modifiers import cache
@@ -7,6 +6,7 @@ from adt_press.models.config import TemplateConfig
 from adt_press.models.epub import create_epub_file
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
+from adt_press.utils.web_assets import build_config_json
 
 
 @cache(behavior="recompute")
@@ -18,6 +18,7 @@ def package_epub(
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
     web_pages: list[WebPage],
+    strategy_config: dict[str, str],
     package_adt_web: str,  # Dependency to ensure web packaging runs first
 ) -> dict[str, str]:
     """
@@ -30,30 +31,23 @@ def package_epub(
     adt_dir = os.path.join(run_output_dir_config, "adt")
     image_dir = os.path.join(adt_dir, "images")
 
-    # Temporarily disable tutorial experience when packaging EPUB assets.
-    config_path = os.path.join(adt_dir, "assets", "config.json")
-    original_config_text: str | None = None
-    config_modified = False
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as config_file:
-            original_config_text = config_file.read()
+    languages = list(plate_translations.keys())
+    default_language = languages[0]
+    feature_overrides = {
+        "showNavigationControls": False,
+        "showTutorial": False,
+    }
 
-        try:
-            config_data = json.loads(original_config_text)
-        except json.JSONDecodeError:
-            config_data = None
-        if config_data is not None:
-            features = config_data.setdefault("features", {})
-            features["showTutorial"] = False
-
-            with open(config_path, "w", encoding="utf-8") as config_file:
-                json.dump(
-                    config_data,
-                    config_file,
-                    ensure_ascii=False,
-                    indent=2,
-                )
-            config_modified = True
+    build_config_json(
+        template_config,
+        run_output_dir_config,
+        book_title=pdf_title_config,
+        languages=languages,
+        default_language=default_language,
+        strategy_config=strategy_config,
+        output_subdir="adt",
+        feature_overrides=feature_overrides,
+    )
 
     plate_texts = {txt.text_id: txt for txt in plate.texts}
 
@@ -84,8 +78,14 @@ def package_epub(
 
             epub_paths[language] = epub_filename
     finally:
-        if config_modified and original_config_text is not None:
-            with open(config_path, "w", encoding="utf-8") as config_file:
-                config_file.write(original_config_text)
+        build_config_json(
+            template_config,
+            run_output_dir_config,
+            book_title=pdf_title_config,
+            languages=languages,
+            default_language=default_language,
+            strategy_config=strategy_config,
+            output_subdir="adt",
+        )
 
     return epub_paths

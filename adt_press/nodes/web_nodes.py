@@ -14,7 +14,7 @@ from adt_press.models.speech import SpeechFile
 from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.sync import gather_with_limit, run_async_task
-from adt_press.utils.web_assets import build_web_assets
+from adt_press.utils.web_assets import build_config_json, build_web_assets
 
 
 def web_pages(
@@ -199,21 +199,14 @@ def package_adt_web(
         with open(os.path.join(locale_dir, "glossary.json"), "w") as f:
             json.dump(glossary, f, indent=2)
 
-    # write our config file
-    config_output_path = "adt/assets/config.json"
-    config_dir = os.path.dirname(os.path.join(run_output_dir_config, config_output_path))
-    os.makedirs(config_dir, exist_ok=True)
-
-    render_template(
+    build_config_json(
         template_config,
-        "config.json",
-        dict(
-            languages=list(plate_translations.keys()),
-            default_language=default_language,
-            book_title=pdf_title_config,
-            config=strategy_config,
-        ),
-        output_name=config_output_path,
+        run_output_dir_config,
+        book_title=pdf_title_config,
+        languages=list(plate_translations.keys()),
+        default_language=default_language,
+        strategy_config=strategy_config,
+        output_subdir="adt",
     )
 
     build_web_assets(run_output_dir_config, list(plate_translations.keys()))
