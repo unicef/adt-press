@@ -49,6 +49,7 @@ dev = [
     "licensecheck>=2025.1.0",
     "mypy>=1.17.0",
     "pytest>=8.4.1",
+    "pytest-asyncio>=0.25.2",
 ]
 
 [tool.mypy]

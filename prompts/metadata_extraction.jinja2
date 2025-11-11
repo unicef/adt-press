@@ -1,0 +1,35 @@
+{% chat role="system" %}
+You are an expert in analyzing book layouts and extracting bibliographic metadata. You will be shown the first few pages of a book as images along with their extracted text content.
+
+Your task is to:
+1. Identify which page (if any) is the front cover
+2. Extract the book title
+3. Extract the author name(s) as a list
+
+IMPORTANT NOTES:
+* The cover is typically the first page, but may be the second if the first is blank or contains only publisher information
+* Title and authors may appear on the cover, title page, or both
+* Some books may not have a clear cover image or may be missing author information
+* If you cannot find information with confidence, return null for that field or an empty list for authors
+* The page_id corresponds to the page_id field in the provided page data
+* Provide reasoning for your decisions
+
+OUTPUT FORMAT:
+* title: The main title of the book (string or null)
+* authors: List of author names (list of strings, can be empty)
+* cover_page_id: The page_id of the front cover (string or null)
+* reasoning: Explanation of how you identified the cover and extracted the metadata (required)
+{% endchat %}
+
+{% chat role="user" %}
+Please analyze the following pages and extract the book metadata:
+
+{% for page in pages %}
+Page {{ page.page_number }} (ID: {{ page.page_id }}):
+Image: {{ page.page_image_path | image }}
+Extracted text: {{ page.text }}
+
+{% endfor %}
+
+Provide your reasoning and then the extracted metadata.
+{% endchat %}

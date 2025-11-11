@@ -3,10 +3,12 @@ import os
 
 from hamilton.function_modifiers import config
 
+from adt_press.llm.metadata_extraction import get_metadata
 from adt_press.llm.text_easy_read import get_text_easy_read
 from adt_press.llm.text_extraction import get_page_text
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import MetadataPromptConfig, PromptConfig
 from adt_press.models.image import Image
+from adt_press.models.metadata import Metadata
 from adt_press.models.pdf import Page
 from adt_press.models.text import EasyReadText, PageText, PageTextGroup, PageTexts
 from adt_press.nodes.config_nodes import PageRangeConfig
@@ -196,3 +198,26 @@ def pdf_pages(run_output_dir_config: str, pdf_extraction_dir: str) -> list[Page]
         pages.append(page)
 
     return pages
+
+
+def metadata(
+    pdf_pages: list[Page],
+    metadata_extraction_prompt_config: MetadataPromptConfig,
+) -> Metadata:
+    """
+    Extract book metadata (title, author, cover page) from the first pages.
+
+    Args:
+        pdf_pages: All extracted pages from the PDF
+        metadata_extraction_prompt_config: Configuration for the LLM prompt including page_range
+
+    Returns:
+        Metadata object with extracted title, author, and cover page identification
+    """
+    # Get the first N pages for analysis
+    pages_to_analyze = pdf_pages[: metadata_extraction_prompt_config.page_range]
+
+    async def extract_metadata():
+        return await get_metadata(metadata_extraction_prompt_config, pages_to_analyze)
+
+    return run_async_task(extract_metadata)

@@ -8,6 +8,7 @@ from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
     LayoutType,
+    MetadataPromptConfig,
     PageRangeConfig,
     PromptConfig,
     RenderPromptConfig,
@@ -126,6 +127,11 @@ def meaningfulness_prompt_config(config: DictConfig) -> PromptConfig:
 @cache(behavior="recompute")
 def text_extraction_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["text_extraction"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def metadata_extraction_prompt_config(config: DictConfig) -> MetadataPromptConfig:
+    return MetadataPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["metadata_extraction"], config["default_model"]))
 
 
 @cache(behavior="recompute")
