@@ -24,7 +24,15 @@ class GenerationResponse(CleanTextBaseModel):
     @classmethod
     def validate_html_data_ids(cls, v: str, info: ValidationInfo) -> str:
         """Ensure nodes with inline text declare valid data-id attributes."""
+        if not v or not v.strip():
+            raise ValueError("Generated HTML content is empty.")
+
         soup = BeautifulSoup(v, "html.parser")
+
+        if not soup.find(True):
+            raise ValueError(
+                "Generated HTML does not contain any HTML elements."
+            )
 
         # Get valid IDs from context
         text_ids = set()
@@ -32,6 +40,9 @@ class GenerationResponse(CleanTextBaseModel):
         if info.context:
             text_ids.update(info.context.get("text_ids", []))
             image_ids.update(info.context.get("image_ids", []))
+            section_type = info.context.get("section_type")
+        else:
+            section_type = None
 
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
@@ -81,6 +92,64 @@ class GenerationResponse(CleanTextBaseModel):
                     )
                 )
 
+        # Ensure required structural elements exist
+        container = soup.find("div", id="content")
+        if not container:
+            raise ValueError(
+                "Generated HTML is missing the main <div id='content'> container."
+            )
+
+        container_classes = container.get("class", [])
+        if "container" not in container_classes:
+            raise ValueError(
+                "The main content container must include the 'container' class."
+            )
+
+        sections = soup.find_all("section")
+        if not sections:
+            raise ValueError(
+                "Generated HTML must include a <section> element."
+            )
+
+        if len(sections) != 1:
+            raise ValueError(
+                "Generated HTML must include exactly one <section> element."
+            )
+
+        section_element = sections[0]
+
+        if section_type:
+            data_section_type = section_element.get("data-section-type")
+            if data_section_type != section_type:
+                raise ValueError(
+                    (
+                        "Section data-section-type attribute is invalid. "
+                        f"Expected '{section_type}', got "
+                        f"'{data_section_type}'."
+                    )
+                )
+
+            if section_type.startswith("activity_"):
+                expected_role = "activity"
+            else:
+                expected_role = "article"
+            role = section_element.get("role")
+            if role != expected_role:
+                raise ValueError(
+                    (
+                        "Section role attribute is invalid. Expected "
+                        f"'{expected_role}', got '{role}'."
+                    )
+                )
+
+        if not soup.find(attrs={"data-id": True}):
+            raise ValueError(
+                (
+                    "Generated HTML must include at least one element with a "
+                    "data-id attribute."
+                )
+            )
+
         return v
 
 
@@ -92,12 +161,6 @@ def sanitize_generated_html(html: str) -> str:
     for element in list(soup.contents):
         if isinstance(element, Doctype):
             element.extract()
-
-    # Drop script tags pointing to external CDNs; unsupported by the reader.
-    for script in soup.find_all("script"):
-        src = script.get("src", "")
-        if src.startswith("http://") or src.startswith("https://"):
-            script.decompose()
 
     # If a body node exists, return only its direct children to avoid nesting.
     if soup.body:
@@ -164,6 +227,7 @@ async def generate_web_page_html(
     validation_context = {
         "text_ids": [t.text_id for t in texts],
         "image_ids": [i.image_id for i in images],
+        "section_type": section.section_type.value,
     }
 
     messages = [
