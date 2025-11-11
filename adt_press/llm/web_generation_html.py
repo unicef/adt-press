@@ -1,10 +1,7 @@
 # mypy: ignore-errors
-import re
-
 import instructor
 from banks import Prompt
 from bs4 import BeautifulSoup
-from bs4.element import Doctype
 from litellm import acompletion
 from pydantic import ValidationInfo, field_validator
 
@@ -23,11 +20,17 @@ class GenerationResponse(CleanTextBaseModel):
     @field_validator("content")
     @classmethod
     def validate_html_data_ids(cls, v: str, info: ValidationInfo) -> str:
-        """Ensure nodes with inline text declare valid data-id attributes."""
+        """Sanitize and validate generated HTML content."""
         if not v or not v.strip():
             raise ValueError("Generated HTML content is empty.")
 
         soup = BeautifulSoup(v, "html.parser")
+
+        # Strip document wrappers if LLM wrapped content in html/body tags
+        if soup.body:
+            # Extract just the body contents
+            v = "".join(str(child) for child in soup.body.contents)
+            soup = BeautifulSoup(v, "html.parser")
 
         if not soup.find(True):
             raise ValueError(
@@ -96,13 +99,15 @@ class GenerationResponse(CleanTextBaseModel):
         container = soup.find("div", id="content")
         if not container:
             raise ValueError(
-                "Generated HTML is missing the main <div id='content'> container."
+                "Generated HTML is missing the main "
+                "<div id='content'> container."
             )
 
         container_classes = container.get("class", [])
         if "container" not in container_classes:
             raise ValueError(
-                "The main content container must include the 'container' class."
+                "The main content container must include "
+                "the 'container' class."
             )
 
         sections = soup.find_all("section")
@@ -153,50 +158,6 @@ class GenerationResponse(CleanTextBaseModel):
         return v
 
 
-def sanitize_generated_html(html: str) -> str:
-    """Strip outer document wrappers and remote scripts from generated HTML."""
-    soup = BeautifulSoup(html, "html.parser")
-
-    # Remove top-level doctypes that confuse downstream HTML injection.
-    for element in list(soup.contents):
-        if isinstance(element, Doctype):
-            element.extract()
-
-    # If a body node exists, return only its direct children to avoid nesting.
-    if soup.body:
-        fragment = "".join(str(child) for child in soup.body.contents)
-        fragment = re.sub(
-            r"<!DOCTYPE html>",
-            "",
-            fragment,
-            flags=re.IGNORECASE,
-        )
-        fragment = re.sub(
-            r"^\s*html\s*$",
-            "",
-            fragment,
-            flags=re.IGNORECASE | re.MULTILINE,
-        )
-        fragment_soup = BeautifulSoup(fragment, "html.parser")
-
-        for element in list(fragment_soup.contents):
-            if isinstance(element, Doctype):
-                element.extract()
-
-        for head in fragment_soup.find_all("head"):
-            head.decompose()
-
-        for wrapper in fragment_soup.find_all(["html", "body"]):
-            wrapper.unwrap()
-
-        cleaned = "".join(str(child) for child in fragment_soup.contents)
-
-        return cleaned.strip()
-
-    # Default to the cleaned soup when no explicit body is present.
-    return str(soup).strip()
-
-
 async def generate_web_page_html(
     render_strategy: str,
     config: PromptConfig,
@@ -242,13 +203,12 @@ async def generate_web_page_html(
         context=validation_context,
     )
 
-    sanitized_content = sanitize_generated_html(response.content)
-
+    # The content is already sanitized and validated by the field_validator
     return WebPage(
         text_id=texts[0].text_id if texts else "",
         section_id=section.section_id,
         reasoning=response.reasoning,
-        content=sanitized_content,
+        content=response.content,
         image_ids=[i.image_id for i in images],
         text_ids=[t.text_id for t in texts],
         render_strategy=render_strategy,
