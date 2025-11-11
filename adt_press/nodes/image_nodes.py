@@ -14,8 +14,8 @@ from adt_press.models.image import (
     ProcessedImage,
     PrunedImage,
 )
-from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
 from adt_press.models.pdf import Page
+from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
 from adt_press.utils.file import write_file
 from adt_press.utils.image import crop_image, image_bytes, is_blank_image
 from adt_press.utils.sync import gather_with_limit, run_async_task

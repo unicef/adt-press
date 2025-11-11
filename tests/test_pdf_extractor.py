@@ -12,7 +12,7 @@ import pytest
 pdf_extractor_path = Path(__file__).parent.parent / "tools" / "pdf_extractor"
 sys.path.insert(0, str(pdf_extractor_path))
 
-from pdf_extractor import extract_pages_from_pdf, get_page_groupings  # type: ignore[import-not-found]
+from pdf_extractor import extract_pages_from_pdf  # type: ignore[import-not-found]
 
 # Test PDF path
 TEST_PDF = Path(__file__).parent.parent / "assets" / "raven.pdf"

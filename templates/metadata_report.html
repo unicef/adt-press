@@ -38,6 +38,16 @@
                         {% endif %}
                     </div>
 
+                    <!-- Publisher Section -->
+                    <div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Publisher</div>
+                        {% if metadata.publisher %}
+                        <div class="text-xl text-gray-900">{{ metadata.publisher }}</div>
+                        {% else %}
+                        <div class="text-lg text-gray-400 italic">Not detected</div>
+                        {% endif %}
+                    </div>
+
                     <!-- Cover Page ID -->
                     <div>
                         <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Cover Page</div>

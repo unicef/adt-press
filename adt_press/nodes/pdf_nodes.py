@@ -200,8 +200,29 @@ def pdf_pages(run_output_dir_config: str, pdf_extraction_dir: str) -> list[Page]
     return pages
 
 
+def pdf_metadata(pdf_extraction_dir: str) -> dict[str, object]:
+    """
+    Extract PDF metadata from the extraction directory.
+
+    Args:
+        pdf_extraction_dir: Directory containing pdf_extract.json from extraction
+
+    Returns:
+        Dictionary of PDF metadata extracted from the PDF file's Info dictionary
+    """
+    results_file = os.path.join(pdf_extraction_dir, "pdf_extract.json")
+    if not os.path.exists(results_file):
+        raise RuntimeError(f"Extraction results file not found: {results_file}")
+
+    with open(results_file, "r") as f:
+        extract_data = json.load(f)
+
+    return extract_data.get("pdf_metadata", {})
+
+
 def metadata(
     pdf_pages: list[Page],
+    pdf_metadata: dict[str, object],
     metadata_extraction_prompt_config: MetadataPromptConfig,
 ) -> Metadata:
     """
@@ -209,6 +230,7 @@ def metadata(
 
     Args:
         pdf_pages: All extracted pages from the PDF
+        pdf_metadata: PDF metadata from the PDF file's Info dictionary
         metadata_extraction_prompt_config: Configuration for the LLM prompt including page_range
 
     Returns:
@@ -218,6 +240,6 @@ def metadata(
     pages_to_analyze = pdf_pages[: metadata_extraction_prompt_config.page_range]
 
     async def extract_metadata():
-        return await get_metadata(metadata_extraction_prompt_config, pages_to_analyze)
+        return await get_metadata(metadata_extraction_prompt_config, pages_to_analyze, pdf_metadata)
 
     return run_async_task(extract_metadata)

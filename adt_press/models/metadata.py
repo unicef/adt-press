@@ -8,5 +8,6 @@ class Metadata(BaseModel):
 
     title: Optional[str] = None
     authors: list[str] = []
+    publisher: Optional[str] = None
     cover_page_id: Optional[str] = None
     reasoning: str
