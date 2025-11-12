@@ -13,6 +13,8 @@
     "eli5": true,
     "readAloud": true,
     "autoplay": true,
+  "showNavigationControls": true,
+  "showTutorial": true,
     "describeImages": true,
     "notepad": true,
     "showAutoHideButton": true,

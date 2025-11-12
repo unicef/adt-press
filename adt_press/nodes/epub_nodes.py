@@ -6,6 +6,7 @@ from adt_press.models.config import TemplateConfig
 from adt_press.models.epub import create_epub_file
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
+from adt_press.utils.web_assets import build_config_json
 
 
 @cache(behavior="recompute")
@@ -17,6 +18,7 @@ def package_epub(
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
     web_pages: list[WebPage],
+    strategy_config: dict[str, str],
     package_adt_web: str,  # Dependency to ensure web packaging runs first
 ) -> dict[str, str]:
     """
@@ -28,6 +30,24 @@ def package_epub(
     epub_paths = {}
     adt_dir = os.path.join(run_output_dir_config, "adt")
     image_dir = os.path.join(adt_dir, "images")
+
+    languages = list(plate_translations.keys())
+    default_language = languages[0]
+    feature_overrides = {
+        "showNavigationControls": False,
+        "showTutorial": False,
+    }
+
+    build_config_json(
+        template_config,
+        run_output_dir_config,
+        book_title=pdf_title_config,
+        languages=languages,
+        default_language=default_language,
+        strategy_config=strategy_config,
+        output_subdir="adt",
+        feature_overrides=feature_overrides,
+    )
 
     plate_texts = {txt.text_id: txt for txt in plate.texts}
 

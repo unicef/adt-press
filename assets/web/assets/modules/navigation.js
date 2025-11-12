@@ -436,7 +436,7 @@ const escapeKeyPressed = () => {
     setNavVisibility(false);
   }
   // Check if sidebar is open
-  else if (sidebar && !sidebar.classList.contains('translate-x-full')) {
+  else if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
     toggleSidebar();
   }
   // Move focus to main content
@@ -461,7 +461,7 @@ export const setupClickOutsideHandler = () => {
     const isNavOpen = navPopup && navPopup.getAttribute("aria-expanded") === "true";
 
     // Check if sidebar is open
-    const isSidebarOpen = sidebar && !sidebar.classList.contains('translate-x-full');
+  const isSidebarOpen = sidebar && sidebar.getAttribute('aria-expanded') === 'true';
 
     // If neither menu is open, no action needed
     if (!isNavOpen && !isSidebarOpen) {

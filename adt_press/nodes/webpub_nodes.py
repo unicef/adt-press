@@ -10,6 +10,7 @@ from adt_press.models.plate import Plate
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import WebPage
+from adt_press.utils.web_assets import build_config_json
 
 
 @cache(behavior="recompute")
@@ -26,7 +27,8 @@ def package_webpub(
     strategy_config: dict[str, str],
     package_adt_web: str,
 ) -> str:
-    default_language = list(plate_translations.keys())[0]
+    languages = list(plate_translations.keys())
+    default_language = languages[0]
 
     reading_order: list[dict[str, str]] = []
     resources: list[dict[str, str]] = []
@@ -48,7 +50,11 @@ def package_webpub(
         "@context": "https://readium.org/webpub-manifest/context.jsonld",
         "metadata": metadata,
         "links": [
-            {"rel": "self", "href": "manifest.json", "type": "application/webpub+json"},
+            {
+                "rel": "self",
+                "href": "manifest.json",
+                "type": "application/webpub+json",
+            },
         ],
         "readingOrder": reading_order,
         "resources": resources,
@@ -79,6 +85,20 @@ def package_webpub(
     adt_dir = os.path.join(run_output_dir_config, "adt")
     shutil.copytree(adt_dir, webpub_dir)
 
+    build_config_json(
+        template_config,
+        run_output_dir_config,
+        book_title=pdf_title_config,
+        languages=languages,
+        default_language=default_language,
+        strategy_config=strategy_config,
+        output_subdir="webpub",
+        feature_overrides={
+            "showNavigationControls": False,
+            "showTutorial": False,
+        },
+    )
+
     # now add all our resources to the manifest
     for root, dirs, files in os.walk(webpub_dir):
         for file in files:
@@ -99,7 +119,10 @@ def package_webpub(
             elif file.endswith(".json"):
                 mime_type = "application/json"
 
-            resource_entry = {"href": file_path.replace("\\", "/"), "type": mime_type}
+            resource_entry = {
+                "href": file_path.replace("\\", "/"),
+                "type": mime_type,
+            }
 
             resources.append(resource_entry)
 
@@ -111,7 +134,11 @@ def package_webpub(
     # zip it into a standalone webpub file
     webpub_filename = f"{pdf_title_config}.webpub"
     webpub_path = os.path.join(run_output_dir_config, webpub_filename)
-    shutil.make_archive(base_name=webpub_path.replace(".webpub", ""), format="zip", root_dir=webpub_dir)
+    shutil.make_archive(
+        base_name=webpub_path.replace(".webpub", ""),
+        format="zip",
+        root_dir=webpub_dir,
+    )
     # rename .zip to .webpub
     os.rename(webpub_path.replace(".webpub", ".zip"), webpub_path)
 

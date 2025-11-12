@@ -1,6 +1,10 @@
 import os
 import shutil
 import subprocess
+from typing import Any
+
+from adt_press.models.config import TemplateConfig
+from adt_press.utils.html import render_template
 
 
 def copy_interface_translations(run_output_dir_config: str, languages: list[str]) -> None:
@@ -166,6 +170,63 @@ def run_npm_build(run_output_dir_config: str) -> None:
         cwd=build_dir,
         check=True,
     )
+
+
+def build_config_json(
+    template_config: TemplateConfig,
+    run_output_dir_config: str,
+    *,
+    book_title: str,
+    languages: list[str],
+    default_language: str,
+    strategy_config: dict[str, Any],
+    output_subdir: str = "adt",
+    feature_overrides: dict[str, Any] | None = None,
+) -> str:
+    """Render config.json for the requested output and apply feature overrides if provided."""
+
+    relative_path = os.path.join(output_subdir, "assets", "config.json")
+    absolute_path = os.path.join(run_output_dir_config, relative_path)
+
+    os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
+
+    # Compute feature flags so templates stay deterministic.
+    feature_flags: dict[str, Any] = {
+        "signLanguage": False,
+        "easyRead": strategy_config.get("easy_read_strategy", "none") != "none",
+        "glossary": strategy_config.get("glossary_strategy", "none") != "none",
+        "eli5": strategy_config.get("explanation_strategy", "none") != "none",
+        "readAloud": strategy_config.get("speech_strategy", "none") != "none",
+        "autoplay": True,
+        "showTutorial": True,
+        "showNavigationControls": True,
+        "describeImages": True,
+        "notepad": False,
+        "state": True,
+        "characterDisplay": True,
+        "highlight": False,
+    }
+
+    if feature_overrides:
+        feature_flags.update(feature_overrides)
+
+    # Prepare template context with feature overrides merged in
+    template_context = {
+        "languages": languages,
+        "default_language": default_language,
+        "book_title": book_title,
+        "config": strategy_config,
+        "features": feature_flags,
+    }
+
+    render_template(
+        template_config,
+        "config.json",
+        template_context,
+        output_name=relative_path,
+    )
+
+    return absolute_path
 
 
 def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:
