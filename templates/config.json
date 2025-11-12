@@ -7,19 +7,19 @@
     "default": "{{ default_language }}"
   },
   "features": {
-    "signLanguage": false,
-    "easyRead": {{ feature_overrides.get('easyRead', (config.easy_read_strategy != 'none')) | tojson }},
-    "glossary": {{ feature_overrides.get('glossary', (config.glossary_strategy != 'none')) | tojson }},
-    "eli5": {{ feature_overrides.get('eli5', (config.explanation_strategy != 'none')) | tojson }},
-    "readAloud": {{ feature_overrides.get('readAloud', (config.speech_strategy != 'none')) | tojson }},
-    "autoplay": true,
-    "showTutorial": {{ feature_overrides.get('showTutorial', true) | tojson }},
-    "showNavigationControls": {{ feature_overrides.get('showNavigationControls', true) | tojson }},
-    "describeImages": true,
-    "notepad": false,
-    "state": true,
-    "characterDisplay": true,
-    "highlight": false
+    "signLanguage": {{ features['signLanguage'] | tojson }},
+    "easyRead": {{ features['easyRead'] | tojson }},
+    "glossary": {{ features['glossary'] | tojson }},
+    "eli5": {{ features['eli5'] | tojson }},
+    "readAloud": {{ features['readAloud'] | tojson }},
+    "autoplay": {{ features['autoplay'] | tojson }},
+    "showTutorial": {{ features['showTutorial'] | tojson }},
+    "showNavigationControls": {{ features['showNavigationControls'] | tojson }},
+    "describeImages": {{ features['describeImages'] | tojson }},
+    "notepad": {{ features['notepad'] | tojson }},
+    "state": {{ features['state'] | tojson }},
+    "characterDisplay": {{ features['characterDisplay'] | tojson }},
+    "highlight": {{ features['highlight'] | tojson }}
   },
   "analytics": {
     "enabled": false,

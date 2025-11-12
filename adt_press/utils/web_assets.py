@@ -190,13 +190,33 @@ def build_config_json(
 
     os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
 
+    # Compute feature flags so templates stay deterministic.
+    feature_flags: dict[str, Any] = {
+        "signLanguage": False,
+        "easyRead": strategy_config.get("easy_read_strategy", "none") != "none",
+        "glossary": strategy_config.get("glossary_strategy", "none") != "none",
+        "eli5": strategy_config.get("explanation_strategy", "none") != "none",
+        "readAloud": strategy_config.get("speech_strategy", "none") != "none",
+        "autoplay": True,
+        "showTutorial": True,
+        "showNavigationControls": True,
+        "describeImages": True,
+        "notepad": False,
+        "state": True,
+        "characterDisplay": True,
+        "highlight": False,
+    }
+
+    if feature_overrides:
+        feature_flags.update(feature_overrides)
+
     # Prepare template context with feature overrides merged in
     template_context = {
         "languages": languages,
         "default_language": default_language,
         "book_title": book_title,
         "config": strategy_config,
-        "feature_overrides": feature_overrides or {},
+        "features": feature_flags,
     }
 
     render_template(
