@@ -37,6 +37,7 @@ const LANGUAGE_STORAGE_KEY = "currentLanguage";
 const READ_ALOUD_STORAGE_KEY = "readAloudMode";
 const AUTOPLAY_STORAGE_KEY = "autoplayMode";
 const DESCRIBE_IMAGES_STORAGE_KEY = "describeImagesMode";
+const GLOSSARY_STORAGE_KEY = "glossaryMode";
 
 const getSafeLocalStorageItem = (key) => {
   try {
@@ -83,6 +84,12 @@ export const persistAutoplayPreference = (enabled) => setSafeLocalStorageItem(
 export const getStoredDescribeImagesPreference = () => getSafeLocalStorageItem(DESCRIBE_IMAGES_STORAGE_KEY);
 export const persistDescribeImagesPreference = (enabled) => setSafeLocalStorageItem(
   DESCRIBE_IMAGES_STORAGE_KEY,
+  enabled ? "true" : "false"
+);
+
+export const getStoredGlossaryPreference = () => getSafeLocalStorageItem(GLOSSARY_STORAGE_KEY);
+export const persistGlossaryPreference = (enabled) => setSafeLocalStorageItem(
+  GLOSSARY_STORAGE_KEY,
   enabled ? "true" : "false"
 );
 
@@ -645,6 +652,7 @@ export const loadGlossaryTerms = async () => {
 export const toggleGlossaryMode = () => {
   setState("glossaryMode", !state.glossaryMode);
   setCookie("glossaryMode", state.glossaryMode, 7);
+  persistGlossaryPreference(state.glossaryMode);
   toggleButtonState("toggle-glossary", state.glossaryMode);
 
   if (state.glossaryMode) {

@@ -21,7 +21,9 @@ import {
     getStoredAutoplayPreference,
     persistAutoplayPreference,
     getStoredDescribeImagesPreference,
-    persistDescribeImagesPreference
+    persistDescribeImagesPreference,
+    getStoredGlossaryPreference,
+    persistGlossaryPreference
 } from './interface.js'
 import { toggleButtonColor, toggleButtonState } from './utils.js';
 import { extractPageTerms } from './interface.js';
@@ -131,15 +133,31 @@ export const loadSyllablesState = () => {
  * Loads the glossary state from cookies and updates UI.
  */
 export const loadGlossaryState = async () => {
+    const storedPreference = getStoredGlossaryPreference();
     const glossaryModeCookie = getCookie("glossaryMode");
-    if (glossaryModeCookie !== null) {
-        setState('glossaryMode', glossaryModeCookie === "true");
-        toggleButtonState("toggle-glossary", state.glossaryMode);
-        
-        if (state.glossaryMode) {
-            await loadGlossaryTerms();
-            highlightGlossaryTerms();
-        }
+
+    let resolvedValue = storedPreference;
+    if (resolvedValue === null && glossaryModeCookie !== null) {
+        resolvedValue = glossaryModeCookie;
+    }
+
+    if (resolvedValue === null) {
+        return;
+    }
+
+    const isEnabled = resolvedValue === "true";
+    setState('glossaryMode', isEnabled);
+    toggleButtonState("toggle-glossary", state.glossaryMode);
+
+    persistGlossaryPreference(isEnabled);
+    const desiredCookieValue = isEnabled ? "true" : "false";
+    if (glossaryModeCookie !== desiredCookieValue) {
+        setCookie("glossaryMode", desiredCookieValue, 7);
+    }
+    
+    if (state.glossaryMode) {
+        await loadGlossaryTerms();
+        highlightGlossaryTerms();
     }
 };
 
