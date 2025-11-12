@@ -16,7 +16,7 @@ import {
     unhighlightAllElements
 } from './ui_utils.js';
 import { toggleButtonColor, toggleButtonState } from './utils.js';
-import { togglePlayBarSettings, toggleSignLanguageMode } from './interface.js';
+import { togglePlayBarSettings, toggleSignLanguageMode, persistReadAloudPreference } from './interface.js';
 import { trackToggleEvent } from './analytics.js';
 import { isFeatureEnabled } from '../base.js';
 
@@ -441,6 +441,7 @@ export const toggleReadAloud = ({ stopCalls = false } = {}) => {
     const newState = !state.readAloudMode;
     setState('readAloudMode', newState);
     setCookie('readAloudMode', newState.toString(), 7);
+    persistReadAloudPreference(newState);
     toggleButtonColor("tts-quick-toggle-button", newState);
 
     // Track the toggle event

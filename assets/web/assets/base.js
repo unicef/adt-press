@@ -39,7 +39,9 @@ import {
   toggleSignLanguageMode,
   loadSignLanguageMode,
   adjustLayout,
-  initializeSignLanguage
+  initializeSignLanguage,
+  getStoredLanguagePreference,
+  persistLanguagePreference
   //checkWindowsScaling
   //adjustPageScale
 } from "./modules/interface.js";
@@ -327,28 +329,39 @@ async function initializeCoreFunctionality() {
 }
 
 function initializeLanguage() {
+  const storedLanguage = getStoredLanguagePreference();
   const cookieLanguage = getCookie("currentLanguage");
   const htmlLang = document.getElementsByTagName("html")[0].getAttribute("lang");
   const defaultLanguage = window.appConfig?.languages?.default || htmlLang || "en";
   const availableLanguages = window.appConfig?.languages?.available || [];
 
-  // Simple validation: check if cookie language exists in available languages
-  let selectedLanguage = cookieLanguage;
-  
-  if (cookieLanguage && availableLanguages.length > 0 && !availableLanguages.includes(cookieLanguage)) {
-    console.warn(`Cookie language "${cookieLanguage}" not available. Available languages:`, availableLanguages);
-    // Clear invalid cookie on root path
+  let selectedLanguage = storedLanguage || cookieLanguage;
+
+  if (selectedLanguage && availableLanguages.length > 0 && !availableLanguages.includes(selectedLanguage)) {
+    console.warn(`Stored language "${selectedLanguage}" not available. Available languages:`, availableLanguages);
+
     eraseCookie("currentLanguage", "/");
-    // Also clear cookie on current page path (in case it was set with specific path)
     const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1);
     if (currentPath !== "/") {
       eraseCookie("currentLanguage", currentPath);
     }
-    // Use default instead
+
     selectedLanguage = defaultLanguage;
   }
 
-  setState("currentLanguage", selectedLanguage || defaultLanguage);
+  if (!selectedLanguage) {
+    selectedLanguage = defaultLanguage;
+  }
+
+  setState("currentLanguage", selectedLanguage);
+  persistLanguagePreference(selectedLanguage);
+
+  const cookieValue = getCookie("currentLanguage");
+  if (cookieValue !== selectedLanguage) {
+    setCookie("currentLanguage", selectedLanguage, 7);
+  }
+
+  document.documentElement.lang = selectedLanguage;
 }
 
 const handleResponse = async (response) => {
