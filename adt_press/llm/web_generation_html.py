@@ -33,9 +33,7 @@ class GenerationResponse(CleanTextBaseModel):
             soup = BeautifulSoup(v, "html.parser")
 
         if not soup.find(True):
-            raise ValueError(
-                "Generated HTML does not contain any HTML elements."
-            )
+            raise ValueError("Generated HTML does not contain any HTML elements.")
 
         # Get valid IDs from context
         text_ids = set()
@@ -50,9 +48,7 @@ class GenerationResponse(CleanTextBaseModel):
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
             # Check if element has direct text content (not just whitespace)
-            direct_text = "".join(
-                element.find_all(string=True, recursive=False)
-            ).strip()
+            direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
 
             if direct_text:
                 data_id = element.get("data-id")
@@ -79,60 +75,35 @@ class GenerationResponse(CleanTextBaseModel):
         for img_element in soup.find_all("img"):
             data_id = img_element.get("data-id")
             if not data_id:
-                raise ValueError(
-                    (
-                        "Image element is missing required data-id attribute. "
-                        f"Image attributes: {dict(img_element.attrs)}"
-                    )
-                )
+                raise ValueError((f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}"))
 
             if image_ids and data_id not in image_ids:
                 raise ValueError(
-                    (
-                        "Image element has invalid data-id="
-                        f"'{data_id}'. Must be one of image IDs: "
-                        f"{', '.join(sorted(image_ids))}"
-                    )
+                    (f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
                 )
 
         # Ensure required structural elements exist
         container = soup.find("div", id="content")
         if not container:
-            raise ValueError(
-                "Generated HTML is missing the main "
-                "<div id='content'> container."
-            )
+            raise ValueError("Generated HTML is missing the main <div id='content'> container.")
 
         container_classes = container.get("class", [])
         if "container" not in container_classes:
-            raise ValueError(
-                "The main content container must include "
-                "the 'container' class."
-            )
+            raise ValueError("The main content container must include the 'container' class.")
 
         sections = soup.find_all("section")
         if not sections:
-            raise ValueError(
-                "Generated HTML must include a <section> element."
-            )
+            raise ValueError("Generated HTML must include a <section> element.")
 
         if len(sections) != 1:
-            raise ValueError(
-                "Generated HTML must include exactly one <section> element."
-            )
+            raise ValueError("Generated HTML must include exactly one <section> element.")
 
         section_element = sections[0]
 
         if section_type:
             data_section_type = section_element.get("data-section-type")
             if data_section_type != section_type:
-                raise ValueError(
-                    (
-                        "Section data-section-type attribute is invalid. "
-                        f"Expected '{section_type}', got "
-                        f"'{data_section_type}'."
-                    )
-                )
+                raise ValueError((f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'."))
 
             if section_type.startswith("activity_"):
                 expected_role = "activity"
@@ -140,20 +111,10 @@ class GenerationResponse(CleanTextBaseModel):
                 expected_role = "article"
             role = section_element.get("role")
             if role != expected_role:
-                raise ValueError(
-                    (
-                        "Section role attribute is invalid. Expected "
-                        f"'{expected_role}', got '{role}'."
-                    )
-                )
+                raise ValueError((f"Section role attribute is invalid. Expected '{expected_role}', got '{role}'."))
 
         if not soup.find(attrs={"data-id": True}):
-            raise ValueError(
-                (
-                    "Generated HTML must include at least one element with a "
-                    "data-id attribute."
-                )
-            )
+            raise ValueError(("Generated HTML must include at least one element with a data-id attribute."))
 
         return v
 
@@ -191,9 +152,7 @@ async def generate_web_page_html(
         "section_type": section.section_type.value,
     }
 
-    messages = [
-        m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)
-    ]
+    messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
     response: GenerationResponse = await client.chat.completions.create(
         model=config.model,
