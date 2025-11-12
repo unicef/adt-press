@@ -1,8 +1,9 @@
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig, OmegaConf
 
-from adt_press.models.config import TemplateConfig
+from adt_press.models.config import MetadataPromptConfig, TemplateConfig
 from adt_press.models.image import ProcessedImage, PrunedImage
+from adt_press.models.metadata import Metadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateSection
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
@@ -123,6 +124,29 @@ def glossary_report(
 
 
 @cache(behavior="recompute")
+def metadata_report(
+    template_config: TemplateConfig,
+    metadata: Metadata,
+    pdf_pages_by_id: dict[str, Page],
+    metadata_extraction_prompt_config: MetadataPromptConfig,
+) -> str:
+    # Find the cover page if specified
+    cover_page = None
+    if metadata.cover_page_id:
+        cover_page = pdf_pages_by_id.get(metadata.cover_page_id)
+
+    return render_template(
+        template_config,
+        "templates/metadata_report.html",
+        dict(
+            metadata=metadata,
+            cover_page=cover_page,
+            pages_analyzed=metadata_extraction_prompt_config.page_range,
+        ),
+    )
+
+
+@cache(behavior="recompute")
 def web_report(
     template_config: TemplateConfig,
     web_pages: list[WebPage],
@@ -149,6 +173,7 @@ def report_index(
     plate_report: str,
     web_report: str,
     translation_report: str,
+    metadata_report: str,
 ) -> str:
     return render_template(
         template_config,
@@ -159,5 +184,6 @@ def report_index(
             report_pages=report_pages,
             report_config=report_config,
             package_adt_web=package_adt_web,
+            metadata_report=metadata_report,
         ),
     )

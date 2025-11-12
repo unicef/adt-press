@@ -48,6 +48,7 @@ LANGUAGE_MAP = {
     "pa": "Punjabi",
     "pl": "Polish",
     "pt": "Portuguese",
+    "pt-br": "Brazilian Portuguese",
     "ro": "Romanian",
     "ru": "Russian",
     "sr": "Serbian",

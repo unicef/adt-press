@@ -124,6 +124,12 @@ class CropPromptConfig(PromptConfig):
     recrops: int = 0
 
 
+class MetadataPromptConfig(PromptConfig):
+    """Prompt config for book metadata extraction with page range."""
+
+    page_range: int = 3
+
+
 class RenderPromptConfig(PromptConfig):
     """Prompt config that also includes a template used to render the final output."""
 

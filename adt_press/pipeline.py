@@ -101,7 +101,7 @@ def run_pipeline(config: DictConfig) -> None:
             print(f"- {model}")
 
     # Execute nodes in sequence to ensure reports are generated even if later steps fail
-    nodes_to_execute = ["report_pages", "plate_report", "glossary_report", "web_report", "report_index", "package_epub", "package_webpub"]
+    nodes_to_execute = ["metadata_report", "report_pages", "plate_report", "glossary_report", "web_report", "report_index", "package_epub", "package_webpub"]
 
     dr.execute(nodes_to_execute, overrides={"config": config})
 

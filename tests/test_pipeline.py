@@ -75,6 +75,7 @@ class PipelineTest(unittest.TestCase):
                 "web_report.html",
                 "glossary_report.html",
                 "translation_report.html",
+                "metadata_report.html",
             ]
 
             for file in output_files:
@@ -97,6 +98,9 @@ class PipelineTest(unittest.TestCase):
             self.assertFileContains("page_report.html", "corbeau", "Translated text not found in page report")
             self.assertFileContains("page_report.html", "Glossary", "No glossary section found in report")
             self.assertFileContains("page_report.html", "Easy Read", "No easy read section found in report")
+
+            self.assertFileContains("metadata_report.html", "Hyena and Raven", "Hyena and Raven title not found in metadata report")
+            self.assertFileContains("metadata_report.html", "Tony Lelliott", "Tony Lelliott not found as an author in metadata report")
 
     def test_pipeline_integration_no_translation(self):
         # Create a temporary output directory for this test
@@ -139,6 +143,7 @@ class PipelineTest(unittest.TestCase):
                 "web_report.html",
                 "glossary_report.html",
                 "translation_report.html",
+                "metadata_report.html",
             ]
 
             for file in output_files:
