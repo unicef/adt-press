@@ -23,6 +23,8 @@ IMPORTANT, THE GENERATED HTML MUST:
 10. For `textarea` and `input` (with type=text) tags, you must generate an appropriate placeholder text where necessary. THIS PLACEHOLDER MUST BE IN THIS LANGUAGE: {{ language }}.
 11. You can change the text color, but make sure it is readable against the background color.
 12. DO NOT USE ANY OTHER DATA-IDS OTHER THAN THE ONES I PROVIDED.
+13. RETURN ONLY AN HTML FRAGMENT. DO NOT OUTPUT `<!DOCTYPE>`, `<html>`, `<head>`, OR `<body>` TAGS.
+14. RESPOND WITH VALID HTML MARKUP ONLY. DO NOT INCLUDE COMMENTS, EXPLANATIONS, OR TEXT OUTSIDE OF HTML TAGS.
 
 IMPORTANT NOTES FOR IMAGE TAGS:
 1. Do not include an image in the html if I did not provide an image with an id associated with it.
