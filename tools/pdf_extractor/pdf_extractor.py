@@ -291,6 +291,15 @@ def extract_pages_from_pdf(
 
     doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
 
+    # Capture PDF metadata (Info dictionary and XMP, if present)
+    raw_doc_metadata = doc.metadata or {}
+    pdf_metadata_dict: dict[str, object] = {}
+    for key, value in raw_doc_metadata.items():
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            pdf_metadata_dict[key] = value
+        else:
+            pdf_metadata_dict[key] = str(value)
+
     # Determine page range
     total_pages = len(doc)
     end_page = min(end_page, total_pages) if end_page > 0 else total_pages
@@ -350,7 +359,7 @@ def extract_pages_from_pdf(
         )
 
     # Create metadata
-    pdf_metadata = Metadata(
+    extract_metadata = Metadata(
         filename=os.path.basename(pdf_path),
         total_pages=total_pages,
         extracted_pages=extracted_page_numbers,
@@ -361,7 +370,7 @@ def extract_pages_from_pdf(
     )
 
     # Create final result
-    return PDFExtract(pdf_metadata=pdf_metadata, pages=pages)
+    return PDFExtract(extract_metadata=extract_metadata, pdf_metadata=pdf_metadata_dict, pages=pages)
 
 
 def main():

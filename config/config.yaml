@@ -147,6 +147,12 @@ section_filters:
    
 
 prompts:
+  metadata_extraction:
+    model: default
+    template_path: prompts/metadata_extraction.jinja2
+    max_retries: 3
+    page_range: 3  # Number of pages to analyze for metadata extraction
+
   text_extraction:
     model: default
     template_path: prompts/text_extraction_groups.jinja2

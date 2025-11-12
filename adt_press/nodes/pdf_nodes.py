@@ -1,13 +1,19 @@
+import json
+import os
+
 from hamilton.function_modifiers import config
 
+from adt_press.llm.metadata_extraction import get_metadata
 from adt_press.llm.text_easy_read import get_text_easy_read
 from adt_press.llm.text_extraction import get_page_text
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import MetadataPromptConfig, PromptConfig
 from adt_press.models.image import Image
+from adt_press.models.metadata import Metadata
 from adt_press.models.pdf import Page
 from adt_press.models.text import EasyReadText, PageText, PageTextGroup, PageTexts
 from adt_press.nodes.config_nodes import PageRangeConfig
-from adt_press.utils.pdf import pages_for_pdf
+from adt_press.utils.file import copy_file
+from adt_press.utils.pdf import extract_pdf_to_dir
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -127,8 +133,113 @@ def pdf_text_groups_by_id(processed_pdf_texts: dict[str, PageTexts]) -> dict[str
     return groups
 
 
-def pdf_pages(
-    run_output_dir_config: str, pdf_path_config: str, pdf_hash_config: str, page_range_config: PageRangeConfig, page_grouping_config: str
-) -> list[Page]:
+def pdf_extraction_dir(
+    run_output_dir_config: str, pdf_path_config: str, page_range_config: PageRangeConfig, page_grouping_config: str
+) -> str:
+    """
+    Extract PDF metadata and content to extraction directory.
+
+    Returns:
+        Path to the extraction directory containing pdf_extract.json
+    """
     spread_mode = page_grouping_config == "spread"
-    return pages_for_pdf(run_output_dir_config, pdf_path_config, page_range_config.start, page_range_config.end, spread_mode)
+    return extract_pdf_to_dir(run_output_dir_config, pdf_path_config, page_range_config.start, page_range_config.end, spread_mode)
+
+
+def pdf_pages(run_output_dir_config: str, pdf_extraction_dir: str) -> list[Page]:
+    """
+    Read extracted pages from the extraction directory.
+
+    Args:
+        run_output_dir_config: Output directory containing images subdirectory
+        pdf_extraction_dir: Directory containing pdf_extract.json from extraction
+
+    Returns:
+        List of Page objects with extracted content
+    """
+    # Create images directory for copying images
+    images_dir = os.path.join(run_output_dir_config, "images")
+    os.makedirs(images_dir, exist_ok=True)
+
+    # Parse the results
+    results_file = os.path.join(pdf_extraction_dir, "pdf_extract.json")
+    if not os.path.exists(results_file):
+        raise RuntimeError(f"Extraction results file not found: {results_file}")
+
+    with open(results_file, "r") as f:
+        extract_data = json.load(f)
+
+    # Convert to our models and copy images to images directory
+    pages = []
+    for page_data in extract_data["pages"]:
+        # Convert images and copy them to images directory
+        images = []
+        for img_data in page_data["images"]:
+            image = Image(
+                image_id=img_data["image_id"],
+                page_id=img_data["page_id"],
+                index=img_data["index"],
+                image_path=copy_file(pdf_extraction_dir, images_dir, img_data["image_path"]),
+                chart_path=copy_file(pdf_extraction_dir, images_dir, img_data["chart_path"]),
+                width=img_data["width"],
+                height=img_data["height"],
+                image_type=img_data["image_type"],
+            )
+            images.append(image)
+
+        # Create page object with copied image path
+        page = Page(
+            page_id=page_data["page_id"],
+            page_number=page_data["page_number"],
+            page_image_path=copy_file(pdf_extraction_dir, images_dir, page_data["page_image_path"]),
+            text=page_data["text"],
+            images=images,
+        )
+        pages.append(page)
+
+    return pages
+
+
+def pdf_metadata(pdf_extraction_dir: str) -> dict[str, object]:
+    """
+    Extract PDF metadata from the extraction directory.
+
+    Args:
+        pdf_extraction_dir: Directory containing pdf_extract.json from extraction
+
+    Returns:
+        Dictionary of PDF metadata extracted from the PDF file's Info dictionary
+    """
+    results_file = os.path.join(pdf_extraction_dir, "pdf_extract.json")
+    if not os.path.exists(results_file):
+        raise RuntimeError(f"Extraction results file not found: {results_file}")
+
+    with open(results_file, "r") as f:
+        extract_data = json.load(f)
+
+    return dict[str, object](extract_data.get("pdf_metadata", {}))
+
+
+def metadata(
+    pdf_pages: list[Page],
+    pdf_metadata: dict[str, object],
+    metadata_extraction_prompt_config: MetadataPromptConfig,
+) -> Metadata:
+    """
+    Extract book metadata (title, author, cover page) from the first pages.
+
+    Args:
+        pdf_pages: All extracted pages from the PDF
+        pdf_metadata: PDF metadata from the PDF file's Info dictionary
+        metadata_extraction_prompt_config: Configuration for the LLM prompt including page_range
+
+    Returns:
+        Metadata object with extracted title, author, and cover page identification
+    """
+    # Get the first N pages for analysis
+    pages_to_analyze = pdf_pages[: metadata_extraction_prompt_config.page_range]
+
+    async def extract_metadata() -> Metadata:
+        return await get_metadata(metadata_extraction_prompt_config, pages_to_analyze, pdf_metadata)
+
+    return run_async_task(extract_metadata)

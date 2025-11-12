@@ -1,4 +1,6 @@
 import hashlib
+import os
+import shutil
 from functools import cache
 
 from fsspec import open
@@ -53,3 +55,26 @@ def calculate_file_hash(file_path: str) -> str:
     with open(file_path, "rb") as f:
         hasher.update(f.read())
     return hasher.hexdigest()
+
+
+def copy_file(source_dir: str, dest_dir: str, relative_path: str) -> str:
+    """
+    Copy a file from source directory to destination directory.
+
+    Args:
+        source_dir: Source directory containing the original file
+        dest_dir: Destination directory for copied files
+        relative_path: Relative path of the file within source_dir
+
+    Returns:
+        Path relative to current working directory
+    """
+    original_path = os.path.join(source_dir, relative_path)
+    filename = os.path.basename(relative_path)
+    new_path = os.path.join(dest_dir, filename)
+
+    if os.path.exists(original_path):
+        shutil.copy2(original_path, new_path)
+
+    # Return path relative to current working directory
+    return os.path.relpath(new_path)

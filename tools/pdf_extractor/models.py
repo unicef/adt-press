@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Image(BaseModel):
@@ -54,7 +54,8 @@ class Metadata(BaseModel):
 class PDFExtract(BaseModel):
     """Complete PDF extraction result."""
 
-    pdf_metadata: Metadata
+    extract_metadata: Metadata
+    pdf_metadata: dict[str, Any] = Field(default_factory=dict)
     pages: list[Page]
 
     def to_dict(self) -> dict[str, Any]:
