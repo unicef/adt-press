@@ -46,28 +46,30 @@ def package_webpub(
     if plate.publisher:
         metadata["publisher"] = plate.publisher
 
-    manifest = {
-        "@context": "https://readium.org/webpub-manifest/context.jsonld",
-        "metadata": metadata,
-        "links": [
-            {
-                "rel": "self",
-                "href": "manifest.json",
-                "type": "application/webpub+json",
-            },
-        ],
-        "readingOrder": reading_order,
-        "resources": resources,
-    }
+    links: list[dict[str, str]] = [
+        {
+            "rel": "self",
+            "href": "manifest.json",
+            "type": "application/webpub+json",
+        },
+    ]
 
     if plate.cover_image_id:
-        manifest["links"].append(
+        links.append(
             {
                 "rel": "cover",
                 "href": "cover.png",
                 "type": "image/png",
             }
         )
+
+    manifest = {
+        "@context": "https://readium.org/webpub-manifest/context.jsonld",
+        "metadata": metadata,
+        "links": links,
+        "readingOrder": reading_order,
+        "resources": resources,
+    }
 
     # populate our reading order from our web pages
     for webpage in web_pages:
