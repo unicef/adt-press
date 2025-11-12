@@ -1,4 +1,3 @@
-import json
 import os
 import shutil
 import subprocess
@@ -191,28 +190,21 @@ def build_config_json(
 
     os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
 
+    # Prepare template context with feature overrides merged in
+    template_context = {
+        "languages": languages,
+        "default_language": default_language,
+        "book_title": book_title,
+        "config": strategy_config,
+        "feature_overrides": feature_overrides or {},
+    }
+
     render_template(
         template_config,
         "config.json",
-        dict(
-            languages=languages,
-            default_language=default_language,
-            book_title=book_title,
-            config=strategy_config,
-        ),
+        template_context,
         output_name=relative_path,
     )
-
-    if feature_overrides:
-        with open(absolute_path, "r", encoding="utf-8") as config_file:
-            config_data = json.load(config_file)
-
-        features = config_data.setdefault("features", {})
-        for key, value in feature_overrides.items():
-            features[key] = value
-
-        with open(absolute_path, "w", encoding="utf-8") as config_file:
-            json.dump(config_data, config_file, ensure_ascii=False, indent=2)
 
     return absolute_path
 

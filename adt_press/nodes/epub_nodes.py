@@ -58,34 +58,23 @@ def package_epub(
         with open(css_path, "r") as f:
             css_content = f.read()
 
-    try:
-        for language, translations in plate_translations.items():
-            epub_filename = f"{pdf_title_config}_{language}.epub"
-            epub_path = os.path.join(run_output_dir_config, epub_filename)
+    for language, translations in plate_translations.items():
+        epub_filename = f"{pdf_title_config}_{language}.epub"
+        epub_path = os.path.join(run_output_dir_config, epub_filename)
 
-            create_epub_file(
-                output_path=epub_path,
-                title=pdf_title_config,
-                language=language,
-                author="ADT Press",
-                plate=plate,
-                web_pages=web_pages,
-                plate_texts=plate_texts,
-                translations=translations,
-                image_dir=image_dir,
-                css_content=css_content,
-            )
-
-            epub_paths[language] = epub_filename
-    finally:
-        build_config_json(
-            template_config,
-            run_output_dir_config,
-            book_title=pdf_title_config,
-            languages=languages,
-            default_language=default_language,
-            strategy_config=strategy_config,
-            output_subdir="adt",
+        create_epub_file(
+            output_path=epub_path,
+            title=pdf_title_config,
+            language=language,
+            author="ADT Press",
+            plate=plate,
+            web_pages=web_pages,
+            plate_texts=plate_texts,
+            translations=translations,
+            image_dir=image_dir,
+            css_content=css_content,
         )
+
+        epub_paths[language] = epub_filename
 
     return epub_paths
