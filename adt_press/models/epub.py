@@ -12,7 +12,7 @@ def create_epub_file(
     output_path: str,
     title: str,
     language: str,
-    author: str,
+    authors: list[str],
     plate: Plate,
     web_pages: list[WebPage],
     plate_texts: dict[str, PlateText],
@@ -45,7 +45,8 @@ def create_epub_file(
     book.set_identifier(f"adt-press-{title}")
     book.set_title(title)
     book.set_language(language)
-    book.add_author(author)
+    for author in authors:
+        book.add_author(author)
 
     # Add CSS
     if css_content:
@@ -56,7 +57,10 @@ def create_epub_file(
     images_by_id: dict[str, PlateImage] = {img.image_id: img for img in plate.images}
     texts_by_id: dict[str, PlateText] = {txt.text_id: txt for txt in plate.texts}
 
-    image_items = {}
+    if plate.cover_image_id:
+        img = images_by_id[plate.cover_image_id]
+        img_bytes = cached_read_file(img.image_path)
+        book.set_cover(file_name="images/cover.png", content=img_bytes)
 
     # add all our images to the book
     for webpage in web_pages:
@@ -67,9 +71,7 @@ def create_epub_file(
 
             # replace our PlateImage with one that has the correct path
             images_by_id[image_id] = PlateImage(image_id=img.image_id, image_path=f"images/{image_id}.png", caption_id=img.caption_id)
-
             book.add_item(img_item)
-            image_items[image_id] = img_item
 
     # Create chapters from web pages
     chapters = []

@@ -44,9 +44,9 @@ def package_epub(
 
         create_epub_file(
             output_path=epub_path,
-            title=pdf_title_config,
+            title=plate.title,
             language=language,
-            author="ADT Press",
+            authors=plate.authors,
             plate=plate,
             web_pages=web_pages,
             plate_texts=plate_texts,

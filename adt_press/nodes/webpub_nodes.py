@@ -15,8 +15,8 @@ from adt_press.models.web import WebPage
 @cache(behavior="recompute")
 def package_webpub(
     template_config: TemplateConfig,
-    run_output_dir_config: str,
     pdf_title_config: str,
+    run_output_dir_config: str,
     plate_language_config: str,
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
@@ -31,20 +31,37 @@ def package_webpub(
     reading_order: list[dict[str, str]] = []
     resources: list[dict[str, str]] = []
 
+    metadata: dict[str, str] = {
+        "@type": "http://schema.org/Book",
+        "title": plate.title,
+        "language": default_language,
+        "modified": datetime.now().isoformat(),
+    }
+
+    if plate.authors:
+        metadata["author"] = ", ".join(plate.authors)
+
+    if plate.publisher:
+        metadata["publisher"] = plate.publisher
+
     manifest = {
         "@context": "https://readium.org/webpub-manifest/context.jsonld",
-        "metadata": {
-            "@type": "http://schema.org/Book",
-            "title": pdf_title_config,
-            "language": default_language,
-            "modified": datetime.now().isoformat(),
-        },
+        "metadata": metadata,
         "links": [
             {"rel": "self", "href": "manifest.json", "type": "application/webpub+json"},
         ],
         "readingOrder": reading_order,
         "resources": resources,
     }
+
+    if plate.cover_image_id:
+        manifest["links"].append(
+            {
+                "rel": "cover",
+                "href": "cover.png",
+                "type": "image/png",
+            }
+        )
 
     # populate our reading order from our web pages
     for webpage in web_pages:

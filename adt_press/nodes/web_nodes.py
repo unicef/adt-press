@@ -153,6 +153,10 @@ def package_adt_web(
             output_name=f"adt/{webpage.section_id}.html",
         )
 
+    # copy our cover image if it exists
+    if plate.cover_image_id:
+        shutil.copy(plate_images[plate.cover_image_id].image_path, os.path.join(adt_dir, "cover.png"))
+
     # create our navigation directory
     nav_dir = os.path.join(adt_dir, "content", "navigation")
     os.makedirs(nav_dir, exist_ok=True)

@@ -6,6 +6,7 @@ from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
+from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateSection, PlateText
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
@@ -17,6 +18,7 @@ from adt_press.utils.sync import gather_with_limit, run_async_task
 def generated_plate(
     pdf_title_config: str,
     plate_language_config: str,
+    book_metadata: BookMetadata,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     processed_images_by_id: dict[str, ProcessedImage],
@@ -29,7 +31,11 @@ def generated_plate(
     plate_sections: list[PlateSection] = []
 
     # build our place sections from our pages
+    cover_image_path = None
     for page in pdf_pages:
+        if page.page_id == book_metadata.cover_page_id:
+            cover_image_path = page.page_image_path
+
         page_sections = filtered_sections_by_page_id[page.page_id]
         for page_section in page_sections.sections:
             if page_section.is_pruned:
@@ -56,8 +62,16 @@ def generated_plate(
     texts = [PlateText(text_id=t.text_id, text_type=t.text_type, text=t.text) for t in plate_output_texts_by_id.values()]
     images = [PlateImage(image_id=i.image_id, image_path=i.crop.image_path, caption_id=i.image_id) for i in processed_images_by_id.values()]
 
+    cover_image_id = ""
+    if cover_image_path:
+        cover_image_id = "cover"
+        images.append(PlateImage(image_id=cover_image_id, image_path=cover_image_path, caption_id=cover_image_id))
+
     return Plate(
-        title=pdf_title_config,
+        title=book_metadata.title or pdf_title_config,
+        authors=book_metadata.authors,
+        publisher=book_metadata.publisher,
+        cover_image_id=cover_image_id,
         language_code=plate_language_config,
         sections=plate_sections,
         images=images,
