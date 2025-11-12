@@ -217,7 +217,7 @@ def pdf_metadata(pdf_extraction_dir: str) -> dict[str, object]:
     with open(results_file, "r") as f:
         extract_data = json.load(f)
 
-    return extract_data.get("pdf_metadata", {})
+    return dict[str, object](extract_data.get("pdf_metadata", {}))
 
 
 def metadata(
@@ -239,7 +239,7 @@ def metadata(
     # Get the first N pages for analysis
     pages_to_analyze = pdf_pages[: metadata_extraction_prompt_config.page_range]
 
-    async def extract_metadata():
+    async def extract_metadata() -> Metadata:
         return await get_metadata(metadata_extraction_prompt_config, pages_to_analyze, pdf_metadata)
 
     return run_async_task(extract_metadata)
