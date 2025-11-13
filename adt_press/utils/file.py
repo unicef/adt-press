@@ -1,7 +1,9 @@
 import hashlib
+import json
 import os
 import shutil
 from functools import cache
+from typing import Any
 
 from fsspec import open
 
@@ -24,6 +26,16 @@ def write_text_file(output_path: str, content: str) -> str:
         f.write(content)
 
     return output_path
+
+
+def write_json_file(file_path: str, data: Any, default=None) -> str:
+    """
+    Dumps JSON data to a file with UTF-8 encoding and specified indentation.
+    """
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2, default=default)
+
+    return file_path
 
 
 def read_file(file_path: str) -> bytes:

@@ -1,10 +1,11 @@
 import functools
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, TypeVar, cast
 
 from pydantic import BaseModel
+
+from adt_press.utils.file import write_json_file
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -80,8 +81,7 @@ def io_logger(
         """Shared log writing logic."""
         log_file = log_dir / filename
         try:
-            with open(log_file, "w", encoding="utf-8") as f:
-                json.dump(log_data, f, indent=2, default=json_serializer, ensure_ascii=False)
+            write_json_file(log_file, log_data, default=json_serializer)
         except Exception as log_error:
             # Don't let logging errors break the main function
             print(f"Warning: Failed to write log file {log_file}: {log_error}")

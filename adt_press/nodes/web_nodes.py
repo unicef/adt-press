@@ -1,4 +1,3 @@
-import json
 import os
 import shutil
 from typing import Any
@@ -12,6 +11,7 @@ from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import RenderTextGroup, WebPage
+from adt_press.utils.file import write_json_file
 from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
@@ -175,33 +175,30 @@ def package_adt_web(
         os.makedirs(locale_dir, exist_ok=True)
 
         # write our translated texts
-        with open(os.path.join(locale_dir, "texts.json"), "w") as f:
-            json.dump(translations, f, indent=2)
+        write_json_file(os.path.join(locale_dir, "texts.json"), translations)
 
         audio_dir = os.path.join(locale_dir, "audio")
         os.makedirs(audio_dir, exist_ok=True)
-        with open(os.path.join(locale_dir, "audios.json"), "w") as f:
-            audio_map = dict[str, str]()
-            for text_id, speech in speeches.items():
-                filename = f"{speech.text_id}.mp3"
-                audio_map[text_id] = filename
+        audio_map = dict[str, str]()
+        for text_id, speech in speeches.items():
+            filename = f"{speech.text_id}.mp3"
+            audio_map[text_id] = filename
 
-                # copy the audio file over
-                shutil.copy(os.path.join(run_output_dir_config, speech.speech_path), os.path.join(audio_dir, filename))
+            # copy the audio file over
+            shutil.copy(os.path.join(run_output_dir_config, speech.speech_path), os.path.join(audio_dir, filename))
 
-            json.dump(audio_map, f, indent=2)
+        write_json_file(os.path.join(locale_dir, "audios.json"), audio_map)
 
         # TODO: replace with real sign videos
-        with open(os.path.join(locale_dir, "videos.json"), "w") as f:
-            json.dump({}, f, indent=2)
+        write_json_file(os.path.join(locale_dir, "videos.json"), dict())
 
         # write our glossary
         glossary = {
             i.word: dict(word=i.word, definition=i.definition, variations=i.variations, emoji="".join(i.emojis))
             for i in plate_glossary_translations[language]
         }
-        with open(os.path.join(locale_dir, "glossary.json"), "w") as f:
-            json.dump(glossary, f, indent=2)
+
+        write_json_file(os.path.join(locale_dir, "glossary.json"), glossary)
 
     build_config_json(
         template_config,
