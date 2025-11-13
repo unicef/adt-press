@@ -7,9 +7,8 @@ from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
 from adt_press.models.plate import Plate
-from adt_press.models.section import GlossaryItem
-from adt_press.models.speech import SpeechFile
 from adt_press.models.web import WebPage
+from adt_press.utils.string import page_number_for_section_id
 from adt_press.utils.web_assets import build_config_json
 
 
@@ -18,11 +17,8 @@ def package_webpub(
     template_config: TemplateConfig,
     pdf_title_config: str,
     run_output_dir_config: str,
-    plate_language_config: str,
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
-    plate_glossary_translations: dict[str, list[GlossaryItem]],
-    speech_files: dict[str, dict[str, SpeechFile]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
@@ -73,9 +69,15 @@ def package_webpub(
 
     # populate our reading order from our web pages
     for webpage in web_pages:
+        page_number = page_number_for_section_id(webpage.section_id)
+        title = f"{page_number}"
+        if len(webpage.text_ids):
+            title += f" - {plate_translations[default_language].get(webpage.text_ids[0], '')}"
+
         page_entry = {
             "href": f"{webpage.section_id}.html",
             "type": "text/html",
+            "title": title,
         }
         reading_order.append(page_entry)
 
