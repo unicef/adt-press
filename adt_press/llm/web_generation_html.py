@@ -62,7 +62,7 @@ class GenerationResponse(CleanTextBaseModel):
                         )
                     )
 
-                if text_ids and data_id not in text_ids:
+                if data_id not in text_ids:
                     raise ValueError(
                         (
                             f"HTML element '{element.name}' has invalid "
@@ -77,7 +77,7 @@ class GenerationResponse(CleanTextBaseModel):
             if not data_id:
                 raise ValueError((f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}"))
 
-            if image_ids and data_id not in image_ids:
+            if data_id not in image_ids:
                 raise ValueError(
                     (f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
                 )
