@@ -12,13 +12,13 @@ clear_cache: false
 print_available_models: false
 
 # our strategy for cropping, either llm or none
-crop_strategy: llm
+crop_strategy: none
 
 # our glossary strategy, either llm or none
 glossary_strategy: llm
 
 # our explanation strategy, either llm or none
-explanation_strategy: llm
+explanation_strategy: none
 
 # our easy read strategy, either llm or none
 easy_read_strategy: llm
