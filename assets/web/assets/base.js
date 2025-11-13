@@ -568,7 +568,6 @@ function setupEventListeners() {
   });
   
   setupClickOutsideHandler();
-  initializeAudioElements();
 }
 
 function setupAudioListeners() {
@@ -613,6 +612,7 @@ async function initializeUIComponents() {
         
         // Show play bar if needed
         if (state.readAloudMode) {
+          initializeAudioElements();
           const playBar = elementCache.get("play-bar");
           if (playBar) playBar.classList.remove("hidden");
         }
