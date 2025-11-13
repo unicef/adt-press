@@ -32,6 +32,67 @@ let interfaceCache = {
   sidebarState: null,
 };
 
+const EASY_READ_STORAGE_KEY = "easyReadMode";
+const LANGUAGE_STORAGE_KEY = "currentLanguage";
+const READ_ALOUD_STORAGE_KEY = "readAloudMode";
+const AUTOPLAY_STORAGE_KEY = "autoplayMode";
+const DESCRIBE_IMAGES_STORAGE_KEY = "describeImagesMode";
+const GLOSSARY_STORAGE_KEY = "glossaryMode";
+
+const getSafeLocalStorageItem = (key) => {
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.warn(`Unable to read ${key} from localStorage:`, error);
+    return null;
+  }
+};
+
+const setSafeLocalStorageItem = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (error) {
+    console.warn(`Unable to persist ${key} to localStorage:`, error);
+  }
+};
+
+const getStoredEasyReadPreference = () => getSafeLocalStorageItem(EASY_READ_STORAGE_KEY);
+const persistEasyReadPreference = (enabled) => setSafeLocalStorageItem(
+  EASY_READ_STORAGE_KEY,
+  enabled ? "true" : "false"
+);
+
+export const getStoredLanguagePreference = () => getSafeLocalStorageItem(LANGUAGE_STORAGE_KEY);
+export const persistLanguagePreference = (language) => {
+  if (typeof language === "string" && language.trim() !== "") {
+    setSafeLocalStorageItem(LANGUAGE_STORAGE_KEY, language);
+  }
+};
+
+const getStoredReadAloudPreference = () => getSafeLocalStorageItem(READ_ALOUD_STORAGE_KEY);
+export const persistReadAloudPreference = (enabled) => setSafeLocalStorageItem(
+  READ_ALOUD_STORAGE_KEY,
+  enabled ? "true" : "false"
+);
+
+export const getStoredAutoplayPreference = () => getSafeLocalStorageItem(AUTOPLAY_STORAGE_KEY);
+export const persistAutoplayPreference = (enabled) => setSafeLocalStorageItem(
+  AUTOPLAY_STORAGE_KEY,
+  enabled ? "true" : "false"
+);
+
+export const getStoredDescribeImagesPreference = () => getSafeLocalStorageItem(DESCRIBE_IMAGES_STORAGE_KEY);
+export const persistDescribeImagesPreference = (enabled) => setSafeLocalStorageItem(
+  DESCRIBE_IMAGES_STORAGE_KEY,
+  enabled ? "true" : "false"
+);
+
+export const getStoredGlossaryPreference = () => getSafeLocalStorageItem(GLOSSARY_STORAGE_KEY);
+export const persistGlossaryPreference = (enabled) => setSafeLocalStorageItem(
+  GLOSSARY_STORAGE_KEY,
+  enabled ? "true" : "false"
+);
+
 /**
  * Returns the cached sidebar HTML.
  * @returns {string|null} The cached sidebar HTML or null if not cached.
@@ -55,11 +116,18 @@ export const initializeSidebar = () => {
   // Load saved sidebar state
   const savedState = getCookie("sidebarState");
   const stateMode = getCookie("stateMode") === "true";
-  const isOpen = savedState === "open";
+  const hasSavedState = savedState === "open" || savedState === "closed";
+  const shouldOpenByDefault = !hasSavedState;
 
-  // Apply initial state
   if (!stateMode) {
-    setSidebarVisibility(isOpen);
+    const shouldShow = savedState === "open" || shouldOpenByDefault;
+    setSidebarVisibility(shouldShow);
+
+    if (shouldShow) {
+      setCookie("sidebarState", "open", 7);
+    }
+  } else if (savedState === "open") {
+    setSidebarVisibility(true);
   }
 
   // Ensure proper styling
@@ -140,6 +208,7 @@ export const initializeLanguageDropdown = async () => {
 
       // Set current language before adding options
       const currentLang = state.currentLanguage ||
+        getStoredLanguagePreference() ||
         getCookie("currentLanguage") ||
         document.documentElement.lang ||
         "es";
@@ -155,8 +224,9 @@ export const initializeLanguageDropdown = async () => {
         dropdown.appendChild(option);
       });
 
-      dropdown.value = currentLang;
-      setState("currentLanguage", currentLang);
+  dropdown.value = currentLang;
+  setState("currentLanguage", currentLang);
+  persistLanguagePreference(currentLang);
 
       // Ensure visibility of dropdown and container
       dropdown.classList.remove('hidden');
@@ -418,14 +488,16 @@ export const switchLanguage = async () => {
     stopAudio();
 
     // Update language state
-    setState("currentLanguage", dropdown.value);
+  setState("currentLanguage", dropdown.value);
+  persistLanguagePreference(state.currentLanguage);
 
     // Save to cookie
     const basePath = window.location.pathname.substring(
       0,
       window.location.pathname.lastIndexOf("/") + 1
     );
-    setCookie("currentLanguage", state.currentLanguage, 7, basePath);
+  setCookie("currentLanguage", state.currentLanguage, 7, basePath);
+  setCookie("currentLanguage", state.currentLanguage, 7);
 
     // Update HTML lang attribute
     document.documentElement.lang = state.currentLanguage;
@@ -457,7 +529,8 @@ export const switchLanguage = async () => {
  */
 export const toggleEasyReadMode = async ({ stopCalls = false } = {}) => {
   setState("easyReadMode", !state.easyReadMode);
-  setCookie("easyReadMode", state.easyReadMode, 7);
+  setCookie("easyReadMode", state.easyReadMode ? "true" : "false", 7);
+  persistEasyReadPreference(state.easyReadMode);
   toggleButtonState("toggle-easy-read", state.easyReadMode);
 
   // Track the toggle event
@@ -576,6 +649,7 @@ export const loadGlossaryTerms = async () => {
 export const toggleGlossaryMode = () => {
   setState("glossaryMode", !state.glossaryMode);
   setCookie("glossaryMode", state.glossaryMode, 7);
+  persistGlossaryPreference(state.glossaryMode);
   toggleButtonState("toggle-glossary", state.glossaryMode);
 
   if (state.glossaryMode) {
@@ -1077,24 +1151,40 @@ export const removeGlossaryHighlights = () => {
 };
 
 /**
- * Loads Easy Read mode from cookies and applies state.
+ * Loads Easy Read mode, preferring localStorage with cookie fallback.
  * Updates UI and fetches translations.
  * @async
  */
 export const loadEasyReadMode = async () => {
-  const easyReadModeCookie = getCookie("easyReadMode");
+  const storageValue = getStoredEasyReadPreference();
+  let persistedValue = storageValue;
 
-  if (easyReadModeCookie !== "") {
-    setState("easyReadMode", easyReadModeCookie === "true");
-    toggleButtonState("toggle-easy-read", state.easyReadMode);
-
-    stopAudio();
-    /*setState(
-      "currentLanguage",
-      document.getElementById("language-dropdown").value
-    );*/
-    await fetchTranslations();
+  if (persistedValue === null) {
+    persistedValue = getCookie("easyReadMode");
   }
+
+  if (persistedValue === null || persistedValue === "") {
+    return;
+  }
+
+  const isEnabled = persistedValue === "true";
+  setState("easyReadMode", isEnabled);
+  toggleButtonState("toggle-easy-read", state.easyReadMode);
+
+  // Ensure both storage locations reflect the current preference.
+  persistEasyReadPreference(isEnabled);
+  const cookieValue = getCookie("easyReadMode");
+  const desiredCookieValue = isEnabled ? "true" : "false";
+  if (cookieValue !== desiredCookieValue) {
+    setCookie("easyReadMode", desiredCookieValue, 7);
+  }
+
+  stopAudio();
+  /*setState(
+    "currentLanguage",
+    document.getElementById("language-dropdown").value
+  );*/
+  await fetchTranslations();
 };
 
 /**
@@ -1104,6 +1194,12 @@ export const toggleStateMode = () => {
   setState("stateMode", !state.stateMode);
   setCookie("stateMode", state.stateMode ? "true" : "false", 7);
   toggleButtonState("toggle-state", state.stateMode);
+
+  if (state.stateMode) {
+    setSidebarVisibility(false);
+  } else {
+    setSidebarVisibility(true);
+  }
 };
 
 /**
@@ -1118,11 +1214,16 @@ export const loadStateMode = () => {
     setState("stateMode", isEnabled);
     setCookie("stateMode", isEnabled ? "true" : "false", 7);
     toggleButtonState("toggle-state", isEnabled);
+
+    if (!isEnabled) {
+      setSidebarVisibility(true);
+    }
   } else {
     // Set default state - auto-hide disabled by default
     setState("stateMode", false);
     setCookie("stateMode", "false", 7);
     toggleButtonState("toggle-state", false);
+    setSidebarVisibility(true);
   }
 };
 
@@ -1134,9 +1235,24 @@ export const initializePlayBar = () => {
   try {
     // Get play bar visibility state
     const playBarVisible = getCookie("playBarVisible") === "true";
-    const readAloudMode = getCookie("readAloudMode") === "true";
+    const storedReadAloud = getStoredReadAloudPreference();
+    const cookieReadAloud = getCookie("readAloudMode");
+
+    let readAloudValue = storedReadAloud;
+    if (readAloudValue === null && cookieReadAloud !== null) {
+      readAloudValue = cookieReadAloud;
+      persistReadAloudPreference(cookieReadAloud === "true");
+    }
+
+    const readAloudMode = readAloudValue === "true";
     // Set initial state
     setState("readAloudMode", readAloudMode);
+    persistReadAloudPreference(readAloudMode);
+
+    const desiredCookieValue = readAloudMode ? "true" : "false";
+    if (cookieReadAloud !== desiredCookieValue) {
+      setCookie("readAloudMode", desiredCookieValue, 7);
+    }
 
     // Get play bar element
     const playBar = document.getElementById("play-bar");
@@ -1681,6 +1797,7 @@ export const setSidebarVisibility = (show) => {
  */
 export const setNavVisibility = (show) => {
   const navPopup = document.getElementById("navPopup");
+  const sidebarToggle = document.getElementById("open-sidebar");
   const navList = document.querySelector(".nav__list");
   if (!navPopup) return;
 
@@ -1694,6 +1811,10 @@ export const setNavVisibility = (show) => {
     navPopup.setAttribute("aria-expanded", "true");
     navPopup.removeAttribute("inert");
 
+
+  if (sidebarToggle) {
+    sidebarToggle.setAttribute("aria-expanded", show ? "true" : "false");
+  }
     // Show navList
     if (navList) {
       // navList.removeAttribute("hidden");

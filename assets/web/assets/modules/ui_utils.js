@@ -12,7 +12,19 @@ import {
     playCurrentAudio,
     playAudioSequentially
 } from './audio.js';
-import { setPlayPauseIcon, loadGlossaryTerms, highlightGlossaryTerms, removeGlossaryHighlights, cacheInterfaceElements } from './interface.js'
+import {
+    setPlayPauseIcon,
+    loadGlossaryTerms,
+    highlightGlossaryTerms,
+    removeGlossaryHighlights,
+    cacheInterfaceElements,
+    getStoredAutoplayPreference,
+    persistAutoplayPreference,
+    getStoredDescribeImagesPreference,
+    persistDescribeImagesPreference,
+    getStoredGlossaryPreference,
+    persistGlossaryPreference
+} from './interface.js'
 import { toggleButtonColor, toggleButtonState } from './utils.js';
 import { extractPageTerms } from './interface.js';
 import { translateText } from './translations.js';
@@ -49,35 +61,59 @@ document.addEventListener('click', (event) => {
 }, {capture: true}); // Use capture to ensure this runs before other handlers
 
 /**
- * Loads the autoplay state from cookies and updates UI.
+ * Loads the autoplay state from storage and updates UI.
  */
 export const loadAutoplayState = () => {
+    const storedPreference = getStoredAutoplayPreference();
     const autoplayModeCookie = getCookie("autoplayMode");
-    if (autoplayModeCookie !== null) {
-        setState('autoplayMode', autoplayModeCookie === "true");
-        toggleButtonState("toggle-autoplay", state.autoplayMode);
+
+    let resolvedValue = storedPreference;
+    if (resolvedValue === null && autoplayModeCookie !== null) {
+        resolvedValue = autoplayModeCookie;
+    }
+
+    if (resolvedValue === null) {
+        resolvedValue = "true";
+    }
+
+    const isAutoplayEnabled = resolvedValue === "true";
+    setState('autoplayMode', isAutoplayEnabled);
+    toggleButtonState("toggle-autoplay", state.autoplayMode);
+    persistAutoplayPreference(isAutoplayEnabled);
+
+    const desiredCookieValue = isAutoplayEnabled ? "true" : "false";
+    if (autoplayModeCookie !== desiredCookieValue) {
+        setCookie("autoplayMode", desiredCookieValue, 7);
     }
 };
 
 /**
- * Loads the describe images state from cookies and updates UI.
+ * Loads the describe images state from storage and updates UI.
  */
 export const loadDescribeImagesState = () => {
+    const storedPreference = getStoredDescribeImagesPreference();
     const describeImagesModeCookie = getCookie("describeImagesMode");
-    if (describeImagesModeCookie !== null) {
-        // Cookie exists, use its value
-        setState('describeImagesMode', describeImagesModeCookie === "true");
-    } else {
-        // Cookie doesn't exist, set a default value (false)
-        setState('describeImagesMode', false);
-        setCookie("describeImagesMode", "false", 7);
+
+    let resolvedValue = storedPreference;
+    if (resolvedValue === null && describeImagesModeCookie !== null) {
+        resolvedValue = describeImagesModeCookie;
     }
-    
-    // Always sync UI with state (this line was commented out)
+
+    if (resolvedValue === null) {
+        resolvedValue = "true";
+    }
+
+    const isDescribeImagesEnabled = resolvedValue === "true";
+    setState('describeImagesMode', isDescribeImagesEnabled);
     toggleButtonState("toggle-describe-images", state.describeImagesMode);
-    
-    // Regather audio elements to ensure correct initial state
-    if (state.describeImagesMode){
+    persistDescribeImagesPreference(isDescribeImagesEnabled);
+
+    const desiredCookieValue = isDescribeImagesEnabled ? "true" : "false";
+    if (describeImagesModeCookie !== desiredCookieValue) {
+        setCookie("describeImagesMode", desiredCookieValue, 7);
+    }
+
+    if (state.describeImagesMode) {
         gatherAudioElements();
     }
 };
@@ -97,15 +133,31 @@ export const loadSyllablesState = () => {
  * Loads the glossary state from cookies and updates UI.
  */
 export const loadGlossaryState = async () => {
+    const storedPreference = getStoredGlossaryPreference();
     const glossaryModeCookie = getCookie("glossaryMode");
-    if (glossaryModeCookie !== null) {
-        setState('glossaryMode', glossaryModeCookie === "true");
-        toggleButtonState("toggle-glossary", state.glossaryMode);
-        
-        if (state.glossaryMode) {
-            await loadGlossaryTerms();
-            highlightGlossaryTerms();
-        }
+
+    let resolvedValue = storedPreference;
+    if (resolvedValue === null && glossaryModeCookie !== null) {
+        resolvedValue = glossaryModeCookie;
+    }
+
+    if (resolvedValue === null) {
+        return;
+    }
+
+    const isEnabled = resolvedValue === "true";
+    setState('glossaryMode', isEnabled);
+    toggleButtonState("toggle-glossary", state.glossaryMode);
+
+    persistGlossaryPreference(isEnabled);
+    const desiredCookieValue = isEnabled ? "true" : "false";
+    if (glossaryModeCookie !== desiredCookieValue) {
+        setCookie("glossaryMode", desiredCookieValue, 7);
+    }
+    
+    if (state.glossaryMode) {
+        await loadGlossaryTerms();
+        highlightGlossaryTerms();
     }
 };
 
@@ -118,7 +170,9 @@ export const toggleAutoplay = () => {
 
     setState('autoplayMode', !state.autoplayMode);
     toggleButtonState("toggle-autoplay", state.autoplayMode);
-    setCookie("autoplayMode", state.autoplayMode, 7);
+    const autoplayCookieValue = state.autoplayMode ? "true" : "false";
+    setCookie("autoplayMode", autoplayCookieValue, 7);
+    persistAutoplayPreference(state.autoplayMode);
 
     if (state.readAloudMode && state.autoplayMode) {
         setState('currentIndex', 0);
@@ -137,7 +191,9 @@ export const toggleDescribeImages = () => {
 
     setState('describeImagesMode', !state.describeImagesMode);
     toggleButtonState("toggle-describe-images", state.describeImagesMode);
-    setCookie("describeImagesMode", state.describeImagesMode, 7);
+    const describeImagesCookieValue = state.describeImagesMode ? "true" : "false";
+    setCookie("describeImagesMode", describeImagesCookieValue, 7);
+    persistDescribeImagesPreference(state.describeImagesMode);
 
     // Regather audio elements to update the sequence with or without images
     // gatherAudioElements();

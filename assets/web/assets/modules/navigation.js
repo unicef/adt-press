@@ -340,9 +340,26 @@ export function handleKeyboardShortcuts(event) {
     return;
   }
 
+  const safeGetLocalStorageItem = (key) => {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.warn(`Unable to read ${key} from localStorage:`, error);
+      return null;
+    }
+  };
+
   // Get toggle states
-  const readAloudMode = getCookie("readAloudMode") === "true";
-  const easyReadMode = getCookie("easyReadMode") === "true";
+  const storedReadAloud = safeGetLocalStorageItem("readAloudMode");
+  const storedEasyRead = safeGetLocalStorageItem("easyReadMode");
+
+  const readAloudMode = storedReadAloud !== null
+    ? storedReadAloud === "true"
+    : getCookie("readAloudMode") === "true";
+
+  const easyReadMode = storedEasyRead !== null
+    ? storedEasyRead === "true"
+    : getCookie("easyReadMode") === "true";
   const eli5Mode = getCookie("eli5Mode") === "true";
 
   console.log(
