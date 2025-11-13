@@ -28,7 +28,7 @@ def write_text_file(output_path: str, content: str) -> str:
     return output_path
 
 
-def write_json_file(file_path, data: Any, default=None) -> str:
+def write_json_file(file_path: str, data: Any, default=None) -> str:
     """
     Dumps JSON data to a file with UTF-8 encoding and specified indentation.
     """
