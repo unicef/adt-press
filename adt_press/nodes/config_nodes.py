@@ -203,6 +203,7 @@ def strategy_config(config: DictConfig) -> dict[str, str]:
             "glossary_strategy": config["glossary_strategy"],
             "explanation_strategy": config["explanation_strategy"],
             "easy_read_strategy": config["easy_read_strategy"],
+            "speech_strategy": config["speech_strategy"],
         }
     )
 

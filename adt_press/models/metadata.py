@@ -1,13 +1,11 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
-class Metadata(BaseModel):
-    """Metadata extracted from the first pages of a book."""
+class BookMetadata(BaseModel):
+    """Metadata extracted from the first pages of the book"""
 
-    title: Optional[str] = None
+    title: str | None = None
     authors: list[str] = []
-    publisher: Optional[str] = None
-    cover_page_id: Optional[str] = None
+    publisher: str | None = None
+    cover_page_id: str | None = None
     reasoning: str

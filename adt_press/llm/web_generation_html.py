@@ -20,8 +20,20 @@ class GenerationResponse(CleanTextBaseModel):
     @field_validator("content")
     @classmethod
     def validate_html_data_ids(cls, v: str, info: ValidationInfo) -> str:
-        """Ensure all HTML nodes with text have data-id attributes that reference valid IDs."""
+        """Sanitize and validate generated HTML content."""
+        if not v or not v.strip():
+            raise ValueError("Generated HTML content is empty.")
+
         soup = BeautifulSoup(v, "html.parser")
+
+        # Strip document wrappers if LLM wrapped content in html/body tags
+        if soup.body:
+            # Extract just the body contents
+            v = "".join(str(child) for child in soup.body.contents)
+            soup = BeautifulSoup(v, "html.parser")
+
+        if not soup.find(True):
+            raise ValueError("Generated HTML does not contain any HTML elements.")
 
         # Get valid IDs from context
         text_ids = set()
@@ -29,6 +41,9 @@ class GenerationResponse(CleanTextBaseModel):
         if info.context:
             text_ids.update(info.context.get("text_ids", []))
             image_ids.update(info.context.get("image_ids", []))
+            section_type = info.context.get("section_type")
+        else:
+            section_type = None
 
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
@@ -39,24 +54,67 @@ class GenerationResponse(CleanTextBaseModel):
                 data_id = element.get("data-id")
                 if not data_id:
                     raise ValueError(
-                        f"HTML element '{element.name}' contains text but is missing required data-id attribute. "
-                        f"Text content: '{direct_text[:50]}...'"
+                        (
+                            "HTML element "
+                            f"'{element.name}' contains text but is missing "
+                            "required data-id attribute. "
+                            f"Text content: '{direct_text[:50]}...'"
+                        )
                     )
 
-                if text_ids and data_id not in text_ids:
+                if data_id not in text_ids:
                     raise ValueError(
-                        f"HTML element '{element.name}' has invalid data-id='{data_id}'. "
-                        f"Must be one of text IDs: {', '.join(sorted(text_ids))}"
+                        (
+                            f"HTML element '{element.name}' has invalid "
+                            f"data-id='{data_id}'. Must be one of text IDs: "
+                            f"{', '.join(sorted(text_ids))}"
+                        )
                     )
 
         # Validate image elements
         for img_element in soup.find_all("img"):
             data_id = img_element.get("data-id")
             if not data_id:
-                raise ValueError(f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}")
+                raise ValueError((f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}"))
 
-            if image_ids and data_id not in image_ids:
-                raise ValueError(f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
+            if data_id not in image_ids:
+                raise ValueError(
+                    (f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
+                )
+
+        # Ensure required structural elements exist
+        container = soup.find("div", id="content")
+        if not container:
+            raise ValueError("Generated HTML is missing the main <div id='content'> container.")
+
+        container_classes = container.get("class", [])
+        if "container" not in container_classes:
+            raise ValueError("The main content container must include the 'container' class.")
+
+        sections = soup.find_all("section")
+        if not sections:
+            raise ValueError("Generated HTML must include a <section> element.")
+
+        if len(sections) != 1:
+            raise ValueError("Generated HTML must include exactly one <section> element.")
+
+        section_element = sections[0]
+
+        if section_type:
+            data_section_type = section_element.get("data-section-type")
+            if data_section_type != section_type:
+                raise ValueError((f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'."))
+
+            if section_type.startswith("activity_"):
+                expected_role = "activity"
+            else:
+                expected_role = "article"
+            role = section_element.get("role")
+            if role != expected_role:
+                raise ValueError((f"Section role attribute is invalid. Expected '{expected_role}', got '{role}'."))
+
+        if not soup.find(attrs={"data-id": True}):
+            raise ValueError(("Generated HTML must include at least one element with a data-id attribute."))
 
         return v
 
@@ -91,16 +149,20 @@ async def generate_web_page_html(
     validation_context = {
         "text_ids": [t.text_id for t in texts],
         "image_ids": [i.image_id for i in images],
+        "section_type": section.section_type.value,
     }
+
+    messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
     response: GenerationResponse = await client.chat.completions.create(
         model=config.model,
         response_model=GenerationResponse,
-        messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
+        messages=messages,
         max_retries=config.max_retries,
         context=validation_context,
     )
 
+    # The content is already sanitized and validated by the field_validator
     return WebPage(
         text_id=texts[0].text_id if texts else "",
         section_id=section.section_id,

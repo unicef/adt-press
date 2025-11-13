@@ -1,6 +1,10 @@
 import os
 import shutil
 import subprocess
+from typing import Any
+
+from adt_press.models.config import TemplateConfig
+from adt_press.utils.html import render_template
 
 
 def copy_interface_translations(run_output_dir_config: str, languages: list[str]) -> None:
@@ -27,6 +31,7 @@ def copy_interface_translations(run_output_dir_config: str, languages: list[str]
 def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> None:
     """Install only the required language dictionaries to the output directory using npm."""
     adt_dir = os.path.join(run_output_dir_config, "adt")
+    build_dir = os.path.join(run_output_dir_config, "build")
     dictionaries_dir = os.path.join(adt_dir, "assets", "libs", "dictionaries")
 
     # Remove existing dictionaries
@@ -41,10 +46,10 @@ def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> No
         try:
             # Install the dictionary package (e.g., dictionary-en, dictionary-es, etc.)
             package_name = f"dictionary-{language}"
-            subprocess.run(["npm", "install", package_name], cwd=adt_dir, check=True, capture_output=True, text=True)
+            subprocess.run(["npm", "install", package_name], cwd=build_dir, check=True, capture_output=True, text=True)
 
             # Copy the dictionary files from node_modules to our dictionaries directory
-            source_dict_dir = os.path.join(adt_dir, "node_modules", package_name)
+            source_dict_dir = os.path.join(build_dir, "node_modules", package_name)
             target_lang_dir = os.path.join(dictionaries_dir, language)
 
             if os.path.exists(source_dict_dir):
@@ -94,24 +99,27 @@ def copy_web_assets(run_output_dir_config: str) -> None:
 
 def copy_build_files(run_output_dir_config: str) -> None:
     """Copy build configuration files to the output directory."""
-    adt_dir = os.path.join(run_output_dir_config, "adt")
+    build_dir = os.path.join(run_output_dir_config, "build")
+    shutil.rmtree(build_dir, ignore_errors=True)
+    os.makedirs(build_dir, exist_ok=True)
 
     # Copy Makefile
     makefile_path = os.path.join("assets", "web", "utils", "Makefile")
-    shutil.copy(makefile_path, os.path.join(adt_dir, "Makefile"))
+    shutil.copy(makefile_path, os.path.join(build_dir, "Makefile"))
 
     # Copy package.json
     package_path = os.path.join("assets", "web", "utils", "package.json")
-    shutil.copy(package_path, os.path.join(adt_dir, "package.json"))
+    shutil.copy(package_path, os.path.join(build_dir, "package.json"))
 
     # Copy tailwind.config.js
     tailwind_path = os.path.join("assets", "web", "utils", "tailwind.config.js")
-    shutil.copy(tailwind_path, os.path.join(adt_dir, "tailwind.config.js"))
+    shutil.copy(tailwind_path, os.path.join(build_dir, "tailwind.config.js"))
 
 
 def install_fontawesome(run_output_dir_config: str) -> None:
     """Install Font Awesome via npm and copy to standard structure."""
     adt_dir = os.path.join(run_output_dir_config, "adt")
+    build_dir = os.path.join(run_output_dir_config, "build")
     fontawesome_dir = os.path.join(adt_dir, "assets", "libs", "fontawesome")
 
     # Remove existing fontawesome
@@ -123,10 +131,10 @@ def install_fontawesome(run_output_dir_config: str) -> None:
 
     try:
         # Install Font Awesome via npm
-        subprocess.run(["npm", "install", "@fortawesome/fontawesome-free"], cwd=adt_dir, check=True, capture_output=True, text=True)
+        subprocess.run(["npm", "install", "@fortawesome/fontawesome-free"], cwd=build_dir, check=True, capture_output=True, text=True)
 
         # Get Font Awesome source directory
-        fa_source = os.path.join(adt_dir, "node_modules", "@fortawesome", "fontawesome-free")
+        fa_source = os.path.join(build_dir, "node_modules", "@fortawesome", "fontawesome-free")
 
         # Copy only the minified CSS file we need
         css_source_file = os.path.join(fa_source, "css", "all.min.css")
@@ -151,13 +159,74 @@ def install_fontawesome(run_output_dir_config: str) -> None:
 
 def run_npm_build(run_output_dir_config: str) -> None:
     """Run npm install and tailwindcss build commands in the ADT output directory."""
-    adt_dir = os.path.join(run_output_dir_config, "adt")
+    build_dir = os.path.join(run_output_dir_config, "build")
 
     # Run npm install
-    subprocess.run(["npm", "install"], cwd=adt_dir, check=True)
+    subprocess.run(["npm", "install"], cwd=build_dir, check=True)
 
     # Run tailwindcss build
-    subprocess.run(["npx", "tailwindcss", "-i", "assets/tailwind_css.css", "-o", "content/tailwind_output.css"], cwd=adt_dir, check=True)
+    subprocess.run(
+        ["npx", "tailwindcss", "-i", "../adt/assets/tailwind_css.css", "-o", "../adt/content/tailwind_output.css"],
+        cwd=build_dir,
+        check=True,
+    )
+
+
+def build_config_json(
+    template_config: TemplateConfig,
+    run_output_dir_config: str,
+    *,
+    book_title: str,
+    languages: list[str],
+    default_language: str,
+    strategy_config: dict[str, Any],
+    output_subdir: str = "adt",
+    feature_overrides: dict[str, Any] | None = None,
+) -> str:
+    """Render config.json for the requested output and apply feature overrides if provided."""
+
+    relative_path = os.path.join(output_subdir, "assets", "config.json")
+    absolute_path = os.path.join(run_output_dir_config, relative_path)
+
+    os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
+
+    # Compute feature flags so templates stay deterministic.
+    feature_flags: dict[str, Any] = {
+        "signLanguage": False,
+        "easyRead": strategy_config.get("easy_read_strategy", "none") != "none",
+        "glossary": strategy_config.get("glossary_strategy", "none") != "none",
+        "eli5": strategy_config.get("explanation_strategy", "none") != "none",
+        "readAloud": strategy_config.get("speech_strategy", "none") != "none",
+        "autoplay": True,
+        "showTutorial": True,
+        "showNavigationControls": True,
+        "describeImages": True,
+        "notepad": False,
+        "state": True,
+        "characterDisplay": True,
+        "highlight": False,
+    }
+
+    if feature_overrides:
+        feature_flags.update(feature_overrides)
+
+    # Prepare template context with feature overrides merged in
+    template_context = {
+        "languages": languages,
+        "default_language": default_language,
+        "book_title": book_title,
+        "config": strategy_config,
+        "features": feature_flags,
+    }
+
+    render_template(
+        template_config,
+        "config.json",
+        template_context,
+        output_name=relative_path,
+    )
+
+    return absolute_path
 
 
 def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:

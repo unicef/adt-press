@@ -3,7 +3,7 @@ from banks import Prompt
 from litellm import acompletion
 
 from adt_press.models.config import MetadataPromptConfig
-from adt_press.models.metadata import Metadata
+from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
@@ -17,7 +17,7 @@ class MetadataResponse(CleanTextBaseModel):
     reasoning: str
 
 
-async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_metadata: dict[str, object]) -> Metadata:
+async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_metadata: dict[str, object]) -> BookMetadata:
     """
     Extract book metadata (title, author, cover page) from the first pages of a PDF.
 
@@ -44,7 +44,7 @@ async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_meta
         max_retries=config.max_retries,
     )
 
-    return Metadata(
+    return BookMetadata(
         title=response.title,
         authors=response.authors,
         publisher=response.publisher,

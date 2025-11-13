@@ -70,10 +70,6 @@ export const initializeSidebar = () => {
     "bg-white",
     "shadow-lg",
     "z-70",
-    "transform",
-    "transition-transform",
-    "duration-300",
-    "ease-in-out",
     "overflow-y-auto"
   );
   attachSidebarListeners();
@@ -252,7 +248,7 @@ export const toggleSidebar = () => {
   if (!sidebar) return;
 
   // Determine current state
-  const isCurrentlyOpen = !sidebar.classList.contains("translate-x-full");
+  const isCurrentlyOpen = sidebar.getAttribute("aria-expanded") === "true";
 
   // Toggle to opposite state
   setSidebarVisibility(!isCurrentlyOpen);
@@ -274,8 +270,9 @@ export const adjustLayout = () => {
   const mainContent = document.querySelector("body > .container");
   const submitButton = document.getElementById("submit-button");
 
-  // Determine if any panel is active (sidebar or sign language)
-  const isPanelActive = state.sideBarActive || state.signLanguageMode;
+  const isSignLanguageActive = state.signLanguageMode;
+  // Only the sign language panel should influence layout spacing.
+  const shouldShiftLayout = isSignLanguageActive;
 
   // Check if this is an activity page with submit button visible
   const isActivity = submitButton && window.getComputedStyle(submitButton).display !== 'none';
@@ -286,7 +283,7 @@ export const adjustLayout = () => {
     mainContent.classList.remove("lg:ml-0", "lg:w-[calc(100vw-450px)]", "mx-auto");
 
     // Apply appropriate classes based on current state
-    if (isPanelActive) {
+    if (shouldShiftLayout) {
       mainContent.classList.add("lg:ml-0", "lg:w-[calc(100vw-450px)]");
     } else {
       mainContent.classList.add("mx-auto");
@@ -299,7 +296,7 @@ export const adjustLayout = () => {
     submitButtonContainer.classList.remove("lg:right-0", "lg:right-[calc(425px-1rem)]");
 
     // Apply appropriate classes based on current state
-    if (isPanelActive) {
+    if (shouldShiftLayout) {
       submitButtonContainer.classList.add("lg:right-[calc(425px-1rem)]");
     } else {
       submitButtonContainer.classList.add("lg:right-0");
@@ -315,7 +312,7 @@ export const adjustLayout = () => {
     if (isActivity) {
       // On activity pages, use left-20 for all screen sizes
       navButtons.classList.add("left-20");
-    } else if (isPanelActive) {
+    } else if (shouldShiftLayout) {
       navButtons.classList.add("lg:left-[calc(50vw-212.5px)]", "left-1/2");
     } else {
       navButtons.classList.add("left-1/2");
@@ -887,7 +884,7 @@ export const showGlossaryDefinition = async (event) => {
     const glossaryTermsPage = document.getElementById('glossary-terms-page');
 
     // Make sure the sidebar is open
-    if (sidebar && sidebar.classList.contains('translate-x-full')) {
+  if (sidebar && sidebar.getAttribute('aria-expanded') !== 'true') {
       toggleSidebar();
 
       // Add small delay to ensure sidebar is open before proceeding
@@ -1649,13 +1646,19 @@ export const setSidebarVisibility = (show) => {
 
   if (show) {
     // Show sidebar
-    sidebar.classList.remove("translate-x-full");
+    sidebar.style.opacity = "1";
+    sidebar.style.visibility = "visible";
+    sidebar.style.pointerEvents = "auto";
     sidebar.setAttribute("aria-expanded", "true");
+    sidebar.setAttribute("aria-hidden", "false");
     sidebar.removeAttribute("inert");
   } else {
     // Hide sidebar
-    sidebar.classList.add("translate-x-full");
+    sidebar.style.opacity = "0";
+    sidebar.style.visibility = "hidden";
+    sidebar.style.pointerEvents = "none";
     sidebar.setAttribute("aria-expanded", "false");
+    sidebar.setAttribute("aria-hidden", "true");
     sidebar.setAttribute("inert", "");
   }
   // Save current state

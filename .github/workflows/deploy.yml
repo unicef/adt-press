@@ -45,7 +45,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/raven.pdf label=raven
+          uv run adt-press.py pdf_path=./assets/raven.pdf label=raven input_language=en
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 

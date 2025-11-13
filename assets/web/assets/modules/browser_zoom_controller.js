@@ -124,7 +124,7 @@ function applyTransformZoom(zoomLevel) {
   }
   
   // Adjust sidebar positioning if it's open
-  if (sidebar && !sidebar.classList.contains('translate-x-full')) {
+  if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
     sidebar.style.transform = `scale(${zoomLevel})`;
     sidebar.style.transformOrigin = 'top right';
     sidebar.style.right = '0';
@@ -147,7 +147,7 @@ function adjustInterfaceForNativeZoom(zoomLevel) {
     bottomInterface.style.bottom = '0';
   }
   
-  if (sidebar && !sidebar.classList.contains('translate-x-full')) {
+  if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
     // Ensure sidebar stays properly positioned
     sidebar.style.right = '0';
   }

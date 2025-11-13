@@ -170,6 +170,51 @@ class TestPDFExtractionIntegration:
         assert img_spread.width == img_page2.width + img_page3.width
         assert img_spread.height >= max(img_page2.height, img_page3.height)
 
+    def test_spread_image_has_content_on_both_sides(self, tmp_path):
+        """Test that spread images have content on both left and right sides (not blank)."""
+        from PIL import Image
+
+        # Extract pages 2-3 as a spread
+        spread_dir = str(tmp_path / "spread")
+        spread_result = extract_pages_from_pdf(
+            output_dir=spread_dir,
+            pdf_path=str(TEST_PDF),
+            start_page=2,
+            end_page=3,
+            spread_mode=True,
+            quiet=True,
+        )
+
+        # Load the spread image
+        img_path = os.path.join(spread_dir, spread_result.pages[0].page_image_path)
+        img = Image.open(img_path)
+        width, height = img.size
+
+        # Sample pixels from left and right halves to check for non-white content
+        def count_non_white_pixels(img, x_start, x_end, y_start, y_end, step=20):
+            """Count non-white pixels in a region."""
+            count = 0
+            for y in range(y_start, y_end, step):
+                for x in range(x_start, x_end, step):
+                    if x < img.width and y < img.height:
+                        pixel = img.getpixel((x, y))
+                        if pixel != (255, 255, 255):
+                            count += 1
+            return count
+
+        # Check left half (first page)
+        left_non_white = count_non_white_pixels(img, 0, width // 2, 0, height)
+
+        # Check right half (second page)
+        right_non_white = count_non_white_pixels(img, width // 2, width, 0, height)
+
+        # Both halves should have content (not be blank)
+        assert left_non_white > 0, "Left side of spread is blank"
+        assert right_non_white > 0, "Right side of spread is blank"
+
+        # Ensure the spread is wider than a single page would be
+        assert width > 1000, "Spread image seems too narrow"
+
     def test_error_handling(self, tmp_path):
         """Test error handling for invalid inputs."""
         output_dir = str(tmp_path / "errors")

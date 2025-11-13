@@ -1,9 +1,9 @@
 label: "???"
 pdf_path: "???"
 
-input_language: en
-plate_language: en
-output_languages: [en]
+input_language: "???"
+plate_language: "${input_language}"
+output_languages: ["${input_language}"]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"

@@ -10,12 +10,14 @@ Usage:
 """
 
 import argparse
+import io
 import os
 import sys
 import traceback
 from datetime import datetime
 
 import pymupdf  # PyMuPDF
+from PIL import Image as PILImage
 
 from models import Image, Metadata, Page, PDFExtract
 from utils import matplotlib_chart, render_drawings, write_file
@@ -96,28 +98,35 @@ def stitch_page_images(doc: pymupdf.Document, page_indices: list[int]) -> bytes:
     # Get pixmaps for all pages
     pixmaps = [doc[idx].get_pixmap(matrix=FITZ_MAT) for idx in page_indices]
 
-    # Calculate dimensions
-    total_width = sum(pix.width for pix in pixmaps)
-    max_height = max(pix.height for pix in pixmaps)
-
-    # Create a new pixmap for the stitched image
-    stitched = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, total_width, max_height), False)
-    stitched.clear_with(value=255)  # White background
-
-    # Copy each page image into the stitched image
-    x_offset = 0
+    # Convert pixmaps to PIL Images for easier manipulation
+    pil_images = []
     for pix in pixmaps:
-        # Calculate vertical offset to center the page if heights differ
-        y_offset = (max_height - pix.height) // 2
-        stitched.copy(pix, pymupdf.IRect(x_offset, y_offset, x_offset + pix.width, y_offset + pix.height))
-        x_offset += pix.width
+        img = PILImage.frombytes("RGB", (pix.width, pix.height), pix.samples)
+        pil_images.append(img)
 
-    result = stitched.tobytes(output="png")
+    # Calculate dimensions
+    total_width = sum(img.width for img in pil_images)
+    max_height = max(img.height for img in pil_images)
+
+    # Create a new blank image with white background
+    stitched = PILImage.new("RGB", (total_width, max_height), (255, 255, 255))
+
+    # Paste each page image into the stitched image
+    x_offset = 0
+    for img in pil_images:
+        # Calculate vertical offset to center the page if heights differ
+        y_offset = (max_height - img.height) // 2
+        stitched.paste(img, (x_offset, y_offset))
+        x_offset += img.width
+
+    # Convert to PNG bytes
+    output = io.BytesIO()
+    stitched.save(output, format="PNG")
+    result = output.getvalue()
 
     # Clean up
     for pix in pixmaps:
         pix = None
-    stitched = None
 
     return result
 

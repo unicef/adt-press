@@ -35,6 +35,9 @@ class PlateSection(BaseModel):
 class Plate(BaseModel):
     title: str
     language_code: str
+    authors: list[str]
+    publisher: str | None
+    cover_image_id: str | None
     sections: list[PlateSection]
     images: list[PlateImage]
     groups: list[PlateGroup]

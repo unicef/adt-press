@@ -1,6 +1,9 @@
 # eval tasks go to `output/eval` by default
 label: eval
 
+# input language defaults to English
+input_language: en
+
 # ADT Evaluation Configuration
 eval:
 
