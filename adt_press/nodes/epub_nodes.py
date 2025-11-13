@@ -46,7 +46,7 @@ def package_epub(
         default_language=default_language,
         strategy_config=strategy_config,
         output_subdir="webpub",
-        feature_overrides=feature_overrides
+        feature_overrides=feature_overrides,
     )
 
     plate_texts = {txt.text_id: txt for txt in plate.texts}
