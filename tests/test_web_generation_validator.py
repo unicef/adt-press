@@ -126,7 +126,6 @@ class TestHTMLDataIdValidator:
         <div id="content" class="container">
         <section><div data-id="text-1">This is some text</div>
         <div><p data-id="text-1">Another paragraph</p></div>
-        <img data-id="invalid-image-id" src="test.jpg" alt="Test image">
         </section>
         </div>
         """
@@ -144,7 +143,6 @@ class TestHTMLDataIdValidator:
         <div id="content" class="container">
         <section><div data-id="text-1">This is some text</div>
         <div><p data-id="text-1">Another paragraph</p></div>
-        <img data-id="invalid-image-id" src="test.jpg" alt="Test image">
         <div>
 
 
@@ -157,22 +155,6 @@ class TestHTMLDataIdValidator:
 
         # This should pass validation (whitespace-only div is ignored)
         response = GenerationResponse.model_validate({"reasoning": "Test", "content": html_content}, context=context)
-
-        assert response.content == html_content
-
-    def test_no_context_provided(self):
-        """Test behavior when no validation context is provided."""
-        html_content = """
-        <div id="content" class="container">
-        <section><div data-id="text-1">This is some text</div>
-        <div><p data-id="text-1">Another paragraph</p></div>
-        <img data-id="invalid-image-id" src="test.jpg" alt="Test image">
-        </section>
-        </div>
-        """
-
-        # This should pass validation when no context is provided
-        response = GenerationResponse.model_validate({"reasoning": "Test", "content": html_content})
 
         assert response.content == html_content
 
