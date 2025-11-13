@@ -126,6 +126,7 @@ class CropPromptConfig(PromptConfig):
 
 class MetadataPromptConfig(PromptConfig):
     """Prompt config for book metadata extraction with page range."""
+
     page_range: int = 3
 
 
