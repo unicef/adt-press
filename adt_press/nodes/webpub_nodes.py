@@ -8,6 +8,7 @@ from hamilton.function_modifiers import cache
 from adt_press.models.config import TemplateConfig
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
+from adt_press.utils.file import write_json_file
 from adt_press.utils.string import page_number_for_section_id
 from adt_press.utils.web_assets import build_config_json
 
@@ -132,8 +133,7 @@ def package_webpub(
 
     # write out the manifest file
     manifest_path = os.path.join(webpub_dir, "manifest.json")
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, ensure_ascii=False, indent=4)
+    write_json_file(manifest_path, manifest)
 
     # zip it into a standalone webpub file
     webpub_filename = f"{pdf_title_config}.webpub"
