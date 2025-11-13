@@ -210,7 +210,7 @@ def package_adt_web(
         languages=list(plate_translations.keys()),
         default_language=default_language,
         strategy_config=strategy_config,
-        output_subdir="adt",
+        output_subdir="webpub",
     )
 
     build_web_assets(run_output_dir_config, list(plate_translations.keys()))

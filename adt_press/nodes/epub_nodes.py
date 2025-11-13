@@ -45,7 +45,7 @@ def package_epub(
         languages=languages,
         default_language=default_language,
         strategy_config=strategy_config,
-        output_subdir="adt",
+        output_subdir="epub",
         feature_overrides=feature_overrides,
     )
 
