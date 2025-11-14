@@ -19,13 +19,8 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 plt.rcParams.update({"figure.max_open_warning": 100})
 
 
-def write_file(output_path: str, data: bytes, suffix: str = "") -> str:
-    """Writes bytes to the specified output path, optionally appending a suffix to the filename."""
-
-    # if we have a suffix, add it in after removing the extension
-    if suffix != "":
-        output_path = output_path.rsplit(".", 1)[0] + f"_{suffix}." + output_path.rsplit(".", 1)[1]
-
+def write_file(output_path: str, data: bytes) -> str:
+    """Writes bytes to the specified output path"""
     with open(output_path, "wb") as f:
         f.write(data)
 
