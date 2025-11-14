@@ -278,7 +278,7 @@ class TestPDFExtractionIntegration:
     @pytest.mark.skipif(not CHEF_PDF.exists(), reason="Test PDF (chef.pdf) not available")
     def test_chef_pdf_image_extraction(self, tmp_path):
         """Test extraction of raster and vector images from chef.pdf.
-        
+
         Expected:
         - Page 1: 1 raster image
         - Page 2: 2 vector images
@@ -311,7 +311,7 @@ class TestPDFExtractionIntegration:
         page2 = result.pages[1]
         assert page2.page_number == 2
         assert len(page2.images) == 2
-        
+
         # Both images should be vector type
         for img in page2.images:
             assert img.image_type == "vector"
@@ -319,9 +319,8 @@ class TestPDFExtractionIntegration:
             assert img.width > 0 and img.height > 0
             assert os.path.exists(os.path.join(output_dir, img.image_path))
             assert os.path.exists(os.path.join(output_dir, img.chart_path))
-        
+
         # Verify the specific image IDs
         image_ids = [img.image_id for img in page2.images]
         assert "img_p2_v0" in image_ids
         assert "img_p2_v1" in image_ids
-
