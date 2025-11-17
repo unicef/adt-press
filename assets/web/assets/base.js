@@ -453,9 +453,15 @@ function applyFeatureFlags(features) {
       
       if (notepadButton) {
         notepadButton.classList.toggle('hidden', !enabled);
+        notepadButton.setAttribute('aria-expanded', 'false');
       }
       if (notepadContent) {
-        notepadContent.classList.toggle('hidden', !enabled);
+        notepadContent.classList.add('hidden');
+        if (!enabled) {
+          notepadContent.setAttribute('aria-hidden', 'true');
+        } else {
+          notepadContent.removeAttribute('aria-hidden');
+        }
       }
     } else if (feature === 'showAutoHideButton') {
       // Hide/show the auto-hide menu toggle button

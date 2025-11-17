@@ -16,7 +16,7 @@
   "showNavigationControls": true,
   "showTutorial": true,
     "describeImages": true,
-    "notepad": true,
+    "notepad": false,
     "showAutoHideButton": true,
     "characterDisplay": false,
     "highlight": false
