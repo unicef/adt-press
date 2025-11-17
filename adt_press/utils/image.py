@@ -1,4 +1,5 @@
 import io
+import os
 import warnings
 
 import cv2
@@ -15,6 +16,55 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 # Set the figure.max_open_warning to a high number to suppress the warning
 plt.rcParams.update({"figure.max_open_warning": 100})
+
+
+def _has_visible_alpha(image: PIL.Image.Image) -> bool:
+    """Return True if the PIL image has any pixel with alpha below full opacity."""
+
+    if image.mode in ("RGBA", "LA"):
+        alpha = image.getchannel("A")
+        min_alpha, max_alpha = alpha.getextrema()
+        return min_alpha < 255 or max_alpha < 255
+
+    transparency = image.info.get("transparency")
+    if transparency is None:
+        return False
+
+    if isinstance(transparency, int):
+        return True
+
+    if isinstance(transparency, (bytes, bytearray)):
+        return any(value < 255 for value in transparency)
+
+    if isinstance(transparency, (list, tuple)):
+        return any(int(value) < 255 for value in transparency)
+
+    return bool(transparency)
+
+
+def compress_image_for_web(src_path: str, dest_dir: str, base_name: str, jpeg_quality: int = 85) -> str:
+    """Compress an image for web output, returning the generated filename."""
+
+    os.makedirs(dest_dir, exist_ok=True)
+
+    with PIL.Image.open(src_path) as image:
+        has_alpha = _has_visible_alpha(image)
+
+        if has_alpha:
+            if image.mode not in ("RGBA", "LA"):
+                image = image.convert("RGBA")
+            filename = f"{base_name}.png"
+            save_kwargs: dict[str, object] = {"optimize": True}
+        else:
+            if image.mode not in ("RGB", "L"):
+                image = image.convert("RGB")
+            filename = f"{base_name}.jpg"
+            save_kwargs = {"optimize": True, "quality": jpeg_quality, "progressive": True}
+
+        dest_path = os.path.join(dest_dir, filename)
+        image.save(dest_path, **save_kwargs)
+
+    return filename
 
 
 def image_bytes(image_path: str) -> bytes:
