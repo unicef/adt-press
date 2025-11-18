@@ -31,6 +31,40 @@ let interfaceCache = {
   navigation: null,
   sidebarState: null,
 };
+let lastSidebarTrigger = null;
+
+// Constants for sidebar focus management
+const SIDEBAR_TRANSITION_MS = 300;
+const SIDEBAR_FOCUS_DELAY_MS = SIDEBAR_TRANSITION_MS + 50;
+const SIDEBAR_FOCUSABLE_SELECTOR = 'button:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), a[href]:not([tabindex="-1"]):not([aria-hidden="true"]), input:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), select:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), textarea:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), [tabindex]:not([tabindex="-1"]):not([aria-hidden="true"])';
+
+const focusFirstSidebarElement = () => {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+
+  // Query only visible, non-hidden focusable elements within the currently visible tab
+  const focusableElements = sidebar.querySelectorAll(SIDEBAR_FOCUSABLE_SELECTOR);
+  
+  // Find first truly visible element (not in a hidden tab)
+  const firstInteractive = Array.from(focusableElements).find(el => {
+    const tabContent = el.closest('.tab-content');
+    return !tabContent || !tabContent.classList.contains('hidden');
+  });
+
+  if (firstInteractive) {
+    firstInteractive.focus({ preventScroll: true });
+  }
+};
+
+const restoreSidebarTriggerFocus = () => {
+  if (lastSidebarTrigger && document.contains(lastSidebarTrigger)) {
+    lastSidebarTrigger.focus({ preventScroll: true });
+  } else {
+    const fallbackTrigger = document.getElementById('open-sidebar');
+    fallbackTrigger?.focus({ preventScroll: true });
+  }
+  lastSidebarTrigger = null;
+};
 
 /**
  * Returns the cached sidebar HTML.
@@ -59,7 +93,7 @@ export const initializeSidebar = () => {
 
   // Apply initial state
   if (!stateMode) {
-    setSidebarVisibility(isOpen);
+    setSidebarVisibility(isOpen, { manageFocus: false });
   }
 
   // Ensure proper styling
@@ -1640,12 +1674,15 @@ window.addEventListener('load', () => {
  * Shows or hides the sidebar based on provided state.
  * @param {boolean} show - Whether to show the sidebar (true) or hide it (false).
  */
-export const setSidebarVisibility = (show) => {
+export const setSidebarVisibility = (show, { manageFocus = true } = {}) => {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar) return;
 
   if (show) {
     // Show sidebar
+    if (manageFocus) {
+      lastSidebarTrigger = document.activeElement;
+    }
     sidebar.style.opacity = "1";
     sidebar.style.visibility = "visible";
     sidebar.style.pointerEvents = "auto";
@@ -1672,6 +1709,16 @@ export const setSidebarVisibility = (show) => {
     setTimeout(() => {
       setNativeZoom(currentZoom);
     }, 50);
+  }
+
+  if (manageFocus) {
+    if (show) {
+      // Wait for CSS transition to complete before focusing
+      setTimeout(() => focusFirstSidebarElement(), SIDEBAR_FOCUS_DELAY_MS);
+    } else {
+      // Use requestAnimationFrame for immediate focus return (no transition when closing)
+      requestAnimationFrame(() => restoreSidebarTriggerFocus());
+    }
   }
 };
 
