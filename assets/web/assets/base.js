@@ -493,24 +493,6 @@ function applyFeatureFlags(features) {
       if (characterProfileRow) {
         characterProfileRow.classList.toggle('hidden', !enabled);
       }
-    } else if (feature === 'eli5') {
-      // Hide/show the Explain Me toggle in sidebar
-      const eli5Container = document.getElementById('eli5-container');
-      if (eli5Container) {
-        eli5Container.classList.toggle('hidden', !enabled);
-      }
-      
-      // Hide/show the Explain Me floating button
-      const explainMeButton = document.getElementById('explain-me-button');
-      if (explainMeButton) {
-        explainMeButton.classList.toggle('hidden', !enabled);
-      }
-      
-      // Hide/show the Explain Me content popup
-      const eli5Content = document.getElementById('eli5-content');
-      if (eli5Content) {
-        eli5Content.classList.toggle('hidden', !enabled);
-      }
     } else {
       // Find the toggle element for other features
       const toggleElement = elementCache.get(`toggle-${kebabFeature}`);
