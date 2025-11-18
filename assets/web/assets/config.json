@@ -10,7 +10,7 @@
     "signLanguage": false,
     "easyRead": true,
     "glossary": false,
-    "eli5": true,
+    "eli5": false,
     "readAloud": true,
     "autoplay": true,
   "showNavigationControls": true,
