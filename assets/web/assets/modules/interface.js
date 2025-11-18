@@ -1199,7 +1199,11 @@ export const initializePlayBar = () => {
  */
 export const togglePlayBarSettings = () => {
   const readAloudSettings = document.getElementById("read-aloud-settings");
-  if (readAloudSettings.classList.contains("opacity-0")) {
+  const triggerButton = document.getElementById("read-aloud-speed");
+  const isHidden = readAloudSettings.classList.contains("opacity-0");
+  
+  if (isHidden) {
+    // Show settings
     readAloudSettings.classList.add(
       "opacity-100",
       "pointer-events-auto",
@@ -1210,13 +1214,29 @@ export const togglePlayBarSettings = () => {
       "pointer-events-none",
       "h-0"
     );
+    readAloudSettings.setAttribute("aria-hidden", "false");
+    readAloudSettings.removeAttribute("inert");
+    triggerButton?.setAttribute("aria-expanded", "true");
+    
+    // Focus first menu item after a brief delay for transition
+    setTimeout(() => {
+      const firstMenuItem = readAloudSettings.querySelector('[role="menuitem"]');
+      firstMenuItem?.focus();
+    }, 100);
   } else {
+    // Hide settings
     readAloudSettings.classList.remove(
       "opacity-100",
       "pointer-events-auto",
       "h-auto"
     );
     readAloudSettings.classList.add("h-0", "opacity-0", "pointer-events-none");
+    readAloudSettings.setAttribute("aria-hidden", "true");
+    readAloudSettings.setAttribute("inert", "");
+    triggerButton?.setAttribute("aria-expanded", "false");
+    
+    // Return focus to trigger button
+    triggerButton?.focus();
   }
 };
 
