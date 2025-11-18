@@ -1759,6 +1759,7 @@ export const setNavVisibility = (show) => {
     navPopup.classList.remove("-translate-x-full");
     navPopup.classList.add("left-2");
     navPopup.setAttribute("aria-expanded", "true");
+    navPopup.setAttribute("aria-hidden", "false");
     navPopup.removeAttribute("inert");
 
     // Show navList
@@ -1776,6 +1777,7 @@ export const setNavVisibility = (show) => {
     navPopup.classList.add("-translate-x-full");
     navPopup.classList.remove("left-2");
     navPopup.setAttribute("aria-expanded", "false");
+    navPopup.setAttribute("aria-hidden", "true");
     navPopup.setAttribute("inert", "");
 
     // Hide navList and save scroll position
