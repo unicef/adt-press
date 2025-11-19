@@ -8,15 +8,15 @@
   },
   "features": {
     "signLanguage": false,
-    "easyRead": true,
+    "easyRead": false,
     "glossary": false,
-    "eli5": true,
+    "eli5": false,
     "readAloud": true,
     "autoplay": true,
   "showNavigationControls": true,
   "showTutorial": true,
     "describeImages": true,
-    "notepad": true,
+    "notepad": false,
     "showAutoHideButton": true,
     "characterDisplay": false,
     "highlight": false
