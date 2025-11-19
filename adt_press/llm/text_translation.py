@@ -1,8 +1,7 @@
-import instructor
 from banks import Prompt
-from litellm import acompletion
 from pydantic import ValidationInfo, field_validator
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.text import OutputText
 from adt_press.utils.encoding import CleanTextBaseModel
@@ -64,7 +63,7 @@ async def get_text_translation(
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
 
     # Create validation context
     validation_context = {
