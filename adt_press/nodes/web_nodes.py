@@ -272,12 +272,11 @@ def package_adt_web(
         for text_id, speech in speeches.items():
             filename = f"{speech.text_id}.mp3"
             audio_map[text_id] = filename
-
-        # copy the audio file over
-        shutil.copy(
-            os.path.join(run_output_dir_config, speech.speech_path),
-            os.path.join(audio_dir, filename),
-        )
+            # copy the audio file over
+            shutil.copy(
+                os.path.join(run_output_dir_config, speech.speech_path),
+                os.path.join(audio_dir, filename),
+            )
 
         write_json_file(os.path.join(locale_dir, "audios.json"), audio_map)
 
