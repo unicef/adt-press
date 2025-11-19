@@ -74,17 +74,17 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
 
     # convert response data directly to page sections
     sections = []
-    for i, s in enumerate(response.data):
+    for i, s in enumerate(response.sections):
         section = PageSection(
             section_id=f"sec_{page.page_id}_s{i}",
             section_type=s.section_type,
             part_ids=s.part_ids.copy(),
-            page_number=response.page_number,
         )
         sections.append(section)
 
     return PageSections(
         page_id=page.page_id,
+        page_number=response.page_number,
         sections=sections,
-        reasoning=response.reasoning,
+        reasoning=response.reasoning,        
     )

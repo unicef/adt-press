@@ -191,8 +191,11 @@
         <div class="p-4 border-b border-gray-200">
             <div class="bg-gray-100 rounded overflow-hidden">
                 <!-- Tab-style header -->
-                <div class="bg-gray-700 text-white px-4 py-2 font-medium">
-                    Extracted Sections ({% if page_sections and page_sections.sections %}{{ page_sections.sections|length }}{% else %}0{% endif %})
+                <div class="bg-gray-700 text-white px-4 py-2 font-medium flex justify-between items-center">
+                    <span>Extracted Sections ({% if page_sections and page_sections.sections %}{{ page_sections.sections|length }}{% else %}0{% endif %})</span>
+                    {% if page_sections and page_sections.page_number is not none %}
+                    <span class="px-3 py-1 text-sm bg-gray-800 text-white rounded-full">Page {{ page_sections.page_number }}</span>
+                    {% endif %}
                 </div>
                 <div class="p-4">
                     {% if page_sections and page_sections.sections %}

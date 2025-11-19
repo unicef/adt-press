@@ -47,6 +47,7 @@ def filtered_sections_by_page_id(
     for page_id, page_sections in sections_by_page_id.items():
         filtered_sections[page_id] = PageSections(
             page_id=page_id,
+            page_number=page_sections.page_number,
             sections=[
                 PageSection(
                     section_id=section.section_id,
