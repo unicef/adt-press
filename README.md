@@ -54,7 +54,7 @@
 | adt\_press/utils/pdf.py                     |       18 |        3 |     83% | 47, 52-53 |
 | adt\_press/utils/string.py                  |        3 |        0 |    100% |           |
 | adt\_press/utils/sync.py                    |       14 |        0 |    100% |           |
-| adt\_press/utils/web\_assets.py             |      115 |       14 |     88% |17, 64-71, 92, 127, 152-157 |
+| adt\_press/utils/web\_assets.py             |      115 |       13 |     89% |17, 64-71, 127, 152-157 |
 | tests/test\_clear\_cache.py                 |       45 |        0 |    100% |           |
 | tests/test\_encoding.py                     |       39 |        1 |     97% |        64 |
 | tests/test\_page\_sectioning\_validator.py  |       46 |        0 |    100% |           |
@@ -65,7 +65,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-|                                   **TOTAL** | **2758** |  **445** | **84%** |           |
+|                                   **TOTAL** | **2758** |  **444** | **84%** |           |
 
 
 ## Setup coverage badge
