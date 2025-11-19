@@ -1,10 +1,9 @@
-import instructor
 from banks import Prompt
-from litellm import acompletion
 
 from adt_press.models.config import MetadataPromptConfig
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
+from adt_press.llm import get_instructor_client
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 
@@ -36,7 +35,7 @@ async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_meta
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
     response: MetadataResponse = await client.chat.completions.create(
         model=config.model,
         response_model=MetadataResponse,
