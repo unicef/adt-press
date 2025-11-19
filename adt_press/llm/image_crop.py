@@ -1,7 +1,6 @@
-import instructor
 from banks import Prompt
-from litellm import acompletion
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import CropPromptConfig
 from adt_press.models.image import CropCoordinates, Image
 from adt_press.models.pdf import Page
@@ -27,7 +26,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
     prompt = Prompt(cached_read_text_file(config.template_path))
     messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
     response: CropResponse = await client.chat.completions.create(
         model=config.model,
         response_model=CropResponse,
