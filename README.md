@@ -6,21 +6,21 @@
 |-------------------------------------------- | -------: | -------: | ------: | --------: |
 | adt-press.py                                |       23 |        0 |    100% |           |
 | adt\_press/\_\_init\_\_.py                  |        0 |        0 |    100% |           |
-| adt\_press/llm/\_\_init\_\_.py              |        8 |        3 |     62% |  9-10, 15 |
-| adt\_press/llm/glossary\_translation.py     |       17 |        0 |    100% |           |
-| adt\_press/llm/image\_caption.py            |       17 |        0 |    100% |           |
-| adt\_press/llm/image\_crop.py               |       28 |        0 |    100% |           |
-| adt\_press/llm/image\_meaningfulness.py     |       15 |        0 |    100% |           |
-| adt\_press/llm/metadata\_extraction.py      |       15 |        0 |    100% |           |
-| adt\_press/llm/page\_sectioning.py          |       38 |        0 |    100% |           |
-| adt\_press/llm/section\_explanations.py     |       18 |        6 |     67% |     22-42 |
-| adt\_press/llm/section\_glossary.py         |       16 |        0 |    100% |           |
-| adt\_press/llm/section\_metadata.py         |       23 |        1 |     96% |        25 |
+| adt\_press/llm/\_\_init\_\_.py              |       18 |        4 |     78% |12-13, 18, 40 |
+| adt\_press/llm/glossary\_translation.py     |       16 |        0 |    100% |           |
+| adt\_press/llm/image\_caption.py            |       16 |        0 |    100% |           |
+| adt\_press/llm/image\_crop.py               |       27 |        0 |    100% |           |
+| adt\_press/llm/image\_meaningfulness.py     |       14 |        0 |    100% |           |
+| adt\_press/llm/metadata\_extraction.py      |       14 |        0 |    100% |           |
+| adt\_press/llm/page\_sectioning.py          |       37 |        0 |    100% |           |
+| adt\_press/llm/section\_explanations.py     |       17 |        6 |     65% |     21-41 |
+| adt\_press/llm/section\_glossary.py         |       15 |        0 |    100% |           |
+| adt\_press/llm/section\_metadata.py         |       22 |        1 |     95% |        24 |
 | adt\_press/llm/speech\_generation.py        |       23 |        0 |    100% |           |
-| adt\_press/llm/text\_easy\_read.py          |       16 |        0 |    100% |           |
-| adt\_press/llm/text\_extraction.py          |       19 |        0 |    100% |           |
-| adt\_press/llm/text\_translation.py         |       39 |        4 |     90% |27, 31, 38, 40 |
-| adt\_press/llm/web\_generation\_html.py     |       79 |       28 |     65% |25, 32-33, 36, 46, 88, 92, 96, 99, 104-114, 117, 132-166 |
+| adt\_press/llm/text\_easy\_read.py          |       15 |        0 |    100% |           |
+| adt\_press/llm/text\_extraction.py          |       18 |        0 |    100% |           |
+| adt\_press/llm/text\_translation.py         |       38 |        4 |     89% |26, 30, 37, 39 |
+| adt\_press/llm/web\_generation\_html.py     |       78 |       28 |     64% |24, 31-32, 35, 45, 87, 91, 95, 98, 103-113, 116, 131-165 |
 | adt\_press/llm/web\_generation\_template.py |        9 |        0 |    100% |           |
 | adt\_press/models/\_\_init\_\_.py           |        0 |        0 |    100% |           |
 | adt\_press/models/epub.py                   |       50 |        3 |     94% | 53-54, 87 |
@@ -65,7 +65,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-|                                   **TOTAL** | **2761** |  **444** | **84%** |           |
+|                                   **TOTAL** | **2758** |  **445** | **84%** |           |
 
 
 ## Setup coverage badge
