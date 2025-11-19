@@ -33,6 +33,7 @@ class PageSection(BaseModel):
     section_type: SectionType
     part_ids: list[str] = []
     is_pruned: bool = False
+    page_number: int | None = None
 
 
 class SectionExplanation(BaseModel):

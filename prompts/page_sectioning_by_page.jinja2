@@ -19,9 +19,12 @@ If you detect two pages that are clearly meant to be separate, you can split the
 The image-ids and text-ids can be repeated across section ids only when it makes strong pedagogical sense.
 For example, if a text-id corresponds to instructions that apply for the whole page across sections, it should be repeated across sections.
 
+Additionally, extract the page number if one is present on the page. Look for numeric indicators (e.g., "1", "2", "Page 5") typically found in headers, footers, or margins. Make sure the page number is for the current page and not a reference to another page like in a table of contents.
+
 Section the text and images and provide a json output of this format:
 {
-    "data": [
+    "page_number": <integer or null if no page number found>,
+    "sections": [
         {
             "section_type": "<section_type>",
             "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...]
@@ -119,5 +122,5 @@ The following text are the text extracted from the PDF, associated with each ID.
 {{ text | tojson }}
 {% endfor %}
 
-Please section the image and text.
+Please section the image and text, and extract the page number if present.
 {% endchat %}

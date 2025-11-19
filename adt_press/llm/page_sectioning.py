@@ -19,9 +19,10 @@ class Section(BaseModel):
 
 class SectionResponse(CleanTextBaseModel):
     reasoning: str
-    data: list[Section]
+    page_number: int | None
+    sections: list[Section]
 
-    @field_validator("data")
+    @field_validator("sections")
     @classmethod
     def validate_section_ids(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
         """Ensure all Section part IDs reference valid group or image IDs."""
@@ -79,6 +80,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
             section_id=f"sec_{page.page_id}_s{i}",
             section_type=s.section_type,
             part_ids=s.part_ids.copy(),
+            page_number=response.page_number,
         )
         sections.append(section)
 
