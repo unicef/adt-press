@@ -1,8 +1,8 @@
 from banks import Prompt
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.text import EasyReadText, PageText
-from adt_press.llm import get_instructor_client
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP

@@ -2,10 +2,10 @@
 from banks import Prompt
 from pydantic import ValidationInfo, field_validator
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import LayoutType, PromptConfig
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, SectionMetadata
-from adt_press.llm import get_instructor_client
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 

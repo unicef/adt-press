@@ -1,9 +1,9 @@
 from banks import Prompt
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import MetadataPromptConfig
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
-from adt_press.llm import get_instructor_client
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 
