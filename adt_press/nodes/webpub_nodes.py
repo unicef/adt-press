@@ -42,6 +42,8 @@ def package_webpub(
     if plate.publisher:
         metadata["publisher"] = plate.publisher
 
+    adt_dir = os.path.join(run_output_dir_config, "adt")
+
     links: list[dict[str, str]] = [
         {
             "rel": "self",
@@ -51,13 +53,26 @@ def package_webpub(
     ]
 
     if plate.cover_image_id:
-        links.append(
-            {
-                "rel": "cover",
-                "href": "cover.png",
-                "type": "image/png",
-            }
-        )
+        cover_href = None
+        cover_type = "image/png"
+        for filename, mime_type in (
+            ("cover.png", "image/png"),
+            ("cover.jpg", "image/jpeg"),
+            ("cover.jpeg", "image/jpeg"),
+        ):
+            if os.path.exists(os.path.join(adt_dir, filename)):
+                cover_href = filename
+                cover_type = mime_type
+                break
+
+        if cover_href:
+            links.append(
+                {
+                    "rel": "cover",
+                    "href": cover_href,
+                    "type": cover_type,
+                }
+            )
 
     manifest = {
         "@context": "https://readium.org/webpub-manifest/context.jsonld",
@@ -86,7 +101,6 @@ def package_webpub(
         shutil.rmtree(webpub_dir)  # pragma: no cover
 
     # copy all our assets over from our built adt directory
-    adt_dir = os.path.join(run_output_dir_config, "adt")
     shutil.copytree(adt_dir, webpub_dir)
 
     build_config_json(
