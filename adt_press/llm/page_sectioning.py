@@ -86,5 +86,5 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
         page_id=page.page_id,
         page_number=response.page_number,
         sections=sections,
-        reasoning=response.reasoning,        
+        reasoning=response.reasoning,
     )
