@@ -31,6 +31,40 @@ let interfaceCache = {
   navigation: null,
   sidebarState: null,
 };
+let lastSidebarTrigger = null;
+
+// Constants for sidebar focus management
+const SIDEBAR_TRANSITION_MS = 300;
+const SIDEBAR_FOCUS_DELAY_MS = SIDEBAR_TRANSITION_MS + 50;
+const SIDEBAR_FOCUSABLE_SELECTOR = 'button:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), a[href]:not([tabindex="-1"]):not([aria-hidden="true"]), input:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), select:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), textarea:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), [tabindex]:not([tabindex="-1"]):not([aria-hidden="true"])';
+
+const focusFirstSidebarElement = () => {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+
+  // Query only visible, non-hidden focusable elements within the currently visible tab
+  const focusableElements = sidebar.querySelectorAll(SIDEBAR_FOCUSABLE_SELECTOR);
+  
+  // Find first truly visible element (not in a hidden tab)
+  const firstInteractive = Array.from(focusableElements).find(el => {
+    const tabContent = el.closest('.tab-content');
+    return !tabContent || !tabContent.classList.contains('hidden');
+  });
+
+  if (firstInteractive) {
+    firstInteractive.focus({ preventScroll: true });
+  }
+};
+
+const restoreSidebarTriggerFocus = () => {
+  if (lastSidebarTrigger && document.contains(lastSidebarTrigger)) {
+    lastSidebarTrigger.focus({ preventScroll: true });
+  } else {
+    const fallbackTrigger = document.getElementById('open-sidebar');
+    fallbackTrigger?.focus({ preventScroll: true });
+  }
+  lastSidebarTrigger = null;
+};
 
 /**
  * Returns the cached sidebar HTML.
@@ -59,7 +93,7 @@ export const initializeSidebar = () => {
 
   // Apply initial state
   if (!stateMode) {
-    setSidebarVisibility(isOpen);
+    setSidebarVisibility(isOpen, { manageFocus: false });
   }
 
   // Ensure proper styling
@@ -1165,7 +1199,11 @@ export const initializePlayBar = () => {
  */
 export const togglePlayBarSettings = () => {
   const readAloudSettings = document.getElementById("read-aloud-settings");
-  if (readAloudSettings.classList.contains("opacity-0")) {
+  const triggerButton = document.getElementById("read-aloud-speed");
+  const isHidden = readAloudSettings.classList.contains("opacity-0");
+  
+  if (isHidden) {
+    // Show settings
     readAloudSettings.classList.add(
       "opacity-100",
       "pointer-events-auto",
@@ -1176,13 +1214,29 @@ export const togglePlayBarSettings = () => {
       "pointer-events-none",
       "h-0"
     );
+    readAloudSettings.setAttribute("aria-hidden", "false");
+    readAloudSettings.removeAttribute("inert");
+    triggerButton?.setAttribute("aria-expanded", "true");
+    
+    // Focus first menu item after a brief delay for transition
+    setTimeout(() => {
+      const firstMenuItem = readAloudSettings.querySelector('[role="menuitem"]');
+      firstMenuItem?.focus();
+    }, 100);
   } else {
+    // Hide settings
     readAloudSettings.classList.remove(
       "opacity-100",
       "pointer-events-auto",
       "h-auto"
     );
     readAloudSettings.classList.add("h-0", "opacity-0", "pointer-events-none");
+    readAloudSettings.setAttribute("aria-hidden", "true");
+    readAloudSettings.setAttribute("inert", "");
+    triggerButton?.setAttribute("aria-expanded", "false");
+    
+    // Return focus to trigger button
+    triggerButton?.focus();
   }
 };
 
@@ -1640,12 +1694,15 @@ window.addEventListener('load', () => {
  * Shows or hides the sidebar based on provided state.
  * @param {boolean} show - Whether to show the sidebar (true) or hide it (false).
  */
-export const setSidebarVisibility = (show) => {
+export const setSidebarVisibility = (show, { manageFocus = true } = {}) => {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar) return;
 
   if (show) {
     // Show sidebar
+    if (manageFocus) {
+      lastSidebarTrigger = document.activeElement;
+    }
     sidebar.style.opacity = "1";
     sidebar.style.visibility = "visible";
     sidebar.style.pointerEvents = "auto";
@@ -1673,6 +1730,16 @@ export const setSidebarVisibility = (show) => {
       setNativeZoom(currentZoom);
     }, 50);
   }
+
+  if (manageFocus) {
+    if (show) {
+      // Wait for CSS transition to complete before focusing
+      setTimeout(() => focusFirstSidebarElement(), SIDEBAR_FOCUS_DELAY_MS);
+    } else {
+      // Use requestAnimationFrame for immediate focus return (no transition when closing)
+      requestAnimationFrame(() => restoreSidebarTriggerFocus());
+    }
+  }
 };
 
 /**
@@ -1692,6 +1759,7 @@ export const setNavVisibility = (show) => {
     navPopup.classList.remove("-translate-x-full");
     navPopup.classList.add("left-2");
     navPopup.setAttribute("aria-expanded", "true");
+    navPopup.setAttribute("aria-hidden", "false");
     navPopup.removeAttribute("inert");
 
     // Show navList
@@ -1709,6 +1777,7 @@ export const setNavVisibility = (show) => {
     navPopup.classList.add("-translate-x-full");
     navPopup.classList.remove("left-2");
     navPopup.setAttribute("aria-expanded", "false");
+    navPopup.setAttribute("aria-hidden", "true");
     navPopup.setAttribute("inert", "");
 
     // Hide navList and save scroll position

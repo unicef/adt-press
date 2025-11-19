@@ -1,10 +1,9 @@
 # mypy: ignore-errors
-import instructor
 from banks import Prompt
 from bs4 import BeautifulSoup
-from litellm import acompletion
 from pydantic import ValidationInfo, field_validator
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
@@ -151,7 +150,7 @@ async def generate_web_page_html(
     template_path = config.template_path
     prompt = Prompt(cached_read_text_file(template_path))
 
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
 
     # Create validation context for Pydantic
     validation_context = {

@@ -1,7 +1,6 @@
-import instructor
 from banks import Prompt
-from litellm import acompletion
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
@@ -33,7 +32,7 @@ async def get_page_text(output_dir: str, task_id: str, config: PromptConfig, pag
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
     response: TextResponse = await client.chat.completions.create(
         model=config.model,
         response_model=TextResponse,

@@ -399,9 +399,16 @@ const updateAudioSpeed = (speed) => {
 const updateSpeedDisplay = (speed) => {
     const speedClass = Object.entries(SPEED_MAPPING)
         .find(([key, value]) => value === speed)?.[0] || 'speed-1';
-    const display = document.querySelector(`[class*="${speedClass}"]`)?.innerHTML;
+    const speedButton = document.querySelector(`[class*="${speedClass}"]`);
+    const display = speedButton?.innerHTML;
+    
     if (display) {
-        document.getElementById('read-aloud-speed').innerHTML = display;
+        const speedButtonElement = document.getElementById('read-aloud-speed');
+        speedButtonElement.innerHTML = display;
+        
+        // Update aria-label for screen readers
+        const speedText = speedButton.textContent.trim();
+        speedButtonElement.setAttribute('aria-label', `Playback speed: ${speedText}`);
     }
 };
 

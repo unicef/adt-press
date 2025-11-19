@@ -55,28 +55,28 @@
     class="z--1 fixed bottom-16 right-20 bg-gray-100 rounded-lg shadow-lg mb-3 py-0 px-2 flex items-center space-x-6 border border-gray-200 hidden">
     <!-- Settings Panel (hidden by default) -->
     <div class="opacity-0 h-0 pointer-events-none absolute bottom-full right-0 bg-[#083149] rounded-lg mb-2 w-32"
-        id="read-aloud-settings">
+        id="read-aloud-settings" role="menu" aria-hidden="true" inert>
         <ul class="flex flex-col items-stretch p-1">
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-0-5">
                     <span data-id="read-aloud-speed-slow">Slow</span>
                 </button>
             </li>
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-1">
                     <span data-id="read-aloud-speed-normal">Normal</span>
                 </button>
             </li>
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-1-5">
                     <span data-id="read-aloud-speed-fast">Fast</span>
                 </button>
             </li>
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-2">
                     <span data-id="read-aloud-speed-very-fast">Very Fast</span>
                 </button>
@@ -104,8 +104,10 @@
     </button>
 
     <button type="button" id="read-aloud-speed"
-        class="text-gray-700 hover:text-gray-900 text-sm font-medium border border-gray-300 rounded px-2">
-        <span data-id="read-aloud-speed-normal">Normal</span>
+        class="text-gray-700 hover:text-gray-900 text-sm font-medium border border-gray-300 rounded px-2"
+        aria-label="Playback speed: Normal" aria-haspopup="menu" aria-expanded="false" 
+        aria-controls="read-aloud-settings" data-aria-id="read-aloud-speed-label">
+        <span data-id="read-aloud-speed-normal" aria-hidden="true">Normal</span>
     </button>
 </div>
 
