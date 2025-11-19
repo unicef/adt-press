@@ -23,10 +23,7 @@ def _coerce_extrema_value(value: object) -> int:
     """Return a scalar int from extrema outputs that may nest tuples/lists."""
 
     current = value
-    while (
-        isinstance(current, Sequence)
-        and not isinstance(current, (str, bytes, bytearray))
-    ):
+    while isinstance(current, Sequence) and not isinstance(current, (str, bytes, bytearray)):
         if not current:
             raise ValueError("Extrema sequence is empty.")
         current = current[0]
@@ -157,9 +154,7 @@ def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
     return buffer.getvalue()
 
 
-def visualize_crop_extents(
-    image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y
-) -> bytes:
+def visualize_crop_extents(image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y) -> bytes:
     """Draw a transparent rectangle to visualize crop coordinates."""
     im = PIL.Image.open(io.BytesIO(image_bytes))
     draw = PIL.ImageDraw.Draw(im)
