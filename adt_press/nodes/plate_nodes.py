@@ -259,9 +259,7 @@ def plate_translations(
         tasks = []
         for output_language in output_languages_config:
             if output_language == plate_language_config:
-                plate_translations[output_language] = {
-                    t.text_id: t.text for t in combined_texts
-                }
+                plate_translations[output_language] = {t.text_id: t.text for t in combined_texts}
                 continue
 
             plate_translations[output_language] = {}

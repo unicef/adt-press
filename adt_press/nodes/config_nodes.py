@@ -166,11 +166,7 @@ def text_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
 
 @cache(behavior="recompute")
 def activity_answers_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(
-        prompt_config_with_model(
-            config["prompts"]["activity_answers"], config["default_model"]
-        )
-    )
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["activity_answers"], config["default_model"]))
 
 
 @cache(behavior="recompute")

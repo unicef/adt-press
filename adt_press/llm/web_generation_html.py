@@ -54,9 +54,7 @@ class GenerationResponse(CleanTextBaseModel):
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
             # Check if element has direct text content (not just whitespace)
-            direct_text = "".join(
-                element.find_all(string=True, recursive=False)
-            ).strip()
+            direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
 
             if direct_text:
                 data_id = element.get("data-id")
@@ -69,16 +67,9 @@ class GenerationResponse(CleanTextBaseModel):
                         )
                     )
 
-                is_allowed_new_id = any(
-                    data_id.startswith(prefix)
-                    for prefix in allowed_prefixes
-                )
+                is_allowed_new_id = any(data_id.startswith(prefix) for prefix in allowed_prefixes)
 
-                if (
-                    text_ids
-                    and data_id not in text_ids
-                    and not is_allowed_new_id
-                ):
+                if text_ids and data_id not in text_ids and not is_allowed_new_id:
                     raise ValueError(
                         (
                             f"HTML element '{element.name}' has invalid "
@@ -91,22 +82,11 @@ class GenerationResponse(CleanTextBaseModel):
         for img_element in soup.find_all("img"):
             data_id = img_element.get("data-id")
             if not data_id:
-                raise ValueError(
-                    (
-                        "Image element is missing required data-id attribute. "
-                        f"Image attributes: {dict(img_element.attrs)}"
-                    )
-                )
+                raise ValueError((f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}"))
 
             if data_id not in image_ids:
                 raise ValueError(
-                    (
-                        
-                    (f"Image element has invalid data-id='{data_id}'. "
-                        "Must be one of image IDs: "
-                        f"{', '.join(sorted(image_ids))}"
-                    )
-                )
+                    (f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
                 )
 
         # Ensure required structural elements exist
@@ -181,15 +161,10 @@ async def generate_web_page_html(
         "section_type": section.section_type.value,
     }
 
-    messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
-
     response: GenerationResponse = await client.chat.completions.create(
         model=config.model,
         response_model=GenerationResponse,
-        messages=[
-            m.model_dump(exclude_none=True)
-            for m in prompt.chat_messages(context)
-        ],
+        messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
         context=validation_context,
     )
@@ -218,12 +193,7 @@ async def generate_web_page_html(
         )
         known_ids.add(data_id)
 
-    combined_text_ids = list(
-        dict.fromkeys(
-            [t.text_id for t in texts]
-            + [t.text_id for t in generated_texts]
-        )
-    )
+    combined_text_ids = list(dict.fromkeys([t.text_id for t in texts] + [t.text_id for t in generated_texts]))
 
     return WebPage(
         text_id=texts[0].text_id if texts else "",

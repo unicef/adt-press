@@ -113,7 +113,7 @@ def web_pages(
         "activity_true_false",
         "activity_fill_in_the_blank",
         "activity_matching",
-        "activity_fill_in_a_table"
+        "activity_fill_in_a_table",
     ]
 
     async def generate_answers():
@@ -124,9 +124,7 @@ def web_pages(
             section = section_by_id.get(page.section_id)
             if section and section.section_type in activity_types:
                 # Get texts for this section
-                section_texts = [
-                    t for t in plate.texts if t.text_id in page.text_ids
-                ]
+                section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
 
                 answer_tasks.append(
                     (
@@ -192,10 +190,7 @@ def package_adt_web(
     plate_images = {img.image_id: img for img in plate.images}
     plate_texts = {txt.text_id: txt for txt in plate.texts}
     plate_texts.update(activity_generated_texts)
-    sections_by_id = {
-        section.section_id: section
-        for section in plate.sections
-    }
+    sections_by_id = {section.section_id: section for section in plate.sections}
 
     for webpage_index, webpage in enumerate(web_pages):
         section = sections_by_id[webpage.section_id]
@@ -222,14 +217,10 @@ def package_adt_web(
         # Add answer script if this is an activity with answers
         if webpage.activity_answers:
             answers_json = json.dumps(webpage.activity_answers, indent=2, ensure_ascii=False)
-            answer_script = (
-                f'<script type="text/javascript">\n'
-                f'  window.correctAnswers = {answers_json};\n'
-                f'</script>\n'
-            )
+            answer_script = f'<script type="text/javascript">\n  window.correctAnswers = {answers_json};\n</script>\n'
             # Insert before closing body tag
-            if '</body>' in content:
-                content = content.replace('</body>', f'{answer_script}</body>')
+            if "</body>" in content:
+                content = content.replace("</body>", f"{answer_script}</body>")
             else:
                 content += answer_script
 
@@ -308,9 +299,7 @@ def package_adt_web(
         write_json_file(os.path.join(locale_dir, "glossary.json"), glossary)
     # write our config file
     config_output_path = "adt/assets/config.json"
-    config_dir = os.path.dirname(
-        os.path.join(run_output_dir_config, config_output_path)
-    )
+    config_dir = os.path.dirname(os.path.join(run_output_dir_config, config_output_path))
     os.makedirs(config_dir, exist_ok=True)
 
     build_config_json(

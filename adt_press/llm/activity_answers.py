@@ -49,16 +49,11 @@ async def generate_activity_answers(
 
     client = instructor.from_litellm(acompletion)
 
-    response: ActivityAnswersResponse = (
-        await client.chat.completions.create(
-            model=config.model,
-            response_model=ActivityAnswersResponse,
-            messages=[
-                m.model_dump(exclude_none=True)
-                for m in prompt.chat_messages(context)
-            ],
-            max_retries=config.max_retries,
-        )
+    response: ActivityAnswersResponse = await client.chat.completions.create(
+        model=config.model,
+        response_model=ActivityAnswersResponse,
+        messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
+        max_retries=config.max_retries,
     )
 
     return response
