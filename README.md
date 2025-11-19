@@ -41,14 +41,14 @@
 | adt\_press/nodes/report\_nodes.py           |       51 |        0 |    100% |           |
 | adt\_press/nodes/section\_nodes.py          |       84 |       20 |     76% |31, 94-119 |
 | adt\_press/nodes/speech\_nodes.py           |       24 |        0 |    100% |           |
-| adt\_press/nodes/web\_nodes.py              |      115 |        6 |     95% |56, 64, 69, 71, 75, 79 |
-| adt\_press/nodes/webpub\_nodes.py           |       64 |        1 |     98% |       118 |
+| adt\_press/nodes/web\_nodes.py              |      116 |        6 |     95% |57, 65, 70, 72, 76, 80 |
+| adt\_press/nodes/webpub\_nodes.py           |       72 |        0 |    100% |           |
 | adt\_press/pipeline.py                      |       35 |        0 |    100% |           |
 | adt\_press/utils/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | adt\_press/utils/encoding.py                |       22 |        1 |     95% |         9 |
 | adt\_press/utils/file.py                    |       45 |        0 |    100% |           |
 | adt\_press/utils/html.py                    |       34 |        0 |    100% |           |
-| adt\_press/utils/image.py                   |       50 |       13 |     74% |     49-65 |
+| adt\_press/utils/image.py                   |       94 |       36 |     62% |25-34, 41-45, 54-60, 77-80, 83, 120-136 |
 | adt\_press/utils/languages.py               |        3 |        0 |    100% |           |
 | adt\_press/utils/logging.py                 |       72 |       26 |     64% |17-24, 50, 85-87, 100-107, 115-134, 142 |
 | adt\_press/utils/pdf.py                     |       18 |        3 |     83% | 47, 52-53 |
@@ -61,11 +61,12 @@
 | tests/test\_parameter\_validation.py        |       30 |        0 |    100% |           |
 | tests/test\_pdf\_extractor.py               |      116 |        0 |    100% |           |
 | tests/test\_pipeline.py                     |       78 |        0 |    100% |           |
+| tests/test\_utils\_image.py                 |       20 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py   |       75 |        0 |    100% |           |
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-|                                   **TOTAL** | **2758** |  **444** | **84%** |           |
+|                                   **TOTAL** | **2831** |  **466** | **84%** |           |
 
 
 ## Setup coverage badge
