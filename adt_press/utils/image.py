@@ -1,6 +1,7 @@
 import io
 import os
 import warnings
+from collections.abc import Sequence
 
 import cv2
 import matplotlib.pyplot as plt
@@ -18,12 +19,32 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 plt.rcParams.update({"figure.max_open_warning": 100})
 
 
+def _coerce_extrema_value(value: object) -> int:
+    """Return a scalar int from extrema outputs that may nest tuples/lists."""
+
+    current = value
+    while (
+        isinstance(current, Sequence)
+        and not isinstance(current, (str, bytes, bytearray))
+    ):
+        if not current:
+            raise ValueError("Extrema sequence is empty.")
+        current = current[0]
+
+    if isinstance(current, (int, float)):
+        return int(current)
+
+    raise TypeError(f"Unsupported extrema value type: {type(current)!r}")
+
+
 def _has_visible_alpha(image: PIL.Image.Image) -> bool:
-    """Return True if the PIL image has any pixel with alpha below full opacity."""
+    """Return True if any pixel is partially transparent."""
 
     if image.mode in ("RGBA", "LA"):
         alpha = image.getchannel("A")
-        min_alpha, max_alpha = alpha.getextrema()
+        min_alpha_raw, max_alpha_raw = alpha.getextrema()
+        min_alpha = _coerce_extrema_value(min_alpha_raw)
+        max_alpha = _coerce_extrema_value(max_alpha_raw)
         return min_alpha < 255 or max_alpha < 255
 
     transparency = image.info.get("transparency")
@@ -42,7 +63,12 @@ def _has_visible_alpha(image: PIL.Image.Image) -> bool:
     return bool(transparency)
 
 
-def compress_image_for_web(src_path: str, dest_dir: str, base_name: str, jpeg_quality: int = 85) -> str:
+def compress_image_for_web(
+    src_path: str,
+    dest_dir: str,
+    base_name: str,
+    jpeg_quality: int = 85,
+) -> str:
     """Compress an image for web output, returning the generated filename."""
 
     os.makedirs(dest_dir, exist_ok=True)
@@ -59,7 +85,11 @@ def compress_image_for_web(src_path: str, dest_dir: str, base_name: str, jpeg_qu
             if image.mode not in ("RGB", "L"):
                 image = image.convert("RGB")
             filename = f"{base_name}.jpg"
-            save_kwargs = {"optimize": True, "quality": jpeg_quality, "progressive": True}
+            save_kwargs = {
+                "optimize": True,
+                "quality": jpeg_quality,
+                "progressive": True,
+            }
 
         dest_path = os.path.join(dest_dir, filename)
         image.save(dest_path, **save_kwargs)
@@ -75,13 +105,7 @@ def image_bytes(image_path: str) -> bytes:
 
 
 def is_blank_image(image_bytes: bytes, threshold: int) -> bool:
-    """
-    Checks if an image is blank (completely single color blank background). By default set to a low pixel standard deviation threshold of 2, if the image's
-    pixel standard deviation is below this threshold, the image is considered blank.
-    :param image_bytes: The bytes of the image to check.
-    :param threshold: The threshold value to consider small variations due to compression or noise.
-    :return: True if the image is blank, False otherwise.
-    """
+    """Return True when grayscale stddev stays under the limit."""
 
     # Convert the image data to a numpy array
     image_array = np.frombuffer(image_bytes, np.uint8)
@@ -94,7 +118,7 @@ def is_blank_image(image_bytes: bytes, threshold: int) -> bool:
 
 
 def matplotlib_chart(img_bytes: bytes) -> bytes:
-    """Generates a matplotlib chart from the image bytes and returns it as PNG bytes."""
+    """Generate a matplotlib chart from bytes and return PNG bytes."""
 
     image = PIL.Image.open(io.BytesIO(img_bytes))
     fig, ax = plt.subplots(figsize=(10, 6), dpi=200)
@@ -116,25 +140,36 @@ def matplotlib_chart(img_bytes: bytes) -> bytes:
 
 
 def crop_image(img_bytes: bytes, crop: CropCoordinates) -> bytes:
-    """Crops the image bytes according to the provided coordinates and returns the cropped image as bytes."""
+    """Crop the provided bytes per coordinates and return PNG bytes."""
 
     image = PIL.Image.open(io.BytesIO(img_bytes))
-    cropped_image = image.crop((crop.top_left_x, crop.top_left_y, crop.bottom_right_x, crop.bottom_right_y))
+    cropped_image = image.crop(
+        (
+            crop.top_left_x,
+            crop.top_left_y,
+            crop.bottom_right_x,
+            crop.bottom_right_y,
+        )
+    )
     buffer = io.BytesIO()
     cropped_image.save(buffer, format="png")
     buffer.seek(0)
     return buffer.getvalue()
 
 
-def visualize_crop_extents(image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y) -> bytes:
-    """
-    Draws a transparent rectangle on the image to visualize the crop coordinates.
-    """
+def visualize_crop_extents(
+    image_bytes: bytes, top_left_x, top_left_y, bottom_right_x, bottom_right_y
+) -> bytes:
+    """Draw a transparent rectangle to visualize crop coordinates."""
     im = PIL.Image.open(io.BytesIO(image_bytes))
     draw = PIL.ImageDraw.Draw(im)
 
     # Draw a semi-transparent rectangle
-    draw.rectangle([top_left_x, top_left_y, bottom_right_x, bottom_right_y], outline="red", width=2)
+    draw.rectangle(
+        [top_left_x, top_left_y, bottom_right_x, bottom_right_y],
+        outline="red",
+        width=2,
+    )
 
     buf = io.BytesIO()
     im.save(buf, format="PNG")
