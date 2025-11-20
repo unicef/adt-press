@@ -30,7 +30,7 @@
 | adt\_press/models/plate.py                  |        7 |        0 |    100% |           |
 | adt\_press/models/section.py                |       33 |        0 |    100% |           |
 | adt\_press/models/speech.py                 |        2 |        0 |    100% |           |
-| adt\_press/models/text.py                   |       35 |        0 |    100% |           |
+| adt\_press/models/text.py                   |       36 |        0 |    100% |           |
 | adt\_press/models/web.py                    |        4 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | adt\_press/nodes/config\_nodes.py           |      126 |        5 |     96% |68, 93, 179, 184, 189 |
@@ -66,7 +66,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-|                                   **TOTAL** | **2831** |  **466** | **84%** |           |
+|                                   **TOTAL** | **2832** |  **466** | **84%** |           |
 
 
 ## Setup coverage badge
