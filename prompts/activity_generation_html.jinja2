@@ -98,7 +98,7 @@ When section type is `activity_multiple_matching`, you MUST use this exact struc
 **Drop zones:**
 - Class: `dropzone` - REQUIRED
 - Contains: `<div role="region" class="flex flex-wrap justify-center gap-2"></div>` - REQUIRED
-- Include numbered labels: `<p class="text-lg font-bold">1.</p>`
+- Include numbered labels: `<p class="text-lg font-bold" data-id="REPLACE_NUMBER_ID">1.</p>`
 
 Example multiple matching activity:
 ```html
@@ -137,7 +137,7 @@ Example multiple matching activity:
     <!-- Dropzones -->
     <div class="flex flex-col gap-4 justify-center mt-2">
       <div class="flex gap-4 items-center dropzone border border-gray-300 p-2 pl-4 rounded-lg min-w-[180px] min-h-[62px]" id="dropzone-1">
-        <p class="text-lg font-bold">1.</p>
+        <p class="text-lg font-bold" data-id="text-19-30">1.</p>
         <div role="region" class="flex flex-wrap justify-center gap-2"></div>
       </div>
     </div>
@@ -384,7 +384,7 @@ You are given:
 ## CRITICAL REQUIREMENTS
 
 ### Structure
-1. **Layout Shell** - The system already provides the `<body>` wrapper plus the interface/navigation containers. Your response MUST begin with the page wrapper `<div class="flex justify-center items-start min-h-[calc(100dvh-100px)]">` and include the nested content container `<div id="content" ...>`. Do **NOT** output `<body>`, `<div id="interface-container">`, or `<div id="nav-container">`.
+1. **Layout Shell** - The system already provides the `<body>` wrapper plus the interface/navigation containers. Your response MUST begin with the page wrapper `<div class="flex justify-center items-start min-h-[calc(100dvh-100px)]">` and include the nested content container `<div id="content" ...>`. Do **NOT** output `<body>`, `<div id="interface-container">`, or `<div id="nav-container">`. Do NOT include HTML comments in your response.
 
 2. **Single Section** - There MUST be exactly ONE `<section>` tag in the HTML.
 
@@ -392,6 +392,7 @@ You are given:
    - `role="article"` for narrative/informational content
    - `role="activity"` for interactive/exercise content
    - `data-section-type` attribute with the provided section type (e.g., `data-section-type="text-and-images"`)
+   - The `<section>` element itself MUST NOT contain any direct text - all text must be wrapped in child elements (p, h1, span, etc.) with proper data-id attributes
 
 ### Text & Data IDs
 4. **All text elements** MUST have a `data-id` attribute matching the provided text ID.
@@ -428,21 +429,28 @@ You are given:
     - Add `data-activity-item`, `data-column-index`, and `data-id` to each draggable item
     - Use `dropzone` class for drop zones
     - Include `<div role="region" class="flex flex-wrap justify-center gap-2"></div>` inside each drop zone
-    - Add numbered labels using `<p class="text-lg font-bold">1.</p>` inside each drop zone
+    - Add numbered labels using `<p class="text-lg font-bold" data-id="REPLACE_NUMBER_ID">1.</p>` inside each drop zone
     - See "Multiple Matching Activity Structure" in style guide for complete example
 
-### Styling & Components
-12. **Follow the style guide** - Reference the included style guide above for all styling patterns, components, and color choices.
+12. **Fill in the Blank Activities (activity_fill_in_the_blank)** - When section type is `activity_fill_in_the_blank`, you MUST:
+    - Include `data-activity-item` attribute on every input field (sequential: item-1, item-2, etc.)
+    - Add `data-placeholder-id` and `data-aria-id` for accessibility
+    - Choose appropriate layout based on text content structure (simple list, grouped, hierarchical, or grid)
+    - Use color-coded containers only when grouping/hierarchy is evident from text structure
+    - Add connecting lines ONLY if text implies parent-child relationships
+    - All labels must have `data-id` attributes matching provided text IDs
+    - See "Fill in the Blank Activity Structure" section for examples
+
 
 ### Content Rules
-13. **Text modification** - You MAY slightly truncate or exclude text for pedagogical reasons, but you MUST:
+14. **Text modification** - You MAY slightly truncate or exclude text for pedagogical reasons, but you MUST:
     - Remove the entire element AND its data-id if excluding text
     - Never split a data-id across multiple elements
     - Preserve the meaning and flow
 
-14. **Language** - For `textarea` and `input` placeholder text, use this language: {{ language }}
+15. **Language** - For `textarea` and `input` placeholder text, use this language: {{ language }}
 
-15. **Accessibility** - Include proper `aria-label`, `role`, and semantic HTML. Ensure readable contrast as specified in the style guide.
+16. **Accessibility** - Include proper `aria-label`, `role`, and semantic HTML. Ensure readable contrast as specified in the style guide.
 
 ## Design Goals
 - Create warm, inviting, magical pages that feel educational yet fun

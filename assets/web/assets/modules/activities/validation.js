@@ -145,7 +145,7 @@ const validateOpenEndedAnswer = async () => {
          localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
      
          
-         localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+         localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
 
         executeMail(ActivityTypes.OPEN_ENDED_ANSWER);
     }

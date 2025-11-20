@@ -82,7 +82,7 @@ export const loadInputState = (inputs) => {
         }
         // Otherwise, keep the pre-filled content
     });
-    localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+    localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
 };
 
 export const countUnfilledInputs = (inputs) => {

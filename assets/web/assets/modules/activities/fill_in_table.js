@@ -280,7 +280,7 @@ const handleTableValidationResult = (validationResult) => {
 
     if (allFilled && isValid) {
         playActivitySound('success');
-        localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
 
         // Obtener el ID de la actividad desde la URL
         const activityId = location.pathname
