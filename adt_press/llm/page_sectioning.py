@@ -88,5 +88,5 @@ async def get_page_sections(config: PromptConfig, spread_mode: bool, page: Page,
     return PageSections(
         page_id=page.page_id,
         sections=sections,
-        reasoning=response.reasoning,        
+        reasoning=response.reasoning,
     )
