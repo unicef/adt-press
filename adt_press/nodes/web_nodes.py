@@ -13,6 +13,7 @@ from adt_press.models.speech import SpeechFile
 from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.file import write_json_file
 from adt_press.utils.html import render_template, replace_images, replace_texts
+from adt_press.utils.image import compress_image_for_web
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
 
@@ -138,9 +139,16 @@ def package_adt_web(
         images = {}
         for image_id in webpage.image_ids:
             image = plate_images[image_id]
-            images[image_id] = PlateImage(image_id=image.image_id, image_path=f"images/{image_id}.png", caption_id=image.caption_id)
-
-            shutil.copy(image.image_path, os.path.join(image_dir, f"{image_id}.png"))
+            optimized_name = compress_image_for_web(
+                image.image_path,
+                image_dir,
+                image_id,
+            )
+            images[image_id] = PlateImage(
+                image_id=image.image_id,
+                image_path=os.path.join("images", optimized_name),
+                caption_id=image.caption_id,
+            )
 
         content = webpage.content
         content = replace_images(content, images, plate_texts)
@@ -155,7 +163,11 @@ def package_adt_web(
 
     # copy our cover image if it exists
     if plate.cover_image_id:
-        shutil.copy(plate_images[plate.cover_image_id].image_path, os.path.join(adt_dir, "cover.png"))
+        compress_image_for_web(
+            plate_images[plate.cover_image_id].image_path,
+            adt_dir,
+            "cover",
+        )
 
     # create our navigation directory
     nav_dir = os.path.join(adt_dir, "content", "navigation")
@@ -207,7 +219,7 @@ def package_adt_web(
         languages=list(plate_translations.keys()),
         default_language=default_language,
         strategy_config=strategy_config,
-        output_subdir="webpub",
+        output_subdir="adt",
     )
 
     build_web_assets(run_output_dir_config, list(plate_translations.keys()))

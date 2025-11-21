@@ -23,6 +23,7 @@ class TextType(str, enum.Enum):
     instruction_text = "instruction_text"
     activity_number = "activity_number"
     activity_option = "activity_option"
+    fill_in_the_blank = "fill_in_the_blank"
     activity_input_placeholder_text = "activity_input_placeholder_text"
     image_label = "image_label"
     image_caption = "image_caption"
