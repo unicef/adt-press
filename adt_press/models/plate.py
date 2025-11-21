@@ -24,7 +24,7 @@ class PlateImage(BaseModel):
 class PlateSection(BaseModel):
     section_id: str
     section_type: SectionType
-    page_number: int
+    page_number: int | None
     page_image_path: str
     part_ids: list[str]
     explanation_id: str | None
