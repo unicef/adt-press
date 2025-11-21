@@ -12,6 +12,7 @@ class Chapter(CleanTextBaseModel):
     title: str
     page_number: int
 
+
 class MetadataResponse(CleanTextBaseModel):
     title: str | None
     authors: list[str]
@@ -54,6 +55,9 @@ async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_meta
         authors=response.authors,
         publisher=response.publisher,
         cover_page_id=response.cover_page_id,
-        table_of_contents=[BookChapter(chapter_id=f"chp_{idx}", title=chap.title, page_number=chap.page_number) for idx, chap in enumerate(response.table_of_contents)],
+        table_of_contents=[
+            BookChapter(chapter_id=f"chp_{idx}", title=chap.title, page_number=chap.page_number)
+            for idx, chap in enumerate(response.table_of_contents)
+        ],
         reasoning=response.reasoning,
     )

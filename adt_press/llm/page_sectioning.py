@@ -47,7 +47,9 @@ class SectionResponse(CleanTextBaseModel):
         return v
 
 
-async def get_page_sections(config: PromptConfig, spread_mode: bool, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]) -> PageSections:
+async def get_page_sections(
+    config: PromptConfig, spread_mode: bool, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]
+) -> PageSections:
     context = dict(
         page=page,
         spread_mode=spread_mode,

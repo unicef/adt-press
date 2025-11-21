@@ -32,9 +32,11 @@ class PlateSection(BaseModel):
     text_color: str
     layout_type: str
 
+
 class PlateChapter(BaseModel):
     chapter_id: str
     section_id: str
+
 
 class Plate(BaseModel):
     title: str
