@@ -213,6 +213,44 @@ prompts:
     model: default
     template_path: prompts/activity_generation_html.jinja2
 
+  # Activity-specific prompts for smaller, focused generation
+  activity_sorting:
+    model: default
+    template_path: prompts/activities/sorting.jinja2
+    
+  activity_multiple_matching:
+    model: default
+    template_path: prompts/activities/multiple_matching.jinja2
+    
+  activity_fill_in_a_table:
+    model: default
+    template_path: prompts/activities/fill_in_table.jinja2
+    
+  activity_true_false:
+    model: default
+    template_path: prompts/activities/true_false.jinja2
+
+  # Activity-specific answer generation prompts
+  activity_generic_answers:
+    model: default
+    template_path: prompts/activities/answers/generic.jinja2
+    
+  activity_sorting_answers:
+    model: default
+    template_path: prompts/activities/answers/sorting.jinja2
+    
+  activity_multiple_matching_answers:
+    model: default
+    template_path: prompts/activities/answers/multiple_matching.jinja2
+    
+  activity_fill_in_a_table_answers:
+    model: default
+    template_path: prompts/activities/answers/fill_in_table.jinja2
+    
+  activity_true_false_answers:
+    model: default
+    template_path: prompts/activities/answers/true_false.jinja2
+
   speech_generation:
     model: gpt-4o-mini-tts
     template_path: prompts/speech_generation.jinja2

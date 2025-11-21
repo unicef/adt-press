@@ -34,7 +34,8 @@ def web_pages(
     layout_types_config: dict[str, LayoutType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
-    activity_answers_config: PromptConfig,
+    activity_prompts_config: dict[str, HTMLPromptConfig],
+    activity_answers_prompts_config: dict[str, PromptConfig],
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -74,17 +75,28 @@ def web_pages(
             if not strategy:
                 raise ValueError(f"Unknown render strategy: {strategy_name}")
 
-            config = cached_configs.get(strategy_name)
+            # Check if we have a specific activity config for this section type
+            specific_activity_config = activity_prompts_config.get(section.section_type)
+
+            # Use section-specific cache key if we have a specific config
+            cache_key = f"{strategy_name}::{section.section_type}" if specific_activity_config else strategy_name
+
+            config = cached_configs.get(cache_key)
             if not config:
                 if "model" in strategy.config and strategy.config["model"] == "default":
                     strategy.config["model"] = default_model_config
+
                 if strategy.render_type == "html":
-                    config = HTMLPromptConfig.model_validate(strategy.config)
+                    # Use activity-specific config if available, otherwise use default strategy config
+                    if specific_activity_config:
+                        config = specific_activity_config
+                    else:
+                        config = HTMLPromptConfig.model_validate(strategy.config)
                 elif strategy.render_type == "template":
                     config = TemplateRenderConfig.model_validate(strategy.config)
                 else:
                     raise ValueError(f"Unknown render strategy type: {strategy.render_type}")
-                cached_configs[strategy_name] = config
+                cached_configs[cache_key] = config
 
             if strategy.render_type == "html":
                 web_pages.append(
@@ -127,11 +139,14 @@ def web_pages(
                 # Get texts for this section
                 section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
 
+                # Use activity-specific answer config if available, otherwise use default
+                answer_config = activity_answers_prompts_config.get(section.section_type, activity_answers_prompts_config["default"])
+
                 answer_tasks.append(
                     (
                         page,
                         generate_activity_answers(
-                            activity_answers_config,
+                            answer_config,
                             section,
                             section_texts,
                             page.content,

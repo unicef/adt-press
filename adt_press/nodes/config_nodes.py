@@ -170,6 +170,57 @@ def activity_answers_config(config: DictConfig) -> PromptConfig:
 
 
 @cache(behavior="recompute")
+def activity_prompts_config(config: DictConfig) -> dict[str, HTMLPromptConfig]:
+    """Load activity-specific prompt configs into a dictionary keyed by section type."""
+    activity_types = [
+        "activity_sorting",
+        "activity_multiple_matching",
+        "activity_fill_in_a_table",
+        "activity_true_false",
+    ]
+
+    activity_configs = {}
+    for activity_type in activity_types:
+        if activity_type in config["prompts"]:
+            activity_configs[activity_type] = HTMLPromptConfig.model_validate(
+                prompt_config_with_model(config["prompts"][activity_type], config["default_model"])
+            )
+
+    return activity_configs
+
+
+@cache(behavior="recompute")
+def activity_answers_prompts_config(config: DictConfig) -> dict[str, PromptConfig]:
+    """Load activity-specific answer generation prompt configs into a dictionary keyed by section type.
+
+    Includes a 'default' key with the generic fallback config for activity types without specific configs.
+    """
+    activity_types = [
+        "activity_sorting",
+        "activity_multiple_matching",
+        "activity_fill_in_a_table",
+        "activity_true_false",
+    ]
+
+    answer_configs = {}
+
+    # Load activity-specific configs
+    for activity_type in activity_types:
+        answer_key = f"{activity_type}_answers"
+        if answer_key in config["prompts"]:
+            answer_configs[activity_type] = PromptConfig.model_validate(
+                prompt_config_with_model(config["prompts"][answer_key], config["default_model"])
+            )
+
+    # Add generic fallback config for activities without specific templates
+    answer_configs["default"] = PromptConfig.model_validate(
+        prompt_config_with_model(config["prompts"]["activity_generic_answers"], config["default_model"])
+    )
+
+    return answer_configs
+
+
+@cache(behavior="recompute")
 def speech_prompt_config(config: DictConfig) -> PromptConfig:
     return SpeechPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["speech_generation"], config["default_model"]))
 
