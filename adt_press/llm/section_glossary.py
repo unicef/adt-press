@@ -30,6 +30,7 @@ async def get_section_glossary(language_code: str, config: PromptConfig, section
         response_model=GlossaryResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        timeout=config.timeout,
     )
 
     return SectionGlossary(

@@ -24,6 +24,7 @@ class PlateImage(BaseModel):
 class PlateSection(BaseModel):
     section_id: str
     section_type: SectionType
+    page_number: int
     page_image_path: str
     part_ids: list[str]
     explanation_id: str | None
@@ -31,11 +32,15 @@ class PlateSection(BaseModel):
     text_color: str
     layout_type: str
 
+class PlateChapter(BaseModel):
+    chapter_id: str
+    section_id: str
 
 class Plate(BaseModel):
     title: str
     language_code: str
     authors: list[str]
+    table_of_contents: list[PlateChapter]
     publisher: str | None
     cover_image_id: str | None
     sections: list[PlateSection]

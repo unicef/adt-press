@@ -17,8 +17,11 @@ def sections_by_page_id(
     processed_images_by_page: dict[str, list[ProcessedImage]],
     filtered_pdf_texts: dict[str, PageTexts],
     page_sectioning_prompt_config: PromptConfig,
+    page_grouping_config: str
 ) -> dict[str, PageSections]:
     page_sections = {}
+
+    spread_mode = page_grouping_config == "spread"
 
     async def section_pages():
         sections = []
@@ -30,7 +33,7 @@ def sections_by_page_id(
             if not page_images and not page_texts.groups:
                 page_sections[page.page_id] = PageSections(page_id=page.page_id, sections=[], reasoning="No images or text to section")
             else:
-                sections.append(get_page_sections(page_sectioning_prompt_config, page, page_images, page_texts.groups))
+                sections.append(get_page_sections(page_sectioning_prompt_config, spread_mode, page, page_images, page_texts.groups))
 
         return await gather_with_limit(sections, page_sectioning_prompt_config.rate_limit)
 
@@ -47,11 +50,11 @@ def filtered_sections_by_page_id(
     for page_id, page_sections in sections_by_page_id.items():
         filtered_sections[page_id] = PageSections(
             page_id=page_id,
-            page_number=page_sections.page_number,
             sections=[
                 PageSection(
                     section_id=section.section_id,
                     section_type=section.section_type,
+                    page_number=section.page_number,
                     part_ids=section.part_ids,
                     is_pruned=section.section_type in pruned_section_types_config,
                 )

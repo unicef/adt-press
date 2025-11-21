@@ -31,6 +31,7 @@ class SectionType(str, enum.Enum):
 class PageSection(BaseModel):
     section_id: str
     section_type: SectionType
+    page_number: int | None
     part_ids: list[str] = []
     is_pruned: bool = False
 
@@ -65,6 +66,5 @@ class SectionMetadata(BaseModel):
 
 class PageSections(BaseModel):
     page_id: str
-    page_number: int | None
     sections: list[PageSection]
     reasoning: str

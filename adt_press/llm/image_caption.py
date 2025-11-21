@@ -32,6 +32,7 @@ async def get_image_caption(config: PromptConfig, page: Page, image: Image, lang
         response_model=CaptionResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        timeout=config.timeout,
     )
 
     return ImageCaption(

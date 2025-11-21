@@ -6,9 +6,9 @@ from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
-from adt_press.models.metadata import BookMetadata
+from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
-from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateSection, PlateText
+from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, PlateSection, PlateText
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
@@ -67,10 +67,23 @@ def generated_plate(
         cover_image_id = "cover"
         images.append(PlateImage(image_id=cover_image_id, image_path=cover_image_path, caption_id=cover_image_id))
 
+    table_of_contents: list[PlateChapter] = []
+    for chapter in book_metadata.table_of_contents:
+        # find the first section id that matches this chapter's page number
+        matching_section = next((sec for sec in plate_sections if sec.page_number == chapter.page_number), None)
+        if matching_section:
+            table_of_contents.append(
+                PlateChapter(
+                    chapter_id=chapter.chapter_id,
+                    section_id=matching_section.section_id
+                )
+            )
+
     return Plate(
         title=book_metadata.title or pdf_title_config,
         authors=book_metadata.authors,
         publisher=book_metadata.publisher,
+        table_of_contents=table_of_contents,
         cover_image_id=cover_image_id,
         language_code=plate_language_config,
         sections=plate_sections,
@@ -173,6 +186,7 @@ def plate_output_texts_by_id(
     easy_reads_by_text_id: dict[str, EasyReadText],
     image_captions_by_id: dict[str, ImageCaption],
     explanations_by_section_id: dict[str, SectionExplanation],
+    book_table_of_contents: list[BookChapter],
     input_language_config: str,
     plate_language_config: str,
 ) -> dict[str, OutputText]:
@@ -197,6 +211,10 @@ def plate_output_texts_by_id(
     # Explanations
     for explanation in explanations_by_section_id.values():
         texts_to_process.append((explanation.explanation_id, "explanation", explanation.explanation))
+
+    # Chapter titles
+    for chapter in book_table_of_contents:
+        texts_to_process.append((chapter.chapter_id, "chapter_title", chapter.title))
 
     # Handle same language case (no translation needed)
     if input_language_config == plate_language_config:

@@ -76,6 +76,7 @@ async def get_text_translation(
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
         context=validation_context,
+        timeout=config.timeout,
     )
 
     # Map back to OutputText objects

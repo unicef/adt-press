@@ -13,12 +13,12 @@ from adt_press.utils.file import cached_read_text_file
 
 class Section(BaseModel):
     section_type: SectionType
+    page_number: int | None
     part_ids: list[str]
 
 
 class SectionResponse(CleanTextBaseModel):
     reasoning: str
-    page_number: int | None
     sections: list[Section]
 
     @field_validator("sections")
@@ -47,9 +47,10 @@ class SectionResponse(CleanTextBaseModel):
         return v
 
 
-async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]) -> PageSections:
+async def get_page_sections(config: PromptConfig, spread_mode: bool, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]) -> PageSections:
     context = dict(
         page=page,
+        spread_mode=spread_mode,
         images=[i.model_dump() for i in images],
         texts=[dict(text_id=g.group_id, text=" ".join([t.text for t in g.texts])) for g in groups],
         examples=config.examples,
@@ -70,6 +71,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
         context=validation_context,
+        timeout=config.timeout,
     )
 
     # convert response data directly to page sections
@@ -79,12 +81,12 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
             section_id=f"sec_{page.page_id}_s{i}",
             section_type=s.section_type,
             part_ids=s.part_ids.copy(),
+            page_number=s.page_number,
         )
         sections.append(section)
 
     return PageSections(
         page_id=page.page_id,
-        page_number=response.page_number,
         sections=sections,
         reasoning=response.reasoning,        
     )

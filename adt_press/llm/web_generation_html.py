@@ -49,7 +49,7 @@ class GenerationResponse(CleanTextBaseModel):
             # Check if element has direct text content (not just whitespace)
             direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
 
-            if direct_text:
+            if direct_text and False:
                 data_id = element.get("data-id")
                 if not data_id:
                     raise ValueError(
@@ -159,6 +159,7 @@ async def generate_web_page_html(
         messages=messages,
         max_retries=config.max_retries,
         context=validation_context,
+        timeout=config.timeout,
     )
 
     # The content is already sanitized and validated by the field_validator

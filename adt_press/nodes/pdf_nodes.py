@@ -8,7 +8,7 @@ from adt_press.llm.text_easy_read import get_text_easy_read
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import MetadataPromptConfig, PromptConfig
 from adt_press.models.image import Image
-from adt_press.models.metadata import BookMetadata
+from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.text import EasyReadText, PageText, PageTextGroup, PageTexts
 from adt_press.nodes.config_nodes import PageRangeConfig
@@ -243,3 +243,6 @@ def book_metadata(
         return await get_metadata(metadata_extraction_prompt_config, pages_to_analyze, pdf_metadata)
 
     return run_async_task(extract_metadata)
+
+def book_table_of_contents(book_metadata: BookMetadata) -> list[BookChapter]:
+    return book_metadata.table_of_contents

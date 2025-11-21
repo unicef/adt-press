@@ -36,4 +36,5 @@ async def get_text_easy_read(language_code: str, config: PromptConfig, text: Pag
         text_id=text.text_id,
         easy_read=response.data,
         reasoning=response.reasoning,
+        timeout=config.timeout,
     )
