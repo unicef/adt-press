@@ -168,22 +168,23 @@ def package_adt_web(
             dict(
                 section_id=webpage.section_id,
                 page_number=section.page_number,
-                href=f"{webpage.section_id}.html",)
+                href=f"{webpage.section_id}.html",
+            )
         )
 
     # write our page list out
     write_json_file(os.path.join(adt_dir, "content", "pages.json"), page_list)
-    
+
     # create and write our table of contents
     toc = []
     for chapter in plate.table_of_contents:
-        if chapter.section_id in sections_by_id:            
+        if chapter.section_id in sections_by_id:
             toc.append(
                 dict(
                     chapter_id=chapter.chapter_id,
                     section_id=chapter.section_id,
                     href=f"{chapter.section_id}.html",
-                    title=plate_texts[chapter.chapter_id].text
+                    title=plate_texts[chapter.chapter_id].text,
                 )
             )
     write_json_file(os.path.join(adt_dir, "content", "toc.json"), toc)
