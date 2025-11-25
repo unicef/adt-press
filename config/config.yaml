@@ -103,14 +103,14 @@ render_strategies:
     config:
       model: default
       template_path: prompts/web_generation_overlay.jinja2
-      max_retries: 50
+      max_retries: 25
 
   html:
     render_type: html
     config:
       model: default
       template_path: prompts/web_generation_html.jinja2
-      max_retries: 50
+      max_retries: 25
 
 page_range:
   start: 0
@@ -144,7 +144,6 @@ prompts:
   metadata_extraction:
     model: default
     template_path: prompts/metadata_extraction.jinja2
-    max_retries: 3
     page_range: 10
 
   text_extraction:
@@ -168,7 +167,6 @@ prompts:
   page_sectioning:
     model: default
     template_path: prompts/page_sectioning_by_page.jinja2
-    max_retries: 10
 
   section_explanation:
     model: default
