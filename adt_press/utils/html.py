@@ -149,7 +149,20 @@ def render_template(
     # write the output to a file named after the template
     output_name = output_name if output_name else basename(template_path)
     output_path = config.output_dir + os.sep + output_name
+
+    rendered_content = render_template_to_string(template_path, context)
+
+    # Format HTML output for better readability
+    if output_name.endswith(".html"):
+        rendered_content = format_html(rendered_content)
+
     with open(output_path, "w") as f:
-        f.write(render_template_to_string(template_path, context))
+        f.write(rendered_content)
 
     return str(output_path)
+
+
+def format_html(html: str) -> str:
+    """Format HTML with proper indentation."""
+    soup = BeautifulSoup(html, "html.parser")
+    return soup.prettify()

@@ -177,6 +177,8 @@ def activity_prompts_config(config: DictConfig) -> dict[str, HTMLPromptConfig]:
         "activity_multiple_matching",
         "activity_fill_in_a_table",
         "activity_true_false",
+        "activity_open_ended_answer",
+        "activity_fill_in_the_blank",
     ]
 
     activity_configs = {}
@@ -200,6 +202,7 @@ def activity_answers_prompts_config(config: DictConfig) -> dict[str, PromptConfi
         "activity_multiple_matching",
         "activity_fill_in_a_table",
         "activity_true_false",
+        "activity_fill_in_the_blank",
     ]
 
     answer_configs = {}

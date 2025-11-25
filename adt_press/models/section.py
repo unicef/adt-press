@@ -18,11 +18,11 @@ class SectionType(str, enum.Enum):
     activity_matching = "activity_matching"
     activity_fill_in_a_table = "activity_fill_in_a_table"
     activity_multiple_choice = "activity_multiple_choice"
-    activity_quiz = "activity_quiz"
+    # activity_quiz = "activity_quiz"
     activity_true_false = "activity_true_false"
     activity_open_ended_answer = "activity_open_ended_answer"
     activity_fill_in_the_blank = "activity_fill_in_the_blank"
-    # activity_labeling = "activity_labeling"
+    activity_labeling = "activity_labeling"
     activity_multiselect = "activity_multiselect"
     activity_sorting = "activity_sorting"
     activity_other = "activity_other"
@@ -61,6 +61,12 @@ class SectionMetadata(BaseModel):
     background_color: str
     text_color: str
     layout_type: str
+    reasoning: str
+
+
+class ActivityAnswer(BaseModel):
+    section_id: str
+    answers: dict[str, str]
     reasoning: str
 
 

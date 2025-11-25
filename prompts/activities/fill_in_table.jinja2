@@ -44,7 +44,6 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 Example fill in table activity:
 ```html
 <section data-section-type="activity_fill_in_a_table" role="activity" class="max-w-6xl mx-auto">
-  <!-- Title and Image -->
   <div class="flex items-center justify-center mb-4">
     <h1 class="text-2xl font-bold mb-4 bg-green-200 -mr-4 p-4 pr-8 rounded-lg" data-id="text-10-0">
       Form title here
@@ -52,16 +51,13 @@ Example fill in table activity:
     <img class="rounded-full" src="images/image.png" alt="" data-id="img-10-0">
   </div>
   
-  <!-- Instructions -->
   <p class="text-lg mb-6 text-center">
     <i class="fas fa-pen-to-square text-blue-700 mr-2"></i>
     <span data-id="text-10-1">Instructions here</span>
   </p>
 
-  <!-- Form Fields -->
   <div class="activity-text">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <!-- Single input field -->
       <div class="p-4 rounded bg-gray-100 flex items-center">
         <label for="field1" class="mr-2 font-bold whitespace-nowrap" data-id="text-10-3">
           Label text
@@ -70,7 +66,6 @@ Example fill in table activity:
       </div>
     </div>
     
-    <!-- Multiple inputs in one row -->
     <div class="grid grid-cols-1 gap-4 mb-6">
       <div class="p-4 rounded bg-gray-100 flex items-center">
         <label for="field2" class="mr-2 font-bold" data-id="text-10-6">First part</label>
@@ -90,6 +85,12 @@ Example fill in table activity:
 - Use appropriate input widths (`w-full`, `w-24`, `sm:w-32`) based on expected content length
 - Maintain consistent spacing with `mb-6` between sections
 - Title typically has `bg-green-200` background with special styling
+
+### CRITICAL RULE: The <section> tag MUST NOT contain raw text nodes.
+// Every textual snippet MUST be inside an element (h1, p, span, label, th, td, etc.) WITH data-id.
+// No literal words directly between <section> and its first child element.
+// If you need grouping text like "Title and Image", omit it or move into a <p data-id="..."> with a provided text_id.
+// Do not duplicate data-id values.
 {% endchat %}
 
 {% for example in examples %}

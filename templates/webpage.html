@@ -16,6 +16,12 @@
 <body class="bg-blue-100 min-h-screen flex items-center justify-center">
     {{ content | safe }}
 
+    {% if activity_answers %}
+    <script type="text/javascript">
+        window.correctAnswers = {{ activity_answers | tojson }};
+    </script>
+    {% endif %}
+    
     <div class="relative z-50" id="interface-container"></div>
     <div class="relative z-50" id="nav-container"></div>
     <script src="./assets/modules/state.js" type="module"></script>

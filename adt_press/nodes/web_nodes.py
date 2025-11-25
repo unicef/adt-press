@@ -1,4 +1,3 @@
-import json
 import os
 import shutil
 from typing import Any
@@ -78,29 +77,47 @@ def web_pages(
             # Check if we have a specific activity config for this section type
             specific_activity_config = activity_prompts_config.get(section.section_type)
 
-            # Use section-specific cache key if we have a specific config
-            cache_key = f"{strategy_name}::{section.section_type}" if specific_activity_config else strategy_name
+            # Normalize section type to string for dict lookups
+            section_type_name = getattr(section.section_type, "name", section.section_type)
+
+            # Specific activity config keyed by string names like "activity_open_ended_answer"
+            specific_activity_config = activity_prompts_config.get(section_type_name)
+
+            # Cache key must use normalized string
+            cache_key = f"{strategy_name}::{section_type_name}" if specific_activity_config else strategy_name
 
             config = cached_configs.get(cache_key)
             if not config:
                 if "model" in strategy.config and strategy.config["model"] == "default":
                     strategy.config["model"] = default_model_config
 
-                if strategy.render_type == "html":
-                    # Use activity-specific config if available, otherwise use default strategy config
-                    if specific_activity_config:
-                        config = specific_activity_config
+                if strategy.render_type == "template":
+                    config = TemplateRenderConfig.model_validate(strategy.config)
+                elif strategy.render_type == "html":
+                    # Special handling for activity sections
+                    if strategy_name == "activity":
+                        # Use specific activity config if available, otherwise fallback to config template_path
+                        if specific_activity_config:
+                            config = specific_activity_config
+                        else:
+                            config = HTMLPromptConfig.model_validate(strategy.config)
                     else:
                         config = HTMLPromptConfig.model_validate(strategy.config)
-                elif strategy.render_type == "template":
-                    config = TemplateRenderConfig.model_validate(strategy.config)
                 else:
                     raise ValueError(f"Unknown render strategy type: {strategy.render_type}")
                 cached_configs[cache_key] = config
 
             if strategy.render_type == "html":
+                # For activities, use section type as strategy name to enable proper template selection
+                effective_strategy_name = strategy_name
+                if strategy_name == "activity":
+                    # Use section type name if specific config exists, else fallback to "activity_other"
+                    effective_strategy_name = section_type_name if specific_activity_config else "activity_other"
+
                 web_pages.append(
-                    generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language_config)
+                    generate_web_page_html(
+                        effective_strategy_name, config, config.examples, section, groups, texts, images, plate_language_config
+                    )
                 )
             elif strategy.render_type == "template":
                 web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
@@ -119,15 +136,16 @@ def web_pages(
         page.content = replace_images(page.content, image_urls, texts_by_id)
 
     # Generate answers for activity sections
-    activity_types = [
+    activity_types = {
         "activity_sorting",
         "activity_multiple_choice",
-        "activity_quiz",  # Quiz uses same logic as multiple choice
+        # "activity_quiz",
         "activity_true_false",
         "activity_fill_in_the_blank",
         "activity_matching",
         "activity_fill_in_a_table",
-    ]
+        # Note: activity_open_ended_answer is intentionally excluded - no answers needed
+    }
 
     async def generate_answers():
         answer_tasks = []
@@ -135,25 +153,30 @@ def web_pages(
 
         for page in pages:
             section = section_by_id.get(page.section_id)
-            if section and section.section_type in activity_types:
-                # Get texts for this section
-                section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
+            if section:
+                section_type_name = getattr(section.section_type, "name", section.section_type)
 
-                # Use activity-specific answer config if available, otherwise use default
-                answer_config = activity_answers_prompts_config.get(section.section_type, activity_answers_prompts_config["default"])
+                # Only generate answers for activity types in the allowed list
+                if section_type_name in activity_types:
+                    section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
 
-                answer_tasks.append(
-                    (
-                        page,
-                        generate_activity_answers(
-                            answer_config,
-                            section,
-                            section_texts,
-                            page.content,
-                            plate_language_config,
-                        ),
-                    )
-                )
+                    # Use activity-specific answer config
+                    answer_config = activity_answers_prompts_config.get(section_type_name)
+
+                    # If no specific config exists for this type, skip answer generation
+                    if answer_config:
+                        answer_tasks.append(
+                            (
+                                page,
+                                generate_activity_answers(
+                                    answer_config,
+                                    section,
+                                    section_texts,
+                                    page.content,
+                                    plate_language_config,
+                                ),
+                            )
+                        )
 
         # Generate all answers in parallel
         for page, answer_coro in answer_tasks:
@@ -230,16 +253,6 @@ def package_adt_web(
         content = replace_images(content, images, plate_texts)
         content = replace_texts(content, plate_texts)
 
-        # Add answer script if this is an activity with answers
-        if webpage.activity_answers:
-            answers_json = json.dumps(webpage.activity_answers, indent=2, ensure_ascii=False)
-            answer_script = f'<script type="text/javascript">\n  window.correctAnswers = {answers_json};\n</script>\n'
-            # Insert before closing body tag
-            if "</body>" in content:
-                content = content.replace("</body>", f"{answer_script}</body>")
-            else:
-                content += answer_script
-
         render_template(
             template_config,
             "webpage.html",
@@ -249,6 +262,7 @@ def package_adt_web(
                 section=section,
                 language=plate_language_config,
                 webpage_number=webpage_index + 1,
+                activity_answers=webpage.activity_answers,
             ),
             output_name=f"adt/{webpage.section_id}.html",
         )

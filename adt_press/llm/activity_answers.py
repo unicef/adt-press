@@ -5,6 +5,7 @@ from litellm import acompletion
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateSection, PlateText
+from adt_press.models.section import ActivityAnswer
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
@@ -21,7 +22,7 @@ async def generate_activity_answers(
     texts: list[PlateText],
     activity_html: str,
     language_code: str,
-) -> ActivityAnswersResponse:
+) -> ActivityAnswer:
     """
     Generate correct answers for an interactive activity.
 
@@ -33,7 +34,7 @@ async def generate_activity_answers(
         language_code: Language code for the activity
 
     Returns:
-        ActivityAnswersResponse with reasoning and answers dict
+        ActivityAnswer domain model with section_id, reasoning and answers dict
     """
     language = LANGUAGE_MAP[language_code]
 
@@ -56,4 +57,8 @@ async def generate_activity_answers(
         max_retries=config.max_retries,
     )
 
-    return response
+    return ActivityAnswer(
+        section_id=section.section_id,
+        answers=response.answers,
+        reasoning=response.reasoning,
+    )

@@ -39,41 +39,41 @@ default_model: gpt-5
 render_strategy: dynamic
 
 layout_types:
-  # cover_page:
-  #   description: "Cover page of the book, typically includes title, author, and publisher information."
-  #   render_strategy: two_column
+  cover_page:
+    description: "Cover page of the book, typically includes title, author, and publisher information."
+    render_strategy: two_column
 
-  # divider_page:
-  #   description: "Divider or chapter title pages that separate sections or chapters within the book."
-  #   render_strategy: single_column
+  divider_page:
+    description: "Divider or chapter title pages that separate sections or chapters within the book."
+    render_strategy: single_column
 
-  # novel_text_and_images:
-  #   description: "Novel pages with text and embedded images, including poetry. Text flows around images, or text and images would be best laid out in two column format."
-  #   render_strategy: two_column
+  novel_text_and_images:
+    description: "Novel pages with text and embedded images, including poetry. Text flows around images, or text and images would be best laid out in two column format."
+    render_strategy: two_column
 
-  # novel_text_only:
-  #   description: "Novel pages with only text content, including poetry. Simple flowing text layout."
-  #   render_strategy: two_column
+  novel_text_only:
+    description: "Novel pages with only text content, including poetry. Simple flowing text layout."
+    render_strategy: two_column
 
-  # novel_images_only:
-  #   description: "Novel pages with only images, including spreads, such as illustrated novels or photo essays."
-  #   render_strategy: two_column
+  novel_images_only:
+    description: "Novel pages with only images, including spreads, such as illustrated novels or photo essays."
+    render_strategy: two_column
 
-  # mathbook:
-  #   description: "Math textbook pages with equations, diagrams, and structured layouts typical of educational math content."
-  #   render_strategy: html
+  mathbook:
+    description: "Math textbook pages with equations, diagrams, and structured layouts typical of educational math content."
+    render_strategy: html
 
-  # storybook_text_images:
-  #   description: "Storybook pages with integrated text and illustrations. Often text is overlapping, however it will work in a two column format. If the overlapping is too complex like speech bubbles, the comic_overlay strategy will be used instead."
-  #   render_strategy: two_column
+  storybook_text_images:
+    description: "Storybook pages with integrated text and illustrations. Often text is overlapping, however it will work in a two column format. If the overlapping is too complex like speech bubbles, the comic_overlay strategy will be used instead."
+    render_strategy: two_column
 
-  # storybook_images_only:
-  #   description: "Storybook pages with only illustrations, no text content."
-  #   render_strategy: two_column
+  storybook_images_only:
+    description: "Storybook pages with only illustrations, no text content."
+    render_strategy: two_column
 
-  # comic_overlay:
-  #   description: "Visually rich layouts that are image focused with text overlayed positionally. For examples comics, storybooks, graphic novels features pages with speech bubbles, captions, and text overlays on images. Complex spatial relationships between text and visuals."
-  #   render_strategy: overlay
+  comic_overlay:
+    description: "Visually rich layouts that are image focused with text overlayed positionally. For examples comics, storybooks, graphic novels features pages with speech bubbles, captions, and text overlays on images. Complex spatial relationships between text and visuals."
+    render_strategy: overlay
 
   text_and_images:
     description: "Textbook pages with complex multi-element layouts including sidebars, callout boxes, diagrams, and non-linear reading flow."
@@ -118,9 +118,8 @@ render_strategies:
     render_type: html
     config:
       model: default
-      template_path: prompts/activity_generation_html.jinja2
+      template_path: prompts/activities/generic.jinja2
       max_retries: 25
-
       example_dirs: []
 
 page_range:
@@ -205,51 +204,67 @@ prompts:
     model: default
     template_path: prompts/text_easy_read.jinja2
 
-  activity_answers:
-    model: default
-    template_path: prompts/activity_answers.jinja2
-
-  activity_interactive_generation:
-    model: default
-    template_path: prompts/activity_generation_html.jinja2
-
-  # Activity-specific prompts for smaller, focused generation
+  # Activity-specific prompts for HTML generation
   activity_sorting:
     model: default
     template_path: prompts/activities/sorting.jinja2
+    max_retries: 2
     
   activity_multiple_matching:
     model: default
     template_path: prompts/activities/multiple_matching.jinja2
+    max_retries: 2
     
   activity_fill_in_a_table:
     model: default
     template_path: prompts/activities/fill_in_table.jinja2
+    max_retries: 2
     
   activity_true_false:
     model: default
     template_path: prompts/activities/true_false.jinja2
+    max_retries: 2
+    
+  activity_open_ended_answer:
+    model: default
+    template_path: prompts/activities/open_ended_answer.jinja2
+    max_retries: 2
+    
+  activity_fill_in_the_blank:
+    model: default
+    template_path: prompts/activities/fill_in_the_blank.jinja2
+    max_retries: 2
 
   # Activity-specific answer generation prompts
   activity_generic_answers:
     model: default
     template_path: prompts/activities/answers/generic.jinja2
+    max_retries: 2
     
   activity_sorting_answers:
     model: default
     template_path: prompts/activities/answers/sorting.jinja2
+    max_retries: 2
     
   activity_multiple_matching_answers:
     model: default
     template_path: prompts/activities/answers/multiple_matching.jinja2
+    max_retries: 2
     
   activity_fill_in_a_table_answers:
     model: default
     template_path: prompts/activities/answers/fill_in_table.jinja2
+    max_retries: 2
     
   activity_true_false_answers:
     model: default
     template_path: prompts/activities/answers/true_false.jinja2
+    max_retries: 2
+    
+  activity_fill_in_the_blank_answers:
+    model: default
+    template_path: prompts/activities/answers/fill_in_the_blank.jinja2
+    max_retries: 2
 
   speech_generation:
     model: gpt-4o-mini-tts

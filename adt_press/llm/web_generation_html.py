@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 from banks import Prompt
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment, NavigableString
 from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
@@ -9,7 +9,6 @@ from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.html import sanitize_generated_html
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
@@ -123,6 +122,64 @@ class GenerationResponse(CleanTextBaseModel):
             raise ValueError(("Generated HTML must include at least one element with a data-id attribute."))
 
         return v
+
+
+def strip_section_stray_text(root) -> None:
+    """Remove stray text nodes directly inside <section> tags."""
+    for section in root.find_all("section"):
+        for child in list(section.children):
+            if isinstance(child, NavigableString):
+                if child.strip():
+                    # Remove any non-whitespace text directly in section
+                    child.extract()
+
+
+def sanitize_generated_html(html_content: str) -> str:
+    """
+    Strip outer document wrappers, duplicated shell elements, and comments from LLM HTML
+    output.
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Remove all HTML comments before processing
+    for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
+        comment.extract()
+
+    # Prefer <body> contents when present, then <html>, otherwise the soup root
+    root = soup.body or soup.find("html") or soup
+
+    # Remove nested body/html wrappers within the selected root
+    for nested_body in list(root.find_all("body")):
+        nested_body.unwrap()
+    for nested_html in list(root.find_all("html")):
+        nested_html.unwrap()
+
+    # Drop interface/nav containers – the app injects them separately
+    shell_ids = {"interface-container", "nav-container"}
+
+    def is_shell(tag_id: str | None) -> bool:
+        return bool(tag_id and tag_id in shell_ids)
+
+    for disallowed in list(root.find_all(id=is_shell)):
+        disallowed.decompose()
+
+    strip_section_stray_text(root)
+
+    fragments: list[str] = []
+    for child in list(root.children):
+        if isinstance(child, Comment):
+            # Extra safety: skip any remaining comments
+            continue
+        if isinstance(child, NavigableString):
+            if not child.strip():
+                continue
+            fragments.append(str(child))
+        else:
+            fragments.append(str(child))
+
+    fragment_html = "".join(fragments).strip()
+
+    return fragment_html or html_content.strip()
 
 
 async def generate_web_page_html(
