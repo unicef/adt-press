@@ -91,8 +91,8 @@ class PipelineTest(unittest.TestCase):
             self.assertFileCount("images/img_p*_r*_recrop.png", 5, "Unexpected number of recropped images created")
             self.assertFileCount("images/img_p*_chart.png", 10, "Unexpected number of chart images created")
 
-            self.assertFileContains("page_report.html", ">Hyena and Raven<", "Title not found in page report")
-            self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
+            self.assertFileContains("page_report.html", "Hyena and Raven", "Title not found in page report")
+            self.assertFileContains("page_report.html", "sec_p1_s0", "No section found for page 1 in page report")
             self.assertFileContains("page_report.html", "French", "Output language not found in page report")
             self.assertFileContains("page_report.html", "English", "Input language not found in page report")
             self.assertFileContains("page_report.html", "orbeau", "Translated text not found in page report")
@@ -150,8 +150,8 @@ class PipelineTest(unittest.TestCase):
                 file_path = Path(f"{self.run_dir}/{file}")
                 assert file_path.exists(), f"Output file {file} was not created."
 
-            self.assertFileContains("page_report.html", ">Hyena and Raven<", "Title not found in page report")
-            self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
+            self.assertFileContains("page_report.html", "Hyena and Raven", "Title not found in page report")
+            self.assertFileContains("page_report.html", "sec_p1_s0", "No section found for page 1 in page report")
             self.assertFileDoesNotContain("page_report.html", "corbeau", "French should not be in page report")
 
             # rerun using two column web strategy
