@@ -49,7 +49,7 @@ class GenerationResponse(CleanTextBaseModel):
             # Check if element has direct text content (not just whitespace)
             direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
 
-            if direct_text and False:
+            if direct_text:
                 data_id = element.get("data-id")
                 if not data_id:
                     raise ValueError(
