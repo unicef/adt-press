@@ -210,14 +210,14 @@ prompts:
     template_path: prompts/activities/sorting.jinja2
     max_retries: 2
     
-  activity_multiple_matching:
+  activity_matching:
     model: default
-    template_path: prompts/activities/multiple_matching.jinja2
+    template_path: prompts/activities/matching.jinja2
     max_retries: 2
     
   activity_fill_in_a_table:
     model: default
-    template_path: prompts/activities/fill_in_table.jinja2
+    template_path: prompts/activities/fill_in_a_table.jinja2
     max_retries: 2
     
   activity_true_false:
@@ -234,26 +234,27 @@ prompts:
     model: default
     template_path: prompts/activities/fill_in_the_blank.jinja2
     max_retries: 2
+    
+  activity_multiple_choice:
+    model: default
+    template_path: prompts/activities/multiple_choice.jinja2
+    max_retries: 2
 
   # Activity-specific answer generation prompts
-  activity_generic_answers:
-    model: default
-    template_path: prompts/activities/answers/generic.jinja2
-    max_retries: 2
     
   activity_sorting_answers:
     model: default
     template_path: prompts/activities/answers/sorting.jinja2
     max_retries: 2
     
-  activity_multiple_matching_answers:
+  activity_matching_answers:
     model: default
-    template_path: prompts/activities/answers/multiple_matching.jinja2
+    template_path: prompts/activities/answers/matching.jinja2
     max_retries: 2
     
   activity_fill_in_a_table_answers:
     model: default
-    template_path: prompts/activities/answers/fill_in_table.jinja2
+    template_path: prompts/activities/answers/fill_in_a_table.jinja2
     max_retries: 2
     
   activity_true_false_answers:
@@ -264,6 +265,11 @@ prompts:
   activity_fill_in_the_blank_answers:
     model: default
     template_path: prompts/activities/answers/fill_in_the_blank.jinja2
+    max_retries: 2
+    
+  activity_multiple_choice_answers:
+    model: default
+    template_path: prompts/activities/answers/multiple_choice.jinja2
     max_retries: 2
 
   speech_generation:

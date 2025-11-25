@@ -174,11 +174,12 @@ def activity_prompts_config(config: DictConfig) -> dict[str, HTMLPromptConfig]:
     """Load activity-specific prompt configs into a dictionary keyed by section type."""
     activity_types = [
         "activity_sorting",
-        "activity_multiple_matching",
+        "activity_matching",
         "activity_fill_in_a_table",
         "activity_true_false",
         "activity_open_ended_answer",
         "activity_fill_in_the_blank",
+        "activity_multiple_choice",
     ]
 
     activity_configs = {}
@@ -193,32 +194,24 @@ def activity_prompts_config(config: DictConfig) -> dict[str, HTMLPromptConfig]:
 
 @cache(behavior="recompute")
 def activity_answers_prompts_config(config: DictConfig) -> dict[str, PromptConfig]:
-    """Load activity-specific answer generation prompt configs into a dictionary keyed by section type.
-
-    Includes a 'default' key with the generic fallback config for activity types without specific configs.
-    """
+    """Load activity-specific answer generation prompt configs into a dictionary keyed by section type."""
     activity_types = [
         "activity_sorting",
-        "activity_multiple_matching",
+        "activity_matching",
         "activity_fill_in_a_table",
         "activity_true_false",
         "activity_fill_in_the_blank",
+        "activity_multiple_choice",
     ]
 
     answer_configs = {}
 
-    # Load activity-specific configs
     for activity_type in activity_types:
         answer_key = f"{activity_type}_answers"
         if answer_key in config["prompts"]:
             answer_configs[activity_type] = PromptConfig.model_validate(
                 prompt_config_with_model(config["prompts"][answer_key], config["default_model"])
             )
-
-    # Add generic fallback config for activities without specific templates
-    answer_configs["default"] = PromptConfig.model_validate(
-        prompt_config_with_model(config["prompts"]["activity_generic_answers"], config["default_model"])
-    )
 
     return answer_configs
 

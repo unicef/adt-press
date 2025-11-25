@@ -51,8 +51,17 @@ class GenerationResponse(CleanTextBaseModel):
 
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
-            # Check if element has direct text content (not just whitespace)
-            direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
+            # Get direct text content, excluding HTML comments
+            direct_text_nodes = []
+            for child in element.children:
+                # Skip comments - they're allowed
+                if isinstance(child, Comment):
+                    continue
+                # Only include NavigableString (text) that's not a comment
+                if isinstance(child, NavigableString) and not isinstance(child, Comment):
+                    direct_text_nodes.append(str(child))
+
+            direct_text = "".join(direct_text_nodes).strip()
 
             if direct_text:
                 data_id = element.get("data-id")
@@ -136,14 +145,13 @@ def strip_section_stray_text(root) -> None:
 
 def sanitize_generated_html(html_content: str) -> str:
     """
-    Strip outer document wrappers, duplicated shell elements, and comments from LLM HTML
-    output.
+    Strip outer document wrappers and duplicated shell elements from LLM HTML output.
+    Preserves HTML comments.
     """
     soup = BeautifulSoup(html_content, "html.parser")
 
-    # Remove all HTML comments before processing
-    for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
-        comment.extract()
+    # DO NOT remove comments - they're allowed now
+    # (removed the comment stripping code)
 
     # Prefer <body> contents when present, then <html>, otherwise the soup root
     root = soup.body or soup.find("html") or soup
@@ -167,8 +175,9 @@ def sanitize_generated_html(html_content: str) -> str:
 
     fragments: list[str] = []
     for child in list(root.children):
+        # Comments are now preserved
         if isinstance(child, Comment):
-            # Extra safety: skip any remaining comments
+            fragments.append(f"<!--{child}-->")
             continue
         if isinstance(child, NavigableString):
             if not child.strip():

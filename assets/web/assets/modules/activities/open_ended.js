@@ -1,6 +1,6 @@
 import { playActivitySound } from '../audio.js';
 import { updateSubmitButtonAndToast, provideFeedback, ActivityTypes } from '../utils.js';
-import { clearInputValidationFeedback } from './fill_in_blank.js';
+import { clearInputValidationFeedback } from './fill_in_the_blank.js';
 import TextValidator from './textvalidator.js';
 
 const validator = new TextValidator();

@@ -1,6 +1,6 @@
 import { playActivitySound } from '../audio.js';
 import { ActivityTypes, updateSubmitButtonAndToast, provideFeedback } from '../utils.js';
-import { countUnfilledInputs } from './fill_in_blank.js';
+import { countUnfilledInputs } from './fill_in_the_blank.js';
 import { translateText } from '../translations.js';
 import { checkForGibberish } from './validation.js';
 import { executeMail } from './send-email.js';

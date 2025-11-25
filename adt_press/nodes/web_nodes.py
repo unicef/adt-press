@@ -74,13 +74,11 @@ def web_pages(
             if not strategy:
                 raise ValueError(f"Unknown render strategy: {strategy_name}")
 
-            # Check if we have a specific activity config for this section type
-            specific_activity_config = activity_prompts_config.get(section.section_type)
-
             # Normalize section type to string for dict lookups
-            section_type_name = getattr(section.section_type, "name", section.section_type)
+            section_type_name = getattr(section.section_type, "name", str(section.section_type))
 
-            # Specific activity config keyed by string names like "activity_open_ended_answer"
+            # Check if we have a specific activity config for this section type
+            # Activity configs are keyed by string names like "activity_open_ended_answer"
             specific_activity_config = activity_prompts_config.get(section_type_name)
 
             # Cache key must use normalized string
@@ -111,8 +109,12 @@ def web_pages(
                 # For activities, use section type as strategy name to enable proper template selection
                 effective_strategy_name = strategy_name
                 if strategy_name == "activity":
-                    # Use section type name if specific config exists, else fallback to "activity_other"
-                    effective_strategy_name = section_type_name if specific_activity_config else "activity_other"
+                    # If we have a specific config, use the section type name
+                    # Otherwise, fallback to "activity_other" for generic handling
+                    if specific_activity_config:
+                        effective_strategy_name = section_type_name
+                    else:
+                        effective_strategy_name = "activity_other"
 
                 web_pages.append(
                     generate_web_page_html(
@@ -159,24 +161,21 @@ def web_pages(
                 # Only generate answers for activity types in the allowed list
                 if section_type_name in activity_types:
                     section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
-
-                    # Use activity-specific answer config
                     answer_config = activity_answers_prompts_config.get(section_type_name)
-
-                    # If no specific config exists for this type, skip answer generation
-                    if answer_config:
-                        answer_tasks.append(
-                            (
-                                page,
-                                generate_activity_answers(
-                                    answer_config,
-                                    section,
-                                    section_texts,
-                                    page.content,
-                                    plate_language_config,
-                                ),
-                            )
+                    if not answer_config:
+                        continue  # no answers for this activity type
+                    answer_tasks.append(
+                        (
+                            page,
+                            generate_activity_answers(
+                                answer_config,
+                                section,
+                                section_texts,
+                                page.content,
+                                plate_language_config,
+                            ),
                         )
+                    )
 
         # Generate all answers in parallel
         for page, answer_coro in answer_tasks:
