@@ -73,12 +73,7 @@ def generated_plate(
         # find the first section id that matches this chapter's page number
         matching_section = next((sec for sec in plate_sections if sec.page_number == chapter.page_number), None)
         if matching_section:
-            table_of_contents.append(
-                PlateChapter(
-                    chapter_id=chapter.chapter_id,
-                    section_id=matching_section.section_id
-                )
-            )
+            table_of_contents.append(PlateChapter(chapter_id=chapter.chapter_id, section_id=matching_section.section_id))
 
     return Plate(
         title=book_metadata.title or pdf_title_config,

@@ -199,7 +199,12 @@ def package_adt_web(
     # create our navigation directory
     nav_dir = os.path.join(adt_dir, "content", "navigation")
     os.makedirs(nav_dir, exist_ok=True)
-    render_template(template_config, "nav.html", dict(table_of_contents=plate.table_of_contents, texts=plate_texts), output_name="adt/content/navigation/nav.html")
+    render_template(
+        template_config,
+        "nav.html",
+        dict(table_of_contents=plate.table_of_contents, texts=plate_texts),
+        output_name="adt/content/navigation/nav.html",
+    )
 
     for language, translations in plate_translations.items():
         # speech files

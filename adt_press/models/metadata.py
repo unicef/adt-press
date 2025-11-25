@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 
+
 class BookChapter(BaseModel):
     chapter_id: str
     title: str
     page_number: int
+
 
 class BookMetadata(BaseModel):
     """Metadata extracted from the first pages of the book"""

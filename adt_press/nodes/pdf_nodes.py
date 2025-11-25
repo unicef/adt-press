@@ -244,5 +244,6 @@ def book_metadata(
 
     return run_async_task(extract_metadata)
 
+
 def book_table_of_contents(book_metadata: BookMetadata) -> list[BookChapter]:
     return book_metadata.table_of_contents
