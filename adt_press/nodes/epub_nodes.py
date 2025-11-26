@@ -30,11 +30,6 @@ def package_epub(
     epub_paths = {}
     adt_dir = os.path.join(run_output_dir_config, "adt")
 
-    # Debug: Check what paths plate actually has
-    if plate.images:
-        print(f"DEBUG: First image path in plate: {plate.images[0].image_path}")
-        print(f"DEBUG: Expected path should start with: output/{os.path.basename(run_output_dir_config)}/images/")
-
     languages = list(plate_translations.keys())
     default_language = languages[0]
     feature_overrides = {

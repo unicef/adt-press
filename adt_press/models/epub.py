@@ -39,7 +39,6 @@ def create_epub_file(
     Returns:
         Path to the generated EPUB file
     """
-    print("writing epub to", output_path)
     book = epub.EpubBook()
 
     # Set metadata

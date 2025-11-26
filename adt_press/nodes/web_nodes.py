@@ -161,8 +161,10 @@ def web_pages(
                 if section_type_name in activity_types:
                     section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
                     answer_config = activity_answers_prompts_config.get(section_type_name)
+
                     if not answer_config:
                         continue  # no answers for this activity type
+
                     answer_tasks.append(
                         (
                             page,

@@ -23,13 +23,13 @@ You MUST respond with valid JSON containing exactly two fields:
 ```
 
 The `answers` field is REQUIRED and must be a JSON object (dictionary), never null or missing.
-If there are no items to answer, use an empty object: `"answers": {}`
 
 ## Answer Key Requirements
 
-- ALL keys in the `answers` object MUST match `data-activity-item` or `data-aria-id` values from the HTML
-- Values must match the expected format for the activity type
-- Do not add extra fields or change the structure
+- The `answers` object MUST include ALL `data-activity-item` or `data-aria-id` keys found in the HTML
+- Count all `data-activity-item` attributes and ensure your answers dict has exactly that many keys
+- Values must be the strings "true" or "false" (lowercase) for this activity type
+- If you cannot determine the answer, use empty string "" as the value
 - Think carefully about the textbook context before providing answers
 
 ---
@@ -55,10 +55,12 @@ For each statement with `data-activity-item`, determine if it's true or false ba
 ```
 
 CRITICAL:
-1. Answer keys must match `data-activity-item` values exactly
-2. Answer values must be exactly "true" or "false" (lowercase)
-3. All statements must have corresponding answers
-4. The `answers` field is REQUIRED (use `{}` if no statements found)
+1. Count ALL `data-activity-item` attributes in the HTML
+2. Your `answers` dict must have EXACTLY that many keys
+3. Answer keys must match `data-activity-item` values exactly
+4. Answer values must be exactly "true" or "false" (lowercase strings)
+5. If you cannot determine the answer, use empty string ""
+6. The `answers` field is REQUIRED and must include ALL keys
 {% endchat %}
 
 {% chat role="user" %}

@@ -42,7 +42,12 @@ Provide correct text for each blank based on:
 - Logical flow and semantic relationships
 - Educational level and language appropriateness
 
-### Example Response:
+**IMPORTANT**: The `answers` dictionary MUST include ALL `data-activity-item` keys found in the HTML:
+- If you can determine correct answers: provide the answer text as values
+- If the exercise is open-ended (multiple valid answers, creative writing, personal responses, or requires context not provided): use empty strings `""` as values for all keys
+- ALWAYS include all keys - never return an empty `answers` object if input fields exist
+
+### Example Response (definitive answers):
 ```json
 {
     "reasoning": "Based on verb conjugation patterns for the given infinitives in context.",
@@ -50,6 +55,21 @@ Provide correct text for each blank based on:
         "item-1": "me encargo",
         "item-2": "hacen",
         "item-3": "traigo"
+    }
+}
+```
+
+### Example Response (open-ended exercise with 6 inputs):
+```json
+{
+    "reasoning": "This is an open-ended exercise asking students to rewrite sentences by replacing pronouns with character names. Without the full story context identifying who the pronouns refer to, there are multiple valid answers. Students should use their knowledge of the text.",
+    "answers": {
+        "item-1": "",
+        "item-2": "",
+        "item-3": "",
+        "item-4": "",
+        "item-5": "",
+        "item-6": ""
     }
 }
 ```
@@ -65,11 +85,35 @@ Provide correct text for each blank based on:
 **VALIDATION CHECKLIST**:
 ✓ Response has "reasoning" field (non-empty string)
 ✓ Response has "answers" field (object/dictionary)  
-✓ Answer keys match HTML attribute values exactly
-✓ Answer values are appropriate text strings
-✓ Both fields present even if answers is empty object
+✓ Answer keys match ALL `data-activity-item` values from HTML exactly
+✓ Answer values are either correct text strings OR empty strings `""` for open-ended exercises
+✓ Both fields present - `answers` must include ALL input field keys
 
-**DO NOT OMIT THE ANSWERS FIELD UNDER ANY CIRCUMSTANCES.**
+**CRITICAL**: 
+- Count the number of `data-activity-item` attributes in the HTML
+- Your `answers` object must have EXACTLY that many keys
+- Use empty string `""` as the value if you cannot determine a definitive answer
+- DO NOT OMIT THE ANSWERS FIELD OR ANY KEYS
+
+**FUNCTION CALL REQUIREMENT**:
+When calling the ActivityAnswersResponse function, you MUST provide BOTH arguments:
+1. `reasoning` - your explanation as a string
+2. `answers` - a dictionary/object with all item keys
+
+Example function call structure:
+```
+ActivityAnswersResponse(
+    reasoning="Elena is the possessor; the possessive pronoun 'su' (her) is needed before each noun.",
+    answers={
+        "item-1": "su",
+        "item-2": "su", 
+        "item-3": "su",
+        "item-4": "su"
+    }
+)
+```
+
+DO NOT call the function with only the reasoning parameter. BOTH parameters are mandatory.
 {% endchat %}
 
 {% chat role="user" %}
@@ -84,9 +128,10 @@ Context from textbook:
 Activity HTML:
 {{ activity_html }}
 
-CRITICAL REMINDER: Your response MUST include BOTH fields:
-1. "reasoning" - explanation of your answer determination
-2. "answers" - dictionary mapping item IDs to answer text (use {} if no items found)
+STEP 1: Count how many `data-activity-item` attributes are in the HTML above.
+STEP 2: Extract the item IDs (e.g., "item-1", "item-2", etc.).
+STEP 3: For each item ID, determine the answer based on context.
+STEP 4: Call ActivityAnswersResponse with BOTH reasoning AND answers parameters.
 
-Both fields are required. Do not omit "answers" under any circumstances.
+Your answers dictionary MUST have all the item IDs as keys. Use empty string "" if you cannot determine the answer.
 {% endchat %}

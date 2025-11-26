@@ -1,8 +1,10 @@
 # mypy: ignore-errors
+import re
+
 import instructor
 from banks import Prompt
 from litellm import acompletion
-from pydantic import field_validator
+from pydantic import Field, field_validator
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateSection, PlateText
@@ -13,13 +15,16 @@ from adt_press.utils.languages import LANGUAGE_MAP
 
 
 class ActivityAnswersResponse(CleanTextBaseModel):
-    reasoning: str
-    answers: dict[str, str] = {}  # Default to empty dict if LLM doesn't provide
+    reasoning: str = Field(..., description="Brief explanation of answer determination")
+    answers: dict[str, str] = Field(
+        ...,
+        description="Dictionary mapping activity item IDs to their correct answers",
+    )
 
-    @field_validator("answers")
+    @field_validator("answers", mode="before")
     @classmethod
-    def validate_answers_present(cls, v):
-        """Ensure answers is never None - convert to empty dict."""
+    def ensure_answers_dict(cls, v):
+        """Ensure answers is always a dict, never None."""
         if v is None:
             return {}
         return v
@@ -66,11 +71,15 @@ async def generate_activity_answers(
         max_retries=config.max_retries,
     )
 
-    # Defensive check - ensure answers field is present
-    if response.answers is None:
-        raise ValueError(
-            f"LLM failed to provide required 'answers' field for section {section.section_id}. Reasoning: {response.reasoning}"
-        )
+    # If LLM returned empty answers but HTML has input fields, extract keys and use empty strings
+    if not response.answers:
+        # Extract all data-activity-item values from HTML
+        item_pattern = r'data-activity-item="([^"]+)"'
+        item_keys = re.findall(item_pattern, activity_html)
+
+        if item_keys:
+            # Build answers dict with all keys and empty string values
+            response.answers = {key: "" for key in item_keys}
 
     return ActivityAnswer(
         section_id=section.section_id,
