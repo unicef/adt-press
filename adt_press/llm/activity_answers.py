@@ -2,6 +2,7 @@
 import instructor
 from banks import Prompt
 from litellm import acompletion
+from pydantic import field_validator
 
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateSection, PlateText
@@ -13,7 +14,15 @@ from adt_press.utils.languages import LANGUAGE_MAP
 
 class ActivityAnswersResponse(CleanTextBaseModel):
     reasoning: str
-    answers: dict[str, str]
+    answers: dict[str, str] = {}  # Default to empty dict if LLM doesn't provide
+
+    @field_validator("answers")
+    @classmethod
+    def validate_answers_present(cls, v):
+        """Ensure answers is never None - convert to empty dict."""
+        if v is None:
+            return {}
+        return v
 
 
 async def generate_activity_answers(
@@ -56,6 +65,12 @@ async def generate_activity_answers(
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
     )
+
+    # Defensive check - ensure answers field is present
+    if response.answers is None:
+        raise ValueError(
+            f"LLM failed to provide required 'answers' field for section {section.section_id}. Reasoning: {response.reasoning}"
+        )
 
     return ActivityAnswer(
         section_id=section.section_id,

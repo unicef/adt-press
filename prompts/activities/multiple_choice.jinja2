@@ -108,11 +108,13 @@ The `content` field must contain the complete HTML starting with the layout shel
             <p data-id="text-123">What is 2 + 2?</p>
           </div>
     
-          <!-- Options -->
+          <!-- Option A -->
           <div class="option-container">
             <label class="activity-option flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50 cursor-pointer">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 option-letter"><i class="fas fa-circle text-xs"></i></div>
+                <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 option-letter">
+                  <i class="fas fa-circle text-xs"></i>
+                </div>
               </div>
               <div class="flex-grow">
                 <input aria-label="Option A: 3" class="sr-only" data-activity-item="item-1" name="math-question" tabindex="0" type="radio" value="item-1" />
@@ -126,8 +128,48 @@ The `content` field must contain the complete HTML starting with the layout shel
               </div>
             </label>
           </div>
-          
-          <!-- More options B, C, D... -->
+
+          <!-- Option B -->
+          <div class="option-container">
+            <label class="activity-option flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 option-letter">
+                  <i class="fas fa-circle text-xs"></i>
+                </div>
+              </div>
+              <div class="flex-grow">
+                <input aria-label="Option B: 4" class="sr-only" data-activity-item="item-2" name="math-question" tabindex="0" type="radio" value="item-2" />
+                <div class="text-gray-700" data-id="text-125">4</div>
+                <div class="feedback-container mt-2 hidden">
+                  <div class="flex items-center gap-2">
+                    <span class="feedback-icon w-5 h-5 rounded-full flex items-center justify-center text-sm"></span>
+                    <span class="feedback-text text-sm font-medium"></span>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Option C -->
+          <div class="option-container">
+            <label class="activity-option flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 option-letter">
+                  <i class="fas fa-circle text-xs"></i>
+                </div>
+              </div>
+              <div class="flex-grow">
+                <input aria-label="Option C: 5" class="sr-only" data-activity-item="item-3" name="math-question" tabindex="0" type="radio" value="item-3" />
+                <div class="text-gray-700" data-id="text-126">5</div>
+                <div class="feedback-container mt-2 hidden">
+                  <div class="flex items-center gap-2">
+                    <span class="feedback-icon w-5 h-5 rounded-full flex items-center justify-center text-sm"></span>
+                    <span class="feedback-text text-sm font-medium"></span>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
         </div>
         
         <!-- Optional image -->
@@ -141,6 +183,7 @@ The `content` field must contain the complete HTML starting with the layout shel
 Remember:
 - All text content needs `data-id` attributes
 - Radio inputs need `data-activity-item` attributes for answer checking
+- Use FontAwesome icons (`<i class="fas fa-circle text-xs"></i>`) in letter circles - DO NOT use text letters
 - Keep feedback containers hidden (JavaScript handles display)
 - Use semantic HTML and ARIA labels for accessibility
 - Maintain consistent styling with Tailwind CSS classes

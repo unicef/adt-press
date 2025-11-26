@@ -1,82 +1,82 @@
 {% chat role="system" %}
 You are an expert in generating answers for interactive educational activities.
 
-You will be provided with:
-1. The complete HTML content of an activity section
-2. The type of activity
-3. Context from the textbook page where this activity appears
-
-Your task is to analyze the activity and provide the correct answers in a structured format.
-
 ## CRITICAL Response Format
 
-You MUST respond with valid JSON containing exactly two fields:
+You MUST respond with valid JSON containing EXACTLY TWO FIELDS - BOTH ARE MANDATORY:
 
 ```json
 {
-    "reasoning": "Brief 1-2 sentence explanation of how you determined the answers",
+    "reasoning": "Brief 1-2 sentence explanation",
     "answers": {
-        "item-id-1": "correct-answer-1",
-        "item-id-2": "correct-answer-2"
+        "item-1": "answer-1",
+        "item-2": "answer-2"
     }
 }
 ```
 
-The `answers` field is REQUIRED and must be a JSON object (dictionary), never null or missing.
-If there are no items to answer, use an empty object: `"answers": {}`
+**ABSOLUTE REQUIREMENTS - FAILURE CAUSES IMMEDIATE REJECTION**:
+1. The `reasoning` field is MANDATORY - must be a non-empty string
+2. The `answers` field is MANDATORY - must be a JSON object/dictionary
+3. NEVER omit `answers` - if no items found, use empty object: `"answers": {}`
+4. NEVER return null for `answers`
+5. Both fields must be present in EVERY response
 
 ## Answer Key Requirements
 
-- ALL keys in the `answers` object MUST match `data-activity-item` or `data-aria-id` values from the HTML
-- Values must match the expected format for the activity type
-- Do not add extra fields or change the structure
-- Think carefully about the textbook context before providing answers
+- Keys in `answers` must match `data-activity-item` or `data-aria-id` values from HTML
+- Values are correct fill-in text for each blank
+- Use plain text strings (no extra punctuation unless grammatically required)
+- Consider the textbook context and language level
 
----
+## Fill in the Blank Activity
 
-## Fill in the Blank Activity Answer Generation
+### What to look for:
+- Input elements with `data-activity-item="item-N"` or `data-aria-id="aria-X-Y-Z"`
+- Labels, instructions, and surrounding text for context clues
+- May have hierarchical structure (main → secondary → tertiary)
 
-### Activity Structure:
-- **Input elements**: Each has `data-activity-item="<item_id>"` or `data-aria-id="<aria_id>"`
-- **Layout patterns**: May be simple list, hierarchical diagram, or inline blanks
-- **Context clues**: Labels, instructions, and surrounding text provide answer hints
+### Your task:
+Provide correct text for each blank based on:
+- Context from surrounding text and instructions
+- Logical flow and semantic relationships
+- Educational level and language appropriateness
 
-### Your Task:
-For each input element, provide the correct text value based on:
-- The surrounding context and instructions
-- Any reference material provided in the activity
-- The logical flow of hierarchical structure (if present: main → secondary → tertiary)
-- The semantic relationships between items
-
-### Response Example:
+### Example Response:
 ```json
 {
-    "reasoning": "Based on the text structure diagram, the main title is 'Los biomas', followed by subtitles 'Tipos de biomas' and 'Características', with Selvas, Desiertos, and Praderas as examples.",
+    "reasoning": "Based on verb conjugation patterns for the given infinitives in context.",
     "answers": {
-        "item-1": "Los biomas",
-        "item-2": "Tipos de biomas",
-        "item-3": "Características",
-        "item-4": "Selvas",
-        "item-5": "Desiertos",
-        "item-6": "Praderas"
+        "item-1": "me encargo",
+        "item-2": "hacen",
+        "item-3": "traigo"
     }
 }
 ```
 
-CRITICAL:
-1. Answer keys must match `data-activity-item` or `data-aria-id` values exactly
-2. Answer values are text strings
-3. Consider hierarchical levels when determining answer specificity
-4. Maintain consistency with the educational level and language
-5. The `answers` field is REQUIRED (use `{}` if no inputs found)
+### If no input fields found:
+```json
+{
+    "reasoning": "No input fields with data-activity-item or data-aria-id found in HTML.",
+    "answers": {}
+}
+```
+
+**VALIDATION CHECKLIST**:
+✓ Response has "reasoning" field (non-empty string)
+✓ Response has "answers" field (object/dictionary)  
+✓ Answer keys match HTML attribute values exactly
+✓ Answer values are appropriate text strings
+✓ Both fields present even if answers is empty object
+
+**DO NOT OMIT THE ANSWERS FIELD UNDER ANY CIRCUMSTANCES.**
 {% endchat %}
 
 {% chat role="user" %}
 Activity Type: {{ section.section_type }}
-
 Language: {{ language }}
 
-Textbook Context:
+Context from textbook:
 {% for text in texts %}
 - {{ text.text }}
 {% endfor %}
@@ -84,5 +84,9 @@ Textbook Context:
 Activity HTML:
 {{ activity_html }}
 
-Please analyze this fill-in-the-blank activity and provide the correct answers in JSON format.
+CRITICAL REMINDER: Your response MUST include BOTH fields:
+1. "reasoning" - explanation of your answer determination
+2. "answers" - dictionary mapping item IDs to answer text (use {} if no items found)
+
+Both fields are required. Do not omit "answers" under any circumstances.
 {% endchat %}

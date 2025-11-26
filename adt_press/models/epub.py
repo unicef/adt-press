@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from ebooklib import epub
@@ -63,21 +64,47 @@ def create_epub_file(
         book.set_cover(file_name="images/cover.png", content=img_bytes)
 
     # add all our images to the book
+    processed_image_ids = set()  # Track which images we've already added
+    epub_images_by_id = {}  # Create EPUB-specific image path mappings
+
     for webpage in web_pages:
         for image_id in webpage.image_ids:
-            img = images_by_id[image_id]
-            img_bytes = cached_read_file(img.image_path)
-            img_item = epub.EpubItem(uid=img.image_id, file_name=f"images/{image_id}.png", media_type="image/png", content=img_bytes)
+            # Skip if we've already added this image
+            if image_id in processed_image_ids:
+                continue
 
-            # replace our PlateImage with one that has the correct path
-            images_by_id[image_id] = PlateImage(image_id=img.image_id, image_path=f"images/{image_id}.png", caption_id=img.caption_id)
+            img = images_by_id[image_id]
+
+            # Verify image path exists before trying to read
+            if not img.image_path:
+                raise ValueError(f"Image {image_id} has no image_path set")
+
+            # Try to read the image
+            try:
+                img_bytes = cached_read_file(img.image_path)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(
+                    f"Cannot find image file for EPUB:\n"
+                    f"  Image ID: {image_id}\n"
+                    f"  Image path from plate: {img.image_path}\n"
+                    f"  Current working directory: {os.getcwd()}\n"
+                    f"  Absolute path attempted: {os.path.abspath(img.image_path)}\n"
+                    f"  Image dir parameter: {image_dir}"
+                ) from e
+
+            # Add image to EPUB with internal path
+            img_item = epub.EpubItem(uid=img.image_id, file_name=f"images/{image_id}.png", media_type="image/png", content=img_bytes)
             book.add_item(img_item)
+            processed_image_ids.add(image_id)
+
+            # Create EPUB-specific PlateImage with internal path for HTML replacement
+            epub_images_by_id[image_id] = PlateImage(image_id=img.image_id, image_path=f"images/{image_id}.png", caption_id=img.caption_id)
 
     # Create chapters from web pages
     chapters = []
     for idx, webpage in enumerate(web_pages):
         content = webpage.content
-        content = replace_images(content, images_by_id, texts_by_id)
+        content = replace_images(content, epub_images_by_id, texts_by_id)
         content = replace_texts(content, texts_by_id)
 
         chapter = epub.EpubHtml(title=f"Section {idx + 1}", file_name=f"chap_{webpage.section_id}.xhtml", lang=language)

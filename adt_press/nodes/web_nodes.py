@@ -145,8 +145,7 @@ def web_pages(
         "activity_true_false",
         "activity_fill_in_the_blank",
         "activity_matching",
-        "activity_fill_in_a_table",
-        # Note: activity_open_ended_answer is intentionally excluded - no answers needed
+        # Note: activity_open_ended_answer and activity_fill_in_a_table are intentionally excluded - no predefined answers
     }
 
     async def generate_answers():

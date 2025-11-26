@@ -34,6 +34,7 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 - Use grid layouts: `grid grid-cols-1 lg:grid-cols-2 gap-4` for responsive form rows
 - Input containers: `p-4 rounded bg-gray-100 flex items-center` with relative positioning
 - Labels: Use `font-bold whitespace-nowrap` with proper `data-id` attributes
+- **CRITICAL**: ALL input fields MUST have `data-activity-item="item-N"` attribute (item-1, item-2, item-3, etc.)
 - Inputs: `border border-gray-300 rounded p-2 w-full` or sized appropriately
 - Multiple inputs per row: Use flex layouts with proper spacing
 
@@ -62,16 +63,16 @@ Example fill in table activity:
         <label for="field1" class="mr-2 font-bold whitespace-nowrap" data-id="text-10-3">
           Label text
         </label>
-        <input type="text" id="field1" class="border border-gray-300 rounded p-2 w-full" placeholder="___________">
+        <input type="text" id="field1" data-activity-item="item-1" class="border border-gray-300 rounded p-2 w-full" placeholder="___________">
       </div>
     </div>
     
     <div class="grid grid-cols-1 gap-4 mb-6">
       <div class="p-4 rounded bg-gray-100 flex items-center">
         <label for="field2" class="mr-2 font-bold" data-id="text-10-6">First part</label>
-        <input type="text" id="field2" class="border border-gray-300 rounded p-2 w-24 sm:w-32">
+        <input type="text" id="field2" data-activity-item="item-2" class="border border-gray-300 rounded p-2 w-24 sm:w-32">
         <label for="field3" class="mx-2 font-bold whitespace-nowrap" data-id="text-10-7">Second part</label>
-        <input type="text" id="field3" class="border border-gray-300 rounded p-2 w-24 sm:w-32">
+        <input type="text" id="field3" data-activity-item="item-3" class="border border-gray-300 rounded p-2 w-24 sm:w-32">
       </div>
     </div>
   </div>

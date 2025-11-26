@@ -252,11 +252,6 @@ prompts:
     template_path: prompts/activities/answers/matching.jinja2
     max_retries: 2
     
-  activity_fill_in_a_table_answers:
-    model: default
-    template_path: prompts/activities/answers/fill_in_a_table.jinja2
-    max_retries: 2
-    
   activity_true_false_answers:
     model: default
     template_path: prompts/activities/answers/true_false.jinja2

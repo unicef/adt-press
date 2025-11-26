@@ -15,11 +15,11 @@ def package_epub(
     run_output_dir_config: str,
     pdf_title_config: str,
     plate_language_config: str,
-    plate: Plate,
+    plate: Plate,  # This is the issue - plate object has wrong paths
     plate_translations: dict[str, dict[str, str]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
-    package_adt_web: str,  # Dependency to ensure web packaging runs first
+    package_adt_web: str,
 ) -> dict[str, str]:
     """
     Generate EPUB files for each language translation.
@@ -29,7 +29,11 @@ def package_epub(
     """
     epub_paths = {}
     adt_dir = os.path.join(run_output_dir_config, "adt")
-    image_dir = os.path.join(adt_dir, "images")
+
+    # Debug: Check what paths plate actually has
+    if plate.images:
+        print(f"DEBUG: First image path in plate: {plate.images[0].image_path}")
+        print(f"DEBUG: Expected path should start with: output/{os.path.basename(run_output_dir_config)}/images/")
 
     languages = list(plate_translations.keys())
     default_language = languages[0]
@@ -55,7 +59,7 @@ def package_epub(
     css_content = None
     css_path = os.path.join(adt_dir, "assets", "styles.css")
     if os.path.exists(css_path):
-        with open(css_path, "r") as f:
+        with open(css_path) as f:
             css_content = f.read()
 
     for language, translations in plate_translations.items():
@@ -71,7 +75,7 @@ def package_epub(
             web_pages=web_pages,
             plate_texts=plate_texts,
             translations=translations,
-            image_dir=image_dir,
+            image_dir=os.path.join(run_output_dir_config, "images"),  # Fixed: correct image directory
             css_content=css_content,
         )
 
