@@ -12,6 +12,7 @@ from adt_press.models.text import EasyReadText, OutputText, PageText, PageTextGr
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.report_assets import compile_tailwind_for_reports
 
 
 @cache(behavior="recompute")
@@ -165,6 +166,7 @@ def web_report(
 @cache(behavior="recompute")
 def report_index(
     template_config: TemplateConfig,
+    run_output_dir_config: str,
     report_processed_images: str,
     report_pruned_images: str,
     report_pages: str,
@@ -175,7 +177,7 @@ def report_index(
     translation_report: str,
     metadata_report: str,
 ) -> str:
-    return render_template(
+    index_html = render_template(
         template_config,
         "templates/index.html",
         dict(
@@ -187,3 +189,32 @@ def report_index(
             metadata_report=metadata_report,
         ),
     )
+
+    # Compile Tailwind CSS for all report files
+    report_files = [
+        report_processed_images,
+        report_pruned_images,
+        report_pages,
+        report_config,
+        plate_report,
+        web_report,
+        translation_report,
+        metadata_report,
+        index_html,
+    ]
+
+    try:
+        compile_tailwind_for_reports(
+            output_dir=run_output_dir_config,
+            report_files=report_files,
+        )
+    except Exception as e:
+        import structlog
+
+        logger = structlog.get_logger()
+        logger.error(
+            "Failed to compile Tailwind CSS for reports",
+            error=str(e),
+        )
+
+    return index_html

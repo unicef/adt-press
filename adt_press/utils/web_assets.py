@@ -46,7 +46,13 @@ def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> No
         try:
             # Install the dictionary package (e.g., dictionary-en, dictionary-es, etc.)
             package_name = f"dictionary-{language}"
-            subprocess.run(["npm", "install", package_name], cwd=build_dir, check=True, capture_output=True, text=True)
+            subprocess.run(
+                ["npm", "install", package_name],
+                cwd=build_dir,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
 
             # Copy the dictionary files from node_modules to our dictionaries directory
             source_dict_dir = os.path.join(build_dir, "node_modules", package_name)
@@ -131,7 +137,13 @@ def install_fontawesome(run_output_dir_config: str) -> None:
 
     try:
         # Install Font Awesome via npm
-        subprocess.run(["npm", "install", "@fortawesome/fontawesome-free"], cwd=build_dir, check=True, capture_output=True, text=True)
+        subprocess.run(
+            ["npm", "install", "@fortawesome/fontawesome-free"],
+            cwd=build_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
 
         # Get Font Awesome source directory
         fa_source = os.path.join(build_dir, "node_modules", "@fortawesome", "fontawesome-free")
@@ -162,13 +174,21 @@ def run_npm_build(run_output_dir_config: str) -> None:
     build_dir = os.path.join(run_output_dir_config, "build")
 
     # Run npm install
-    subprocess.run(["npm", "install"], cwd=build_dir, check=True)
+    subprocess.run(
+        ["npm", "install"],
+        cwd=build_dir,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
     # Run tailwindcss build
     subprocess.run(
         ["npx", "tailwindcss", "-i", "../adt/assets/tailwind_css.css", "-o", "../adt/content/tailwind_output.css"],
         cwd=build_dir,
         check=True,
+        capture_output=True,
+        text=True,
     )
 
 

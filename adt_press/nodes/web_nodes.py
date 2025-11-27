@@ -182,6 +182,7 @@ def web_pages(
         for page, answer_coro in answer_tasks:
             answer_response = await answer_coro
             page.activity_answers = answer_response.answers
+            page.activity_reasoning = answer_response.reasoning
 
     run_async_task(generate_answers)
 
@@ -281,7 +282,11 @@ def package_adt_web(
     render_template(
         template_config,
         "nav.html",
-        dict(webpages=web_pages, texts=plate_texts),
+        dict(
+            webpages=web_pages,
+            texts=plate_texts,
+            sections=sections_by_id,  # Pass sections so template can check section types
+        ),
         output_name="adt/content/navigation/nav.html",
     )
 

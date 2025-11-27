@@ -51,7 +51,7 @@ def basename(text):
 def sanitize_generated_html(html_content: str) -> str:
     """
     Strip outer document wrappers and duplicated shell elements from LLM HTML
-    output.
+    output. Preserves HTML comments.
     """
     soup = BeautifulSoup(html_content, "html.parser")
 
@@ -77,7 +77,9 @@ def sanitize_generated_html(html_content: str) -> str:
 
     fragments: list[str] = []
     for child in list(root.children):
+        # Preserve HTML comments
         if isinstance(child, Comment):
+            fragments.append(f"<!--{child}-->")
             continue
         if isinstance(child, NavigableString):
             if not child.strip():

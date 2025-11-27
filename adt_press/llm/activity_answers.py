@@ -17,7 +17,7 @@ from adt_press.utils.languages import LANGUAGE_MAP
 class ActivityAnswersResponse(CleanTextBaseModel):
     reasoning: str = Field(..., description="Brief explanation of answer determination")
     answers: dict[str, str] = Field(
-        ...,
+        default_factory=dict,
         description="Dictionary mapping activity item IDs to their correct answers",
     )
 
