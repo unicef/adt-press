@@ -2,6 +2,7 @@ import os
 import shutil
 from typing import Any
 
+import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.llm.activity_answers import generate_activity_answers
@@ -24,6 +25,8 @@ from adt_press.utils.html import render_template, replace_images, replace_texts
 from adt_press.utils.image import compress_image_for_web
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
+
+logger = structlog.get_logger()
 
 
 def web_pages(
@@ -66,39 +69,88 @@ def web_pages(
             if not layout_type:
                 raise ValueError(f"Unknown layout type: {section.layout_type}")
 
+            # Derive section type info early
+            section_type_name = getattr(section.section_type, "name", str(section.section_type))
+            is_activity_section = section_type_name.startswith("activity_")
+
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":
                 strategy_name = layout_type.render_strategy
 
-            strategy = render_strategies_config.get(strategy_name)
-            if not strategy:
-                raise ValueError(f"Unknown render strategy: {strategy_name}")
+            # Guard: detect and handle mismatched section/layout assignments
+            layout_strategy_override = None
+            corrected_strategy = None
 
-            # Normalize section type to string for dict lookups
-            section_type_name = getattr(section.section_type, "name", str(section.section_type))
+            if is_activity_section and section.layout_type != "textbook_activity":
+                # Activity with wrong layout - force to activity HTML rendering
+                layout_strategy_override = "activity"
+                corrected_strategy = render_strategies_config.get("activity")
+                if corrected_strategy:
+                    strategy_name = "activity"
+                    strategy = corrected_strategy
+                    logger.warning(
+                        "⚠️ Layout mismatch corrected: activity section with non-activity layout",
+                        section_id=section.section_id,
+                        section_type=section_type_name,
+                        layout_type=section.layout_type,
+                        strategy_before=layout_type.render_strategy,
+                        corrected_to="activity (HTML)",
+                    )
+                else:
+                    logger.error(
+                        "Cannot correct activity section: 'activity' strategy not configured",
+                        section_id=section.section_id,
+                        section_type=section_type_name,
+                    )
+            elif not is_activity_section and section.layout_type == "textbook_activity":
+                # Non-activity with activity layout - need to pick an appropriate non-activity strategy
+                # Prefer html for complex layouts, two_column for simpler text content
+                if section_type_name in ("text_only", "boxed_text"):
+                    fallback_strategy_name = "two_column"
+                elif section_type_name in ("text_and_images", "novel_text_and_images"):
+                    fallback_strategy_name = "html"
+                else:
+                    fallback_strategy_name = "html"  # Default to html for unknown types
 
-            # Check if we have a specific activity config for this section type
-            # Activity configs are keyed by string names like "activity_open_ended_answer"
+                layout_strategy_override = fallback_strategy_name
+                corrected_strategy = render_strategies_config.get(fallback_strategy_name)
+
+                if corrected_strategy:
+                    strategy_name = fallback_strategy_name
+                    strategy = corrected_strategy
+                    logger.warning(
+                        "⚠️ Layout mismatch corrected: non-activity section with activity layout",
+                        section_id=section.section_id,
+                        section_type=section_type_name,
+                        layout_type=section.layout_type,
+                        strategy_before="activity",
+                        corrected_to=f"{fallback_strategy_name} ({corrected_strategy.render_type})",
+                    )
+                else:
+                    logger.error(
+                        "Cannot correct non-activity section: fallback strategy not configured",
+                        section_id=section.section_id,
+                        section_type=section_type_name,
+                        fallback_strategy=fallback_strategy_name,
+                    )
+
+            # Get strategy if not already set by correction above
+            if not corrected_strategy:
+                strategy = render_strategies_config.get(strategy_name)
+                if not strategy:
+                    raise ValueError(f"Unknown render strategy: {strategy_name}")
+
             specific_activity_config = activity_prompts_config.get(section_type_name)
-
-            # Cache key must use normalized string
             cache_key = f"{strategy_name}::{section_type_name}" if specific_activity_config else strategy_name
-
             config = cached_configs.get(cache_key)
             if not config:
                 if "model" in strategy.config and strategy.config["model"] == "default":
                     strategy.config["model"] = default_model_config
-
                 if strategy.render_type == "template":
                     config = TemplateRenderConfig.model_validate(strategy.config)
                 elif strategy.render_type == "html":
-                    # Special handling for activity sections
-                    if strategy_name == "activity":
-                        # Use specific activity config if available, otherwise fallback to config template_path
-                        if specific_activity_config:
-                            config = specific_activity_config
-                        else:
-                            config = HTMLPromptConfig.model_validate(strategy.config)
+                    if strategy_name == "activity" and is_activity_section and specific_activity_config:
+                        config = specific_activity_config
                     else:
                         config = HTMLPromptConfig.model_validate(strategy.config)
                 else:
@@ -106,15 +158,31 @@ def web_pages(
                 cached_configs[cache_key] = config
 
             if strategy.render_type == "html":
-                # For activities, use section type as strategy name to enable proper template selection
-                effective_strategy_name = strategy_name
                 if strategy_name == "activity":
-                    # If we have a specific config, use the section type name
-                    # Otherwise, fallback to "activity_other" for generic handling
-                    if specific_activity_config:
-                        effective_strategy_name = section_type_name
+                    if is_activity_section:
+                        effective_strategy_name = specific_activity_config and section_type_name or "activity"
                     else:
-                        effective_strategy_name = "activity_other"
+                        # This should not happen anymore since we correct the strategy above
+                        effective_strategy_name = "text_only"
+                        logger.warning(
+                            "Unexpected: activity strategy for non-activity section",
+                            section_id=section.section_id,
+                            section_type=section_type_name,
+                        )
+                else:
+                    # Non-activity HTML strategies use section type
+                    effective_strategy_name = section_type_name
+
+                # Only log when there's something interesting (mismatch, activity, or HTML generation)
+                if layout_strategy_override or is_activity_section or strategy_name in ("html", "activity"):
+                    logger.info(
+                        "🎨 Generating HTML web page",
+                        section_id=section.section_id,
+                        section_type=section_type_name,
+                        strategy=strategy_name,
+                        effective_strategy=effective_strategy_name,
+                        has_config=bool(specific_activity_config),
+                    )
 
                 web_pages.append(
                     generate_web_page_html(
@@ -122,6 +190,15 @@ def web_pages(
                     )
                 )
             elif strategy.render_type == "template":
+                # Only log template generation for activities or mismatches (less verbose for normal text)
+                if is_activity_section or layout_strategy_override:
+                    logger.info(
+                        "📄 Generating template web page",
+                        section_id=section.section_id,
+                        section_type=section_type_name,
+                        strategy=strategy_name,
+                    )
+
                 web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
 
         return await gather_with_limit(web_pages, 300)

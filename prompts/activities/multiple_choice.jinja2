@@ -89,9 +89,10 @@ You MUST respond with valid JSON containing exactly two fields:
 
 ```json
 {
-    "reasoning": "Brief explanation of your HTML generation decisions",
+  "reasoning": "Brief explanation of your HTML generation decisions (ALWAYS in English)",
     "content": "<div class=\"flex justify-center...\">...</div>"
 }
+IMPORTANT: Your reasoning MUST be written in English, regardless of the activity language. The HTML content itself should match the activity language.
 ```
 
 The `content` field must contain the complete HTML starting with the layout shell wrapper.
