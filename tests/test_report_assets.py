@@ -40,7 +40,7 @@ class TestCompileTailwindForReports:
             # Create dummy HTML files
             report1 = os.path.join(tmpdir, "report1.html")
             report2 = os.path.join(tmpdir, "report2.html")
-            
+
             Path(report1).write_text("<div class='text-xl font-bold'>Test</div>")
             Path(report2).write_text("<div class='bg-blue-500 p-4'>Test</div>")
 
@@ -51,7 +51,7 @@ class TestCompileTailwindForReports:
 
             with patch("subprocess.run") as mock_run:
                 mock_run.side_effect = [mock_npm, mock_tailwind]
-                
+
                 # Mock package.json copy
                 with patch("shutil.copy2"):
                     result = compile_tailwind_for_reports(
@@ -61,16 +61,16 @@ class TestCompileTailwindForReports:
 
             expected_css = os.path.join(tmpdir, "reports_tailwind.css")
             assert result == expected_css
-            
+
             # Verify subprocess was called correctly
             assert mock_run.call_count == 2
-            
+
             # Check npm install call
             npm_call = mock_run.call_args_list[0]
             assert npm_call[0][0] == ["npm", "install"]
             assert npm_call[1]["cwd"] == os.path.join(tmpdir, "build_reports")
             assert npm_call[1]["capture_output"] is True
-            
+
             # Check tailwindcss call
             tailwind_call = mock_run.call_args_list[1]
             assert "tailwindcss" in tailwind_call[0][0]
@@ -98,20 +98,13 @@ class TestCompileTailwindForReports:
             Path(report).write_text("<div>Test</div>")
 
             mock_npm = MagicMock(returncode=0, stdout="", stderr="")
-            mock_tailwind = MagicMock(
-                returncode=9, 
-                stdout="", 
-                stderr="Input file does not exist"
-            )
+            mock_tailwind = MagicMock(returncode=9, stdout="", stderr="Input file does not exist")
 
             with patch("subprocess.run") as mock_run:
                 mock_run.side_effect = [mock_npm, mock_tailwind]
-                
+
                 with patch("shutil.copy2"):
-                    with pytest.raises(
-                        RuntimeError, 
-                        match="Tailwind compilation failed"
-                    ):
+                    with pytest.raises(RuntimeError, match="Tailwind compilation failed"):
                         compile_tailwind_for_reports(
                             output_dir=tmpdir,
                             report_files=[report],
@@ -123,7 +116,7 @@ class TestCompileTailwindForReports:
             # Create existing CSS file
             css_path = os.path.join(tmpdir, "reports_tailwind.css")
             Path(css_path).write_text("/* existing css */")
-            
+
             report = os.path.join(tmpdir, "web_report.html")
             Path(report).write_text("<div class='container'>Content</div>")
 
@@ -132,13 +125,13 @@ class TestCompileTailwindForReports:
 
             with patch("subprocess.run") as mock_run:
                 mock_run.side_effect = [mock_npm, mock_tailwind]
-                
+
                 with patch("shutil.copy2"):
                     result = compile_tailwind_for_reports(
                         output_dir=tmpdir,
                         report_files=[report],
                     )
-                    
+
                     # Should return the CSS path
                     assert result == css_path
 
@@ -153,14 +146,14 @@ class TestCompileTailwindForReports:
 
             with patch("subprocess.run") as mock_run:
                 mock_run.side_effect = [mock_npm, mock_tailwind]
-                
+
                 with patch("shutil.copy2"):
                     with patch("shutil.rmtree") as mock_rmtree:
                         compile_tailwind_for_reports(
                             output_dir=tmpdir,
                             report_files=[report],
                         )
-                        
+
                         # Verify cleanup was attempted
                         mock_rmtree.assert_called_once()
                         build_dir = os.path.join(tmpdir, "build_reports")
@@ -182,6 +175,6 @@ class TestCompileTailwindForReports:
                                 output_dir=tmpdir,
                                 report_files=[report],
                             )
-                        
+
                         # Cleanup should still be attempted
                         mock_rmtree.assert_called_once()

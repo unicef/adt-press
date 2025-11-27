@@ -18,11 +18,7 @@ class TestReplaceImages:
     def test_replaces_image_src_and_alt(self):
         """Test that image src and alt are replaced."""
         html = '<img data-id="img_1" src="old.png" />'
-        replacements = {
-            "img_1": PlateImage(
-                image_id="img_1", image_path="new.png", caption_id="txt_1"
-            )
-        }
+        replacements = {"img_1": PlateImage(image_id="img_1", image_path="new.png", caption_id="txt_1")}
         texts = {"txt_1": PlateText(text_id="txt_1", text_type="paragraph", text="New caption")}
 
         result = replace_images(html, replacements, texts)
@@ -43,9 +39,7 @@ class TestReplaceImages:
     def test_handles_missing_caption_text(self):
         """Test handling when caption text doesn't exist."""
         html = '<img data-id="img_1" src="old.png" />'
-        replacements = {
-            "img_1": PlateImage(image_id="img_1", image_path="new.png", caption_id="txt_999")
-        }
+        replacements = {"img_1": PlateImage(image_id="img_1", image_path="new.png", caption_id="txt_999")}
         texts = {}
 
         result = replace_images(html, replacements, texts)
@@ -147,7 +141,7 @@ class TestSanitizeGeneratedHtml:
 
         soup = BeautifulSoup(result, "html.parser")
         feedback = soup.find(id="feedback")
-        
+
         assert feedback is not None
         assert feedback.get("aria-live") == "polite"
 
@@ -163,12 +157,12 @@ class TestSanitizeGeneratedHtml:
 
     def test_adds_aria_ids_to_open_ended_inputs(self):
         """Test that data-aria-id is added to input/textarea without ids."""
-        html = '''
+        html = """
         <section data-section-type="activity_open_ended_answer">
             <input type="text" />
             <textarea></textarea>
         </section>
-        '''
+        """
 
         result = sanitize_generated_html(html)
 
@@ -177,14 +171,14 @@ class TestSanitizeGeneratedHtml:
 
     def test_skips_inputs_with_existing_ids(self):
         """Test that inputs with existing id/name/data-aria-id are not modified."""
-        html = '''
+        html = """
         <section data-section-type="activity_open_ended_answer">
             <input type="text" id="has-id" />
             <input type="text" name="has-name" />
             <input type="text" data-aria-id="has-aria" />
             <input type="text" />
         </section>
-        '''
+        """
 
         result = sanitize_generated_html(html)
 
