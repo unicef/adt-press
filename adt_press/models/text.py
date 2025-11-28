@@ -13,21 +13,13 @@ class TextGroupType(str, enum.Enum):
 
 class TextType(str, enum.Enum):
    
-    # Simplified 1
-    book_title = "book_title"
-    book_subtitle = "book_subtitle"
-    book_author = "book_author"
-    section_heading = "section_heading"
-    section_text = "section_text"
-    standalone_text = "standalone_text"
-    image_associated_text = "image_associated_text"
-    image_overlay = "image_overlay"
+    # Simplified 2
+    heading_text = "heading_text"
+    paragraph_text = "paragraph_text"
+    floating_text = "floating_text"
     math = "math"
-    instruction_text = "instruction_text"
-    activity_input_placeholder_text = "activity_input_placeholder_text"
-    activity_option = "activity_option"
-    header_text = "header_text"
-    footer_text = "footer_text"
+    page_header = "page_header"
+    page_footer = "page_footer"
     page_number = "page_number"
     other = "other"
     
