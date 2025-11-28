@@ -11,12 +11,29 @@ Extract the text into a structure of groups of text, where each group has a "gro
 Within each group, list all the text that it contains. Text has a "text_type" and "text" field:
 
 "text_type" must only be one of:
-    - "heading_text": For chapter titles or section headings.
-    - "paragraph_text": For the main body of text within the section.
-    - "floating_text": For text that does not fall within a section or is separate from the flow, like a speech bubble or a text based design element.
+    - "book_title": For the title of the book. There can only be one book title for the entire book.
+    - "book_subtitle": For the subtitle of the book. There can only be one subtitle for the entire book.
+    - "book_author": For the author of the book.
+    - "book_metadata": For metadata about the book such as edition, publisher, year, series, language, etc.
+    - "chapter_title": For a chapter title that seems to be the title of a entirely new topic with sections within it. 
+    - "section_heading": For section headings under a chapter. 
+    - "section_text": For the main body of text within the section.
+    - "boxed_text": For text that appears alongside a section but within a box (often with a different background color).
+    - "hint": For hints that are provided to help the reader answer questions or solve problems.
+    - "instruction_text": For instructions that direct the reader to do something or complete an activity.
+    - "activity_number": For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections.
+    - "activity_title": For text that is the title of the activity (often following the activity number).
+    - "activity_option": For text that provides options for an activity like a multiple choice or matching activity.
+    - "activity_input_placeholder_text": For any text that will be used as a placeholder in an input field for a fill in the blank activity. E.g. "replace the word".
+    - "fill_in_the_blank": For text that includes blanks that the reader must fill in for a fill in the blank activity.
+    - "image_label": For text that labels a part of an image.
+    - "image_caption": For captions that describe the entire image.
+    - "image_overlay": For text that is overlaid on an image at a specific location, such as a speech bubble.
+    - "image_credit": For text that accompanies an image with information on photographer, copyright, etc.
     - "math": For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \( \) OR \[ \] OR $$.
-    - "page_header": For text that is at the top of a page with book metadata like page number, book title or chapter title.
-    - "page_footer": For text that appears in the footer of the page.
+    - "standalone_text": For text that does not fall within a section.
+    - "header_text": For text that appears in the header of the page.    
+    - "footer_text": For text that appears in the footer of the page.
     - "page_number": For text that indicates the page number of the page.
     - "other": For any other text that does not fit the above categories.
 
@@ -34,8 +51,11 @@ IMPORTANT:
   - IF A PHRASE OR SENTENCE CONTAINS MATH AND TEXT, THE MATH AND TEXT MUST BE SEPARATE ENTRIES IN THE ARRAY.
   - For math equations, extract and convert them into LaTeX format, providing only the LaTeX expression. Use commonly used special characters in your LaTeX expressions for example: \ {{ '{' }} {{ '}' }} $ % & # _ ^ ~ ` '
   - In the LaTex expressions, exclude characters like ð‘¥ð‘¥â
+  - If the page is a table of contents, the texts typically have types like "chapter_title", "section_heading", or "page_number". 
   - For lines in a table of contents, do not extract sequences of periods or page numbers. For example, "Chapter 5..........35" can just be extracted as "Chapter 5".
-
+  - A text like "Lesson 1", "Lesson 2", etc. is typically a "section_heading".  
+  - A text like "Chapter 1", "Chapter 2", etc. is typically a "chapter_title".
+  - A text like "Activity 1", "Activity 2", etc. is typically an "activity_title".
 
 If there is no text on the page, return:
     {{ '{' }}

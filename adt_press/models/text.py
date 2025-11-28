@@ -13,16 +13,32 @@ class TextGroupType(str, enum.Enum):
 
 class TextType(str, enum.Enum):
    
-    # Simplified 2
-    heading_text = "heading_text"
-    paragraph_text = "paragraph_text"
-    floating_text = "floating_text"
+    # Simplified 3
+    book_title = "book_title"
+    book_subtitle = "book_subtitle"
+    book_author = "book_author"
+    book_metadata = "book_metadata"
+    chapter_title = "chapter_title"
+    section_heading = "section_heading"
+    section_text = "section_text"
+    boxed_text = "boxed_text"
+    hint = "hint"
+    instruction_text = "instruction_text"
+    activity_number = "activity_number"
+    activity_title = "activity_title"
+    activity_option = "activity_option"
+    activity_input_placeholder_text = "activity_input_placeholder_text"
+    image_label = "image_label"
+    image_caption = "image_caption"
+    image_overlay = "image_overlay"
+    image_credit = "image_credit"
     math = "math"
-    page_header = "page_header"
-    page_footer = "page_footer"
+    standalone_text = "standalone_text"
+    header_text = "header_text"
+    footer_text = "footer_text"
     page_number = "page_number"
     other = "other"
-    
+
     
 class EasyReadText(BaseModel):
     easy_read_id: str
