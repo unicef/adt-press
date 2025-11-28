@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 import mlflow
+import os
 
 from adt_eval.base import BaseEvaluator
 from adt_press.llm.text_extraction import get_page_text
@@ -37,7 +38,10 @@ class TextTypeEvaluator(BaseEvaluator):
 
         page_image_path = self.download_azure_image(page_image_url, f"text_extraction_page_{tc['id']}.png")
 
-        truth = tc["annotations"][0]["result"]
+        # Get the most recent annotation
+        latest_annotation = max(tc['annotations'], key=lambda x: x['updated_at'])
+        truth = [i["result"] for i in tc["annotations"] if i['id']==latest_annotation['id']][0]
+    
         result = {
             "id": tc["id"],
             "book_title": book_title,
@@ -125,17 +129,17 @@ class TextTypeEvaluator(BaseEvaluator):
 
         for match in matches:
             mlflow.log_table(match, f"results/{step}.json")
-
+        
         # Calculate score
         correct_matches = sum(1 for m in matches if m["expected"] == m["actual"])
         score = correct_matches / len(matches) if matches else 1.0
 
         result.update(
             {
-                "score": score,
-                "score_count": len(matches),
-                "step": step,
-                "matches": matches,
+                "score": score,                 # Fraction of correct text type matches
+                "score_count": len(matches),    # Number of text type matches attempted
+                "step": step,                   # Test case number
+                "matches": matches,             # List of text type match attempts
             }
         )
 
