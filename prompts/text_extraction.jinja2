@@ -5,20 +5,20 @@ You are an expert at extracting text from a textbook. I have attached a page fro
     - "book_title": For the title of the book. There can only be one book title for the entire book.
     - "book_subtitle": For the subtitle of the book. There can only be one subtitle for the entire book.
     - "book_author": For the author of the book.
-    - "chapter_title": For a chapter title that seems to be the title of a entirely new topic with sections within it. If nothing seems like a chapter title, this should be "NONE".
-    - "section_heading": For section headings under a chapter. If there is no section heading, this should be "NONE".
-    - "section_text": For the main body of text within the section heading.
-    - "boxed_text": For text that standalones from the regular material and is surrounded in a colored box.
+    - "chapter_title": For a chapter title that seems to be the title of a entirely new topic with sections within it. 
+    - "section_heading": For section headings under a chapter. 
+    - "section_text": For the main body of text within the section.
+    - "boxed_text": For text that stands alone from the regular material within a box (often with a different background color).
     - "hint": For hints that are provided to help the reader answer questions or solve problems.
     - "instruction_text": For instructions that direct the reader to do something or complete an activity.
     - "activity_number": For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections.
     - "activity_option": For text that provides options for an activity like a multiple choice or matching activity.
     - "fill_in_the_blank": For text that includes blanks that the reader must fill in for a fill in the blank activity.
-    - "image_label": For text that definitely accompany an image to augment it as a label.
-    - "image_caption": For captions that only describe the image.
+    - "image_label": For short text that accompanies an image to augment it as a label.
+    - "image_caption": For longer captions that describe the image.
     - "image_overlay": For text that is overlaid on an image at a specific location.
     - "math": For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \( \) OR \[ \] OR $$.
-    - "standalone_text": For text that do not fall within a section.
+    - "standalone_text": For text that does not fall within a section.
     - "page_number": For text that indicates the page number of the page.
     - "activity_input_placeholder_text": For any text that will be used as a placeholder in an input field for a fill in the blank activity. E.g. "replace the word".
     - "footer_text": For text that appears in the footer of the page.
@@ -26,7 +26,7 @@ You are an expert at extracting text from a textbook. I have attached a page fro
 
     IMPORTANT:
     - YOU MUST EXTRACT EVERY SINGLE TEXT YOU SEE IN THE PAGE. EVERY SINGLE TEXT. DO NOT LEAVE ANY TEXT OUT.
-    - THE TEXT CAN BE IN ANY LANGUAGE, THEY MUST ALL BE EXTRACTED.
+    - THE TEXT CAN BE IN ANY LANGUAGE, IT MUST ALL BE EXTRACTED.
     - Break up the text into INDIVIDUAL LOGICAL PHRASES OR SENTENCES of text.
     - Each logical phrase or sentence of text MUST be a single entry in the array. DO NOT give an entire paragraph as a single entry.
     - You must also arrange the entries in the "data" array in the order that you think they should be logically read by a person.
@@ -35,7 +35,9 @@ You are an expert at extracting text from a textbook. I have attached a page fro
     - ANY AND ALL MATH MUST BE EXTRACTED INTO A SEPARATE ENTRY IN THE ARRAY AND LABELLED WITH type "math". THIS ENTRY MUST ONLY BE THE MATH EXPRESSION, NO TEXT.
     - IF A PHRASE OR SENTENCE CONTAINS MATH AND TEXT, THE MATH AND TEXT MUST BE SEPARATE ENTRIES IN THE ARRAY.
     - For math equations, extract and convert them into LaTeX format, providing only the LaTeX expression. Use commonly used special characters in your LaTeX expressions for example: \ {{ '{' }} {{ '}' }} $ % & # _ ^ ~ ` '
-    - In the LaTex expressions, exclude characters like ð‘¥ð‘¥â
+    - In the LaTex expressions, exclude characters like ð‘¥ð‘¥â.
+    - The entries in a table of contents are typically "chapter_title", "section_heading", or "page_number".
+    - The entries on the first page of the book are typically "book_title", "book_subtitle", and "book_author".
 
     If there is no text on the page, return:
     {{ '{' }}
@@ -46,7 +48,10 @@ You are an expert at extracting text from a textbook. I have attached a page fro
 {% endchat %}
 
 {% chat role="user" %}
-The following text is extracted from the PDF with fitz (it might be empty):
+The page number is:
+{{ page.page_number }}
+
+The following text is extracted from the PDF with PyMuPDF (it might be empty):
 {{ page.text }}
 
 The following image is the page from the PDF to extract the text from.
