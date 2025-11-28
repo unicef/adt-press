@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 from banks import Prompt
-from bs4 import BeautifulSoup, Comment, NavigableString
+from bs4 import BeautifulSoup
 from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
@@ -9,7 +9,6 @@ from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.html import sanitize_generated_html
 from adt_press.utils.languages import LANGUAGE_MAP
 
 
@@ -38,46 +37,34 @@ class GenerationResponse(CleanTextBaseModel):
         # Get valid IDs from context
         text_ids = set()
         image_ids = set()
-        allowed_prefixes = []
         if info.context:
             text_ids.update(info.context.get("text_ids", []))
             image_ids.update(info.context.get("image_ids", []))
-            allowed_prefixes = info.context.get(
-                "allowed_new_text_id_prefixes",
-                [],
-            )
             section_type = info.context.get("section_type")
         else:
             section_type = None
 
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
-            # Get direct text content, excluding HTML comments
-            direct_text_nodes = []
-            for child in element.children:
-                # Skip comments - they're allowed
-                if isinstance(child, Comment):
-                    continue
-                # Only include NavigableString (text) that's not a comment
-                if isinstance(child, NavigableString) and not isinstance(child, Comment):
-                    direct_text_nodes.append(str(child))
-
-            direct_text = "".join(direct_text_nodes).strip()
+            # Check if element has direct text content (not just whitespace)
+            direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
 
             if direct_text:
                 data_id = element.get("data-id")
                 if not data_id:
                     raise ValueError(
                         (
-                            f"HTML element '{element.name}' contains text but "
-                            "is missing required data-id attribute. "
+                            "HTML element "
+                            f"'{element.name}' contains text but is missing "
+                            "required data-id attribute. "
                             f"Text content: '{direct_text[:50]}...'"
                         )
                     )
 
-                is_allowed_new_id = any(data_id.startswith(prefix) for prefix in allowed_prefixes)
+                # Allow activity-generated text IDs (activity_gen_*) or known text IDs
+                is_generated_activity_text = data_id.startswith("activity_gen_")
 
-                if text_ids and data_id not in text_ids and not is_allowed_new_id:
+                if data_id not in text_ids and not is_generated_activity_text:
                     raise ValueError(
                         (
                             f"HTML element '{element.name}' has invalid "
@@ -145,7 +132,6 @@ async def generate_web_page_html(
     language_code: str,
 ) -> WebPage:
     language = LANGUAGE_MAP[language_code]
-    generated_text_prefix = "activity_gen_"
 
     context = dict(
         section=section,
@@ -165,21 +151,21 @@ async def generate_web_page_html(
     validation_context = {
         "text_ids": [t.text_id for t in texts],
         "image_ids": [i.image_id for i in images],
-        "allowed_new_text_id_prefixes": [generated_text_prefix],
         "section_type": section.section_type.value,
     }
+
+    messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
     response: GenerationResponse = await client.chat.completions.create(
         model=config.model,
         response_model=GenerationResponse,
-        messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
+        messages=messages,
         max_retries=config.max_retries,
         context=validation_context,
     )
 
-    sanitized_content = sanitize_generated_html(response.content)
-
-    soup = BeautifulSoup(sanitized_content, "html.parser")
+    # Extract activity-generated texts from the HTML (for activities only)
+    soup = BeautifulSoup(response.content, "html.parser")
     known_ids = set(validation_context["text_ids"])
     generated_texts: list[PlateText] = []
 
@@ -188,26 +174,28 @@ async def generate_web_page_html(
         if not data_id or data_id in known_ids:
             continue
 
-        text_value = element.get_text(" ", strip=True)
-        if not text_value:
-            continue
+        # Only extract activity-generated texts (activity_gen_* prefix)
+        if data_id.startswith("activity_gen_"):
+            text_value = element.get_text(" ", strip=True)
+            if text_value:
+                generated_texts.append(
+                    PlateText(
+                        text_id=data_id,
+                        text_type="activity_generated",
+                        text=text_value,
+                    )
+                )
+                known_ids.add(data_id)
 
-        generated_texts.append(
-            PlateText(
-                text_id=data_id,
-                text_type="activity_generated",
-                text=text_value,
-            )
-        )
-        known_ids.add(data_id)
-
+    # Combine original text IDs with generated ones, preserving order
     combined_text_ids = list(dict.fromkeys([t.text_id for t in texts] + [t.text_id for t in generated_texts]))
 
+    # The content is already sanitized and validated by the field_validator
     return WebPage(
         text_id=texts[0].text_id if texts else "",
         section_id=section.section_id,
         reasoning=response.reasoning,
-        content=sanitized_content,
+        content=response.content,
         image_ids=[i.image_id for i in images],
         text_ids=combined_text_ids,
         render_strategy=render_strategy,

@@ -26,6 +26,9 @@ easy_read_strategy: none
 # our caption strategy, either llm or none
 caption_strategy: none
 
+# our activity generation strategy, either llm or none
+activity_strategy: none
+
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
 
@@ -208,64 +211,69 @@ prompts:
   activity_sorting:
     model: default
     template_path: prompts/activities/sorting.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_matching:
     model: default
     template_path: prompts/activities/matching.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_fill_in_a_table:
     model: default
     template_path: prompts/activities/fill_in_a_table.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_true_false:
     model: default
     template_path: prompts/activities/true_false.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_open_ended_answer:
     model: default
     template_path: prompts/activities/open_ended_answer.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_fill_in_the_blank:
     model: default
     template_path: prompts/activities/fill_in_the_blank.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_multiple_choice:
     model: default
     template_path: prompts/activities/multiple_choice.jinja2
-    max_retries: 2
+    max_retries: 0
 
   # Activity-specific answer generation prompts
     
   activity_sorting_answers:
     model: default
     template_path: prompts/activities/answers/sorting.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_matching_answers:
     model: default
     template_path: prompts/activities/answers/matching.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_true_false_answers:
     model: default
     template_path: prompts/activities/answers/true_false.jinja2
-    max_retries: 2
+    max_retries: 0
     
   activity_fill_in_the_blank_answers:
     model: default
     template_path: prompts/activities/answers/fill_in_the_blank.jinja2
-    max_retries: 2
+    max_retries: 0
+    
+  activity_fill_in_a_table_answers:
+    model: default
+    template_path: prompts/activities/answers/fill_in_a_table.jinja2
+    max_retries: 0
     
   activity_multiple_choice_answers:
     model: default
     template_path: prompts/activities/answers/multiple_choice.jinja2
-    max_retries: 2
+    max_retries: 0
 
   speech_generation:
     model: gpt-4o-mini-tts

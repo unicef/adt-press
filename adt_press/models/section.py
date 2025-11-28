@@ -25,7 +25,7 @@ class SectionType(str, enum.Enum):
     # activity_labeling = "activity_labeling"
     # activity_multiselect = "activity_multiselect"
     activity_sorting = "activity_sorting"
-    activity_other = "activity_other"
+    # activity_other = "activity_other"
     other = "other"
 
 

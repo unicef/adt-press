@@ -34,29 +34,20 @@ async def generate_activity_answers(
     config: PromptConfig,
     section: PlateSection,
     texts: list[PlateText],
-    activity_html: str,
+    content: str,
     language_code: str,
-) -> ActivityAnswer:
-    """
-    Generate correct answers for an interactive activity.
-
-    Args:
-        config: Configuration containing model and template path
-        section: The section metadata (includes section_type)
-        texts: List of texts from the section for context
-        activity_html: The generated HTML content of the activity
-        language_code: Language code for the activity
-
-    Returns:
-        ActivityAnswer domain model with section_id, reasoning and answers dict
-    """
+) -> ActivityAnswersResponse:
     language = LANGUAGE_MAP[language_code]
 
     context = dict(
-        section=section.model_dump(),
-        texts=[t.model_dump() for t in texts],
-        activity_html=activity_html,
+        section=dict(
+            section_id=section.section_id,
+            section_type=section.section_type.value,
+        ),
+        texts=[dict(text_id=t.text_id, text=t.text, text_type=t.text_type) for t in texts],
+        activity_html=content,
         language=language,
+        examples=[],  # Prevent Undefined error in templates that iterate over examples
     )
 
     template_path = config.template_path
@@ -75,7 +66,7 @@ async def generate_activity_answers(
     if not response.answers:
         # Extract all data-activity-item values from HTML
         item_pattern = r'data-activity-item="([^"]+)"'
-        item_keys = re.findall(item_pattern, activity_html)
+        item_keys = re.findall(item_pattern, content)
 
         if item_keys:
             # Build answers dict with all keys and empty string values

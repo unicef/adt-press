@@ -1,6 +1,7 @@
 import os
 
 from hamilton.function_modifiers import cache
+from hamilton.function_modifiers import config as when_config
 from omegaconf import DictConfig
 from pydantic import BaseModel
 
@@ -170,7 +171,8 @@ def activity_answers_config(config: DictConfig) -> PromptConfig:
 
 
 @cache(behavior="recompute")
-def activity_prompts_config(config: DictConfig) -> dict[str, HTMLPromptConfig]:
+@when_config.when(activity_strategy="llm")
+def activity_prompts_config__llm(config: DictConfig) -> dict[str, HTMLPromptConfig]:
     """Load activity-specific prompt configs into a dictionary keyed by section type."""
     activity_types = [
         "activity_sorting",
@@ -193,7 +195,15 @@ def activity_prompts_config(config: DictConfig) -> dict[str, HTMLPromptConfig]:
 
 
 @cache(behavior="recompute")
-def activity_answers_prompts_config(config: DictConfig) -> dict[str, PromptConfig]:
+@when_config.when(activity_strategy="none")
+def activity_prompts_config__none(config: DictConfig) -> dict[str, HTMLPromptConfig]:
+    """Return empty dict when activity generation is disabled."""
+    return {}
+
+
+@cache(behavior="recompute")
+@when_config.when(activity_strategy="llm")
+def activity_answers_prompts_config__llm(config: DictConfig) -> dict[str, PromptConfig]:
     """Load activity-specific answer generation prompt configs into a dictionary keyed by section type."""
     activity_types = [
         "activity_sorting",
@@ -214,6 +224,13 @@ def activity_answers_prompts_config(config: DictConfig) -> dict[str, PromptConfi
             )
 
     return answer_configs
+
+
+@cache(behavior="recompute")
+@when_config.when(activity_strategy="none")
+def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, PromptConfig]:
+    """Return empty dict when activity answer generation is disabled."""
+    return {}
 
 
 @cache(behavior="recompute")
@@ -255,6 +272,7 @@ def strategy_config(config: DictConfig) -> dict[str, str]:
             "glossary_strategy": config["glossary_strategy"],
             "explanation_strategy": config["explanation_strategy"],
             "easy_read_strategy": config["easy_read_strategy"],
+            "activity_strategy": config["activity_strategy"],
             "speech_strategy": config["speech_strategy"],
         }
     )

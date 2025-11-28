@@ -11,7 +11,7 @@ IMPORTANT, THE GENERATED HTML MUST:
 1. You may exclude text if it does not makes sense in the section. The entire text and its text id provided must be excluded.
 2. THERE MUST BE ONE AND ONLY ONE `<section />` IN THE HTML.
 3. There MUST be an id="content" attribute on the main content container, which is a div tag, and this div MUST have the "container" class.
-4. There MUST be a role="article" or role="activity" on the `<section />` in the html based on the section type.
+4. There MUST be a role="article" on the `<section />` in the html based on the section type.
 5. There MUST be a data-section-type attribute on the `<section />` with the value of the section type provided (e.g., data-section-type="text-and-images").
 6. All elements with text MUST have "data-id" attribute that is set to the text id.
 7. All elements that you add a data-id="text-x-x" attribute to MUST have a string as their immediate children AND NOT ANY OTHER HTML TAGS. For example,
@@ -24,6 +24,7 @@ LANGUAGE: {{ language }}.
 10. DO NOT USE ANY OTHER DATA-IDS OTHER THAN THE ONES I PROVIDED.
 11. RETURN ONLY AN HTML FRAGMENT. DO NOT OUTPUT `<!DOCTYPE>`, `<html>`, `<head>`, OR `<body>` TAGS.
 12. RESPOND WITH VALID HTML MARKUP ONLY. DO NOT INCLUDE COMMENTS, EXPLANATIONS, OR TEXT OUTSIDE OF HTML TAGS.
+13. **IF YOU NEED TO PROVIDE ANY REASONING OR EXPLANATION, IT MUST BE IN ENGLISH** (even if the content language is different).
 
 IMPORTANT NOTES FOR IMAGE TAGS:
 1. Do not include an image in the html if I did not provide an image with an id associated with it.

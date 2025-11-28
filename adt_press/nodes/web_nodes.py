@@ -3,7 +3,7 @@ import shutil
 from typing import Any
 
 import structlog
-from hamilton.function_modifiers import cache
+from hamilton.function_modifiers import cache, config
 
 from adt_press.llm.activity_answers import generate_activity_answers
 from adt_press.llm.web_generation_html import generate_web_page_html
@@ -78,61 +78,64 @@ def web_pages(
                 strategy_name = layout_type.render_strategy
 
             # Guard: detect and handle mismatched section/layout assignments
-            layout_strategy_override = None
             corrected_strategy = None
 
-            if is_activity_section and section.layout_type != "textbook_activity":
-                # Activity with wrong layout - force to activity HTML rendering
-                layout_strategy_override = "activity"
+            # Check if activity generation is enabled by looking at activity_prompts_config
+            activity_strategy_enabled = len(activity_prompts_config) > 0
+
+            if is_activity_section and section.layout_type != "textbook_activity" and activity_strategy_enabled:
+                # Activity with wrong layout - force to activity HTML rendering (only if activity_strategy=llm)
                 corrected_strategy = render_strategies_config.get("activity")
                 if corrected_strategy:
-                    strategy_name = "activity"
-                    strategy = corrected_strategy
                     logger.warning(
-                        "⚠️ Layout mismatch corrected: activity section with non-activity layout",
+                        "Layout mismatch corrected",
                         section_id=section.section_id,
                         section_type=section_type_name,
                         layout_type=section.layout_type,
-                        strategy_before=layout_type.render_strategy,
-                        corrected_to="activity (HTML)",
+                        corrected_to="activity",
                     )
+                    strategy_name = "activity"
+                    strategy = corrected_strategy
+            elif is_activity_section and not activity_strategy_enabled:
+                # Activity section but activity_strategy=none - treat as regular content
+                if section.layout_type == "textbook_activity":
+                    # Has activity layout but should be rendered as regular content
+                    fallback_strategy_name = "html"
                 else:
-                    logger.error(
-                        "Cannot correct activity section: 'activity' strategy not configured",
+                    # Use the layout's render strategy
+                    fallback_strategy_name = layout_type.render_strategy if layout_type.render_strategy != "activity" else "html"
+
+                corrected_strategy = render_strategies_config.get(fallback_strategy_name)
+                if corrected_strategy:
+                    logger.info(
+                        "Activity rendering disabled, using regular content strategy",
                         section_id=section.section_id,
                         section_type=section_type_name,
+                        layout_type=section.layout_type,
+                        using_strategy=fallback_strategy_name,
                     )
+                    strategy_name = fallback_strategy_name
+                    strategy = corrected_strategy
             elif not is_activity_section and section.layout_type == "textbook_activity":
-                # Non-activity with activity layout - need to pick an appropriate non-activity strategy
-                # Prefer html for complex layouts, two_column for simpler text content
+                # Non-activity with activity layout - pick appropriate non-activity strategy
                 if section_type_name in ("text_only", "boxed_text"):
                     fallback_strategy_name = "two_column"
                 elif section_type_name in ("text_and_images", "novel_text_and_images"):
                     fallback_strategy_name = "html"
                 else:
-                    fallback_strategy_name = "html"  # Default to html for unknown types
+                    fallback_strategy_name = "html"
 
-                layout_strategy_override = fallback_strategy_name
                 corrected_strategy = render_strategies_config.get(fallback_strategy_name)
-
                 if corrected_strategy:
-                    strategy_name = fallback_strategy_name
-                    strategy = corrected_strategy
                     logger.warning(
-                        "⚠️ Layout mismatch corrected: non-activity section with activity layout",
+                        "Layout mismatch corrected",
                         section_id=section.section_id,
                         section_type=section_type_name,
                         layout_type=section.layout_type,
-                        strategy_before="activity",
-                        corrected_to=f"{fallback_strategy_name} ({corrected_strategy.render_type})",
+                        corrected_to=fallback_strategy_name,
                     )
-                else:
-                    logger.error(
-                        "Cannot correct non-activity section: fallback strategy not configured",
-                        section_id=section.section_id,
-                        section_type=section_type_name,
-                        fallback_strategy=fallback_strategy_name,
-                    )
+                    strategy_name = fallback_strategy_name
+                    strategy = corrected_strategy
 
             # Get strategy if not already set by correction above
             if not corrected_strategy:
@@ -162,27 +165,9 @@ def web_pages(
                     if is_activity_section:
                         effective_strategy_name = specific_activity_config and section_type_name or "activity"
                     else:
-                        # This should not happen anymore since we correct the strategy above
                         effective_strategy_name = "text_only"
-                        logger.warning(
-                            "Unexpected: activity strategy for non-activity section",
-                            section_id=section.section_id,
-                            section_type=section_type_name,
-                        )
                 else:
-                    # Non-activity HTML strategies use section type
                     effective_strategy_name = section_type_name
-
-                # Only log when there's something interesting (mismatch, activity, or HTML generation)
-                if layout_strategy_override or is_activity_section or strategy_name in ("html", "activity"):
-                    logger.info(
-                        "🎨 Generating HTML web page",
-                        section_id=section.section_id,
-                        section_type=section_type_name,
-                        strategy=strategy_name,
-                        effective_strategy=effective_strategy_name,
-                        has_config=bool(specific_activity_config),
-                    )
 
                 web_pages.append(
                     generate_web_page_html(
@@ -190,15 +175,6 @@ def web_pages(
                     )
                 )
             elif strategy.render_type == "template":
-                # Only log template generation for activities or mismatches (less verbose for normal text)
-                if is_activity_section or layout_strategy_override:
-                    logger.info(
-                        "📄 Generating template web page",
-                        section_id=section.section_id,
-                        section_type=section_type_name,
-                        strategy=strategy_name,
-                    )
-
                 web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
 
         return await gather_with_limit(web_pages, 300)
@@ -214,33 +190,43 @@ def web_pages(
     for page in pages:
         page.content = replace_images(page.content, image_urls, texts_by_id)
 
-    # Generate answers for activity sections
+    return pages
+
+
+@config.when(activity_strategy="llm")
+def activity_answers__llm(
+    web_pages: list[WebPage],
+    plate: Plate,
+    activity_answers_prompts_config: dict[str, PromptConfig],
+    plate_language_config: str,
+) -> list[WebPage]:
+    """Generate answers for activity sections using LLM."""
     activity_types = {
         "activity_sorting",
         "activity_multiple_choice",
-        # "activity_quiz",
         "activity_true_false",
         "activity_fill_in_the_blank",
+        "activity_fill_in_a_table",
         "activity_matching",
-        # Note: activity_open_ended_answer and activity_fill_in_a_table are intentionally excluded - no predefined answers
     }
 
     async def generate_answers():
         answer_tasks = []
         section_by_id = {s.section_id: s for s in plate.sections}
 
-        for page in pages:
+        for page in web_pages:
             section = section_by_id.get(page.section_id)
             if section:
                 section_type_name = getattr(section.section_type, "name", section.section_type)
 
-                # Only generate answers for activity types in the allowed list
                 if section_type_name in activity_types:
+                    # Include both original texts and activity-generated texts
                     section_texts = [t for t in plate.texts if t.text_id in page.text_ids]
+                    section_texts.extend(page.generated_texts)
                     answer_config = activity_answers_prompts_config.get(section_type_name)
 
                     if not answer_config:
-                        continue  # no answers for this activity type
+                        continue
 
                     answer_tasks.append(
                         (
@@ -255,20 +241,30 @@ def web_pages(
                         )
                     )
 
-        # Generate all answers in parallel
         for page, answer_coro in answer_tasks:
             answer_response = await answer_coro
             page.activity_answers = answer_response.answers
             page.activity_reasoning = answer_response.reasoning
 
     run_async_task(generate_answers)
+    return web_pages
 
-    return pages
+
+@config.when(activity_strategy="none")
+def activity_answers__none(
+    web_pages: list[WebPage],
+    plate: Plate,
+    activity_answers_prompts_config: dict[str, PromptConfig],
+    plate_language_config: str,
+) -> list[WebPage]:
+    """Skip activity answer generation."""
+    return web_pages
 
 
-def activity_generated_texts(web_pages: list[WebPage]) -> dict[str, PlateText]:
+def activity_generated_texts(activity_answers: list[WebPage]) -> dict[str, PlateText]:
+    """Extract activity-generated texts from web pages after activity processing."""
     generated: dict[str, PlateText] = {}
-    for page in web_pages:
+    for page in activity_answers:
         for text in page.generated_texts:
             generated[text.text_id] = text
     return generated
@@ -284,10 +280,12 @@ def package_adt_web(
     plate_translations: dict[str, dict[str, str]],
     plate_glossary_translations: dict[str, list[GlossaryItem]],
     speech_files: dict[str, dict[str, SpeechFile]],
-    web_pages: list[WebPage],
+    activity_answers: list[WebPage],
     activity_generated_texts: dict[str, PlateText],
     strategy_config: dict[str, str],
 ) -> str:
+    """Package ADT web content with activity answers."""
+    web_pages = activity_answers  # Alias for compatibility
     default_language = list(plate_translations.keys())[0]
 
     adt_dir = os.path.join(run_output_dir_config, "adt")
@@ -362,7 +360,7 @@ def package_adt_web(
         dict(
             webpages=web_pages,
             texts=plate_texts,
-            sections=sections_by_id,  # Pass sections so template can check section types
+            sections=sections_by_id,
         ),
         output_name="adt/content/navigation/nav.html",
     )
@@ -411,7 +409,6 @@ def package_adt_web(
         }
         write_json_file(os.path.join(locale_dir, "glossary.json"), glossary)
 
-        write_json_file(os.path.join(locale_dir, "glossary.json"), glossary)
     # write our config file
     config_output_path = "adt/assets/config.json"
     config_dir = os.path.dirname(os.path.join(run_output_dir_config, config_output_path))
