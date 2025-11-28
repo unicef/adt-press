@@ -45,6 +45,9 @@ def web_pages(
 
     cached_configs: dict[str, Any] = {}
 
+    # Check if activity generation is enabled by looking at activity_prompts_config
+    activity_strategy_enabled = len(activity_prompts_config) > 0
+
     async def generate_pages():
         web_pages = []
         for section in plate.sections:
@@ -79,9 +82,6 @@ def web_pages(
 
             # Guard: detect and handle mismatched section/layout assignments
             corrected_strategy = None
-
-            # Check if activity generation is enabled by looking at activity_prompts_config
-            activity_strategy_enabled = len(activity_prompts_config) > 0
 
             if is_activity_section and section.layout_type != "textbook_activity" and activity_strategy_enabled:
                 # Activity with wrong layout - force to activity HTML rendering (only if activity_strategy=llm)
@@ -169,9 +169,20 @@ def web_pages(
                 else:
                     effective_strategy_name = section_type_name
 
+                # Determine if this specific page should use activity rendering
+                page_activity_rendering = activity_strategy_enabled and is_activity_section
+
                 web_pages.append(
                     generate_web_page_html(
-                        effective_strategy_name, config, config.examples, section, groups, texts, images, plate_language_config
+                        render_strategy=effective_strategy_name,
+                        config=config,
+                        examples=config.examples,
+                        section=section,
+                        groups=groups,
+                        texts=texts,
+                        images=images,
+                        language_code=plate_language_config,
+                        activity_rendering_enabled=page_activity_rendering,
                     )
                 )
             elif strategy.render_type == "template":

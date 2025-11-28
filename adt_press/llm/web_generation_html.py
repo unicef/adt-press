@@ -41,8 +41,11 @@ class GenerationResponse(CleanTextBaseModel):
             text_ids.update(info.context.get("text_ids", []))
             image_ids.update(info.context.get("image_ids", []))
             section_type = info.context.get("section_type")
+            # Check if activity rendering is enabled
+            activity_rendering_enabled = info.context.get("activity_rendering_enabled", True)
         else:
             section_type = None
+            activity_rendering_enabled = True
 
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
@@ -107,10 +110,12 @@ class GenerationResponse(CleanTextBaseModel):
             if data_section_type != section_type:
                 raise ValueError((f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'."))
 
-            if section_type.startswith("activity_"):
+            # Determine expected role based on section type AND activity rendering status
+            if section_type.startswith("activity_") and activity_rendering_enabled:
                 expected_role = "activity"
             else:
                 expected_role = "article"
+
             role = section_element.get("role")
             if role != expected_role:
                 raise ValueError((f"Section role attribute is invalid. Expected '{expected_role}', got '{role}'."))
@@ -130,6 +135,7 @@ async def generate_web_page_html(
     texts: list[PlateText],
     images: list[PlateImage],
     language_code: str,
+    activity_rendering_enabled: bool = True,
 ) -> WebPage:
     language = LANGUAGE_MAP[language_code]
 
@@ -152,6 +158,7 @@ async def generate_web_page_html(
         "text_ids": [t.text_id for t in texts],
         "image_ids": [i.image_id for i in images],
         "section_type": section.section_type.value,
+        "activity_rendering_enabled": activity_rendering_enabled,
     }
 
     messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
