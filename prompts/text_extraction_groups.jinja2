@@ -14,23 +14,18 @@ Within each group, list all the text that it contains. Text has a "text_type" an
     - "book_title": For the title of the book. There can only be one book title for the entire book.
     - "book_subtitle": For the subtitle of the book. There can only be one subtitle for the entire book.
     - "book_author": For the author of the book.
-    - "chapter_title": For a chapter title that seems to be the title of a entirely new topic with sections within it. 
-    - "section_heading": For section headings under a chapter. 
-    - "section_text": For the main body of text within the section.
-    - "boxed_text": For text that stands alone from the regular material within a box (often with a different background color).
-    - "hint": For hints that are provided to help the reader answer questions or solve problems.
-    - "instruction_text": For instructions that direct the reader to do something or complete an activity.
-    - "activity_number": For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections.
-    - "activity_option": For text that provides options for an activity like a multiple choice or matching activity.
-    - "fill_in_the_blank": For text that includes blanks that the reader must fill in for a fill in the blank activity.
-    - "image_label": For short text that accompanies an image to augment it as a label.
-    - "image_caption": For longer captions that describe the image.
-    - "image_overlay": For text that is overlaid on an image at a specific location.
+    - "section_heading": For text that introduces a new chapter, section, subsection, or topic.
+    - "section_text": For the main body of text within the section heading.
+    - "standalone_text": For text that does not fall within a section and/or stands alone from the regular material. It may be surrounded in a colored box.
+    - "image_associated_text": For text that accompanies or is directly associated with an image to label, explain, or contextualize it. This includes figure numbers, titles, captions, descriptions, copyright information, and credits.
+    - "image_overlay":  For text that is overlaid on an image at a specific location.
     - "math": For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \( \) OR \[ \] OR $$.
-    - "standalone_text": For text that does not fall within a section.
-    - "page_number": For text that indicates the page number of the page.
+    - "instruction_text":  For instructions that direct the reader to do something or complete an activity, including hints that are provided to help the reader answer questions or solve problems.    
     - "activity_input_placeholder_text": For any text that will be used as a placeholder in an input field for a fill in the blank activity. E.g. "replace the word".
+    - "activity_option": For text that provides options for an activity like a multiple choice or matching activity.
+    - "header_text": For text that is at the top of a page with book metadata like page number, book title or chapter title.
     - "footer_text": For text that appears in the footer of the page.
+    - "page_number": For text that indicates the page number of the page.
     - "other": For any other text that does not fit the above categories.
 
 IMPORTANT:

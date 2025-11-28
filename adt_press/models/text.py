@@ -12,28 +12,26 @@ class TextGroupType(str, enum.Enum):
 
 
 class TextType(str, enum.Enum):
+   
+    # Simplified 1
     book_title = "book_title"
     book_subtitle = "book_subtitle"
     book_author = "book_author"
-    chapter_title = "chapter_title"
     section_heading = "section_heading"
     section_text = "section_text"
-    boxed_text = "boxed_text"
-    hint = "hint"
-    instruction_text = "instruction_text"
-    activity_number = "activity_number"
-    activity_option = "activity_option"
-    activity_input_placeholder_text = "activity_input_placeholder_text"
-    image_label = "image_label"
-    image_caption = "image_caption"
+    standalone_text = "standalone_text"
+    image_associated_text = "image_associated_text"
     image_overlay = "image_overlay"
     math = "math"
-    standalone_text = "standalone_text"
-    page_number = "page_number"
+    instruction_text = "instruction_text"
+    activity_input_placeholder_text = "activity_input_placeholder_text"
+    activity_option = "activity_option"
+    header_text = "header_text"
     footer_text = "footer_text"
+    page_number = "page_number"
     other = "other"
-
-
+    
+    
 class EasyReadText(BaseModel):
     easy_read_id: str
     text_id: str
