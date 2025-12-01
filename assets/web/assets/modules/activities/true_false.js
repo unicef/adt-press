@@ -323,7 +323,7 @@ export const checkTrueFalse = () => {
          // Guardar en localStorage
          localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
      
-        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
         console.log(document.querySelector("h1")?.innerText ?? "unknown_page");
 
         executeMail(ActivityTypes.TRUE_FALSE);

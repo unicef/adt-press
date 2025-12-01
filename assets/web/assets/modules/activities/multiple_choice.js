@@ -380,7 +380,7 @@ const showFeedback = (option, isCorrect) => {
         // Guardar en localStorage
         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
     
-        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
         executeMail(ActivityTypes.MULTIPLE_CHOICE);
     } else {
         feedbackIcon.className = 'feedback-icon w-5 h-5 rounded-full flex items-center justify-center text-sm bg-red-100 text-red-700';

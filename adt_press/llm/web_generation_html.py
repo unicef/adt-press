@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 from banks import Prompt
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment, NavigableString
 from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
@@ -49,19 +49,26 @@ class GenerationResponse(CleanTextBaseModel):
 
         # Validate text elements
         for element in soup.find_all(True):  # Find all HTML elements
-            # Check if element has direct text content (not just whitespace)
-            direct_text = "".join(element.find_all(string=True, recursive=False)).strip()
+            # Get direct text content, excluding nested elements and comments
+            direct_text_nodes = []
+            for child in element.children:
+                # Skip HTML comments
+                if isinstance(child, Comment):
+                    continue
+                # Only include NavigableString (text nodes), not nested tags
+                if isinstance(child, NavigableString):
+                    text = str(child).strip()
+                    if text:  # Only non-empty text
+                        direct_text_nodes.append(text)
 
-            if direct_text:
+            # Check if element has meaningful direct text content
+            if direct_text_nodes:
+                direct_text = " ".join(direct_text_nodes)
                 data_id = element.get("data-id")
                 if not data_id:
                     raise ValueError(
-                        (
-                            "HTML element "
-                            f"'{element.name}' contains text but is missing "
-                            "required data-id attribute. "
-                            f"Text content: '{direct_text[:50]}...'"
-                        )
+                        f"HTML element '{element.name}' contains text but is missing "
+                        f"required data-id attribute. Text content: '{direct_text[:50]}...'"
                     )
 
                 # Allow activity-generated text IDs (activity_gen_*) or known text IDs
@@ -69,23 +76,19 @@ class GenerationResponse(CleanTextBaseModel):
 
                 if data_id not in text_ids and not is_generated_activity_text:
                     raise ValueError(
-                        (
-                            f"HTML element '{element.name}' has invalid "
-                            f"data-id='{data_id}'. Must be one of text IDs: "
-                            f"{', '.join(sorted(text_ids))}"
-                        )
+                        f"HTML element '{element.name}' has invalid "
+                        f"data-id='{data_id}'. Must be one of text IDs: "
+                        f"{', '.join(sorted(text_ids))}"
                     )
 
         # Validate image elements
         for img_element in soup.find_all("img"):
             data_id = img_element.get("data-id")
             if not data_id:
-                raise ValueError((f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}"))
+                raise ValueError(f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}")
 
             if data_id not in image_ids:
-                raise ValueError(
-                    (f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
-                )
+                raise ValueError(f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
 
         # Ensure required structural elements exist
         container = soup.find("div", id="content")
@@ -108,7 +111,7 @@ class GenerationResponse(CleanTextBaseModel):
         if section_type:
             data_section_type = section_element.get("data-section-type")
             if data_section_type != section_type:
-                raise ValueError((f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'."))
+                raise ValueError(f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'.")
 
             # Determine expected role based on section type AND activity rendering status
             if section_type.startswith("activity_") and activity_rendering_enabled:
@@ -118,10 +121,10 @@ class GenerationResponse(CleanTextBaseModel):
 
             role = section_element.get("role")
             if role != expected_role:
-                raise ValueError((f"Section role attribute is invalid. Expected '{expected_role}', got '{role}'."))
+                raise ValueError(f"Section role attribute is invalid. Expected '{expected_role}', got '{role}'.")
 
         if not soup.find(attrs={"data-id": True}):
-            raise ValueError(("Generated HTML must include at least one element with a data-id attribute."))
+            raise ValueError("Generated HTML must include at least one element with a data-id attribute.")
 
         return v
 

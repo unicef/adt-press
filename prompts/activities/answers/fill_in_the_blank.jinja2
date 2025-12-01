@@ -27,7 +27,7 @@ You MUST respond with valid JSON containing EXACTLY TWO FIELDS - BOTH ARE MANDAT
 
 ## Answer Key Requirements
 
-- Keys in `answers` must match `data-activity-item` or `data-aria-id` values from HTML
+- Keys in `answers` must match `data-activity-item` values from HTML
 - Values are correct fill-in text for each blank
 - Use plain text strings (no extra punctuation unless grammatically required)
 - Consider the textbook context and language level
@@ -35,7 +35,7 @@ You MUST respond with valid JSON containing EXACTLY TWO FIELDS - BOTH ARE MANDAT
 ## Fill in the Blank Activity
 
 ### What to look for:
-- Input elements with `data-activity-item="item-N"` or `data-aria-id="aria-X-Y-Z"`
+- Input elements with `data-activity-item="item-N"`
 - Labels, instructions, and surrounding text for context clues
 - May have hierarchical structure (main → secondary → tertiary)
 
@@ -80,7 +80,7 @@ Provide correct text for each blank based on:
 ### If no input fields found:
 ```json
 {
-    "reasoning": "No input fields with data-activity-item or data-aria-id found in HTML.",
+    "reasoning": "No input fields with data-activity-item found in HTML.",
     "answers": {}
 }
 ```

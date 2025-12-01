@@ -116,7 +116,7 @@ def ensure_required_activity_elements(root) -> None:
 
             # Reuse a feedback element defined elsewhere if one exists
             global_feedback = root.find(id="feedback")
-            if global_feedback and global_feedback not in section.descendants:
+            if global_feedback and section not in global_feedback.parents:
                 global_feedback.extract()
                 section.append(global_feedback)
                 continue

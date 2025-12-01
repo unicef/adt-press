@@ -566,7 +566,7 @@ const updateFeedback = (correctCount) => {
         // Guardar en localStorage
         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
 
-        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 
         executeMail(ActivityTypes.MATCHING);
     }

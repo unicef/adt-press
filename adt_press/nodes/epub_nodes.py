@@ -70,7 +70,7 @@ def package_epub(
             web_pages=web_pages,
             plate_texts=plate_texts,
             translations=translations,
-            image_dir=os.path.join(run_output_dir_config, "images"),  # Fixed: correct image directory
+            image_dir=os.path.join(adt_dir, "images"),
             css_content=css_content,
         )
 

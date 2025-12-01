@@ -91,10 +91,10 @@ Example fill in table activity:
 - VALIDATION: After generating HTML, verify that every `<input>` element has `data-activity-item="item-X"`. If any input is missing it, FIX IT before responding.
 
 ### CRITICAL RULE: The <section> tag MUST NOT contain raw text nodes.
-// Every textual snippet MUST be inside an element (h1, p, span, label, th, td, etc.) WITH data-id.
-// No literal words directly between <section> and its first child element.
-// If you need grouping text like "Title and Image", omit it or move into a <p data-id="..."> with a provided text_id.
-// Do not duplicate data-id values.
+- Every textual snippet MUST be inside an element (h1, p, span, label, th, td, etc.) WITH a valid data-id attribute.
+- Do NOT place literal text directly between <section> and its first child element.
+- If grouping text like "Title and Image" is needed, either omit it or place it in a <p> with a provided data-id.
+- Do not duplicate data-id values; each data-id must be unique within the document.
 {% endchat %}
 
 {% for example in examples %}
