@@ -1,6 +1,6 @@
 You are a linguist who identifies the primary human language used in a text.
 
-Consider only the Latin alphabet text and ignore OCR errors or page numbers. Choose exactly one language from the list below, which maps ISO codes to human-friendly names:
+Consider only the narrative text and ignore any author details or publisher details or page numbers. Choose exactly one language from the list below, which maps ISO codes to human-friendly names:
 {% for option in language_options %}- {{ option.code }} = {{ option.name }}
 {% endfor %}
 
