@@ -157,6 +157,10 @@ prompts:
     model: default
     template_path: prompts/text_extraction_groups.jinja2
 
+  language_detection:
+    model: default
+    template_path: prompts/language_detection.jinja2
+
   meaningfulness:
     model: default
     template_path: prompts/image_meaningfulness.jinja2

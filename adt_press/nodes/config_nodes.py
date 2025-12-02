@@ -1,9 +1,12 @@
 import os
 
+import structlog
+
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
 from pydantic import BaseModel
 
+from adt_press.llm.language_detection import detect_input_language
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
@@ -15,9 +18,45 @@ from adt_press.models.config import (
     RenderStrategy,
     SpeechPromptConfig,
 )
+from adt_press.models.text import PageTexts
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
+from adt_press.utils.sync import run_async_task
+
+
+log = structlog.get_logger(__name__)
+
+
+def _clean_language_override(language_value: str | None) -> str | None:
+    if language_value is None:
+        return None
+
+    normalized = str(language_value).strip().lower()
+    if not normalized or normalized == "???":
+        return None
+
+    return normalized
+
+
+def _sample_pdf_text_for_language_detection(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
+    collected: list[str] = []
+    total_chars = 0
+
+    for page_id in sorted(pdf_texts.keys()):
+        page_texts = pdf_texts[page_id]
+        for group in page_texts.groups:
+            for text in group.texts:
+                snippet = text.text.strip()
+                if not snippet:
+                    continue
+
+                collected.append(snippet)
+                total_chars += len(snippet)
+                if total_chars >= max_chars:
+                    return "\n".join(collected)
+
+    return "\n".join(collected)
 
 
 def config() -> DictConfig:  # pragma: no cover
@@ -36,8 +75,25 @@ def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
 
-def input_language_config(config: DictConfig) -> str:
-    return str(config.get("input_language", "en"))
+def input_language_config(
+    config: DictConfig,
+    language_detection_prompt_config: PromptConfig,
+    pdf_texts: dict[str, PageTexts],
+) -> str:
+    override = _clean_language_override(config.get("input_language"))
+    if override:
+        return override
+
+    sample_text = _sample_pdf_text_for_language_detection(pdf_texts)
+    if not sample_text.strip():
+        return "en"
+
+    try:
+        response = run_async_task(lambda: detect_input_language(sample_text, language_detection_prompt_config))
+        return response.language_code
+    except Exception as exc:  # pragma: no cover - fallback path
+        log.warning("language detection failed; defaulting to english", error=str(exc))
+        return "en"
 
 
 def plate_language_config(config: DictConfig) -> str:
@@ -112,6 +168,13 @@ def default_model_config(config: DictConfig) -> str:
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["caption"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def language_detection_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(
+        prompt_config_with_model(config["prompts"]["language_detection"], config["default_model"])
+    )
 
 
 @cache(behavior="recompute")
