@@ -23,10 +23,7 @@ class LanguageDetectionResponse(CleanTextBaseModel):
 
 
 async def detect_input_language(sample_text: str, config: PromptConfig) -> LanguageDetectionResponse:
-    language_options = [
-        {"code": code, "name": name}
-        for code, name in sorted(LANGUAGE_MAP.items(), key=lambda item: item[1])
-    ]
+    language_options = [{"code": code, "name": name} for code, name in sorted(LANGUAGE_MAP.items(), key=lambda item: item[1])]
 
     context = dict(
         language_options=language_options,

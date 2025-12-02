@@ -43,7 +43,9 @@ class InputLanguageConfigTests(unittest.TestCase):
     def test_input_language_config_calls_detector_when_not_overridden(self) -> None:
         config = DictConfig({"input_language": None})
 
-        with patch("adt_press.nodes.config_nodes.run_async_task", side_effect=lambda fn: SimpleNamespace(language_code="fr")) as run_async_mock:
+        with patch(
+            "adt_press.nodes.config_nodes.run_async_task", side_effect=lambda fn: SimpleNamespace(language_code="fr")
+        ) as run_async_mock:
             result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
         self.assertEqual(result, "fr")

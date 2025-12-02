@@ -1,7 +1,6 @@
 import os
 
 import structlog
-
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
 from pydantic import BaseModel
@@ -23,7 +22,6 @@ from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
 from adt_press.utils.sync import run_async_task
-
 
 log = structlog.get_logger(__name__)
 
@@ -172,9 +170,7 @@ def caption_prompt_config(config: DictConfig) -> PromptConfig:
 
 @cache(behavior="recompute")
 def language_detection_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(
-        prompt_config_with_model(config["prompts"]["language_detection"], config["default_model"])
-    )
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["language_detection"], config["default_model"]))
 
 
 @cache(behavior="recompute")
