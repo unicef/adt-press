@@ -23,14 +23,14 @@ from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
 from adt_eval.text_type import TextTypeEvaluator
+from adt_eval.text_translation import TextTranslationEvaluator
 from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
 
 # Registry of available evaluators
 EVALUATORS = {
-    "text_type": TextTypeEvaluator,
+    "text_translation": TextTranslationEvaluator,
 }
-
 
 def load_config() -> Dict[str, Any]:
     """Load configuration with command-line overrides."""
@@ -70,14 +70,14 @@ def load_config() -> Dict[str, Any]:
 
     return config
 
-
 def get_tasks_to_run(config: Dict[str, Any]) -> List[str]:
     """Determine which tasks to run based on configuration."""
     tasks_to_run = config.get("tasks", [])
+    selected_task = config.get("task", "")
 
-    # If empty list, run all available tasks
-    if not tasks_to_run:
-        tasks_to_run = list(EVALUATORS.keys())
+    # If empty list, check if task is specified
+    if not tasks_to_run and selected_task:
+        tasks_to_run = [selected_task]
 
     # Validate that all requested tasks exist
     invalid_tasks = [task for task in tasks_to_run if task not in EVALUATORS]
@@ -88,14 +88,12 @@ def get_tasks_to_run(config: Dict[str, Any]) -> List[str]:
 
     return tasks_to_run
 
-
 def get_task_config(base_config: Dict[str, Any], task: str) -> Dict[str, Any]:
     """Extract task-specific configuration."""
     if task not in base_config["eval"]["task_configs"]:
         raise ValueError(f"Task '{task}' not found in eval_config.yaml")
 
     return base_config["eval"]["task_configs"][task]
-
 
 async def run_task(task: str, global_config: Dict[str, Any], output_dir: Path) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     """Run a single evaluation task."""
@@ -104,7 +102,7 @@ async def run_task(task: str, global_config: Dict[str, Any], output_dir: Path) -
     evaluator = evaluator_class(global_config, task_config, output_dir)
 
     print(f"Running {task} evaluation...")
-    return await evaluator.run()
+    return await asyncio.to_thread(evaluator.run)
 
 
 async def main():
@@ -119,6 +117,7 @@ async def main():
         print(f"Error: {e}")
         traceback.print_exc()
         sys.exit(1)
+
 
     # Determine tasks to run
     tasks_to_run = get_tasks_to_run(config)
@@ -136,11 +135,11 @@ async def main():
 
     try:
         for task in tasks_to_run:
-            results, metrics = await run_task(task, config, output_dir)
-            all_results[task] = results
-            all_metrics[task] = metrics
+            await run_task(task, config, output_dir)
+            # all_results[task] = results
+            # all_metrics[task] = metrics
 
-            print(f"✓ {task}: {len(results)} cases, {metrics['score']:.1%} score")
+            # print(f"✓ {task}: {len(results)} cases, {metrics['score']:.1%} score")
 
         context = {
             "tasks": tasks_to_run,
@@ -148,8 +147,8 @@ async def main():
             "results": all_results,
         }
 
-        render_template(TemplateConfig(output_dir=str(output_dir)), "eval/index.html", context)
-        render_template(TemplateConfig(output_dir=str(output_dir)), "eval/results.txt", context)
+        # render_template(TemplateConfig(output_dir=str(output_dir)), "eval/index.html", context)
+        # render_template(TemplateConfig(output_dir=str(output_dir)), "eval/results.txt", context)
 
         print("\nAll evaluations complete!")
         print(f"Reports generated in: {output_dir}")

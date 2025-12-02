@@ -1,0 +1,56 @@
+{% extends "eval/base.html" %}
+{% block title %}Text Translation Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (score * 100) | round | int }}%</span>{% endblock %}
+
+{% block content %}
+{% for result in results %}
+    <div class="bg-white rounded border mb-6 overflow-hidden">
+        <!-- Page ID header -->
+        <div class="bg-gray-600 text-white px-4 py-3 font-bold text-xl flex justify-between items-center">
+            <span>Page Test {{result.step}}</span>
+            <div class="flex gap-2">
+                <span class="px-3 py-1 bg-gray-700 text-white text-sm font-medium rounded-full"><a href="{{ result.label_studio_url }}" target="_blank">{{ result.id }}</a></span>
+                <span class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (result.score * 100) | round | int}}%</span>
+            </div>
+        </div>
+        
+        <div class="flex gap-4 mb-6 pt-4 px-4">
+            <div class="flex-shrink-0">
+                <a href="{{ result.page_image_path }}" target="_blank" class="block">
+                    <img src="{{ result.page_image_path }}" class="h-auto max-h-[150px] border rounded shadow-sm hover:shadow-md transition-shadow" alt="Page {{ result.page_id }}">
+                </a>
+            </div>
+            <div class="flex-1">
+                <div class="text-sm text-gray-600 max-h-96 overflow-y-auto">
+                    {{ result.page_text }} 
+                </div>
+            </div>
+        </div>
+
+        <!-- Results header -->
+        <div class="bg-gray-700 text-white px-4 py-3 font-medium sticky top-0 z-10 rounded-t-lg">
+            <!-- Grid Template: 4 parts for Original, 4 parts for Translated, 1 part for Metric -->
+            <div class="grid gap-4 px-2" style="grid-template-columns: 4fr 4fr 1fr;">
+                <div class="text-base">Original Text</div>
+                <div class="text-base">Translated Text</div>
+                <div class="px-2 text-right text-sm self-center">Is Acceptable?</div>
+            </div>
+        </div>
+        
+        {% for translation in result.translations %}
+        <div class="grid gap-4 px-6 hover:bg-gray-50 items-start" style="grid-template-columns: 4fr 4fr 1fr;">
+            <div class="text-sm text-gray-700 py-3">{{ translation.original_text }}</div>
+            <div class="text-sm text-gray-600 italic py-3">{{ translation.translation }}</div>
+            <div class="text-right flex items-center justify-end h-full py-3">
+                {% if translation.is_acceptable_translation %}
+                <span class="text-sm font-bold text-green-600">{{ translation.is_acceptable_translation }}</span>
+                {% else %}
+                <span class="text-sm font-bold text-red-600">{{ translation.is_acceptable_translation }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+    </div>
+{% endfor %}
+
+{% endblock %}
