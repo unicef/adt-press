@@ -6,6 +6,7 @@ from omegaconf import DictConfig
 from pydantic import BaseModel
 
 from adt_press.models.config import (
+    ActivityTypeConfig,
     CropPromptConfig,
     HTMLPromptConfig,
     LayoutType,
@@ -231,6 +232,24 @@ def activity_answers_prompts_config__llm(config: DictConfig) -> dict[str, Prompt
 def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, PromptConfig]:
     """Return empty dict when activity answer generation is disabled."""
     return {}
+
+
+@cache(behavior="recompute")
+def activity_types_config(config: DictConfig) -> dict[str, ActivityTypeConfig]:
+    """Load activity type configurations from config."""
+    activity_types = {}
+
+    if "activity_types" in config:
+        for activity_type_name, activity_config in config["activity_types"].items():
+            # Build the ActivityTypeConfig
+            activity_types[activity_type_name] = ActivityTypeConfig(
+                section_types=list(activity_config["section_types"]),
+                prompt_config=PromptConfig.model_validate(
+                    prompt_config_with_model(activity_config["prompt_config"], config["default_model"])
+                ),
+            )
+
+    return activity_types
 
 
 @cache(behavior="recompute")

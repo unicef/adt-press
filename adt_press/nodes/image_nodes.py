@@ -70,7 +70,8 @@ def image_meaningfulness(
     return {m.image_id: m for m in run_async_task(generate_meaningfulness)}
 
 
-def image_meaningfulness_failures(image_meaningfulness: dict[str, ImageMeaningfulness]) -> dict[str, ImageFilterFailure]:
+@config.when(image_meaningfulness_strategy="llm")
+def image_meaningfulness_failures__llm(image_meaningfulness: dict[str, ImageMeaningfulness]) -> dict[str, ImageFilterFailure]:
     failures = {}
 
     # map our list back to a dict of failures
@@ -83,6 +84,11 @@ def image_meaningfulness_failures(image_meaningfulness: dict[str, ImageMeaningfu
             )
 
     return failures
+
+
+@config.when(image_meaningfulness_strategy="none")
+def image_meaningfulness_failures__none(image_meaningfulness: dict[str, ImageMeaningfulness]) -> dict[str, ImageFilterFailure]:
+    return {}
 
 
 def pruned_images(

@@ -61,6 +61,26 @@ def filtered_sections_by_page_id(
     return filtered_sections
 
 
+def filtered_sections(pdf_pages: list[Page], sections_by_page_id: dict[str, PageSections]) -> list[PageSections]:
+    filtered_sections = {}
+    for page in pdf_pages:
+        page_sections = sections_by_page_id[page.page_id]
+        filtered_sections[page.page_id] = PageSections(
+            page_id=page.page_id,
+            sections=[
+                PageSection(
+                    section_id=section.section_id,
+                    section_type=section.section_type,
+                    part_ids=section.part_ids,
+                    is_pruned=False,
+                )
+                for section in page_sections.sections
+            ],
+            reasoning=page_sections.reasoning,
+        )
+    return filtered_sections
+
+
 def section_metadata_by_id(
     section_metadata_prompt_config: PromptConfig,
     layout_types_config: dict[str, LayoutType],

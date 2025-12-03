@@ -27,10 +27,13 @@ easy_read_strategy: none
 caption_strategy: none
 
 # our activity generation strategy, either llm or none
-activity_strategy: none
+activity_strategy: llm
 
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
+
+# how we determine image meaningfulness, either llm or none
+image_meaningfulness_strategy: llm
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
@@ -122,7 +125,7 @@ render_strategies:
     config:
       model: default
       template_path: prompts/activities/generic.jinja2
-      max_retries: 25
+      max_retries: 50
       example_dirs: []
 
 page_range:
@@ -152,6 +155,16 @@ section_filters:
     - credits
     - inside_cover
    
+
+# Activity type configurations - maps activity types to section types and prompt configs
+activity_types:
+  fill_in_the_blank:
+    section_types:
+      - activity_fill_in_the_blank
+    prompt_config:
+      model: default
+      template_path: prompts/activity_generation/fill_in_the_blank.jinja2
+      max_retries: 0
 
 prompts:
   metadata_extraction:

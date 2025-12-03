@@ -1,6 +1,7 @@
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig, OmegaConf
 
+from adt_press.models.activity import Activity
 from adt_press.models.config import MetadataPromptConfig, TemplateConfig
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.metadata import BookMetadata
@@ -39,11 +40,15 @@ def report_pages(
     section_glossaries_by_id: dict[str, SectionGlossary],
     easy_reads_by_text_id: dict[str, EasyReadText],
     section_metadata_by_id: dict[str, SectionMetadata],
+    activities: list[Activity],
     input_language_config: str,
     plate_language_config: str,
 ) -> str:
     input_language = LANGUAGE_MAP[input_language_config]
     output_language = LANGUAGE_MAP[plate_language_config]
+
+    # Build a mapping of section_id to activity for easy lookup
+    activities_by_section_id = {activity.section_id: activity for activity in activities}
 
     return render_template(
         template_config,
@@ -60,6 +65,7 @@ def report_pages(
             section_glossaries=section_glossaries_by_id,
             section_metadata=section_metadata_by_id,
             easy_reads=easy_reads_by_text_id,
+            activities=activities_by_section_id,
             input_language=input_language,
             output_language=output_language,
         ),

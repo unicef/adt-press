@@ -42,6 +42,7 @@ def web_pages(
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
+    activities_by_id = {act.activity_id: act for act in plate.activities}
 
     cached_configs: dict[str, Any] = {}
 
@@ -183,6 +184,7 @@ def web_pages(
                         images=images,
                         language_code=plate_language_config,
                         activity_rendering_enabled=page_activity_rendering,
+                        activity=activities_by_id.get(section.activity_id),
                     )
                 )
             elif strategy.render_type == "template":

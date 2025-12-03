@@ -142,6 +142,13 @@ class TemplateRenderConfig(PathHashMixin):
     render_template_path: str
 
 
+class ActivityTypeConfig(BaseModel):
+    """Configuration for an activity type mapping."""
+
+    section_types: list[str]
+    prompt_config: PromptConfig
+
+
 class PageRangeConfig(BaseModel):
     start: int = 0
     end: int = 0

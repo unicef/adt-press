@@ -325,6 +325,25 @@
                                             {% endif %}
                                             {% endwith %}
                                             
+                                            <!-- Activity Definition Section -->
+                                            {% with activity=activities[section.section_id] %}
+                                            {% if activity %}
+                                            <div class="border-t overflow-hidden">
+                                                <!-- Activity Header -->
+                                                <div class="bg-purple-600 text-white px-3 py-2 text-sm font-medium flex items-center justify-between">
+                                                    <span>Activity Definition</span>
+                                                    <span class="px-2 py-1 text-xs bg-purple-800 rounded">{{ activity.activity_type.value }}</span>
+                                                </div>
+                                                <!-- Activity Content -->
+                                                <div class="p-3 bg-purple-50">
+                                                    <div class="font-mono text-xs bg-white p-3 rounded border border-purple-200 overflow-x-auto">
+                                                        <pre class="text-gray-800">{{ activity.items | tojson(indent=2) }}</pre>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endwith %}
+                                            
                                             <!-- Explanation Section -->
                                             {% with explanation=explanations[section.section_id] %}
                                             {% if explanation %}

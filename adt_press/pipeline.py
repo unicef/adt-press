@@ -9,6 +9,7 @@ from hamilton.lifecycle import NodeExecutionHook
 from omegaconf import DictConfig
 
 from adt_press.nodes import (
+    activity_nodes,
     config_nodes,
     epub_nodes,
     image_nodes,
@@ -29,6 +30,7 @@ log = structlog.get_logger()
 
 modules = [
     config_nodes,
+    activity_nodes,
     image_nodes,
     report_nodes,
     pdf_nodes,

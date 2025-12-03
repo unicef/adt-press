@@ -4,11 +4,12 @@ from hamilton.function_modifiers import cache
 
 from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
+from adt_press.models.activity import Activity
 from adt_press.models.config import PromptConfig
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
-from adt_press.models.plate import Plate, PlateGroup, PlateImage, PlateSection, PlateText
+from adt_press.models.plate import Plate, PlateActivity, PlateGroup, PlateImage, PlateSection, PlateText
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
@@ -27,8 +28,11 @@ def generated_plate(
     explanations_by_section_id: dict[str, SectionExplanation],
     section_metadata_by_id: dict[str, SectionMetadata],
     plate_glossary: list[GlossaryItem],
+    activities: list[Activity],
 ) -> Plate:
     plate_sections: list[PlateSection] = []
+
+    activity_id_by_section_id = {activity.section_id: activity.activity_id for activity in activities}
 
     # build our place sections from our pages
     cover_image_path = None
@@ -55,6 +59,7 @@ def generated_plate(
                     layout_type=metadata.layout_type,
                     background_color=metadata.background_color,
                     text_color=metadata.text_color,
+                    activity_id=activity_id_by_section_id.get(page_section.section_id, None),
                 )
             )
 
@@ -67,6 +72,15 @@ def generated_plate(
         cover_image_id = "cover"
         images.append(PlateImage(image_id=cover_image_id, image_path=cover_image_path, caption_id=cover_image_id))
 
+    plate_activities = [
+        PlateActivity(
+            activity_id=activity.activity_id,
+            activity_type=activity.activity_type.value,
+            items=activity.items,
+        )
+        for activity in activities
+    ]
+
     return Plate(
         title=book_metadata.title or pdf_title_config,
         authors=book_metadata.authors,
@@ -78,6 +92,7 @@ def generated_plate(
         groups=plate_groups,
         texts=texts,
         glossary=plate_glossary if plate_glossary else [],
+        activities=plate_activities,
     )
 
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel
 
 from adt_press.models.section import GlossaryItem, SectionType
@@ -21,6 +23,12 @@ class PlateImage(BaseModel):
     caption_id: str
 
 
+class PlateActivity(BaseModel):
+    activity_id: str
+    activity_type: str
+    items: list[dict[str, Any]]
+
+
 class PlateSection(BaseModel):
     section_id: str
     section_type: SectionType
@@ -30,6 +38,7 @@ class PlateSection(BaseModel):
     background_color: str
     text_color: str
     layout_type: str
+    activity_id: str | None
 
 
 class Plate(BaseModel):
@@ -43,3 +52,4 @@ class Plate(BaseModel):
     groups: list[PlateGroup]
     texts: list[PlateText]
     glossary: list[GlossaryItem]
+    activities: list[PlateActivity]

@@ -1,5 +1,5 @@
 {% chat role="system" %}
-You are an expert frontend engineer creating beautiful, kid-friendly HTML pages for educational textbooks.
+You are an expert frontend engineer creating beautiful, kid-friendly HTML pages for educational textbooks. I will provide you the image of a PDF book and the text and image elements extracted from the part of the PDF page I want you to create a fill-in-the-blank activity for. Your job is to generate the HTML content for the activity following the CRITICAL requirements and layout patterns described below. The final webpage should maintain the structure of the original textbook page.
 
 ### Layout Shell (MANDATORY)
 <div class="flex justify-center items-start min-h-[calc(100dvh-100px)]">
@@ -23,12 +23,10 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 - Each blank must be an `<input type="text">` 
 - Required attributes:
   - `class="w-full p-2 border border-gray-300 rounded"`
-  - `data-aria-id="aria-X-Y-Z"` (sequential numbering)
-  - `data-activity-item="item-N"` (for answer extraction, sequential N)
-  - `aria-label="Descriptive label in {{ language }}"`
-  - `placeholder="Hint text"` (optional)
+  - `data-activity-item-id="[id for the item]"` (use the ID for the item from the activity definition)
   - `tabindex="0"`
 - Wrap in labeled containers with semantic colors
+- You must include one input for each blank in the activity
 
 **3. Layout Patterns**
 
@@ -39,7 +37,7 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
     <label class="font-semibold" data-id="text-1">Label</label>
     <input class="w-full p-2 border border-gray-300 rounded" 
            data-aria-id="aria-1-0-0" 
-           data-activity-item="item-1"
+           data-activity-item-id="item-1"
            placeholder="Hint" />
   </div>
 </div>
@@ -50,13 +48,13 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 <div class="flex flex-col items-end gap-4 mb-6 md:w-3/5 mx-auto">
   <div class="bg-green-200 p-3 rounded-lg w-full">
     <label class="font-semibold" data-id="text-1">Main Title</label>
-    <input ... data-activity-item="item-1" />
+    <input ... data-activity-item-id="item-1" />
   </div>
   <div class="relative bg-blue-200 p-3 rounded-lg w-4/5">
     <div class="absolute right-full top-1/2 transform -translate-y-1/2 h-1 bg-blue-200 w-16 mr-1"></div>
     <div class="absolute right-full top-1/2 w-1 h-16 bg-blue-200" style="right: calc(100% + 64px); transform: translateY(-100%);"></div>
     <label class="font-semibold" data-id="text-2">Subtitle</label>
-    <input ... data-activity-item="item-2" />
+    <input ... data-activity-item-id="item-2" />
   </div>
 </div>
 ```
@@ -68,27 +66,16 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
   <input class="inline-block mx-2 px-2 py-1 border-b-2 border-gray-400" 
          style="width: 100px;"
          data-aria-id="aria-1-0-0"
-         data-activity-item="item-1" />
+         data-activity-item-id="item-1" />
   <span data-id="text-2">que emite luz propia.</span>
 </p>
-```
-
-**4. Optional Link Button**
-```html
-<span class="purple-link-button inline-block border-0 border-purple-600 text-purple-600 px-2 py-0 rounded-lg transition-all duration-200 hover:bg-purple-100 hover:shadow-md cursor-pointer">
-  <a href="page.html" alt="Link description">
-    <span class="inline-flex items-center justify-center h-10 w-10 rounded-full border-2 border-purple-600">
-      <i class="fas fa-link text-purple-600"></i>
-    </span> Link text
-  </a>
-</span>
 ```
 
 ### CRITICAL Requirements
 1. ALL text elements MUST have `data-id` matching provided text IDs
 2. ALL images MUST have `data-id` matching provided image IDs
-3. ALL inputs MUST have both `data-aria-id` AND `data-activity-item`
-4. `data-activity-item` values must be unique and sequential (item-1, item-2, etc.)
+3. ALL inputs MUST have `data-activity-item-id`
+4. `data-activity-item-id` values must match those in the activity item definitions
 5. NO stray text directly inside `<section>` - wrap everything in tagged elements
 6. Use semantic colors: green for main level, blue for secondary, gray for tertiary
 7. Match layout complexity to the educational goal (simple list vs. hierarchy)
@@ -120,7 +107,7 @@ IMPORTANT: Your reasoning MUST be written in English, regardless of the activity
           <label class="font-semibold" data-id="text-2">Capital of France:</label>
           <input class="w-full p-2 border border-gray-300 rounded"
                  data-aria-id="aria-1-0-0"
-                 data-activity-item="item-1"
+                 data-activity-item-id="item-1"
                  placeholder="Write the city name"
                  tabindex="0"
                  type="text" />
@@ -131,20 +118,7 @@ IMPORTANT: Your reasoning MUST be written in English, regardless of the activity
 </div>
 ```
 
-**Hierarchical diagram:**
-Use when showing text structure, concept maps, or organizational charts.
-
 {% endchat %}
-
-{% for example in examples %}
-{% chat role="user" %}
-{{ example.input }}
-{% endchat %}
-
-{% chat role="assistant" %}
-{{ example.output }}
-{% endchat %}
-{% endfor %}
 
 {% chat role="user" %}
 Language: {{ language }}
@@ -175,16 +149,12 @@ Text Elements (use all with data-id):
   Text: {{ text.text }}
 {% endfor %}
 
-Text Groups:
-{% for group in groups %}
-- Group ID: {{ group.group_id }}
-  Group Type: {{ group.group_type }}
-  Texts:
-  {% for text in group.texts %}
-  - ID: {{ text.text_id }}
-    Text: {{ text.text }}
-  {% endfor %}
+Activity Item Definitions:
+{% for item in activity_items %}
+{{ activity.activity_id }}_{{ loop.index }}: 
+{% if item.pre_text_id %}{{ texts_by_id[item.pre_text_id].text }}{% endif %} _________________ {% if item.post_text_id %}{{ texts_by_id[item.post_text_id].text }}{% endif %}
+
 {% endfor %}
 
-Generate a fill-in-the-blank activity with appropriate layout. Use data-activity-item on all inputs for answer extraction.
+Generate a fill-in-the-blank activity with appropriate layout. Make sure to add a data-activity-item-id on all inputs.
 {% endchat %}
