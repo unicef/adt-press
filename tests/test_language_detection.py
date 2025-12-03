@@ -116,5 +116,44 @@ class LanguageDetectionLLMTests(unittest.TestCase):
             LanguageDetectionResponse(language_code="xx", reasoning="", confidence=None)
 
 
+class ConfigNodesHelperTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.sample_pdf_texts = {
+            "page_1": PageTexts(
+                page_id="page_1",
+                groups=[
+                    PageTextGroup(
+                        group_id="g1",
+                        group_type=TextGroupType.paragraph,
+                        texts=[
+                            PageText(text_id="t1", text="Bonjour", text_type=TextType.section_text),
+                            PageText(text_id="t2", text="le monde", text_type=TextType.section_text),
+                        ],
+                    )
+                ],
+                reasoning="",
+            )
+        }
+        self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
+
+    def test_clean_language_override_normalizes_and_filters(self) -> None:
+        self.assertIsNone(config_nodes._clean_language_override(None))
+        self.assertIsNone(config_nodes._clean_language_override("???"))
+        self.assertEqual(config_nodes._clean_language_override(" Es "), "es")
+
+    def test_sample_pdf_text_respects_character_limit(self) -> None:
+        sample = config_nodes._sample_pdf_text_for_language_detection(self.sample_pdf_texts, max_chars=5)
+        self.assertEqual(sample, "Bonjour")
+
+    def test_input_language_config_handles_detection_failure(self) -> None:
+        config = DictConfig({"input_language": None})
+
+        with patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")) as run_async_mock:
+            result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
+
+        self.assertEqual(result, "en")
+        run_async_mock.assert_called_once()
+
+
 if __name__ == "__main__":
     unittest.main()
