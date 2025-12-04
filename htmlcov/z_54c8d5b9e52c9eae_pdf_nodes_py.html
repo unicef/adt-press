@@ -4,14 +4,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for adt_press/nodes/pdf_nodes.py: 98%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
-    <link rel="stylesheet" href="style_cb_a37fa487.css" type="text/css">
-    <script src="coverage_html_cb_cadff66e.js" defer></script>
+    <link rel="stylesheet" href="style_cb_8432e98f.css" type="text/css">
+    <script src="coverage_html_cb_bcae5fc4.js" defer></script>
 </head>
 <body class="pyfile">
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>adt_press/nodes/pdf_nodes.py</b>:
+            <span class="text">Coverage for </span><b>adt_press&#8201;/&#8201;nodes&#8201;/&#8201;pdf_nodes.py</b>:
             <span class="pc_cov">98%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">108 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">106<span class="text"> run</span></button>
+            <span class="text">110 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">108<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_54c8d5b9e52c9eae_plate_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.11.3">coverage.py v7.11.3</a>,
-            created at 2025-11-20 18:41 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.12.0">coverage.py v7.12.0</a>,
+            created at 2025-12-04 22:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -90,7 +90,7 @@
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">llm</span><span class="op">.</span><span class="nam">text_extraction</span> <span class="key">import</span> <span class="nam">get_page_text</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">config</span> <span class="key">import</span> <span class="nam">MetadataPromptConfig</span><span class="op">,</span> <span class="nam">PromptConfig</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">image</span> <span class="key">import</span> <span class="nam">Image</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">metadata</span> <span class="key">import</span> <span class="nam">BookMetadata</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">metadata</span> <span class="key">import</span> <span class="nam">BookChapter</span><span class="op">,</span> <span class="nam">BookMetadata</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">pdf</span> <span class="key">import</span> <span class="nam">Page</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">text</span> <span class="key">import</span> <span class="nam">EasyReadText</span><span class="op">,</span> <span class="nam">PageText</span><span class="op">,</span> <span class="nam">PageTextGroup</span><span class="op">,</span> <span class="nam">PageTexts</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">nodes</span><span class="op">.</span><span class="nam">config_nodes</span> <span class="key">import</span> <span class="nam">PageRangeConfig</span>&nbsp;</span><span class="r"></span></p>
@@ -325,6 +325,10 @@
     <p class="run"><span class="n"><a id="t243" href="#t243">243</a></span><span class="t">        <span class="key">return</span> <span class="key">await</span> <span class="nam">get_metadata</span><span class="op">(</span><span class="nam">metadata_extraction_prompt_config</span><span class="op">,</span> <span class="nam">pages_to_analyze</span><span class="op">,</span> <span class="nam">pdf_metadata</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t244" href="#t244">244</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t245" href="#t245">245</a></span><span class="t">    <span class="key">return</span> <span class="nam">run_async_task</span><span class="op">(</span><span class="nam">extract_metadata</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t246" href="#t246">246</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t247" href="#t247">247</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t248" href="#t248">248</a></span><span class="t"><span class="key">def</span> <span class="nam">book_table_of_contents</span><span class="op">(</span><span class="nam">book_metadata</span><span class="op">:</span> <span class="nam">BookMetadata</span><span class="op">)</span> <span class="op">-></span> <span class="nam">list</span><span class="op">[</span><span class="nam">BookChapter</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t249" href="#t249">249</a></span><span class="t">    <span class="key">return</span> <span class="nam">book_metadata</span><span class="op">.</span><span class="nam">table_of_contents</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -333,8 +337,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_54c8d5b9e52c9eae_plate_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.11.3">coverage.py v7.11.3</a>,
-            created at 2025-11-20 18:41 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.12.0">coverage.py v7.12.0</a>,
+            created at 2025-12-04 22:27 +0000
         </p>
     </div>
 </footer>
