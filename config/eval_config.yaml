@@ -10,46 +10,6 @@ task: "text_translation"
 input_language: en
 
 
-# # Experiments to run
-# experiments:
-#   - experiment_name: "adt_press_translation_task_experiment-dev-3"
-#     task: "text_translation"
-#     report_template_path: templates/eval/text_translation_report.html
-#     tags:
-#       - key: "task"
-#         value: "text_translation"
-#     experiment_run_name_prefix: "translation-base"
-#     model: "gpt-4.1-mini"
-#     input_language: "en"
-#     output_language: "es"
-#     prompt:
-#       name: "text_translation.jinja2--DEV"
-#       version: "1"
-#       template_path: "prompts/text_translation.jinja2"
-#       tags:
-#         - key: "task"
-#           value: "text_translation"
-#       optimization:
-#         is_enabled: false
-#         metric_name: "correctness"
-#         max_iterations: 1
-#     dataset:
-#       label_studio_project_name: "A2: Text Type"
-#       name: "text_type_eval_dataset_dev_3_b"
-          # source_path: "adt_eval/datasets/translation_eval_dataset_flores_train_50.csv"
-          # tags:
-          #   - key: "task"
-          #     value: "translation"
-          #   - key: "metric"
-          #     value: "labse_score"
-          #   - key: "stage"
-          #     value: "training"
-          #   - key: "source"
-          #     value: "flores"
-          #   - key: "version"
-          #     value: "1"
-
-
 # ADT Evaluation Configuration
 eval:
 
@@ -74,14 +34,13 @@ eval:
       prompt: ${prompts.text_translation}
       report_template_path: templates/eval/translation_report.html
       experiments:
-        - experiment_name: "adt_press_translation_task_experiment_50"
+        - experiment_name: "adt_press_translation_task_experiment_20"
           task: "text_translation"
           report_template_path: templates/eval/text_translation_report.html
           tags:
             - key: "task"
               value: "text_translation"
-          experiment_run_name_prefix: "translation-base"
-          model: "gpt-5-mini"
+          model: "gpt-5-mini" # This is the model used for the experiment run
           input_language: "en"
           output_language: "es"
           prompt:
@@ -92,10 +51,10 @@ eval:
               - key: "task"
                 value: "translation"
             optimization:
-              is_enabled: true
+              is_enabled: false
               metric_name: "is_acceptable_translation"
               metric_threshold: 0.95
-              max_iterations: 1
+              max_iterations: 3
           dataset:
             label_studio_project_name: "A2: Text Type"
-            name: "text_type_eval_dataset_50"
+            name: "text_type_eval_dataset_20"

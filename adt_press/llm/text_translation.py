@@ -9,6 +9,8 @@ from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import LANGUAGE_MAP
 
+import mlflow
+
 
 class TextItem(CleanTextBaseModel):
     text_id: str
@@ -63,7 +65,11 @@ async def get_text_translation(
         examples=config.examples,
     )
 
-    prompt = Prompt(cached_read_text_file(config.template_path))
+    if config.source == "mlflow":
+        prompt = Prompt(mlflow.genai.load_prompt(config.template_path).template)
+    else:
+        prompt = Prompt(cached_read_text_file(config.template_path))
+    
     client = instructor.from_litellm(acompletion)
 
     # Create validation context

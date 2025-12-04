@@ -1,6 +1,6 @@
 import enum
 import os
-from typing import Self
+from typing import Self, Literal
 
 import yaml
 from pydantic import BaseModel, Field, model_validator
@@ -78,6 +78,8 @@ class PromptConfig(PathHashMixin):
     template_path: str
     examples: list[dict] = []
 
+    source: Literal["mlflow", "local"] = "local"
+    
     rate_limit: int = 300
     max_retries: int = 10
 
