@@ -20,6 +20,8 @@ def clean_label_value(label_value: Any | None) -> str | None:
 def slug_from_pdf_path(pdf_path: str) -> str:
     stem = Path(pdf_path).stem
     slug = slugify(stem, lowercase=True)
+    if not slug:
+        raise ValueError(f"Unable to derive label slug from PDF path: {pdf_path}")
     return slug
 
 
