@@ -115,7 +115,15 @@ def output_languages_config(config: DictConfig, input_language_config: str) -> l
     raw_languages = OmegaConf.select(config, "output_languages", default=None)
     sequence: list[str | None] = []
     if raw_languages is not None:
-        sequence = list(OmegaConf.to_container(raw_languages, resolve=True))
+        container = OmegaConf.to_container(raw_languages, resolve=True)
+        if isinstance(container, list):
+            for item in container:
+                sequence.append(str(item) if item is not None else None)
+        else:
+            log.warning(
+                "output languages config must be a list; falling back to empty sequence",
+                received_type=type(container).__name__,
+            )
     cleaned_languages: list[str] = []
 
     if sequence:
