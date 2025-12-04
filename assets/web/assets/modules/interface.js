@@ -22,7 +22,7 @@ import {
   createZoomControls
 } from './browser_zoom_controller.js';
 import { trackToggleEvent } from './analytics.js';
-import { toggleNav } from './navigation.js';
+import { toggleNav, getNavigationData } from './navigation.js';
 
 
 let glossaryTerms = {};
@@ -236,41 +236,27 @@ export const initializeLanguageDropdown = async () => {
  * Handles special cases for sectioned and non-sectioned pages.
  */
 export const updatePageNumber = () => {
-  const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
   const pageElement = document.getElementById('page-section-id');
-
   if (!pageElement) return;
-  state.currentPage = pageSectionMetaTag?.getAttribute('content') || '0';
 
-  // Default to page 0 if no meta tag is found
-  if (!pageSectionMetaTag) {
-    pageElement.innerHTML = '<span data-id="page"></span> 0';
-    return;
+  const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
+  const sectionMetaTag = document.querySelector('meta[name="title-id"]');
+
+  const fallbackValue = pageSectionMetaTag?.getAttribute('content') || '0';
+  state.currentPage = fallbackValue;
+
+  const sectionId = sectionMetaTag?.getAttribute('content');
+  let displayLabel = null;
+
+  if (sectionId) {
+    const navPages = getNavigationData()?.pages || [];
+    const matchingEntry = navPages.find((page) => page.section_id === sectionId);
+    if (matchingEntry?.page_label) {
+      displayLabel = matchingEntry.page_label;
+    }
   }
 
-  const pageSectionContent = pageSectionMetaTag.getAttribute('content');
-  if (!pageSectionContent) {
-    pageElement.innerHTML = '<span data-id="page"></span> 0';
-    return;
-  }
-
-  const parts = pageSectionContent.split('_').map(Number);
-  let humanReadablePage;
-
-  // Handle special case of page 0
-  if (parts[0] === 0 && (!parts[1] || parts[1] === 0)) {
-    humanReadablePage = '<span data-id="page"></span> 0';
-  }
-  // For pages with sections (format "7_0" renders as "6.1")
-  else if (parts.length === 2) {
-    humanReadablePage = `<span data-id="page"></span> ${parts[0] - 1}.${parts[1] + 1}`;
-  }
-  // For pages with no section information (format "6" renders as "5")
-  else {
-    humanReadablePage = `<span data-id="page"></span> ${parts[0] - 1}`;
-  }
-
-  pageElement.innerHTML = humanReadablePage;
+  pageElement.innerHTML = `<span data-id="page"></span> ${displayLabel || fallbackValue}`;
 };
 
 /**
@@ -1245,7 +1231,7 @@ export const togglePlayBarSettings = () => {
  * Handles activity completion and page/section formatting.
  */
 export const formatNavigationItems = () => {
-  const navListItems = document.querySelectorAll(".nav__list-item");
+  const navListItems = document.querySelectorAll('.nav__list[data-nav-type="pages"] .nav__list-item');
 
   navListItems.forEach((item, index) => {
     const link = item.querySelector(".nav__list-link");
@@ -1256,13 +1242,15 @@ export const formatNavigationItems = () => {
       "border-b",
       "border-gray-300",
       "flex",
-      "items-center"
+      "items-center",
+      "gap-2"
     );
 
     link.classList.add(
       "flex-grow",
       "flex",
       "items-center",
+      "min-w-0",
       "w-full",
       "h-full",
       "p-2",
@@ -1272,77 +1260,57 @@ export const formatNavigationItems = () => {
       "text-gray-500"
     );
 
-    // Add border top to first element
     if (index === 0) {
       item.classList.add("border-t");
     }
 
-    // Get section and page numbers from href
     const href = link.getAttribute("href");
-    const textId = link.getAttribute("data-text-id");
-
-    // Check for both patterns - either "6_0" format or just "6" format
-    const pageSectionMatch = href.match(/(\d+)_(\d+)/);
-    const pageOnlyMatch = !pageSectionMatch && href.match(/(\d+)/);
+    const humanReadablePage =
+      link.dataset.pageDisplayLabel || link.dataset.pageLabel || link.dataset.pageNumber || link.textContent.trim() || "—";
+    const pdfPageLabel = link.dataset.pdfPage;
 
     // Handle activity items
     let itemIcon = "";
-    let itemSubtitle = "";
+    let activityStatus = "";
     if (item.classList.contains("activity")) {
       const activityId = href.split(".")[0];
       const success = JSON.parse(localStorage.getItem(`${activityId}_success`)) || false;
 
       if (success) {
         itemIcon = `<i class="${activityId} fas fa-check-square text-green-500 mt-1"></i>`;
-        itemSubtitle = "<span data-id='activity-completed'></span>";
+        activityStatus = "<span class='activity-status' data-id='activity-completed'></span>";
       } else {
         itemIcon = `<i class="${activityId} fas fa-pen-to-square mt-1 text-blue-700"></i>`;
-        itemSubtitle = "<span data-id='activity-to-do'></span>";
+        activityStatus = "<span class='activity-status' data-id='activity-to-do'></span>";
       }
     }
-    // Format the link content with section numbers
-    let humanReadablePage;
-    if (pageSectionMatch) {
-      const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
 
-      // Handle special case of page 0
-      if (pageNumber === 0 && (!sectionNumber || sectionNumber === 0)) {
-        humanReadablePage = "0";
-      }
-
-      // For pages with sections (format "7_0" renders as "6.1")
-      else if (sectionNumber !== undefined) {
-        humanReadablePage = `${pageNumber - 1}.${sectionNumber + 1}`;
-      }
-    } else if (pageOnlyMatch) {
-      // For pages with no section information (format "6" renders as "5")
-      const pageNumber = Number(pageOnlyMatch[1]);
-      humanReadablePage = pageNumber - 1;
-    } else {
-      humanReadablePage = "0";
+    const metadataSegments = [];
+    if (activityStatus) {
+      metadataSegments.push(activityStatus);
     }
 
-    // Check the textId format to ensure we're not incorrectly treating this as a sectioned page
-    // If href has no section but textId does (like "text-6-0"), we should use href as the source of truth
-    const textIdHasSection = textId && textId.match(/-\d+-\d+$/);
-    const hrefHasNoSection = !pageSectionMatch && pageOnlyMatch;
+    const metadataHtml = metadataSegments.length
+      ? `<div class='text-xs text-gray-500 flex flex-wrap items-center gap-2'>${metadataSegments.join(
+          "<span class='text-gray-300'>•</span>"
+        )}</div>`
+      : "";
 
-    if (hrefHasNoSection && textIdHasSection) {
-      // This is a page without sections being incorrectly treated as having sections
-      // Use just the page number without decimal formatting
-      humanReadablePage = Number(pageOnlyMatch[1]) - 1;
-    }
+    const pdfBadge = pdfPageLabel
+      ? `<div class='text-xs text-gray-500 whitespace-nowrap ml-4' aria-label='Print page ${pdfPageLabel}'>Print Page ${pdfPageLabel}</div>`
+      : "";
 
-    link.innerHTML =
+    const leftContent =
       "<div class='flex items-top space-x-2'>" +
       itemIcon +
       "<div>" +
-      `<div>${humanReadablePage}: <span class='inline text-gray-800' data-id='${textId}'></span></div>` +
-      "<div class='text-sm text-gray-500'>" +
-      itemSubtitle +
-      "</div>" +
+      `<div class='text-gray-800 font-medium'>${humanReadablePage}</div>` +
+      metadataHtml +
       "</div>" +
       "</div>";
+
+    link.innerHTML =
+      `<div class='flex items-center justify-between gap-2 w-full'>${leftContent}${pdfBadge}</div>`;
 
     // Highlight current page
     if (href === window.location.pathname.split("/").pop()) {
@@ -1748,7 +1716,7 @@ export const setSidebarVisibility = (show, { manageFocus = true } = {}) => {
  */
 export const setNavVisibility = (show) => {
   const navPopup = document.getElementById("navPopup");
-  const navList = document.querySelector(".nav__list");
+  const navList = document.querySelector('.nav__list[data-nav-type="pages"]');
   if (!navPopup) return;
 
   // Always ensure transform and transition classes are present
@@ -1783,7 +1751,6 @@ export const setNavVisibility = (show) => {
     // Hide navList and save scroll position
     if (navList) {
       const scrollPosition = navList.scrollTop;
-      // navList.setAttribute("hidden", "true");
       setCookie("navScrollPosition", scrollPosition, 7);
     }
     setCookie("navState", "closed", 7);

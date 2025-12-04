@@ -48,13 +48,17 @@
                         {% endif %}
                     </div>
 
-                    <!-- Cover Page ID -->
+                    <!-- Table of Contents -->
                     <div>
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Cover Page</div>
-                        {% if metadata.cover_page_id %}
-                        <div class="text-lg text-gray-900">
-                            <span class="font-medium">Page ID:</span> 
-                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">{{ metadata.cover_page_id }}</code>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Table of Contents</div>
+                        {% if metadata.table_of_contents %}
+                        <div class="space-y-2">
+                            {% for chapter in metadata.table_of_contents %}
+                            <div class="flex justify-between items-start py-1 border-b border-gray-200 last:border-b-0">
+                                <div class="text-gray-900 flex-1 pr-4">{{ chapter.title }}</div>
+                                <div class="text-gray-600 font-medium whitespace-nowrap">p. {{ chapter.page_number }}</div>
+                            </div>
+                            {% endfor %}
                         </div>
                         {% else %}
                         <div class="text-lg text-gray-400 italic">Not detected</div>
@@ -65,15 +69,21 @@
                 <!-- Right Column: Cover Image -->
                 <div class="flex items-start justify-center">
                     {% if metadata.cover_page_id %}
-                    <div class="bg-gray-50 rounded-lg p-4 w-full">
-                        <a href="./images/{{ cover_page.page_image_path | basename }}" class="block">
-                            <img src="./images/{{ cover_page.page_image_path | basename }}" 
-                                 class="max-w-full h-auto border border-gray-200 rounded shadow-sm mx-auto" 
-                                 alt="Cover page">
-                        </a>
+                    <div class="w-full">
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Cover Page</div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <a href="./images/{{ cover_page.page_image_path | basename }}" class="block">
+                                <img src="./images/{{ cover_page.page_image_path | basename }}" 
+                                     class="max-w-full h-auto border border-gray-200 rounded shadow-sm mx-auto" 
+                                     alt="Cover page">
+                            </a>
+                        </div>
                     </div>
                     {% else %}
-                    <div class="text-lg text-gray-400 italic">No cover image</div>
+                    <div class="w-full">
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Cover Page</div>
+                        <div class="text-lg text-gray-400 italic">No cover image</div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -87,5 +97,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Pages Used for Metadata Extraction -->
+    {% if pages_used %}
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden mt-8">
+        <!-- Header -->
+        <div class="bg-gray-600 text-white px-4 py-3">
+            <h2 class="text-xl font-bold">Pages Analyzed for Metadata ({{ pages_used|length }})</h2>
+        </div>
+
+        <!-- Pages Grid -->
+        <div class="p-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                {% for page in pages_used %}
+                <div class="bg-gray-100 rounded border border-gray-200 hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+                    <div class="bg-gray-700 text-white px-2 py-1 text-xs font-medium text-center">
+                        Page {{ page.page_number }}
+                    </div>
+                    <div class="flex justify-center items-center p-2">
+                        <a href="./images/{{ page.page_image_path | basename }}" class="block">
+                            <img src="./images/{{ page.page_image_path | basename }}" 
+                                 class="max-w-full h-auto border border-gray-300 rounded" 
+                                 alt="Page {{ page.page_number }}"
+                                 style="max-height: 200px;">
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

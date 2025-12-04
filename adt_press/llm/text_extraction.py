@@ -38,6 +38,7 @@ async def get_page_text(output_dir: str, task_id: str, config: PromptConfig, pag
         response_model=TextResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        timeout=config.timeout,
     )
 
     return PageTexts(

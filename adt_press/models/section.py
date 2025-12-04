@@ -31,6 +31,7 @@ class SectionType(str, enum.Enum):
 class PageSection(BaseModel):
     section_id: str
     section_type: SectionType
+    page_number: int | None
     part_ids: list[str] = []
     is_pruned: bool = False
 

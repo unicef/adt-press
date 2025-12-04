@@ -1,5 +1,5 @@
 from banks import Prompt
-from pydantic import BaseModel, ValidationInfo, field_validator
+from pydantic import AliasChoices, BaseModel, Field, ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
@@ -13,14 +13,15 @@ from adt_press.utils.file import cached_read_text_file
 
 class Section(BaseModel):
     section_type: SectionType
+    page_number: int | None
     part_ids: list[str]
 
 
 class SectionResponse(CleanTextBaseModel):
     reasoning: str
-    data: list[Section]
+    sections: list[Section] = Field(validation_alias=AliasChoices("sections", "data"))
 
-    @field_validator("data")
+    @field_validator("sections")
     @classmethod
     def validate_section_ids(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
         """Ensure all Section part IDs reference valid group or image IDs."""
@@ -46,9 +47,12 @@ class SectionResponse(CleanTextBaseModel):
         return v
 
 
-async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]) -> PageSections:
+async def get_page_sections(
+    config: PromptConfig, spread_mode: bool, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]
+) -> PageSections:
     context = dict(
         page=page,
+        spread_mode=spread_mode,
         images=[i.model_dump() for i in images],
         texts=[dict(text_id=g.group_id, text=" ".join([t.text for t in g.texts])) for g in groups],
         examples=config.examples,
@@ -69,15 +73,17 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
         context=validation_context,
+        timeout=config.timeout,
     )
 
     # convert response data directly to page sections
     sections = []
-    for i, s in enumerate(response.data):
+    for i, s in enumerate(response.sections):
         section = PageSection(
             section_id=f"sec_{page.page_id}_s{i}",
             section_type=s.section_type,
             part_ids=s.part_ids.copy(),
+            page_number=s.page_number,
         )
         sections.append(section)
 

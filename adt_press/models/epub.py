@@ -56,6 +56,7 @@ def create_epub_file(
     # Add images
     images_by_id: dict[str, PlateImage] = {img.image_id: img for img in plate.images}
     texts_by_id: dict[str, PlateText] = {txt.text_id: txt for txt in plate.texts}
+    seen_images: dict[str, PlateImage] = {}
 
     if plate.cover_image_id:
         img = images_by_id[plate.cover_image_id]
@@ -69,15 +70,15 @@ def create_epub_file(
             img_bytes = cached_read_file(img.image_path)
             img_item = epub.EpubItem(uid=img.image_id, file_name=f"images/{image_id}.png", media_type="image/png", content=img_bytes)
 
-            # replace our PlateImage with one that has the correct path
-            images_by_id[image_id] = PlateImage(image_id=img.image_id, image_path=f"images/{image_id}.png", caption_id=img.caption_id)
+            # save it for replacement later
+            seen_images[image_id] = PlateImage(image_id=img.image_id, image_path=f"images/{image_id}.png", caption_id=img.caption_id)
             book.add_item(img_item)
 
     # Create chapters from web pages
     chapters = []
     for idx, webpage in enumerate(web_pages):
         content = webpage.content
-        content = replace_images(content, images_by_id, texts_by_id)
+        content = replace_images(content, seen_images, texts_by_id)
         content = replace_texts(content, texts_by_id)
 
         chapter = epub.EpubHtml(title=f"Section {idx + 1}", file_name=f"chap_{webpage.section_id}.xhtml", lang=language)

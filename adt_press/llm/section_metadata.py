@@ -45,6 +45,7 @@ async def get_section_metadata(
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
         context={"layout_types": list(layout_types.keys())},
+        timeout=config.timeout,
     )
 
     return SectionMetadata(

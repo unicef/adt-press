@@ -159,6 +159,7 @@ async def generate_web_page_html(
         messages=messages,
         max_retries=config.max_retries,
         context=validation_context,
+        timeout=config.timeout,
     )
 
     # The content is already sanitized and validated by the field_validator

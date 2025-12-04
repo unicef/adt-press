@@ -29,6 +29,7 @@ async def get_text_easy_read(language_code: str, config: PromptConfig, text: Pag
         response_model=EasyReadResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        timeout=config.timeout,
     )
 
     return EasyReadText(

@@ -80,6 +80,7 @@ class PromptConfig(PathHashMixin):
 
     rate_limit: int = 300
     max_retries: int = 10
+    timeout: int = 300
 
 
 class SpeechPromptConfig(PromptConfig):

@@ -112,12 +112,6 @@ render_strategies:
       template_path: prompts/web_generation_html.jinja2
       max_retries: 25
 
-      example_dirs:
-        - assets/prompts/adt_examples/text_only_1
-        - assets/prompts/adt_examples/text_and_images_1
-        - assets/prompts/adt_examples/text_and_images_2
-        - assets/prompts/adt_examples/text_and_images_3
-
 page_range:
   start: 0
   end: 0
@@ -150,8 +144,7 @@ prompts:
   metadata_extraction:
     model: default
     template_path: prompts/metadata_extraction.jinja2
-    max_retries: 3
-    page_range: 3  # Number of pages to analyze for metadata extraction
+    page_range: 10
 
   text_extraction:
     model: default
@@ -174,7 +167,6 @@ prompts:
   page_sectioning:
     model: default
     template_path: prompts/page_sectioning_by_page.jinja2
-    max_retries: 10
 
   section_explanation:
     model: default
