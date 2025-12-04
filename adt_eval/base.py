@@ -456,8 +456,6 @@ class BaseEvaluator(ABC):
         # prepare the dataset
         self.eval_dataset_records = self.create_eval_dataset_records(self.data)
 
-        self.eval_dataset_records = self.eval_dataset_records[:20]
-
         # download images for the experiment
         self.download_images()
 

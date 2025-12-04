@@ -34,7 +34,7 @@ eval:
       prompt: ${prompts.text_translation}
       report_template_path: templates/eval/translation_report.html
       experiments:
-        - experiment_name: "adt_press_translation_task_experiment_20"
+        - experiment_name: "adt_press_translation_task_experiment"
           task: "text_translation"
           report_template_path: templates/eval/text_translation_report.html
           tags:
@@ -57,4 +57,4 @@ eval:
               max_iterations: 3
           dataset:
             label_studio_project_name: "A2: Text Type"
-            name: "text_type_eval_dataset_20"
+            name: "text_type_eval_dataset_COMPLETE"
