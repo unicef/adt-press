@@ -22,9 +22,7 @@ class LabelConfigTests(unittest.TestCase):
             result = config_nodes.label_config(config, "/tmp/My Fancy Book.pdf")
 
         self.assertEqual(result, "my-fancy-book")
-        log_mock.info.assert_called_once_with(
-            "label derived from pdf", label="my-fancy-book", source="My Fancy Book"
-        )
+        log_mock.info.assert_called_once_with("label derived from pdf", label="my-fancy-book", source="My Fancy Book")
 
     def test_ensure_config_label_sets_value_and_updates_config(self) -> None:
         config = OmegaConf.create({"label": None, "pdf_path": "/tmp/cool.pdf"})
