@@ -1,14 +1,17 @@
 import os
 
+import structlog
 from omegaconf import DictConfig, OmegaConf
 
 from adt_press.pipeline import run_pipeline
+from adt_press.utils.labels import ensure_config_label
 
 # never write these flags to our config file
 TEMP_FLAGS = ["clear_cache", "print_available_models"]
 
 
 def main() -> None:
+    log = structlog.get_logger(__name__)
     cli_config = OmegaConf.from_cli()
     default_config = OmegaConf.load("config/config.yaml")
 
@@ -16,6 +19,7 @@ def main() -> None:
     OmegaConf.set_struct(default_config, True)
     default_config = DictConfig(OmegaConf.merge(default_config, cli_config))
 
+    ensure_config_label(default_config, logger=log)
     run_output_dir = default_config["run_output_dir"]
     os.makedirs(run_output_dir, exist_ok=True)
 

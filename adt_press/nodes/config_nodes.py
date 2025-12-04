@@ -1,7 +1,9 @@
 import os
 
+import structlog
 from hamilton.function_modifiers import cache
 from omegaconf import DictConfig
+from omegaconf import OmegaConf
 from pydantic import BaseModel
 
 from adt_press.models.config import (
@@ -18,7 +20,10 @@ from adt_press.models.config import (
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
+from adt_press.utils.labels import clean_label_value
+from adt_press.utils.labels import slug_from_pdf_path
 
+log = structlog.get_logger()
 
 def config() -> DictConfig:  # pragma: no cover
     assert False, "This function should not be called directly. Use the config from the pipeline instead."
@@ -48,8 +53,20 @@ def output_languages_config(config: DictConfig) -> list[str]:
     return list[str](config["output_languages"])
 
 
-def label_config(config: DictConfig) -> str:
-    return str(config["label"])
+def label_config(config: DictConfig, pdf_path_config: str) -> str:
+    override_value = OmegaConf.select(config, "label", default=None)
+    override = clean_label_value(override_value)
+    if override:
+        log.info("label override used", label=override)
+        return override
+
+    generated_label = slug_from_pdf_path(pdf_path_config)
+    log.info(
+        "label derived from pdf",
+        label=generated_label,
+        source=os.path.splitext(os.path.basename(pdf_path_config))[0]
+    )
+    return generated_label
 
 
 @cache(behavior="recompute")
