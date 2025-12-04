@@ -36,9 +36,7 @@ class InputLanguageConfigTests(unittest.TestCase):
 
     def test_input_language_config_respects_manual_override(self) -> None:
         config = DictConfig({"input_language": "ES"})
-        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(
-            config_nodes, "log"
-        ) as log_mock:
+        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log") as log_mock:
             result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
         self.assertEqual(result, "es")
@@ -48,10 +46,13 @@ class InputLanguageConfigTests(unittest.TestCase):
     def test_input_language_config_calls_detector_when_not_overridden(self) -> None:
         config = DictConfig({"input_language": None})
 
-        with patch(
-            "adt_press.nodes.config_nodes.run_async_task",
-            side_effect=lambda fn: SimpleNamespace(language_code="fr", confidence=0.42),
-        ) as run_async_mock, patch.object(config_nodes, "log") as log_mock:
+        with (
+            patch(
+                "adt_press.nodes.config_nodes.run_async_task",
+                side_effect=lambda fn: SimpleNamespace(language_code="fr", confidence=0.42),
+            ) as run_async_mock,
+            patch.object(config_nodes, "log") as log_mock,
+        ):
             result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
         self.assertEqual(result, "fr")
@@ -62,9 +63,7 @@ class InputLanguageConfigTests(unittest.TestCase):
         empty_texts: dict[str, PageTexts] = {}
         config = DictConfig({"input_language": None})
 
-        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(
-            config_nodes, "log"
-        ) as log_mock:
+        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log") as log_mock:
             result = config_nodes.input_language_config(config, self.prompt_config, empty_texts)
 
         self.assertEqual(result, "en")
@@ -74,10 +73,13 @@ class InputLanguageConfigTests(unittest.TestCase):
     def test_input_language_config_handles_missing_mandatory_value(self) -> None:
         config = OmegaConf.create({"input_language": "???"})
 
-        with patch(
-            "adt_press.nodes.config_nodes.run_async_task",
-            side_effect=lambda fn: SimpleNamespace(language_code="de", confidence=0.7),
-        ) as run_async_mock, patch.object(config_nodes, "log") as log_mock:
+        with (
+            patch(
+                "adt_press.nodes.config_nodes.run_async_task",
+                side_effect=lambda fn: SimpleNamespace(language_code="de", confidence=0.7),
+            ) as run_async_mock,
+            patch.object(config_nodes, "log") as log_mock,
+        ):
             result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
         self.assertEqual(result, "de")
@@ -169,9 +171,10 @@ class ConfigNodesHelperTests(unittest.TestCase):
     def test_input_language_config_handles_detection_failure(self) -> None:
         config = DictConfig({"input_language": None})
 
-        with patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")) as run_async_mock, patch.object(
-            config_nodes, "log"
-        ) as log_mock:
+        with (
+            patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")) as run_async_mock,
+            patch.object(config_nodes, "log") as log_mock,
+        ):
             result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
         self.assertEqual(result, "en")
