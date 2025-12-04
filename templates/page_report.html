@@ -340,6 +340,11 @@
                                                         <pre class="text-gray-800">{{ activity.items | tojson(indent=2) }}</pre>
                                                     </div>
                                                 </div>
+                                                <div class="p-3 bg-blue-50 border-blue-200 border-t text-sm text-blue-800 italic">
+                                                    <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+                                                    <span>{{ activity.reasoning }}</span>
+                                                    <div class="clear-both"></div>
+                                                </div>
                                             </div>
                                             {% endif %}
                                             {% endwith %}

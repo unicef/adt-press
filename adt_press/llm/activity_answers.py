@@ -64,8 +64,8 @@ async def generate_activity_answers(
 
     # If LLM returned empty answers but HTML has input fields, extract keys and use empty strings
     if not response.answers:
-        # Extract all data-activity-item values from HTML
-        item_pattern = r'data-activity-item="([^"]+)"'
+        # Extract all data-activity-item-id values from HTML
+        item_pattern = r'data-activity-item-id="([^"]+)"'
         item_keys = re.findall(item_pattern, content)
 
         if item_keys:

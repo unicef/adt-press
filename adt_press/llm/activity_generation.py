@@ -67,4 +67,5 @@ async def generate_activity_definition(
         section_id=section.section_id,
         activity_type=activity_type,
         items=response.items,
+        reasoning=response.reasoning,
     )

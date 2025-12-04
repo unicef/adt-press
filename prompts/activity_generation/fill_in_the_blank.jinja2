@@ -6,8 +6,8 @@ Your task is to analyze a section from a textbook that contains a fill-in-the-bl
 ### Your Task
 Analyze the page image, text elements, and image elements to identify all fill-in-the-blank items. For each blank, you must specify:
 
-1. **pre_text_id**: The text_id of the text element immediately BEFORE the blank
-2. **post_text_id**: The text_id of the text element immediately AFTER the blank  
+1. **pre_text_id**: The text_id of the text element immediately BEFORE the blank if it's part of the activity (e.g., a sentence leading up to the blank)
+2. **post_text_id**: The text_id of the text element immediately AFTER the blank if it's part of the activity (e.g., the continuation of the sentence after the blank)  
 3. **answer**: The correct answer for the blank (if determinable from context)
 
 ### Output Format
@@ -29,16 +29,16 @@ Return a JSON object with two fields:
 
 ### CRITICAL Structure Requirements
 
-**blanks array**: Must contain one object per fill-in-the-blank item. This is the only top-level field in the definition.
+**items array**: Must contain one object per fill-in-the-blank item. This is the only top-level field in the definition.
 
-Each blank object MUST have:
+Each items object MUST have:
 - **pre_text_id**: String - The text_id of the text element immediately before the blank
   - Format: Use the exact text_id provided (e.g., "txt-5-1", "txt-12-3")
-  - This text appears BEFORE the blank space
+  - This text appears BEFORE the blank space if it's part of the activity
   
 - **post_text_id**: String - The text_id of the text element immediately after the blank
   - Format: Use the exact text_id provided (e.g., "txt-5-2", "txt-12-4")
-  - This text appears AFTER the blank space
+  - This text appears AFTER the blank space if it's part of the activity
   - Use empty string "" if blank is at the end of sentence
   
 - **answer**: String - The correct answer to fill in the blank

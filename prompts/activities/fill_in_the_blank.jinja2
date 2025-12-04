@@ -71,6 +71,57 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 </p>
 ```
 
+### ABSOLUTE CRITICAL RULES
+
+**DO NOT ADD ANYTHING EXTRA:**
+1. **NO "Banco de palabras"** - Do not add word banks, hint boxes, or clue sections
+2. **NO "Recuerda que" sections** - Do not add reminder boxes or definition sections
+3. **NO extra scaffolding** - Do not add helpful tips, explanations, or context boxes beyond what was PROVIDED
+4. **NO decorative sections** - Do not add images, dividers, or auxiliary content that wasn't in the provided elements
+5. **NO placeholder text** - Do not add section titles like "Word Bank", "Instructions", "Tips", etc. unless those exact words are in the provided text IDs
+
+**EVERY text element MUST have data-id:**
+- ALL `<p>`, `<span>`, `<label>`, `<h1>`, `<h2>`, `<h3>` tags with text MUST have `data-id` attribute
+- The `data-id` value MUST match exactly one of the provided text element IDs
+- NO text can appear in any HTML tag without a corresponding data-id
+- NO stray text directly in `<section>` or `<div>` containers
+
+**Validation checklist BEFORE responding:**
+- ✓ Count all text nodes (text inside HTML tags) in your HTML
+- ✓ Verify EVERY text node has a matching `data-id` from the provided text IDs
+- ✓ Verify NO extra explanatory text was added (no "Banco de palabras", no "Recuerda que", no tips)
+- ✓ Verify EVERY `<input>` has `data-activity-item-id` attribute
+- ✓ Verify only provided images are used (not added new ones)
+
+### EXAMPLES OF WHAT NOT TO DO:
+
+WRONG - Added "Banco de palabras" label without data-id:
+```html
+<p class="font-semibold mb-2">Banco de palabras (pistas)</p>  <!-- NO data-id! -->
+```
+
+WRONG - Added "Recuerda que" section without all text having data-id:
+```html
+<div class="bg-gray-100">
+  <p class="font-semibold">Recuerda que:</p>  <!-- NO data-id! -->
+  <p><span data-id="text-1">Definition text</span></p>
+</div>
+```
+
+CORRECT - Only use provided text IDs:
+```html
+<div class="flex flex-col gap-4 mb-6 max-w-2xl mx-auto">
+  <div class="bg-green-200 p-3 rounded-lg">
+    <label class="font-semibold" data-id="text-1">Complete the sentences</label>
+    <input class="w-full p-2 border border-gray-300 rounded"
+           data-activity-item-id="item-1"
+           placeholder="Type here"
+           tabindex="0"
+           type="text" />
+  </div>
+</div>
+```
+
 ### CRITICAL Requirements
 1. ALL text elements MUST have `data-id` matching provided text IDs
 2. ALL images MUST have `data-id` matching provided image IDs
@@ -79,6 +130,7 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 5. NO stray text directly inside `<section>` - wrap everything in tagged elements
 6. Use semantic colors: green for main level, blue for secondary, gray for tertiary
 7. Match layout complexity to the educational goal (simple list vs. hierarchy)
+8. **DO NOT ADD ANY HELPER SECTIONS, SCAFFOLDING, WORD BANKS, OR EXTRA EXPLANATORY TEXT**
 
 ### Response Format (STRICT)
 Return JSON object:
@@ -90,9 +142,8 @@ Return JSON object:
 ```
 IMPORTANT: Your reasoning MUST be written in English, regardless of the activity language. The HTML content itself should match the activity language.
 
-### Example Structures
+### Example Structure
 
-**Simple vertical:**
 ```html
 <div class="flex justify-center items-start min-h-[calc(100dvh-100px)]">
   <div class="container mx-auto max-w-5xl bg-white rounded-lg lg:px-24 md:px-12 sm:px-6 pt-12 pb-12" id="content">
@@ -106,7 +157,6 @@ IMPORTANT: Your reasoning MUST be written in English, regardless of the activity
         <div class="bg-green-200 p-3 rounded-lg">
           <label class="font-semibold" data-id="text-2">Capital of France:</label>
           <input class="w-full p-2 border border-gray-300 rounded"
-                 data-aria-id="aria-1-0-0"
                  data-activity-item-id="item-1"
                  placeholder="Write the city name"
                  tabindex="0"
@@ -142,7 +192,7 @@ Images available:
 {% endif %}
 {% endfor %}
 
-Text Elements (use all with data-id):
+Text Elements (use ALL of these, and ONLY these, with data-id):
 {% for text in texts %}
 - ID: {{ text.text_id }}
   Type: {{ text.type }}
@@ -156,5 +206,7 @@ Activity Item Definitions:
 
 {% endfor %}
 
-Generate a fill-in-the-blank activity with appropriate layout. Make sure to add a data-activity-item-id on all inputs.
-{% endchat %}
+CRITICAL: Use ONLY the text elements provided above. Do NOT add any extra sections, helpers, word banks, or scaffolding. Do NOT add any text that doesn't have a data-id from the provided list above.
+
+Generate a fill-in-the-blank activity with appropriate layout. Make sure every HTML tag with text has a matching data-id attribute. Make sure all inputs have data-activity-item-id attributes.
+{% endchat %}```

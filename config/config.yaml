@@ -165,6 +165,13 @@ activity_types:
       model: default
       template_path: prompts/activity_generation/fill_in_the_blank.jinja2
       max_retries: 0
+  multiple_choice:
+    section_types:
+      - activity_multiple_choice
+    prompt_config:
+      model: default
+      template_path: prompts/activity_generation/multiple_choice.jinja2
+      max_retries: 0
 
 prompts:
   metadata_extraction:

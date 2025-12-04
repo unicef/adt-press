@@ -19,3 +19,4 @@ class Activity(BaseModel):
     section_id: str
     activity_type: ActivityType
     items: list[dict[str, Any]]
+    reasoning: str
