@@ -1,7 +1,7 @@
 label: "???"
 pdf_path: "???"
 
-input_language: "???"
+input_language: null
 plate_language: "${input_language}"
 output_languages: ["${input_language}"]
 

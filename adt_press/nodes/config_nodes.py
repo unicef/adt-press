@@ -2,7 +2,7 @@ import os
 
 import structlog
 from hamilton.function_modifiers import cache
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from pydantic import BaseModel
 
 from adt_press.llm.language_detection import detect_input_language
@@ -78,28 +78,61 @@ def input_language_config(
     language_detection_prompt_config: PromptConfig,
     pdf_texts: dict[str, PageTexts],
 ) -> str:
-    override = _clean_language_override(config.get("input_language"))
+    override_value = OmegaConf.select(config, "input_language", default=None)
+    override = _clean_language_override(override_value)
     if override:
+        log.info("input language override used", language=override)
         return override
 
     sample_text = _sample_pdf_text_for_language_detection(pdf_texts)
     if not sample_text.strip():
+        log.info("input language defaulted to english", reason="no_text")
         return "en"
 
     try:
         response = run_async_task(lambda: detect_input_language(sample_text, language_detection_prompt_config))
+        confidence = getattr(response, "confidence", None)
+        log.info("input language detected automatically", language=response.language_code, confidence=confidence)
         return response.language_code
     except Exception as exc:  # pragma: no cover - fallback path
         log.warning("language detection failed; defaulting to english", error=str(exc))
+        log.info("input language defaulted to english", reason="detection_error")
         return "en"
 
 
-def plate_language_config(config: DictConfig) -> str:
-    return str(config.get("plate_language", "en"))
+def plate_language_config(config: DictConfig, input_language_config: str) -> str:
+    plate_override_value = OmegaConf.select(config, "plate_language", default=None)
+    plate_override = _clean_language_override(plate_override_value)
+    if plate_override:
+        log.info("plate language override used", language=plate_override)
+        return plate_override
+
+    log.info("plate language defaulted to input language", language=input_language_config)
+    return input_language_config
 
 
-def output_languages_config(config: DictConfig) -> list[str]:
-    return list[str](config["output_languages"])
+def output_languages_config(config: DictConfig, input_language_config: str) -> list[str]:
+    raw_languages = OmegaConf.select(config, "output_languages", default=None)
+    sequence: list[str | None] = []
+    if raw_languages is not None:
+        sequence = list(OmegaConf.to_container(raw_languages, resolve=True))
+    cleaned_languages: list[str] = []
+
+    if sequence:
+        for language in sequence:
+            cleaned = _clean_language_override(language)
+            if cleaned:
+                cleaned_languages.append(cleaned)
+            else:
+                log.info("output language entry skipped", value=str(language))
+
+    if not cleaned_languages:
+        cleaned_languages = [input_language_config]
+        log.info("output languages defaulted to input language", languages=cleaned_languages)
+    else:
+        log.info("output languages configured", languages=cleaned_languages)
+
+    return cleaned_languages
 
 
 def label_config(config: DictConfig) -> str:
