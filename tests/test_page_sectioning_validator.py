@@ -11,8 +11,8 @@ class TestPageSectioningValidator:
     def test_valid_sections_with_text_and_image_ids(self):
         """Test that valid sections with correct IDs pass validation."""
         sections_data = [
-            {"section_type": "text_only", "part_ids": ["text-1", "text-2"]},
-            {"section_type": "text_and_images", "part_ids": ["image-1", "text-3"]},
+            {"section_type": "text_only", "part_ids": ["text-1", "text-2"], "page_number": None},
+            {"section_type": "text_and_images", "part_ids": ["image-1", "text-3"], "page_number": None},
         ]
 
         context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
@@ -20,15 +20,15 @@ class TestPageSectioningValidator:
         # This should not raise any validation errors
         response = SectionResponse.model_validate({"reasoning": "Test reasoning", "data": sections_data}, context=context)
 
-        assert len(response.data) == 2
+        assert len(response.sections) == 2
         assert response.reasoning == "Test reasoning"
-        assert response.data[0].part_ids == ["text-1", "text-2"]
-        assert response.data[0].section_type == SectionType.text_only
+        assert response.sections[0].part_ids == ["text-1", "text-2"]
+        assert response.sections[0].section_type == SectionType.text_only
 
     def test_section_with_invalid_text_id(self):
         """Test that sections with invalid text IDs raise validation error."""
         sections_data = [
-            {"section_type": "text_only", "part_ids": ["invalid-text-id", "text-1"]},
+            {"section_type": "text_only", "part_ids": ["invalid-text-id", "text-1"], "page_number": 1},
         ]
 
         context = {"text_ids": ["text-1", "text-2"], "image_ids": ["image-1"]}
@@ -44,7 +44,7 @@ class TestPageSectioningValidator:
     def test_section_with_invalid_image_id(self):
         """Test that sections with invalid image IDs raise validation error."""
         sections_data = [
-            {"section_type": "text_and_images", "part_ids": ["text-1", "invalid-image-id"]},
+            {"section_type": "text_and_images", "part_ids": ["text-1", "invalid-image-id"], "page_number": 1},
         ]
 
         context = {"text_ids": ["text-1"], "image_ids": ["image-1", "image-2"]}
@@ -60,8 +60,8 @@ class TestPageSectioningValidator:
     def test_mixed_valid_and_invalid_sections(self):
         """Test sections with mix of valid and invalid IDs."""
         sections_data = [
-            {"section_type": "text_only", "part_ids": ["text-1", "invalid-id"]},
-            {"section_type": "text_and_images", "part_ids": ["image-1"]},
+            {"section_type": "text_only", "part_ids": ["text-1", "invalid-id"], "page_number": 1},
+            {"section_type": "text_and_images", "part_ids": ["image-1"], "page_number": 2},
         ]
 
         context = {"text_ids": ["text-1"], "image_ids": ["image-1"]}
@@ -76,8 +76,8 @@ class TestPageSectioningValidator:
     def test_multiple_sections_same_section_id(self):
         """Test that multiple sections can be created with valid IDs."""
         sections_data = [
-            {"section_type": "activity_multiple_choice", "part_ids": ["text-1", "text-2", "text-3"]},
-            {"section_type": "text_and_images", "part_ids": ["image-1"]},
+            {"section_type": "activity_multiple_choice", "part_ids": ["text-1", "text-2", "text-3"], "page_number": 1},
+            {"section_type": "text_and_images", "part_ids": ["image-1"], "page_number": 1},
         ]
 
         context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
@@ -85,7 +85,7 @@ class TestPageSectioningValidator:
         # This should pass validation
         response = SectionResponse.model_validate({"reasoning": "Multiple choice activity", "data": sections_data}, context=context)
 
-        assert len(response.data) == 2
+        assert len(response.sections) == 2
         # Check that first section has all text ids
-        assert response.data[0].part_ids == ["text-1", "text-2", "text-3"]
-        assert response.data[1].part_ids == ["image-1"]
+        assert response.sections[0].part_ids == ["text-1", "text-2", "text-3"]
+        assert response.sections[1].part_ids == ["image-1"]

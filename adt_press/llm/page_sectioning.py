@@ -1,5 +1,5 @@
 from banks import Prompt
-from pydantic import BaseModel, ValidationInfo, field_validator
+from pydantic import AliasChoices, BaseModel, Field, ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
@@ -19,7 +19,7 @@ class Section(BaseModel):
 
 class SectionResponse(CleanTextBaseModel):
     reasoning: str
-    sections: list[Section]
+    sections: list[Section] = Field(validation_alias=AliasChoices("sections", "data"))
 
     @field_validator("sections")
     @classmethod
@@ -80,7 +80,7 @@ async def get_page_sections(
     sections = []
     for i, s in enumerate(response.sections):
         section = PageSection(
-            section_id=f"sec_{page.page_id}_s{i + 1}",
+            section_id=f"sec_{page.page_id}_s{i}",
             section_type=s.section_type,
             part_ids=s.part_ids.copy(),
             page_number=s.page_number,
