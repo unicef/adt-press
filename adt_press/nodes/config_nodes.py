@@ -26,14 +26,29 @@ from adt_press.utils.sync import run_async_task
 log = structlog.get_logger(__name__)
 
 
+def config() -> DictConfig:  # pragma: no cover
+    assert False, "This function should not be called directly. Use the config from the pipeline instead."
+
+
+def template_config(run_output_dir_config: str) -> TemplateConfig:
+    return TemplateConfig(output_dir=run_output_dir_config)
+
+
+def pdf_path_config(config: DictConfig) -> str:
+    return str(config["pdf_path"])
+
+
+def custom_plate_path_config(config: DictConfig) -> str:
+    return str(config.get("custom_plate_path", ""))
+
+
 def _clean_language_override(language_value: str | None) -> str | None:
     if language_value is None:
         return None
-
     return str(language_value).strip().lower()
 
 
-def _sample_pdf_text_for_language_detection(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
+def pdf_text_sample(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
     collected: list[str] = []
     total_chars = 0
 
@@ -53,26 +68,10 @@ def _sample_pdf_text_for_language_detection(pdf_texts: dict[str, PageTexts], max
     return "\n".join(collected)
 
 
-def config() -> DictConfig:  # pragma: no cover
-    assert False, "This function should not be called directly. Use the config from the pipeline instead."
-
-
-def template_config(run_output_dir_config: str) -> TemplateConfig:
-    return TemplateConfig(output_dir=run_output_dir_config)
-
-
-def pdf_path_config(config: DictConfig) -> str:
-    return str(config["pdf_path"])
-
-
-def custom_plate_path_config(config: DictConfig) -> str:
-    return str(config.get("custom_plate_path", ""))
-
-
 def input_language_config(
     config: DictConfig,
     language_detection_prompt_config: PromptConfig,
-    pdf_texts: dict[str, PageTexts],
+    pdf_text_sample: str,
 ) -> str:
     override_value = OmegaConf.select(config, "input_language", default=None)
     override = _clean_language_override(override_value)
@@ -80,12 +79,11 @@ def input_language_config(
         log.info("input language override used", language=override)
         return override
 
-    sample_text = _sample_pdf_text_for_language_detection(pdf_texts)
-    if not sample_text.strip():
+    if not pdf_text_sample.strip():
         raise RuntimeError("language detection failed; pdf has no text!")
 
     try:
-        response = run_async_task(lambda: detect_input_language(sample_text, language_detection_prompt_config))
+        response = run_async_task(lambda: detect_input_language(pdf_text_sample, language_detection_prompt_config))
         confidence = getattr(response, "confidence", None)
         log.info("input language detected automatically", language=response.language_code, confidence=confidence)
         return response.language_code
