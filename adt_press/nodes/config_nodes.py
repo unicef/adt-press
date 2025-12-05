@@ -76,7 +76,6 @@ def input_language_config(
     override_value = OmegaConf.select(config, "input_language", default=None)
     override = _clean_language_override(override_value)
     if override:
-        log.info("input language override used", language=override)
         return override
 
     if not pdf_text_sample.strip():
@@ -95,7 +94,6 @@ def plate_language_config(config: DictConfig, input_language_config: str) -> str
     plate_override_value = OmegaConf.select(config, "plate_language", default=None)
     plate_override = _clean_language_override(plate_override_value)
     if plate_override:
-        log.info("plate language override used", language=plate_override)
         return plate_override
 
     log.info("plate language defaulted to input language", language=input_language_config)
@@ -125,8 +123,6 @@ def output_languages_config(config: DictConfig, input_language_config: str) -> l
     if not cleaned_languages:
         cleaned_languages = [input_language_config]
         log.info("output languages defaulted to input language", languages=cleaned_languages)
-    else:
-        log.info("output languages configured", languages=cleaned_languages)
 
     return cleaned_languages
 
