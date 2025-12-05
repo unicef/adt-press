@@ -89,7 +89,7 @@ def input_language_config(
         confidence = getattr(response, "confidence", None)
         log.info("input language detected automatically", language=response.language_code, confidence=confidence)
         return response.language_code
-    except Exception as exc:  # pragma: no cover - fallback path
+    except Exception:  # pragma: no cover - fallback path
         raise RuntimeError("language detection failed; please specify `input_language` configuration parameter")
 
 
