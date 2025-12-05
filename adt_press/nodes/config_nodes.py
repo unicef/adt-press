@@ -30,11 +30,7 @@ def _clean_language_override(language_value: str | None) -> str | None:
     if language_value is None:
         return None
 
-    normalized = str(language_value).strip().lower()
-    if not normalized or normalized == "???":
-        return None
-
-    return normalized
+    return str(language_value).strip().lower()
 
 
 def _sample_pdf_text_for_language_detection(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
@@ -86,8 +82,7 @@ def input_language_config(
 
     sample_text = _sample_pdf_text_for_language_detection(pdf_texts)
     if not sample_text.strip():
-        log.info("input language defaulted to english", reason="no_text")
-        return "en"
+        raise RuntimeError("language detection failed; pdf has no text!")
 
     try:
         response = run_async_task(lambda: detect_input_language(sample_text, language_detection_prompt_config))
@@ -95,9 +90,7 @@ def input_language_config(
         log.info("input language detected automatically", language=response.language_code, confidence=confidence)
         return response.language_code
     except Exception as exc:  # pragma: no cover - fallback path
-        log.warning("language detection failed; defaulting to english", error=str(exc))
-        log.info("input language defaulted to english", reason="detection_error")
-        return "en"
+        raise RuntimeError("language detection failed; please specify `input_language` configuration parameter")
 
 
 def plate_language_config(config: DictConfig, input_language_config: str) -> str:
@@ -120,10 +113,7 @@ def output_languages_config(config: DictConfig, input_language_config: str) -> l
             for item in container:
                 sequence.append(str(item) if item is not None else None)
         else:
-            log.warning(
-                "output languages config must be a list; falling back to empty sequence",
-                received_type=type(container).__name__,
-            )
+            raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
     cleaned_languages: list[str] = []
 
     if sequence:
@@ -132,7 +122,7 @@ def output_languages_config(config: DictConfig, input_language_config: str) -> l
             if cleaned:
                 cleaned_languages.append(cleaned)
             else:
-                log.info("output language entry skipped", value=str(language))
+                raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
 
     if not cleaned_languages:
         cleaned_languages = [input_language_config]
