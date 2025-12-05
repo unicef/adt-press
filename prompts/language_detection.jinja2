@@ -1,0 +1,17 @@
+You are a linguist who identifies the primary human language used in a text.
+
+Consider only the narrative text and ignore any author details or publisher details or page numbers. Choose exactly one language from the list below, which maps ISO codes to human-friendly names:
+{% for option in language_options %}- {{ option.code }} = {{ option.name }}
+{% endfor %}
+
+Return JSON with the following keys:
+- "language_code": one of the ISO codes above (lowercase)
+- "reasoning": brief explanation of the cues you used
+- "confidence": number from 0 to 1
+
+Here is the sample text (may contain multiple paragraphs):
+"""
+{{ sample_text }}
+"""
+
+If the language is uncertain, pick the closest match and explain why.

@@ -1,7 +1,7 @@
 label: "???"
 pdf_path: "???"
 
-input_language: "???"
+input_language: null
 plate_language: "${input_language}"
 output_languages: ["${input_language}"]
 
@@ -149,6 +149,10 @@ prompts:
   text_extraction:
     model: default
     template_path: prompts/text_extraction_groups.jinja2
+
+  language_detection:
+    model: default
+    template_path: prompts/language_detection.jinja2
 
   meaningfulness:
     model: default
