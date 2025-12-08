@@ -11,6 +11,7 @@
 | adt\_press/llm/image\_caption.py            |       16 |        0 |    100% |           |
 | adt\_press/llm/image\_crop.py               |       27 |        0 |    100% |           |
 | adt\_press/llm/image\_meaningfulness.py     |       14 |        0 |    100% |           |
+| adt\_press/llm/language\_detection.py       |       23 |        0 |    100% |           |
 | adt\_press/llm/metadata\_extraction.py      |       15 |        0 |    100% |           |
 | adt\_press/llm/page\_sectioning.py          |       38 |        0 |    100% |           |
 | adt\_press/llm/section\_explanations.py     |       17 |        6 |     65% |     21-42 |
@@ -33,7 +34,7 @@
 | adt\_press/models/text.py                   |       36 |        0 |    100% |           |
 | adt\_press/models/web.py                    |        4 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py            |        0 |        0 |    100% |           |
-| adt\_press/nodes/config\_nodes.py           |      126 |        5 |     96% |68, 93, 179, 184, 189 |
+| adt\_press/nodes/config\_nodes.py           |      186 |       11 |     94% |61, 66, 112, 121, 124-125, 147, 172, 263, 268, 273 |
 | adt\_press/nodes/epub\_nodes.py             |       28 |        2 |     93% |     58-59 |
 | adt\_press/nodes/image\_nodes.py            |      109 |        2 |     98% |   49, 100 |
 | adt\_press/nodes/pdf\_nodes.py              |      110 |        2 |     98% |  167, 215 |
@@ -57,6 +58,7 @@
 | adt\_press/utils/web\_assets.py             |      115 |       13 |     89% |17, 64-71, 127, 152-157 |
 | tests/test\_clear\_cache.py                 |       45 |        0 |    100% |           |
 | tests/test\_encoding.py                     |       39 |        1 |     97% |        64 |
+| tests/test\_language\_detection.py          |      103 |        1 |     99% |       163 |
 | tests/test\_page\_sectioning\_validator.py  |       46 |        0 |    100% |           |
 | tests/test\_parameter\_validation.py        |       30 |        0 |    100% |           |
 | tests/test\_pdf\_extractor.py               |      116 |        0 |    100% |           |
@@ -66,7 +68,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-|                                   **TOTAL** | **2861** |  **472** | **84%** |           |
+|                                   **TOTAL** | **3047** |  **479** | **84%** |           |
 
 
 ## Setup coverage badge
