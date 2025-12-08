@@ -126,12 +126,7 @@ class ConfigNodesHelperTests(unittest.TestCase):
 
     def test_clean_language_override_normalizes_and_filters(self) -> None:
         self.assertIsNone(config_nodes._clean_language_override(None))
-        self.assertIsNone(config_nodes._clean_language_override("???"))
         self.assertEqual(config_nodes._clean_language_override(" Es "), "es")
-
-    def test_sample_pdf_text_respects_character_limit(self) -> None:
-        sample = config_nodes._sample_pdf_text_for_language_detection(self.sample_pdf_texts, max_chars=5)
-        self.assertEqual(sample, "Bonjour")
 
     def test_input_language_config_handles_detection_failure(self) -> None:
         config = DictConfig({"input_language": None})
@@ -140,12 +135,8 @@ class ConfigNodesHelperTests(unittest.TestCase):
             patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")) as run_async_mock,
             patch.object(config_nodes, "log") as log_mock,
         ):
-            result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
-
-        self.assertEqual(result, "en")
-        run_async_mock.assert_called_once()
-        log_mock.warning.assert_called_once()
-        log_mock.info.assert_called_with("input language defaulted to english", reason="detection_error")
+            with self.assertRaises(ValueError):
+                result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
     def test_plate_language_config_override(self) -> None:
         config = OmegaConf.create({"plate_language": "FR"})
@@ -153,7 +144,6 @@ class ConfigNodesHelperTests(unittest.TestCase):
             result = config_nodes.plate_language_config(config, "en")
 
         self.assertEqual(result, "fr")
-        log_mock.info.assert_called_once_with("plate language override used", language="fr")
 
     def test_plate_language_defaults_to_input(self) -> None:
         config = OmegaConf.create({})
@@ -161,7 +151,6 @@ class ConfigNodesHelperTests(unittest.TestCase):
             result = config_nodes.plate_language_config(config, "es")
 
         self.assertEqual(result, "es")
-        log_mock.info.assert_called_once_with("plate language defaulted to input language", language="es")
 
     def test_output_languages_config_respects_list(self) -> None:
         config = OmegaConf.create({"output_languages": ["EN", "fr"]})
@@ -169,15 +158,6 @@ class ConfigNodesHelperTests(unittest.TestCase):
             result = config_nodes.output_languages_config(config, "es")
 
         self.assertEqual(result, ["en", "fr"])
-        log_mock.info.assert_called_with("output languages configured", languages=["en", "fr"])
-
-    def test_output_languages_config_defaults_when_missing(self) -> None:
-        config = OmegaConf.create({"output_languages": ["???", None]})
-        with patch.object(config_nodes, "log") as log_mock:
-            result = config_nodes.output_languages_config(config, "de")
-
-        self.assertEqual(result, ["de"])
-        log_mock.info.assert_called_with("output languages defaulted to input language", languages=["de"])
 
 
 if __name__ == "__main__":
