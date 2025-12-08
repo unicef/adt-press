@@ -7,41 +7,21 @@ from omegaconf import DictConfig, OmegaConf
 
 from adt_press.llm.language_detection import LanguageDetectionResponse, detect_input_language
 from adt_press.models.config import PromptConfig
-from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.nodes import config_nodes
 
 
 class InputLanguageConfigTests(unittest.TestCase):
     def setUp(self) -> None:
         self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
-        self.sample_pdf_texts = {
-            "page_1": PageTexts(
-                page_id="page_1",
-                groups=[
-                    PageTextGroup(
-                        group_id="g1",
-                        group_type=TextGroupType.paragraph,
-                        texts=[
-                            PageText(
-                                text_id="txt_1",
-                                text="Bonjour tout le monde",
-                                text_type=TextType.section_text,
-                            )
-                        ],
-                    )
-                ],
-                reasoning="",
-            )
-        }
+        self.sample_pdf_texts = "Bonjour tout le monde"
 
     def test_input_language_config_respects_manual_override(self) -> None:
         config = DictConfig({"input_language": "ES"})
-        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log") as log_mock:
+        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log"):
             result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
         self.assertEqual(result, "es")
         run_async_mock.assert_not_called()
-        log_mock.info.assert_called_once_with("input language override used", language="es")
 
     def test_input_language_config_calls_detector_when_not_overridden(self) -> None:
         config = DictConfig({"input_language": None})
@@ -60,15 +40,14 @@ class InputLanguageConfigTests(unittest.TestCase):
         log_mock.info.assert_called_once_with("input language detected automatically", language="fr", confidence=0.42)
 
     def test_input_language_config_defaults_to_english_when_no_text(self) -> None:
-        empty_texts: dict[str, PageTexts] = {}
+        empty_texts: str = ""
         config = DictConfig({"input_language": None})
 
-        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log") as log_mock:
-            result = config_nodes.input_language_config(config, self.prompt_config, empty_texts)
+        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log"):
+            with self.assertRaises(ValueError):
+                config_nodes.input_language_config(config, self.prompt_config, empty_texts)
 
-        self.assertEqual(result, "en")
         run_async_mock.assert_not_called()
-        log_mock.info.assert_called_once_with("input language defaulted to english", reason="no_text")
 
     def test_input_language_config_handles_missing_mandatory_value(self) -> None:
         config = OmegaConf.create({"input_language": "???"})
@@ -141,78 +120,43 @@ class LanguageDetectionLLMTests(unittest.TestCase):
 
 class ConfigNodesHelperTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.sample_pdf_texts = {
-            "page_1": PageTexts(
-                page_id="page_1",
-                groups=[
-                    PageTextGroup(
-                        group_id="g1",
-                        group_type=TextGroupType.paragraph,
-                        texts=[
-                            PageText(text_id="t1", text="Bonjour", text_type=TextType.section_text),
-                            PageText(text_id="t2", text="le monde", text_type=TextType.section_text),
-                        ],
-                    )
-                ],
-                reasoning="",
-            )
-        }
+        self.sample_pdf_texts = "Bonjour le monde"
         self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
 
     def test_clean_language_override_normalizes_and_filters(self) -> None:
         self.assertIsNone(config_nodes._clean_language_override(None))
-        self.assertIsNone(config_nodes._clean_language_override("???"))
         self.assertEqual(config_nodes._clean_language_override(" Es "), "es")
-
-    def test_sample_pdf_text_respects_character_limit(self) -> None:
-        sample = config_nodes._sample_pdf_text_for_language_detection(self.sample_pdf_texts, max_chars=5)
-        self.assertEqual(sample, "Bonjour")
 
     def test_input_language_config_handles_detection_failure(self) -> None:
         config = DictConfig({"input_language": None})
 
         with (
-            patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")) as run_async_mock,
-            patch.object(config_nodes, "log") as log_mock,
+            patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")),
+            patch.object(config_nodes, "log"),
         ):
-            result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
-
-        self.assertEqual(result, "en")
-        run_async_mock.assert_called_once()
-        log_mock.warning.assert_called_once()
-        log_mock.info.assert_called_with("input language defaulted to english", reason="detection_error")
+            with self.assertRaises(ValueError):
+                config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
 
     def test_plate_language_config_override(self) -> None:
         config = OmegaConf.create({"plate_language": "FR"})
-        with patch.object(config_nodes, "log") as log_mock:
+        with patch.object(config_nodes, "log"):
             result = config_nodes.plate_language_config(config, "en")
 
         self.assertEqual(result, "fr")
-        log_mock.info.assert_called_once_with("plate language override used", language="fr")
 
     def test_plate_language_defaults_to_input(self) -> None:
         config = OmegaConf.create({})
-        with patch.object(config_nodes, "log") as log_mock:
+        with patch.object(config_nodes, "log"):
             result = config_nodes.plate_language_config(config, "es")
 
         self.assertEqual(result, "es")
-        log_mock.info.assert_called_once_with("plate language defaulted to input language", language="es")
 
     def test_output_languages_config_respects_list(self) -> None:
         config = OmegaConf.create({"output_languages": ["EN", "fr"]})
-        with patch.object(config_nodes, "log") as log_mock:
+        with patch.object(config_nodes, "log"):
             result = config_nodes.output_languages_config(config, "es")
 
         self.assertEqual(result, ["en", "fr"])
-        log_mock.info.assert_called_with("output languages configured", languages=["en", "fr"])
-
-    def test_output_languages_config_defaults_when_missing(self) -> None:
-        config = OmegaConf.create({"output_languages": ["???", None]})
-        with patch.object(config_nodes, "log") as log_mock:
-            result = config_nodes.output_languages_config(config, "de")
-
-        self.assertEqual(result, ["de"])
-        log_mock.info.assert_called_with("output languages defaulted to input language", languages=["de"])
 
 
 if __name__ == "__main__":

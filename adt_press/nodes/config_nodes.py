@@ -79,7 +79,7 @@ def input_language_config(
         return override
 
     if not pdf_text_sample.strip():
-        raise RuntimeError("language detection failed; pdf has no text!")
+        raise ValueError("language detection failed; pdf has no text!")
 
     try:
         response = run_async_task(lambda: detect_input_language(pdf_text_sample, language_detection_prompt_config))
@@ -87,7 +87,7 @@ def input_language_config(
         log.info("input language detected automatically", language=response.language_code, confidence=confidence)
         return response.language_code
     except Exception:  # pragma: no cover - fallback path
-        raise RuntimeError("language detection failed; please specify `input_language` configuration parameter")
+        raise ValueError("language detection failed; please specify `input_language` configuration parameter")
 
 
 def plate_language_config(config: DictConfig, input_language_config: str) -> str:
