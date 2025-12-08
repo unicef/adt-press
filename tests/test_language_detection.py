@@ -14,25 +14,7 @@ from adt_press.nodes import config_nodes
 class InputLanguageConfigTests(unittest.TestCase):
     def setUp(self) -> None:
         self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
-        self.sample_pdf_texts = {
-            "page_1": PageTexts(
-                page_id="page_1",
-                groups=[
-                    PageTextGroup(
-                        group_id="g1",
-                        group_type=TextGroupType.paragraph,
-                        texts=[
-                            PageText(
-                                text_id="txt_1",
-                                text="Bonjour tout le monde",
-                                text_type=TextType.section_text,
-                            )
-                        ],
-                    )
-                ],
-                reasoning="",
-            )
-        }
+        self.sample_pdf_texts = "Bonjour tout le monde"
 
     def test_input_language_config_respects_manual_override(self) -> None:
         config = DictConfig({"input_language": "ES"})
@@ -41,7 +23,6 @@ class InputLanguageConfigTests(unittest.TestCase):
 
         self.assertEqual(result, "es")
         run_async_mock.assert_not_called()
-        log_mock.info.assert_called_once_with("input language override used", language="es")
 
     def test_input_language_config_calls_detector_when_not_overridden(self) -> None:
         config = DictConfig({"input_language": None})
@@ -60,15 +41,14 @@ class InputLanguageConfigTests(unittest.TestCase):
         log_mock.info.assert_called_once_with("input language detected automatically", language="fr", confidence=0.42)
 
     def test_input_language_config_defaults_to_english_when_no_text(self) -> None:
-        empty_texts: dict[str, PageTexts] = {}
+        empty_texts: str = ""
         config = DictConfig({"input_language": None})
 
         with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log") as log_mock:
-            result = config_nodes.input_language_config(config, self.prompt_config, empty_texts)
+            with self.assertRaises(ValueError):
+                config_nodes.input_language_config(config, self.prompt_config, empty_texts)
 
-        self.assertEqual(result, "en")
         run_async_mock.assert_not_called()
-        log_mock.info.assert_called_once_with("input language defaulted to english", reason="no_text")
 
     def test_input_language_config_handles_missing_mandatory_value(self) -> None:
         config = OmegaConf.create({"input_language": "???"})
@@ -141,22 +121,7 @@ class LanguageDetectionLLMTests(unittest.TestCase):
 
 class ConfigNodesHelperTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.sample_pdf_texts = {
-            "page_1": PageTexts(
-                page_id="page_1",
-                groups=[
-                    PageTextGroup(
-                        group_id="g1",
-                        group_type=TextGroupType.paragraph,
-                        texts=[
-                            PageText(text_id="t1", text="Bonjour", text_type=TextType.section_text),
-                            PageText(text_id="t2", text="le monde", text_type=TextType.section_text),
-                        ],
-                    )
-                ],
-                reasoning="",
-            )
-        }
+        self.sample_pdf_texts = "Bonjour le monde"
         self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
 
     def test_clean_language_override_normalizes_and_filters(self) -> None:
