@@ -20,3 +20,8 @@ eval:
       model: ${default_model}
       prompt: ${prompts.text_extraction}
       report_template_path: templates/eval/text_type_report.html
+    text_transcript:
+      label_studio_project_name: "A1: Text Extraction"
+      model: ${default_model}
+      prompt: ${prompts.text_extraction}
+      report_template_path: templates/eval/text_transcript_report.html

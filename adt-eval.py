@@ -10,6 +10,7 @@ Usage:
 
 Available tasks:
     - text_type: Evaluate text type accuracy
+    - text_transcript: Evaluate text type accuracy
 """
 
 import asyncio
@@ -23,12 +24,14 @@ from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
 from adt_eval.text_type import TextTypeEvaluator
+from adt_eval.text_transcript import TextTranscriptEvaluator
 from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
 
 # Registry of available evaluators
 EVALUATORS = {
-    "text_type": TextTypeEvaluator,
+    #"text_type": TextTypeEvaluator,
+    "text_transcript": TextTranscriptEvaluator,
 }
 
 
