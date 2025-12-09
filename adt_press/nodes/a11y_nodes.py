@@ -108,7 +108,7 @@ function collectHtmlFiles(dir) {
       const fullPath = path.join(current, entry.name);
       if (entry.isDirectory()) {
         stack.push(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.html')) {
+      } else if (entry.isFile() && entry.name.endsWith('.html') && !entry.name.startsWith('test-zoom')) {
         results.push(fullPath);
       }
     }
@@ -214,7 +214,7 @@ function collectHtmlFiles(dir) {
       const fullPath = path.join(current, entry.name);
       if (entry.isDirectory()) {
         stack.push(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.html')) {
+      } else if (entry.isFile() && entry.name.endsWith('.html') && !entry.name.startsWith('test-zoom')) {
         results.push(fullPath);
       }
     }
