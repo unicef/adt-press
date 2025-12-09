@@ -305,7 +305,7 @@ async function analyze(filePath) {
     axeResults = await axe.run(dom.window.document, {
       runOnly: {
         type: 'tag',
-        values: ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa'],
+        values: ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa', 'best-practice', 'cat.color', 'cat.semantics', 'cat.time-and-media', 'cat.tables', 'cat.keyboard', 'cat.sensory-and-visual-cues', 'cat.forms', 'cat.text-alternatives'],
       },
     });
   } catch (error) {
