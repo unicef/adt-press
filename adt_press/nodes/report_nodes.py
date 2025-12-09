@@ -92,7 +92,14 @@ def plate_report(template_config: TemplateConfig, plate: Plate, strategy_config:
     return render_template(
         template_config,
         "templates/plate_report.html",
-        dict(plate=plate, texts_by_id=texts_by_id, images_by_id=images_by_id, groups_by_id=groups_by_id, quizzes_by_section_id=quizzes_by_section_id, strategy_config=strategy_config),
+        dict(
+            plate=plate,
+            texts_by_id=texts_by_id,
+            images_by_id=images_by_id,
+            groups_by_id=groups_by_id,
+            quizzes_by_section_id=quizzes_by_section_id,
+            strategy_config=strategy_config,
+        ),
     )
 
 
