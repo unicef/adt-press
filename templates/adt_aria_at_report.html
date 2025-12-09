@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}ARIA-AT & WCAG assessment{% endblock %}
+{% block title %}ARIA-AT & WCAG Checks{% endblock %}
 {% block content %}
 <div class="space-y-8">
   <div class="bg-white shadow rounded p-4">
@@ -111,26 +111,26 @@
               </div>
 
               {% if file.axe %}
-                <div>
+                <div class="space-y-2">
                   <p class="font-semibold">WCAG Results</p>
                   <p><strong>Violations:</strong> {{ file.axe.violations|length }} | <strong>Passes:</strong> {{ file.axe.passes|length }}</p>
                   {% if file.axe.violations %}
                     {% set vlimit = 10 %}
-                    <ul class="list-disc list-inside space-y-2">
+                    <ol class="list-decimal list-inside space-y-3">
                       {% for v in file.axe.violations[:vlimit] %}
-                        <li>
+                        <li class="border border-gray-200 rounded p-3">
                           <div class="font-semibold">{{ v.id|e }} <span class="text-xs text-gray-600">(impact: {{ v.impact or 'n/a' }})</span></div>
                           <div class="text-xs text-gray-600">Tags: {{ (v.tags or [])|join(', ')|e }}</div>
                           <div class="mt-1">{{ v.help|e }} — <a class="text-blue-600 hover:underline" href="{{ v.helpUrl|e }}">guidance</a></div>
-                          <div class="mt-1 text-xs text-gray-700">Categories:
-                            <ul class="list-disc list-inside">
+                          <div class="mt-2 text-xs text-gray-700">Categories:
+                            <ul class="list-disc list-inside ml-3">
                               {% for tag in v.tags if tag.startswith('cat.') %}
                                 <li>{{ tag|e }}</li>
                               {% endfor %}
                             </ul>
                           </div>
-                          <div class="mt-1 text-xs text-gray-700">Nodes:
-                            <ul class="list-disc list-inside space-y-1">
+                          <div class="mt-2 text-xs text-gray-700">Nodes:
+                            <ul class="list-disc list-inside ml-3 space-y-1">
                               {% for node in v.nodes %}
                                 <li><code>{{ node.target|e }}</code><br>{{ node.failureSummary|e }}</li>
                               {% endfor %}
@@ -141,7 +141,7 @@
                       {% if file.axe.violations|length > vlimit %}
                         <li>… ({{ file.axe.violations|length - vlimit }} more)</li>
                       {% endif %}
-                    </ul>
+                    </ol>
                   {% else %}
                     <p>✅ No WCAG violations detected.</p>
                   {% endif %}
