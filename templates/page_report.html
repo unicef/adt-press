@@ -211,7 +211,7 @@
                                                 {% endif %}
                                                 <div class="col-span-4 bg-blue-700 text-white px-3 py-2 text-sm text-right">
                                                     <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_id }}</span>
-                                                    <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_type.replace('ExtractedSectionType.', '') }}</span>
+                                                    <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_type.name }}</span>
                                                     {% if section.is_pruned %}
                                                     <span class="px-2 py-1 text-xs bg-red-900 text-white rounded">pruned</span>
                                                     {% endif %}

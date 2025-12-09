@@ -160,7 +160,7 @@ async def generate_web_page_html(
     validation_context = {
         "text_ids": [t.text_id for t in texts],
         "image_ids": [i.image_id for i in images],
-        "section_type": section.section_type.value,
+        "section_type": section.section_type,
         "activity_rendering_enabled": activity_rendering_enabled,
     }
 

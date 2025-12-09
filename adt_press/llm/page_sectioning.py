@@ -12,7 +12,9 @@ from adt_press.utils.file import cached_read_text_file
 
 
 class Section(BaseModel):
-    section_type: SectionType
+    section_type: str
+    background_color: str
+    text_color: str
     part_ids: list[str]
 
 
@@ -49,13 +51,14 @@ class SectionResponse(CleanTextBaseModel):
     @classmethod
     def validate_section_types(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
         """Ensure all Section types are valid according to config."""
-        section_types = info.context.get("section_types", [])
-        if section_types:
-            for i, section in enumerate(v):
-                if section.section_type not in section_types:
-                    raise ValueError(
-                        f"Section at index {i} has invalid section_type='{section.section_type}'. Must be one of: {', '.join(sorted(section_types))}"
-                    )
+        if info.context:
+            section_types = info.context.get("section_types", [])
+            if section_types:
+                for i, section in enumerate(v):
+                    if section.section_type not in section_types:
+                        raise ValueError(
+                            f"Section at index {i} has invalid section_type='{section.section_type}'. Must be one of: {', '.join(sorted(section_types))}"
+                        )
         return v
 
 
@@ -69,7 +72,6 @@ async def get_page_sections(
         examples=config.examples,
         section_types=section_types,
     )
-
     prompt = Prompt(cached_read_text_file(config.template_path))
     client = get_instructor_client()
 
@@ -88,13 +90,17 @@ async def get_page_sections(
         context=validation_context,
     )
 
+    types_by_id = {st.name: st for st in section_types.values()}
+
     # convert response data directly to page sections
     sections = []
     for i, s in enumerate(response.data):
         section = PageSection(
             section_id=f"sec_{page.page_id}_s{i}",
-            section_type=s.section_type,
+            section_type=types_by_id[s.section_type],
             part_ids=s.part_ids.copy(),
+            background_color=s.background_color,
+            text_color=s.text_color,            
         )
         sections.append(section)
 

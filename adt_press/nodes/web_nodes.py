@@ -100,20 +100,12 @@ def web_pages(
                 cached_configs[cache_key] = config
 
             if strategy.render_type == "html":
-                if strategy_name == "activity":
-                    if is_activity_section:
-                        effective_strategy_name = specific_activity_config and section.section_type or "activity"
-                    else:
-                        effective_strategy_name = "text_only"
-                else:
-                    effective_strategy_name = section.section_type
-
                 # Determine if this specific page should use activity rendering
                 page_activity_rendering = activity_strategy_enabled and is_activity_section
 
                 web_pages.append(
                     generate_web_page_html(
-                        render_strategy=effective_strategy_name,
+                        render_strategy=strategy_name,
                         config=config,
                         examples=config.examples,
                         section=section,

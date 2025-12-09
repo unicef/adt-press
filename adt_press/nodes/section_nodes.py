@@ -54,6 +54,8 @@ def filtered_sections_by_page_id(
                     section_id=section.section_id,
                     section_type=section.section_type,
                     part_ids=section.part_ids,
+                    background_color=section.background_color,
+                    text_color=section.text_color,
                     is_pruned=section.section_type in pruned_section_types_config,
                 )
                 for section in page_sections.sections

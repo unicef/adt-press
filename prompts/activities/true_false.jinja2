@@ -146,7 +146,7 @@ text: {{ part.text }}
 This is the base64 image of the entire page from the textbook for context only.
 {{ section.page_image_path | image }}
 
-The section type for this section is: {{ section.section_type.name }}.
+The section type for this section is: {{ section.section_type }}.
 
 {% for image in images %}
 ID of the following image is: {{ image.image_id }}.
