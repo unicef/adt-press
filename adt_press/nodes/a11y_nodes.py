@@ -295,7 +295,7 @@ async function analyze(filePath) {
   const axe = dom.window.axe;
   // Use configure instead of inline rules to avoid shape/validation errors.
   await axe.configure({
-    rules: [{ id: 'color-contrast', enabled: false }],
+    rules: [{ id: 'color-contrast', enabled: true}],
   });
 
   let axeResults;
