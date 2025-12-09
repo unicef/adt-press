@@ -15,9 +15,12 @@ class A11yNodesTests(unittest.TestCase):
         with mock.patch("adt_press.nodes.a11y_nodes.subprocess.run") as run_mock:
             run_mock.side_effect = [mock.Mock(stdout="", stderr="", returncode=0), mock.Mock(stdout="", stderr="", returncode=0)]
 
-            with mock.patch("pathlib.Path.mkdir"), mock.patch("pathlib.Path.write_text") as wt, mock.patch(
-                "pathlib.Path.exists", side_effect=[False, False, False, False, False, False]
-            ), mock.patch("tempfile.NamedTemporaryFile") as ntf:
+            with (
+                mock.patch("pathlib.Path.mkdir"),
+                mock.patch("pathlib.Path.write_text") as wt,
+                mock.patch("pathlib.Path.exists", side_effect=[False, False, False, False, False, False]),
+                mock.patch("tempfile.NamedTemporaryFile") as ntf,
+            ):
                 ntf.return_value.__enter__.return_value.name = str(work_dir / "temp.mjs")
                 a11y_nodes.adt_a11y_results(str(run_dir), "done")
 
@@ -28,9 +31,14 @@ class A11yNodesTests(unittest.TestCase):
 
     def test_returns_error_when_node_fails(self):
         with mock.patch("adt_press.nodes.a11y_nodes.subprocess.run") as run_mock:
-            run_mock.side_effect = [mock.Mock(stdout="", stderr="", returncode=0), subprocess.CalledProcessError(1, ["node"], stderr="boom")]
-            with mock.patch("tempfile.NamedTemporaryFile") as ntf, mock.patch("pathlib.Path.exists", return_value=True), mock.patch(
-                "pathlib.Path.read_text", return_value=json.dumps({"files": []})
+            run_mock.side_effect = [
+                mock.Mock(stdout="", stderr="", returncode=0),
+                subprocess.CalledProcessError(1, ["node"], stderr="boom"),
+            ]
+            with (
+                mock.patch("tempfile.NamedTemporaryFile") as ntf,
+                mock.patch("pathlib.Path.exists", return_value=True),
+                mock.patch("pathlib.Path.read_text", return_value=json.dumps({"files": []})),
             ):
                 ntf.return_value.__enter__.return_value.name = "/tmp/run/tmp.mjs"
                 result = a11y_nodes.adt_a11y_results("/tmp/run", "done")
