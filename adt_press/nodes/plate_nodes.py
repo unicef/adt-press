@@ -53,8 +53,8 @@ def generated_plate(
                     explanation_id=eli5.explanation_id if eli5 else None,
                     part_ids=page_section.part_ids,
                     layout_type=metadata.layout_type,
-                    background_color=metadata.background_color,
-                    text_color=metadata.text_color,
+                    background_color=page_section.background_color,
+                    text_color=page_section.text_color,
                 )
             )
 

@@ -8,6 +8,8 @@ class PageSection(BaseModel):
     section_type: SectionType
     part_ids: list[str] = []
     is_pruned: bool = False
+    background_color: str = "#ffffff"
+    text_color: str = "#000000"
 
 
 class SectionExplanation(BaseModel):
@@ -32,8 +34,6 @@ class SectionGlossary(BaseModel):
 
 class SectionMetadata(BaseModel):
     section_id: str
-    background_color: str
-    text_color: str
     layout_type: str
     reasoning: str
 
