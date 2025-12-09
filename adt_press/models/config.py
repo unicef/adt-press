@@ -21,6 +21,11 @@ class LayoutType(BaseModel):
     render_strategy: str
 
 
+class SectionType(BaseModel):
+    name: str
+    description: str = ""
+
+
 class RenderStrategy(BaseModel):
     name: str
     render_type: RenderType

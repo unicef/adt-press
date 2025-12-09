@@ -73,8 +73,7 @@ def web_pages(
                 raise ValueError(f"Unknown layout type: {section.layout_type}")
 
             # Derive section type info early
-            section_type_name = getattr(section.section_type, "name", str(section.section_type))
-            is_activity_section = section_type_name.startswith("activity_")
+            is_activity_section = section.section_type.startswith("activity_")
 
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":
@@ -90,7 +89,7 @@ def web_pages(
                     logger.warning(
                         "Layout mismatch corrected",
                         section_id=section.section_id,
-                        section_type=section_type_name,
+                        section_type=section.section_type,
                         layout_type=section.layout_type,
                         corrected_to="activity",
                     )
@@ -110,7 +109,7 @@ def web_pages(
                     logger.info(
                         "Activity rendering disabled, using regular content strategy",
                         section_id=section.section_id,
-                        section_type=section_type_name,
+                        section_type=section.section_type,
                         layout_type=section.layout_type,
                         using_strategy=fallback_strategy_name,
                     )
@@ -118,9 +117,9 @@ def web_pages(
                     strategy = corrected_strategy
             elif not is_activity_section and section.layout_type == "textbook_activity":
                 # Non-activity with activity layout - pick appropriate non-activity strategy
-                if section_type_name in ("text_only", "boxed_text"):
+                if section.section_type in ("text_only", "boxed_text"):
                     fallback_strategy_name = "two_column"
-                elif section_type_name in ("text_and_images", "novel_text_and_images"):
+                elif section.section_type in ("text_and_images", "novel_text_and_images"):
                     fallback_strategy_name = "html"
                 else:
                     fallback_strategy_name = "html"
@@ -130,7 +129,7 @@ def web_pages(
                     logger.warning(
                         "Layout mismatch corrected",
                         section_id=section.section_id,
-                        section_type=section_type_name,
+                        section_type=section.section_type,
                         layout_type=section.layout_type,
                         corrected_to=fallback_strategy_name,
                     )
@@ -143,8 +142,8 @@ def web_pages(
                 if not strategy:
                     raise ValueError(f"Unknown render strategy: {strategy_name}")
 
-            specific_activity_config = activity_prompts_config.get(section_type_name)
-            cache_key = f"{strategy_name}::{section_type_name}" if specific_activity_config else strategy_name
+            specific_activity_config = activity_prompts_config.get(section.section_type)
+            cache_key = f"{strategy_name}::{section.section_type}" if specific_activity_config else strategy_name
             config = cached_configs.get(cache_key)
             if not config:
                 if "model" in strategy.config and strategy.config["model"] == "default":
@@ -163,11 +162,11 @@ def web_pages(
             if strategy.render_type == "html":
                 if strategy_name == "activity":
                     if is_activity_section:
-                        effective_strategy_name = specific_activity_config and section_type_name or "activity"
+                        effective_strategy_name = specific_activity_config and section.section_type or "activity"
                     else:
                         effective_strategy_name = "text_only"
                 else:
-                    effective_strategy_name = section_type_name
+                    effective_strategy_name = section.section_type
 
                 # Determine if this specific page should use activity rendering
                 page_activity_rendering = activity_strategy_enabled and is_activity_section

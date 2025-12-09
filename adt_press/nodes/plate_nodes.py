@@ -48,7 +48,7 @@ def generated_plate(
             plate_sections.append(
                 PlateSection(
                     section_id=page_section.section_id,
-                    section_type=page_section.section_type,
+                    section_type=page_section.section_type.name,
                     page_image_path=page.page_image_path,
                     explanation_id=eli5.explanation_id if eli5 else None,
                     part_ids=page_section.part_ids,

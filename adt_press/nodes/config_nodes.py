@@ -14,6 +14,7 @@ from adt_press.models.config import (
     PromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    SectionType,
     SpeechPromptConfig,
 )
 from adt_press.utils.config import prompt_config_with_model
@@ -84,6 +85,16 @@ def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
         params = dict(layout_type)
         params["name"] = name
         types[name] = LayoutType.model_validate(params)
+    return types
+
+
+@cache(behavior="recompute")
+def section_types_config(config: DictConfig) -> dict[str, SectionType]:
+    types = dict[str, SectionType]()
+    for name, section_type in config["section_types"].items():
+        params = dict(section_type)
+        params["name"] = name
+        types[name] = SectionType.model_validate(params)
     return types
 
 

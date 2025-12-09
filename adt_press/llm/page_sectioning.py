@@ -2,10 +2,10 @@ from banks import Prompt
 from pydantic import BaseModel, ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import PromptConfig, SectionType
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
-from adt_press.models.section import PageSection, PageSections, SectionType
+from adt_press.models.section import PageSection, PageSections
 from adt_press.models.text import PageTextGroup
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
@@ -45,13 +45,29 @@ class SectionResponse(CleanTextBaseModel):
 
         return v
 
+    @field_validator("data")
+    @classmethod
+    def validate_section_types(cls, v: list[Section], info: ValidationInfo) -> list[Section]:
+        """Ensure all Section types are valid according to config."""
+        section_types = info.context.get("section_types", [])
+        if section_types:
+            for i, section in enumerate(v):
+                if section.section_type not in section_types:
+                    raise ValueError(
+                        f"Section at index {i} has invalid section_type='{section.section_type}'. Must be one of: {', '.join(sorted(section_types))}"
+                    )
+        return v
 
-async def get_page_sections(config: PromptConfig, page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]) -> PageSections:
+
+async def get_page_sections(
+    config: PromptConfig, section_types: dict[str, SectionType], page: Page, images: list[ProcessedImage], groups: list[PageTextGroup]
+) -> PageSections:
     context = dict(
         page=page,
         images=[i.model_dump() for i in images],
         texts=[dict(text_id=g.group_id, text=" ".join([t.text for t in g.texts])) for g in groups],
         examples=config.examples,
+        section_types=section_types,
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
@@ -61,6 +77,7 @@ async def get_page_sections(config: PromptConfig, page: Page, images: list[Proce
     validation_context = {
         "text_ids": [t.group_id for t in groups],
         "image_ids": [i.image_id for i in images],
+        "section_types": list(section_types.keys()),
     }
 
     response: SectionResponse = await client.chat.completions.create(

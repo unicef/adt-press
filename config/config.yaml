@@ -41,6 +41,64 @@ default_model: gpt-5
 # what strategy is used to render sections into web pages, dynamic will choose based on layout type 
 render_strategy: dynamic
 
+section_types:
+  front_cover:
+    description: "For the front cover page of the textbook that is the first page. There can only be one front cover page. IMPORTANT! Only the first page can be a front cover page."
+
+  inside_cover:
+    description: "For an inside cover page that can contain the title."
+
+  back_cover:
+    description: "For a back cover page that is the last page of the textbook."
+
+  separator:
+    description: "For a separator page that breaks up the text into different logical sections."
+
+  credits:
+    description: "For a credits page that lists the credits and acknowledgements of the textbook."
+
+  foreword:
+    description: "For a foreword page that can be an introduction, overview, or note from the author."
+
+  table_of_contents:
+    description: "For a table of contents page."
+
+  boxed_text:
+    description: "For text that is contained in a box or callout section."
+
+  text_only:
+    description: "For a reading section with only text."
+
+  text_and_images:
+    description: "For a reading section with text and images."
+
+  images_only:
+    description: "For a section with only images."
+
+  activity_matching:
+    description: "For an interactive matching activity where you match items in a list to items in another list. In general, you can only match one item from the first list to one item in the second list. If you have fewer items in the second list - this is likely a 'sorting activity'."
+
+  activity_fill_in_a_table:
+    description: "For an interactive table to fill in."
+
+  activity_multiple_choice:
+    description: "For an interactive multiple choice activity with a question and two or more options with only one right answer. e.g. 'circle the correct answer'."
+
+  activity_true_false:
+    description: "For a true or false activity with a question and either a true or false answer."
+
+  activity_open_ended_answer:
+    description: "For an activity section with only open ended text response."
+
+  activity_fill_in_the_blank:
+    description: "For a fill in the blank activity with one or more blanks to fill in, with a very short answer."
+
+  activity_sorting:
+    description: "For a sorting activity with a collection of text or images that need to be sorted into different categories. You can have more items in the list to be sorted than categories to sort into."
+
+  other:
+    description: "For any other section type that does not fit the above categories."
+
 layout_types:
   cover_page:
     description: "Cover page of the book, typically includes title, author, and publisher information."

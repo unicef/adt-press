@@ -4,7 +4,7 @@ from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
 from adt_press.llm.section_metadata import get_section_metadata
-from adt_press.models.config import LayoutType, PromptConfig
+from adt_press.models.config import LayoutType, PromptConfig, SectionType
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionMetadata
@@ -17,6 +17,7 @@ def sections_by_page_id(
     processed_images_by_page: dict[str, list[ProcessedImage]],
     filtered_pdf_texts: dict[str, PageTexts],
     page_sectioning_prompt_config: PromptConfig,
+    section_types_config: dict[str, SectionType],
 ) -> dict[str, PageSections]:
     page_sections = {}
 
@@ -30,7 +31,9 @@ def sections_by_page_id(
             if not page_images and not page_texts.groups:
                 page_sections[page.page_id] = PageSections(page_id=page.page_id, sections=[], reasoning="No images or text to section")
             else:
-                sections.append(get_page_sections(page_sectioning_prompt_config, page, page_images, page_texts.groups))
+                sections.append(
+                    get_page_sections(page_sectioning_prompt_config, section_types_config, page, page_images, page_texts.groups)
+                )
 
         return await gather_with_limit(sections, page_sectioning_prompt_config.rate_limit)
 
