@@ -73,7 +73,9 @@ class A11yNodesTests(unittest.TestCase):
         self.assertEqual(result.get("error"), "results file not found")
 
     def test_write_package_json_merges_dependencies(self):
-        with mock.patch("pathlib.Path.exists", return_value=True), mock.patch("pathlib.Path.read_text", return_value=json.dumps({"dependencies": {"foo": "1.0.0"}})) as rt, mock.patch("pathlib.Path.write_text") as wt:
+        with mock.patch("pathlib.Path.exists", return_value=True), mock.patch(
+            "pathlib.Path.read_text", return_value=json.dumps({"dependencies": {"foo": "1.0.0"}})
+        ), mock.patch("pathlib.Path.write_text") as wt:
             work_dir = Path("/tmp/workdir")
             a11y_nodes._write_package_json(work_dir)
             args = wt.call_args[0][0]
