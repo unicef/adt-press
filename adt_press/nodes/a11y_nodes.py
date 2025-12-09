@@ -287,7 +287,7 @@ async function analyze(filePath) {
     };
   }
 
-  // Run axe for WCAG 2.x A/AA/AAA rules. Disable color-contrast to avoid canvas limitations.
+  // Run axe for WCAG 2.x A/AA/AAA rules.
   const axeModule = await import('axe-core');
   const axeSource = axeModule.source || axeModule.default?.source;
   // Initialize axe inside this JSDOM window to avoid stale globals across pages.
