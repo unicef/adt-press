@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
-    LayoutType,
     MetadataPromptConfig,
     PageRangeConfig,
     PromptConfig,
@@ -76,16 +75,6 @@ def page_range_config(config: DictConfig) -> PageRangeConfig:
 
 def page_grouping_config(config: DictConfig) -> str:
     return str(config.get("page_grouping", "single"))
-
-
-@cache(behavior="recompute")
-def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
-    types = dict[str, LayoutType]()
-    for name, layout_type in config["layout_types"].items():
-        params = dict(layout_type)
-        params["name"] = name
-        types[name] = LayoutType.model_validate(params)
-    return types
 
 
 @cache(behavior="recompute")
@@ -255,11 +244,6 @@ def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, Promp
 @cache(behavior="recompute")
 def speech_prompt_config(config: DictConfig) -> PromptConfig:
     return SpeechPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["speech_generation"], config["default_model"]))
-
-
-@cache(behavior="recompute")
-def section_metadata_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_metadata"], config["default_model"]))
 
 
 @cache(behavior="recompute")

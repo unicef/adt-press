@@ -29,7 +29,6 @@ class PlateSection(BaseModel):
     explanation_id: str | None
     background_color: str
     text_color: str
-    layout_type: str
 
 
 class Plate(BaseModel):

@@ -15,12 +15,6 @@ class RenderType(str, enum.Enum):
     template = "template"
 
 
-class LayoutType(BaseModel):
-    name: str
-    description: str = ""
-    render_strategy: str
-
-
 class SectionType(BaseModel):
     name: str
     description: str = ""

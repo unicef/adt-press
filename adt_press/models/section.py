@@ -32,12 +32,6 @@ class SectionGlossary(BaseModel):
     reasoning: str
 
 
-class SectionMetadata(BaseModel):
-    section_id: str
-    layout_type: str
-    reasoning: str
-
-
 class ActivityAnswer(BaseModel):
     section_id: str
     answers: dict[str, str]

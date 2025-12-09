@@ -10,7 +10,6 @@ from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
-    LayoutType,
     PromptConfig,
     RenderStrategy,
     SectionType,
@@ -34,7 +33,6 @@ def web_pages(
     plate_language_config: str,
     plate: Plate,
     default_model_config: str,
-    layout_types_config: dict[str, LayoutType],
     section_types_config: dict[str, SectionType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
@@ -69,10 +67,6 @@ def web_pages(
                     groups.append(RenderTextGroup(group_id=group.group_id, group_type=group.group_type, texts=group_texts))
                 elif part_id.startswith("img_"):
                     images.append(images_by_id[part_id])
-
-            layout_type = layout_types_config.get(section.layout_type)
-            if not layout_type:
-                raise ValueError(f"Unknown layout type: {section.layout_type}")
 
             # Get section type configuration
             section_type_obj = section_types_config.get(section.section_type)
