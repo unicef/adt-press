@@ -442,6 +442,12 @@ class BaseEvaluator(ABC):
                 optimized_prompt_uri=self.optimized_prompt.uri,
             )
 
+            logger.info("Logging artifacts...")
+            self.mlflow_tool.log_markdown_as_artifact(
+                markdown_str=self.mlflow_tool.analysis_to_markdown(self.analysis_output.model_dump()),
+                artifact_name="prompt_analysis_report.md",
+            )
+
             logger.info(f"Completed prompt optimization workflow (iteration {i+1}/{iteration})...")
 
     def run(self):
@@ -455,6 +461,8 @@ class BaseEvaluator(ABC):
 
         # prepare the dataset
         self.eval_dataset_records = self.create_eval_dataset_records(self.data)
+
+        self.eval_dataset_records = self.eval_dataset_records[:20]
 
         # download images for the experiment
         self.download_images()

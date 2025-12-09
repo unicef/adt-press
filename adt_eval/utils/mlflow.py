@@ -1,6 +1,8 @@
 from __future__ import annotations
 import pandas as pd
 import mlflow
+import tempfile
+import os
 from .file import cached_read_text_file
 from typing import Dict, Any, List
 import importlib
@@ -11,6 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Iterable
 from mlflow.genai.datasets import create_dataset, search_datasets
 import ast
+import tempfile
 
 import logging
 
@@ -404,6 +407,233 @@ class MLflowTool:
             return None
 
         return runs_df.head().to_dict(orient="records")[0]
+
+    def log_markdown_as_artifact(self, markdown_str: str, artifact_name: str = "report.md"):
+        """
+        Logs a markdown string as an MLflow artifact.
+
+        Parameters
+        ----------
+        markdown_str : str
+            The markdown content to store.
+        artifact_name : str
+            The filename to use in the MLflow artifact store.
+        """
+
+        # Create a temporary file
+        with tempfile.TemporaryDirectory() as tmpdir:
+            file_path = os.path.join(tmpdir, artifact_name)
+
+            # Write markdown content
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(markdown_str)
+
+            # Log to MLflow
+            mlflow.log_artifact(file_path)
+
+            print(f"Logged markdown artifact: {artifact_name}")
+
+    def analysis_to_markdown(self, analysis: Dict[str, Any]) -> str:
+        """Convert prompt analysis model_dump into a structured Markdown report."""
+
+        lines: List[str] = []
+
+        # ------------------------------------------------------------------ #
+        # Header
+        # ------------------------------------------------------------------ #
+        risk = analysis.get("risk_level", "unknown").upper()
+        confidence = analysis.get("confidence")
+        summary = analysis.get("summary", "")
+
+        lines.append("# Prompt Analysis Report")
+        lines.append("")
+        lines.append(f"- **Risk level:** `{risk}`")
+        if confidence is not None:
+            lines.append(f"- **Model confidence:** `{confidence:.2f}`")
+        lines.append("")
+        lines.append("## 1. High-level Summary")
+        lines.append("")
+        if summary:
+            lines.append(summary)
+        else:
+            lines.append("_No summary provided._")
+        lines.append("")
+
+        # ------------------------------------------------------------------ #
+        # Global behavior patterns
+        # ------------------------------------------------------------------ #
+        global_patterns = analysis.get("global_behavior_patterns", [])
+        lines.append("## 2. Global Behavior Patterns")
+        lines.append("")
+        if global_patterns:
+            for p in global_patterns:
+                lines.append(f"- {p}")
+        else:
+            lines.append("_No global patterns identified._")
+        lines.append("")
+
+        # ------------------------------------------------------------------ #
+        # Per-case analysis
+        # ------------------------------------------------------------------ #
+        per_case = analysis.get("per_case_analysis", [])
+        lines.append("## 3. Per-case Analysis")
+        lines.append("")
+        if not per_case:
+            lines.append("_No per-case analysis available._")
+        else:
+            for case in per_case:
+                case_no = case.get("case_no", "?")
+                short_summary = case.get("short_summary", "").strip()
+                outcome_severity = case.get("outcome_severity", "unknown")
+                issue_type = case.get("issue_type", "unknown")
+
+                lines.append(f"### Case {case_no}")
+                lines.append("")
+                if short_summary:
+                    lines.append(short_summary)
+                    lines.append("")
+                lines.append(f"- **Outcome severity:** `{outcome_severity}`")
+                lines.append(f"- **Issue type:** `{issue_type}`")
+
+                expected_behavior = case.get("expected_behavior")
+                actual_behavior = case.get("actual_behavior")
+                metric_signals = case.get("metric_signals", [])
+                contributing_root_causes = case.get("contributing_root_causes", [])
+
+                if expected_behavior:
+                    lines.append(f"- **Expected behavior:** {expected_behavior}")
+                if actual_behavior:
+                    lines.append(f"- **Actual behavior:** {actual_behavior}")
+
+                if metric_signals:
+                    lines.append("- **Metric signals:**")
+                    for m in metric_signals:
+                        lines.append(f"  - {m}")
+
+                if contributing_root_causes:
+                    ids = ", ".join(str(i) for i in contributing_root_causes)
+                    lines.append(f"- **Contributing root cause IDs:** {ids}")
+
+                lines.append("")
+
+        # ------------------------------------------------------------------ #
+        # Root causes
+        # ------------------------------------------------------------------ #
+        root_causes = analysis.get("root_causes", [])
+        lines.append("## 4. Root Causes")
+        lines.append("")
+        if not root_causes:
+            lines.append("_No root causes identified._")
+        else:
+            for rc in root_causes:
+                rc_id = rc.get("id", "?")
+                area = rc.get("area", "unspecified")
+                explanation = rc.get("explanation", "")
+                pattern = rc.get("pattern_across_cases", "")
+                affected_cases = rc.get("affected_cases", [])
+
+                lines.append(f"### Root Cause {rc_id}: {area}")
+                lines.append("")
+                if explanation:
+                    lines.append(f"**Explanation:** {explanation}")
+                if pattern:
+                    lines.append(f"**Pattern across cases:** {pattern}")
+                if affected_cases:
+                    cases_str = ", ".join(str(c) for c in affected_cases)
+                    lines.append(f"**Affected cases:** {cases_str}")
+                lines.append("")
+
+        # ------------------------------------------------------------------ #
+        # Fixes / Recommended Prompt Changes
+        # ------------------------------------------------------------------ #
+        fixes = analysis.get("fixes", [])
+        lines.append("## 5. Recommended Fixes to the Prompt")
+        lines.append("")
+        if not fixes:
+            lines.append("_No fixes proposed._")
+        else:
+            for fix in fixes:
+                fix_id = fix.get("id", "?")
+                ftype = fix.get("type", "unspecified")
+                target = fix.get("target_section", "unspecified")
+                text = fix.get("text", "")
+                rationale = fix.get("rationale", "")
+                addresses = fix.get("addresses_root_causes", [])
+
+                lines.append(f"### Fix {fix_id}: {ftype} → `{target}`")
+                lines.append("")
+                if addresses:
+                    ids_str = ", ".join(str(i) for i in addresses)
+                    lines.append(f"- **Addresses root cause IDs:** {ids_str}")
+                if rationale:
+                    lines.append(f"- **Rationale:** {rationale}")
+                lines.append("")
+                if text:
+                    lines.append("**Proposed prompt text:**")
+                    lines.append("")
+                    lines.append("```text")
+                    lines.append(text)
+                    lines.append("```")
+                lines.append("")
+
+        # ------------------------------------------------------------------ #
+        # Acceptance criteria
+        # ------------------------------------------------------------------ #
+        acceptance = analysis.get("acceptance_criteria", [])
+        lines.append("## 6. Acceptance Criteria for the Revised Prompt")
+        lines.append("")
+        if acceptance:
+            for crit in acceptance:
+                lines.append(f"- {crit}")
+        else:
+            lines.append("_No acceptance criteria specified._")
+        lines.append("")
+
+        # ------------------------------------------------------------------ #
+        # Evidence
+        # ------------------------------------------------------------------ #
+        evidence = analysis.get("evidence", {})
+        lines.append("## 7. Evidence and Supporting Quotes")
+        lines.append("")
+
+        prompt_quotes = evidence.get("prompt_quotes", [])
+        response_quotes = evidence.get("response_quotes", [])
+        request_features = evidence.get("request_features", [])
+        case_ids = evidence.get("case_ids", [])
+
+        if prompt_quotes:
+            lines.append("### 7.1 Prompt Excerpts Driving Behavior")
+            lines.append("")
+            for q in prompt_quotes:
+                lines.append(f"- {q}")
+            lines.append("")
+
+        if response_quotes:
+            lines.append("### 7.2 Model Response Excerpts")
+            lines.append("")
+            for q in response_quotes:
+                lines.append(f"- {q}")
+            lines.append("")
+
+        if request_features:
+            lines.append("### 7.3 Request / Input Features")
+            lines.append("")
+            for f in request_features:
+                lines.append(f"- {f}")
+            lines.append("")
+
+        if case_ids:
+            ids_str = ", ".join(str(i) for i in case_ids)
+            lines.append("### 7.4 Cases Considered")
+            lines.append("")
+            lines.append(f"- **Case IDs analyzed:** {ids_str}")
+            lines.append("")
+        elif not any([prompt_quotes, response_quotes, request_features]):
+            lines.append("_No evidence captured._")
+            lines.append("")
+
+        # Join everything
+        return "\n".join(lines)
 
 
 def _messages_to_md(messages) -> str:
