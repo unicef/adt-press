@@ -79,6 +79,8 @@ class PipelineTest(unittest.TestCase):
                 "glossary_report.html",
                 "translation_report.html",
                 "metadata_report.html",
+                "adt_aria_at_report.html",
+                "adt_a11y_report.html",
             ]
 
             for file in output_files:
