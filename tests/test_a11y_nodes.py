@@ -45,6 +45,42 @@ class A11yNodesTests(unittest.TestCase):
         self.assertIn("error", result)
         self.assertIn("boom", result["error"])
 
+    def test_aria_at_returns_error_when_node_fails(self):
+        with mock.patch("adt_press.nodes.a11y_nodes.subprocess.run") as run_mock:
+            run_mock.side_effect = [
+                mock.Mock(stdout="", stderr="", returncode=0),
+                subprocess.CalledProcessError(1, ["node"], stderr="kaboom"),
+            ]
+            with (
+                mock.patch("tempfile.NamedTemporaryFile") as ntf,
+                mock.patch("pathlib.Path.exists", return_value=True),
+                mock.patch("pathlib.Path.read_text", return_value=json.dumps({"files": []})),
+            ):
+                ntf.return_value.__enter__.return_value.name = "/tmp/run/tmp.mjs"
+                result = a11y_nodes.adt_aria_at_results("/tmp/run", "done")
+        self.assertIn("error", result)
+        self.assertIn("kaboom", result["error"])
+
+    def test_aria_at_returns_file_not_found(self):
+        with mock.patch("adt_press.nodes.a11y_nodes.subprocess.run") as run_mock:
+            run_mock.side_effect = [mock.Mock(stdout="", stderr="", returncode=0), mock.Mock(stdout="", stderr="", returncode=0)]
+            with (
+                mock.patch("tempfile.NamedTemporaryFile") as ntf,
+                mock.patch("pathlib.Path.exists", return_value=False),
+            ):
+                ntf.return_value.__enter__.return_value.name = "/tmp/run/tmp.mjs"
+                result = a11y_nodes.adt_aria_at_results("/tmp/run", "done")
+        self.assertEqual(result.get("error"), "results file not found")
+
+    def test_write_package_json_merges_dependencies(self):
+        with mock.patch("pathlib.Path.exists", return_value=True), mock.patch("pathlib.Path.read_text", return_value=json.dumps({"dependencies": {"foo": "1.0.0"}})) as rt, mock.patch("pathlib.Path.write_text") as wt:
+            work_dir = Path("/tmp/workdir")
+            a11y_nodes._write_package_json(work_dir)
+            args = wt.call_args[0][0]
+            data = json.loads(args)
+            self.assertIn("foo", data["dependencies"])
+            self.assertIn("@guidepup/virtual-screen-reader", data["dependencies"])
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
