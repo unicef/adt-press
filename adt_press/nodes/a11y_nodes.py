@@ -2,7 +2,7 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from hamilton.function_modifiers import cache
 
@@ -61,9 +61,7 @@ def adt_a11y_results(run_output_dir_config: str, package_adt_web: str) -> dict[s
 
     # Ensure JS dependencies are present (installed once per run_output_dir)
     try:
-        npm = subprocess.run(
-            ["npm", "install"], cwd=work_dir, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        subprocess.run(["npm", "install"], cwd=work_dir, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except subprocess.CalledProcessError as exc:  # pragma: no cover - surfaced to caller
         return {"error": f"npm install failed: {exc.stderr.decode() if exc.stderr else exc}"}
 
@@ -153,7 +151,7 @@ main();
         script_path = Path(f.name)
 
     try:
-        run = subprocess.run(
+        subprocess.run(
             ["node", str(script_path), str(adt_dir), str(results_path)],
             check=True,
             cwd=work_dir,
@@ -170,7 +168,7 @@ main();
             pass
 
     if results_path.exists():
-        return json.loads(results_path.read_text())
+        return cast(dict[str, Any], json.loads(results_path.read_text()))
     return {"error": "results file not found"}
 
 
@@ -352,7 +350,7 @@ main();
         script_path.unlink(missing_ok=True)
 
     if results_path.exists():
-        return json.loads(results_path.read_text())
+        return cast(dict[str, Any], json.loads(results_path.read_text()))
     return {"error": "results file not found"}
 
 
