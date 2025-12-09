@@ -13,6 +13,7 @@ class RenderType(str, enum.Enum):
     rows = "rows"
     two_column = "two_column"
     template = "template"
+    activity = "activity"
 
 
 class LayoutType(BaseModel):

@@ -71,6 +71,8 @@ def web_pages(
                     strategy.config["model"] = default_model_config
                 if strategy.render_type == "html":
                     config = HTMLPromptConfig.model_validate(strategy.config)
+                elif strategy.render_type == "activity":
+                    config = HTMLPromptConfig.model_validate(strategy.config)
                 elif strategy.render_type == "template":
                     config = TemplateRenderConfig.model_validate(strategy.config)
                 else:
@@ -84,7 +86,7 @@ def web_pages(
             elif strategy.render_type == "template":
                 web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
             elif strategy.render_type == "activity":
-                web_pages.append(generate_web_page_activity(strategy_name, config, section, groups, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_activity(strategy_name, config, config.examples, section, groups, texts, images, plate_language_config))
 
         return await gather_with_limit(web_pages, 300)
 
