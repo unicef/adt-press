@@ -106,12 +106,14 @@ def output_languages_config(config: DictConfig, input_language_config: str) -> l
     raw_languages = OmegaConf.select(config, "output_languages", default=None)
     sequence: list[str | None] = []
     if raw_languages is not None:
-        container = OmegaConf.to_container(raw_languages, resolve=True)
-        if isinstance(container, list):
-            for item in container:
+        if OmegaConf.is_list(raw_languages):
+            for item in raw_languages:
+                sequence.append(str(item) if item is not None else None)
+        elif isinstance(raw_languages, (list, tuple)):
+            for item in raw_languages:
                 sequence.append(str(item) if item is not None else None)
         else:
-            raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
+            sequence.append(str(raw_languages))
     cleaned_languages: list[str] = []
 
     if sequence:
@@ -120,11 +122,23 @@ def output_languages_config(config: DictConfig, input_language_config: str) -> l
             if cleaned:
                 cleaned_languages.append(cleaned)
             else:
-                raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
+                log.warning(
+                    "output languages entry invalid; substituting input language",
+                    entry=language,
+                    language=input_language_config,
+                )
+                cleaned_languages.append(input_language_config)
 
     if not cleaned_languages:
         cleaned_languages = [input_language_config]
         log.info("output languages defaulted to input language", languages=cleaned_languages)
+    else:
+        # Preserve the first occurrence order while removing duplicates
+        deduped: list[str] = []
+        for language in cleaned_languages:
+            if language not in deduped:
+                deduped.append(language)
+        cleaned_languages = deduped
 
     return cleaned_languages
 
