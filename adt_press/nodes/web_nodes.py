@@ -13,6 +13,7 @@ from adt_press.models.config import (
     LayoutType,
     PromptConfig,
     RenderStrategy,
+    SectionType,
     TemplateConfig,
     TemplateRenderConfig,
 )
@@ -34,6 +35,7 @@ def web_pages(
     plate: Plate,
     default_model_config: str,
     layout_types_config: dict[str, LayoutType],
+    section_types_config: dict[str, SectionType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
@@ -72,76 +74,20 @@ def web_pages(
             if not layout_type:
                 raise ValueError(f"Unknown layout type: {section.layout_type}")
 
+            # Get section type configuration
+            section_type_obj = section_types_config.get(section.section_type)
+            if not section_type_obj:
+                raise ValueError(f"Unknown section type: {section.section_type}")
+
             # Derive section type info early
             is_activity_section = section.section_type.startswith("activity_")
 
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":
-                strategy_name = layout_type.render_strategy
+                # Use section_type's render_strategy instead of layout_type's
+                strategy_name = section_type_obj.render_strategy
 
-            # Guard: detect and handle mismatched section/layout assignments
-            corrected_strategy = None
-
-            if is_activity_section and section.layout_type != "textbook_activity" and activity_strategy_enabled:
-                # Activity with wrong layout - force to activity HTML rendering (only if activity_strategy=llm)
-                corrected_strategy = render_strategies_config.get("activity")
-                if corrected_strategy:
-                    logger.warning(
-                        "Layout mismatch corrected",
-                        section_id=section.section_id,
-                        section_type=section.section_type,
-                        layout_type=section.layout_type,
-                        corrected_to="activity",
-                    )
-                    strategy_name = "activity"
-                    strategy = corrected_strategy
-            elif is_activity_section and not activity_strategy_enabled:
-                # Activity section but activity_strategy=none - treat as regular content
-                if section.layout_type == "textbook_activity":
-                    # Has activity layout but should be rendered as regular content
-                    fallback_strategy_name = "html"
-                else:
-                    # Use the layout's render strategy
-                    fallback_strategy_name = layout_type.render_strategy if layout_type.render_strategy != "activity" else "html"
-
-                corrected_strategy = render_strategies_config.get(fallback_strategy_name)
-                if corrected_strategy:
-                    logger.info(
-                        "Activity rendering disabled, using regular content strategy",
-                        section_id=section.section_id,
-                        section_type=section.section_type,
-                        layout_type=section.layout_type,
-                        using_strategy=fallback_strategy_name,
-                    )
-                    strategy_name = fallback_strategy_name
-                    strategy = corrected_strategy
-            elif not is_activity_section and section.layout_type == "textbook_activity":
-                # Non-activity with activity layout - pick appropriate non-activity strategy
-                if section.section_type in ("text_only", "boxed_text"):
-                    fallback_strategy_name = "two_column"
-                elif section.section_type in ("text_and_images", "novel_text_and_images"):
-                    fallback_strategy_name = "html"
-                else:
-                    fallback_strategy_name = "html"
-
-                corrected_strategy = render_strategies_config.get(fallback_strategy_name)
-                if corrected_strategy:
-                    logger.warning(
-                        "Layout mismatch corrected",
-                        section_id=section.section_id,
-                        section_type=section.section_type,
-                        layout_type=section.layout_type,
-                        corrected_to=fallback_strategy_name,
-                    )
-                    strategy_name = fallback_strategy_name
-                    strategy = corrected_strategy
-
-            # Get strategy if not already set by correction above
-            if not corrected_strategy:
-                strategy = render_strategies_config.get(strategy_name)
-                if not strategy:
-                    raise ValueError(f"Unknown render strategy: {strategy_name}")
-
+            strategy = render_strategies_config.get(strategy_name)
             specific_activity_config = activity_prompts_config.get(section.section_type)
             cache_key = f"{strategy_name}::{section.section_type}" if specific_activity_config else strategy_name
             config = cached_configs.get(cache_key)
@@ -151,7 +97,7 @@ def web_pages(
                 if strategy.render_type == "template":
                     config = TemplateRenderConfig.model_validate(strategy.config)
                 elif strategy.render_type == "html":
-                    if strategy_name == "activity" and is_activity_section and specific_activity_config:
+                    if strategy_name == "activity" and specific_activity_config:
                         config = specific_activity_config
                     else:
                         config = HTMLPromptConfig.model_validate(strategy.config)

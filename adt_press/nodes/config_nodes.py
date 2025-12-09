@@ -89,13 +89,21 @@ def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
 
 
 @cache(behavior="recompute")
-def section_types_config(config: DictConfig) -> dict[str, SectionType]:
+def section_types_config(config: DictConfig, default_render_strategy_config: str) -> dict[str, SectionType]:
     types = dict[str, SectionType]()
     for name, section_type in config["section_types"].items():
         params = dict(section_type)
         params["name"] = name
+        # Use default_render_strategy if not specified in section_type
+        if "render_strategy" not in params:
+            params["render_strategy"] = default_render_strategy_config
         types[name] = SectionType.model_validate(params)
     return types
+
+
+@cache(behavior="recompute")
+def default_render_strategy_config(config: DictConfig) -> str:
+    return str(config.get("default_render_strategy", "html"))
 
 
 @cache(behavior="recompute")
