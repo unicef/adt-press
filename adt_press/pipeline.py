@@ -9,6 +9,7 @@ from hamilton.lifecycle import NodeExecutionHook
 from omegaconf import DictConfig
 
 from adt_press.nodes import (
+    a11y_nodes,
     config_nodes,
     epub_nodes,
     image_nodes,
@@ -28,6 +29,7 @@ log = structlog.get_logger()
 
 
 modules = [
+    a11y_nodes,
     config_nodes,
     image_nodes,
     report_nodes,
@@ -107,6 +109,8 @@ def run_pipeline(config: DictConfig) -> None:
         "plate_report",
         "glossary_report",
         "web_report",
+        "adt_a11y_report",
+        "adt_aria_at_report",
         "report_index",
         "package_epub",
         "package_webpub",

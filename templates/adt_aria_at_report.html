@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}ARIA-AT & WCAG Checks{% endblock %}
+{% block content %}
+<div class="space-y-8">
+  <div class="bg-white shadow rounded p-4">
+    <p class="text-sm text-gray-700">Heuristic checks plus axe-core WCAG 2.0/2.1/2.2 A/AA/AAA evaluation, with remediation guidance.</p>
+    {% if results.error %}
+      <p class="mt-2 text-red-700 font-semibold">Runner error: {{ results.error }}</p>
+    {% endif %}
+  </div>
+
+  {% set files = files or results.files or [] %}
+  {% if files %}
+    <div class="bg-white shadow rounded overflow-hidden border border-gray-200">
+      <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+        <h2 class="font-semibold text-gray-900">Summary</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm" id="summary-table">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Page</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Total</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Text Alt</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Language</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Forms</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">ARIA</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Keyboard</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Color</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Errors</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700">Tab Phrases</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+          {% for file in files %}
+            {% set cats = namespace(text=0, language=0, forms=0, aria=0, keyboard=0, color=0) %}
+            {% if file.axe and file.axe.violations %}
+              {% for v in file.axe.violations %}
+                {% set tags = v.tags or [] %}
+                {% if 'cat.text-alternatives' in tags %}{% set cats.text = cats.text + 1 %}{% endif %}
+                {% if 'cat.language' in tags %}{% set cats.language = cats.language + 1 %}{% endif %}
+                {% if 'cat.forms' in tags %}{% set cats.forms = cats.forms + 1 %}{% endif %}
+                {% if 'cat.aria' in tags %}{% set cats.aria = cats.aria + 1 %}{% endif %}
+                {% if 'cat.keyboard' in tags %}{% set cats.keyboard = cats.keyboard + 1 %}{% endif %}
+                {% if 'cat.color' in tags or 'cat.color-contrast' in tags %}{% set cats.color = cats.color + 1 %}{% endif %}
+              {% endfor %}
+            {% endif %}
+            <tr class="hover:bg-gray-50 cursor-pointer" data-target="{{ file.file | basename }}">
+              <td class="px-3 py-2 text-blue-700 hover:underline"><a href="#{{ file.file | basename }}">{{ file.file | basename }}</a></td>
+              {% if file.error %}
+                <td class="px-3 py-2">—</td>
+                <td class="px-3 py-2" colspan="6"><span class="text-red-700 font-semibold">runner error</span></td>
+                <td class="px-3 py-2 text-red-700 font-semibold">runner error</td>
+                <td class="px-3 py-2">—</td>
+              {% else %}
+                <td class="px-3 py-2">{{ file.axe and file.axe.violations|length or 0 }}</td>
+                <td class="px-3 py-2">{{ cats.text }}</td>
+                <td class="px-3 py-2">{{ cats.language }}</td>
+                <td class="px-3 py-2">{{ cats.forms }}</td>
+                <td class="px-3 py-2">{{ cats.aria }}</td>
+                <td class="px-3 py-2">{{ cats.keyboard }}</td>
+                <td class="px-3 py-2">{{ cats.color }}</td>
+                <td class="px-3 py-2">{% if file.axe and file.axe.error %}<span class="text-red-700 font-semibold">{{ file.axe.error }}</span>{% else %}—{% endif %}</td>
+                <td class="px-3 py-2">{{ file.tabResult.error and 'error' or (file.tabResult.phrases|length) }}</td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="text-lg font-semibold text-gray-900">Details</h2>
+      {% for file in files %}
+        <div class="bg-white shadow rounded overflow-hidden border border-gray-200" id="{{ file.file | basename }}">
+          <details open>
+            <summary class="bg-gray-50 px-4 py-2 font-semibold text-gray-900 cursor-pointer">{{ file.file | basename }}</summary>
+            <div class="p-4 text-sm text-gray-800 space-y-3">
+            {% if file.error %}
+              <p class="text-red-700 font-semibold">{{ file.error }}</p>
+            {% else %}
+              <p><strong>Landmarks:</strong> main={{ file.landmarks.hasMain }}, nav={{ file.landmarks.hasNav }}</p>
+              <p><strong>Headings:</strong> {{ file.headings }}</p>
+              <div>
+                <p class="font-semibold">Controls with names</p>
+                <ul class="list-disc list-inside space-y-1">
+                  {% for ctrl in file.controls %}
+                    <li>{{ ctrl.id|e }} — {% if ctrl.hasName %}OK{% else %}<span class="text-red-700 font-semibold">missing name</span>{% endif %}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold">Tab phrases</p>
+                {% if file.tabResult.error %}
+                  <p class="text-red-700 font-semibold">{{ file.tabResult.error }}</p>
+                {% else %}
+                  {% set phrases = file.tabResult.phrases or [] %}
+                  {% set limit = 20 %}
+                  <div class="bg-gray-100 rounded p-3 max-h-64 overflow-auto">
+                    <ol class="list-decimal list-inside space-y-1">
+                      {% for phrase in phrases[:limit] %}
+                        <li><code>{{ phrase|e }}</code></li>
+                      {% endfor %}
+                      {% if phrases|length > limit %}
+                        <li>… ({{ phrases|length - limit }} more)</li>
+                      {% endif %}
+                    </ol>
+                  </div>
+                {% endif %}
+              </div>
+
+              {% if file.axe %}
+                <div>
+                  <p class="font-semibold">WCAG Results</p>
+                  <p><strong>Violations:</strong> {{ file.axe.violations|length }} | <strong>Passes:</strong> {{ file.axe.passes|length }}</p>
+                  {% if file.axe.violations %}
+                    {% set vlimit = 10 %}
+                    <ul class="list-disc list-inside space-y-2">
+                      {% for v in file.axe.violations[:vlimit] %}
+                        <li>
+                          <div class="font-semibold">{{ v.id|e }} <span class="text-xs text-gray-600">(impact: {{ v.impact or 'n/a' }})</span></div>
+                          <div class="text-xs text-gray-600">Tags: {{ (v.tags or [])|join(', ')|e }}</div>
+                          <div class="mt-1">{{ v.help|e }} — <a class="text-blue-600 hover:underline" href="{{ v.helpUrl|e }}">guidance</a></div>
+                          <div class="mt-1 text-xs text-gray-700">Categories:
+                            <ul class="list-disc list-inside">
+                              {% for tag in v.tags if tag.startswith('cat.') %}
+                                <li>{{ tag|e }}</li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                          <div class="mt-1 text-xs text-gray-700">Nodes:
+                            <ul class="list-disc list-inside space-y-1">
+                              {% for node in v.nodes %}
+                                <li><code>{{ node.target|e }}</code><br>{{ node.failureSummary|e }}</li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                        </li>
+                      {% endfor %}
+                      {% if file.axe.violations|length > vlimit %}
+                        <li>… ({{ file.axe.violations|length - vlimit }} more)</li>
+                      {% endif %}
+                    </ul>
+                  {% else %}
+                    <p>✅ No WCAG violations detected.</p>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endif %}
+            </div>
+          </details>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-sm text-gray-700">No files processed.</p>
+  {% endif %}
+
+  <script>
+    document.querySelectorAll('#summary-table tr[data-target]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.getAttribute('data-target');
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const details = el.querySelector('details');
+          if (details) details.open = true;
+        }
+      });
+    });
+  </script>
+</div>
+{% endblock %}

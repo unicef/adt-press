@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Accessibility Smoke Test (Guidepup Virtual Screen Reader){% endblock %}
+{% block content %}
+<div class="space-y-8">
+  <div class="bg-white shadow rounded p-4">
+    <p class="text-sm text-gray-700">This report captures the spoken phrases gathered by the virtual screen reader for each generated ADT page. Investigate repeated or missing phrases, or any errors, as potential WCAG issues.</p>
+    {% if results.error %}
+      <p class="mt-2 text-red-700 font-semibold">Runner error: {{ results.error }}</p>
+    {% endif %}
+  </div>
+
+  {% if results.files %}
+    <div class="grid grid-cols-1 gap-4">
+      {% for file in results.files %}
+        <div class="bg-white shadow rounded overflow-hidden border border-gray-200">
+          <div class="bg-gray-50 px-4 py-2 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">{{ file.file | basename }}</h2>
+            {% if file.error %}
+              <span class="text-red-700 text-sm font-medium">Error</span>
+            {% endif %}
+          </div>
+          <div class="p-4 text-sm text-gray-800">
+            {% if file.error %}
+              <p class="text-red-700 font-semibold">{{ file.error }}</p>
+            {% else %}
+              <div class="bg-gray-100 rounded p-3 max-h-64 overflow-auto">
+                <ol class="list-decimal list-inside space-y-1">
+                  {% for phrase in file.phrases %}
+                    <li><code>{{ phrase|e }}</code></li>
+                  {% endfor %}
+                </ol>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-sm text-gray-700">No files processed.</p>
+  {% endif %}
+</div>
+{% endblock %}
