@@ -126,6 +126,7 @@ def glossary_report(
 def metadata_report(
     template_config: TemplateConfig,
     book_metadata: BookMetadata,
+    pdf_pages: list[Page],
     pdf_pages_by_id: dict[str, Page],
     metadata_extraction_prompt_config: MetadataPromptConfig,
 ) -> str:
@@ -134,6 +135,10 @@ def metadata_report(
     if book_metadata.cover_page_id:
         cover_page = pdf_pages_by_id.get(book_metadata.cover_page_id)
 
+    # Get the pages used for metadata extraction (first N pages)
+    page_range = metadata_extraction_prompt_config.page_range
+    pages_used_for_metadata = pdf_pages[:page_range] if page_range > 0 else []
+
     return render_template(
         template_config,
         "templates/metadata_report.html",
@@ -141,6 +146,7 @@ def metadata_report(
             metadata=book_metadata,
             cover_page=cover_page,
             pages_analyzed=metadata_extraction_prompt_config.page_range,
+            pages_used=pages_used_for_metadata,
         ),
     )
 

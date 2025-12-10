@@ -16,11 +16,14 @@ class PipelineTest(unittest.TestCase):
         files = list(Path(self.run_dir).glob(pattern))
         self.assertEqual(len(files), expected_count, msg)
 
-    def assertFileContains(self, name: str, content: str, msg: str = ""):
+    def assertFileContains(self, name: str, content: str, msg: str = "", case_sensitive: bool = True):
         file_path = Path(self.run_dir) / name
         self.assertTrue(file_path.exists(), f"File {name} does not exist.")
         with open(file_path, "r") as f:
             file_content = f.read()
+        if not case_sensitive:
+            file_content = file_content.lower()
+            content = content.lower()
         self.assertIn(content, file_content, msg)
 
     def assertFileDoesNotContain(self, name: str, content: str, msg: str = ""):
@@ -103,6 +106,12 @@ class PipelineTest(unittest.TestCase):
             self.assertFileContains("page_report.html", "sec_p1_s0", "No section found for page 1 in page report")
             self.assertFileContains("page_report.html", "French", "Output language not found in page report")
             self.assertFileContains("page_report.html", "English", "Input language not found in page report")
+            self.assertFileContains(
+                "page_report.html",
+                "corbeau",
+                "Translated text not found in page report",
+                case_sensitive=False,
+            )
             self.assertFileContains("page_report.html", "Glossary", "No glossary section found in report")
             self.assertFileContains("page_report.html", "Easy Read", "No easy read section found in report")
 

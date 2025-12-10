@@ -6,6 +6,7 @@ from adt_press.models.config import SectionType
 class PageSection(BaseModel):
     section_id: str
     section_type: SectionType
+    page_number: int | None
     part_ids: list[str] = []
     is_pruned: bool = False
     background_color: str

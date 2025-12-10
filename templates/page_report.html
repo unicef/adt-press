@@ -210,6 +210,7 @@
                                                 <div class="col-span-4 bg-blue-700 text-white px-3 py-2 text-sm font-medium">{{ output_language }}</div>
                                                 {% endif %}
                                                 <div class="col-span-4 bg-blue-700 text-white px-3 py-2 text-sm text-right">
+                                                    <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{% if section.page_number %}Page {{ section.page_number }}{% else %}No Page Number{% endif %}</span> 
                                                     <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_id }}</span>
                                                     <span class="px-2 py-1 text-xs bg-blue-900 text-white rounded">{{ section.section_type.name }}</span>
                                                     {% if section.is_pruned %}

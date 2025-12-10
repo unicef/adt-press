@@ -51,6 +51,8 @@ import {
   toggleNav,
   previousPage,
   setupClickOutsideHandler,
+  initializeNavTabs,
+  setNavigationData,
 } from "./modules/navigation.js";
 import { setState, state } from "./modules/state.js";
 import { setupTranslations } from "./modules/translations.js";
@@ -360,18 +362,19 @@ const handleResponse = async (response) => {
 
 async function fetchAndInjectComponents() {
   try {
-    // Fetch interface and navigation
-    const [interfaceHTML, navHTML] = await Promise.all([
+    const [interfaceHTML, navHTML, config, pages, toc] = await Promise.all([
       fetch("./assets/interface.html").then(response => response.text()),
-      fetch("./content/navigation/nav.html").then(response => response.text())
+      fetch("./content/navigation/nav.html").then(response => response.text()),
+      fetch("./assets/config.json").then(response => response.json()),
+      fetch("./content/pages.json").then(handleResponse).then(response => response.json()),
+      fetch("./content/toc.json").then(handleResponse).then(response => response.json()),
     ]);
-    
-    // Fetch config as JSON instead of HTML
-    const configResponse = await fetch("./assets/config.json");
-    const config = await configResponse.json();
-    
-    // Pass the config object instead of HTML string
+
     await injectComponents(interfaceHTML, navHTML, config);
+
+    initializeNavTabs();
+    setNavigationData({ pages, toc });
+    formatNavigationItems();
   } catch (error) {
     throw new Error("Failed to fetch components: " + error.message);
   }

@@ -1,10 +1,12 @@
 import os
 
+import structlog
 from hamilton.function_modifiers import cache
 from hamilton.function_modifiers import config as when_config
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from pydantic import BaseModel
 
+from adt_press.llm.language_detection import detect_input_language
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
@@ -16,9 +18,13 @@ from adt_press.models.config import (
     SectionType,
     SpeechPromptConfig,
 )
+from adt_press.models.text import PageTexts
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
+from adt_press.utils.sync import run_async_task
+
+log = structlog.get_logger(__name__)
 
 
 def config() -> DictConfig:  # pragma: no cover
@@ -37,16 +43,89 @@ def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
 
-def input_language_config(config: DictConfig) -> str:
-    return str(config.get("input_language", "en"))
+def _clean_language_override(language_value: str | None) -> str | None:
+    if language_value is None:
+        return None
+    return str(language_value).strip().lower()
 
 
-def plate_language_config(config: DictConfig) -> str:
-    return str(config.get("plate_language", "en"))
+def pdf_text_sample(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
+    collected: list[str] = []
+    total_chars = 0
+
+    for page_id in sorted(pdf_texts.keys()):
+        page_texts = pdf_texts[page_id]
+        for group in page_texts.groups:
+            for text in group.texts:
+                snippet = text.text.strip()
+                if not snippet:
+                    continue
+
+                collected.append(snippet)
+                total_chars += len(snippet)
+                if total_chars >= max_chars:
+                    return "\n".join(collected)
+
+    return "\n".join(collected)
 
 
-def output_languages_config(config: DictConfig) -> list[str]:
-    return list[str](config["output_languages"])
+def input_language_config(
+    config: DictConfig,
+    language_detection_prompt_config: PromptConfig,
+    pdf_text_sample: str,
+) -> str:
+    override_value = OmegaConf.select(config, "input_language", default=None)
+    override = _clean_language_override(override_value)
+    if override:
+        return override
+
+    if not pdf_text_sample.strip():
+        raise ValueError("language detection failed; pdf has no text!")
+
+    try:
+        response = run_async_task(lambda: detect_input_language(pdf_text_sample, language_detection_prompt_config))
+        confidence = getattr(response, "confidence", None)
+        log.info("input language detected automatically", language=response.language_code, confidence=confidence)
+        return response.language_code
+    except Exception:  # pragma: no cover - fallback path
+        raise ValueError("language detection failed; please specify `input_language` configuration parameter")
+
+
+def plate_language_config(config: DictConfig, input_language_config: str) -> str:
+    plate_override_value = OmegaConf.select(config, "plate_language", default=None)
+    plate_override = _clean_language_override(plate_override_value)
+    if plate_override:
+        return plate_override
+
+    log.info("plate language defaulted to input language", language=input_language_config)
+    return input_language_config
+
+
+def output_languages_config(config: DictConfig, input_language_config: str) -> list[str]:
+    raw_languages = OmegaConf.select(config, "output_languages", default=None)
+    sequence: list[str | None] = []
+    if raw_languages is not None:
+        container = OmegaConf.to_container(raw_languages, resolve=True)
+        if isinstance(container, list):
+            for item in container:
+                sequence.append(str(item) if item is not None else None)
+        else:
+            raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
+    cleaned_languages: list[str] = []
+
+    if sequence:
+        for language in sequence:
+            cleaned = _clean_language_override(language)
+            if cleaned:
+                cleaned_languages.append(cleaned)
+            else:
+                raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
+
+    if not cleaned_languages:
+        cleaned_languages = [input_language_config]
+        log.info("output languages defaulted to input language", languages=cleaned_languages)
+
+    return cleaned_languages
 
 
 def label_config(config: DictConfig) -> str:
@@ -121,6 +200,11 @@ def default_model_config(config: DictConfig) -> str:
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["caption"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def language_detection_prompt_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["language_detection"], config["default_model"]))
 
 
 @cache(behavior="recompute")

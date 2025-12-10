@@ -1,7 +1,7 @@
 label: "???"
 pdf_path: "???"
 
-input_language: "???"
+input_language: null
 plate_language: "${input_language}"
 output_languages: ["${input_language}"]
 
@@ -79,6 +79,10 @@ section_types:
 
   text_only:
     description: "For a reading section with only text."
+    render_strategy: two_column
+
+  text_and_single_image:
+    description: "For a section that contains text and a single image."
     render_strategy: two_column
 
   text_and_images:
@@ -187,12 +191,15 @@ prompts:
   metadata_extraction:
     model: default
     template_path: prompts/metadata_extraction.jinja2
-    max_retries: 3
-    page_range: 3  # Number of pages to analyze for metadata extraction
+    page_range: 10
 
   text_extraction:
     model: default
     template_path: prompts/text_extraction_groups.jinja2
+
+  language_detection:
+    model: default
+    template_path: prompts/language_detection.jinja2
 
   meaningfulness:
     model: default
@@ -211,7 +218,6 @@ prompts:
   page_sectioning:
     model: default
     template_path: prompts/page_sectioning_by_page.jinja2
-    max_retries: 10
 
   section_explanation:
     model: default

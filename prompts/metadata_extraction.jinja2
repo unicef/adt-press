@@ -6,6 +6,7 @@ Your task is to:
 2. Extract the book title
 3. Extract the author name(s) as a list
 4. Extract the publisher name
+5. Extract the table of contents (if present)
 
 IMPORTANT NOTES:
 * The cover is typically the first page, but may be the second if the first is blank or contains only publisher information
@@ -14,6 +15,14 @@ IMPORTANT NOTES:
 * If you cannot find information with confidence, return null for that field or an empty list for authors
 * The page_id corresponds to the page_id field in the provided page data
 * Provide reasoning for your decisions 
+
+TABLE OF CONTENTS EXTRACTION:
+* Only extract the table of contents if you see a CLEAR, explicit table of contents section
+* The TOC typically appears in the first few pages after the title/copyright pages
+* Extract chapter titles and their corresponding page numbers
+* Page numbers should be integers (convert Roman numerals like "i, ii, iii" to numbers if needed)
+* If there is no clear table of contents, return null for the table_of_contents field
+* Do not guess or infer chapters that aren't explicitly listed in a TOC
 
 PDF METADATA HINTS:
 * The PDF file may contain embedded metadata (title, author) in its properties
@@ -27,7 +36,9 @@ OUTPUT FORMAT:
 * authors: List of author names (list of strings, can be empty)
 * publisher: The publisher name (string or null)
 * cover_page_id: The page_id of the front cover (string or null)
-* reasoning: Explanation of how you identified the cover and extracted the metadata (required)
+* table_of_contents: List of chapters with title and page_number (list of objects or null)
+  - Each chapter should have: {"title": "Chapter Title", "page_number": 42}
+* reasoning: Explanation of how you identified the cover, metadata, and table of contents (required)
 {% endchat %}
 
 {% chat role="user" %}
@@ -47,5 +58,5 @@ Extracted text: {{ page.text }}
 
 {% endfor %}
 
-Provide your reasoning and then the extracted metadata.
+Provide your reasoning and then the extracted metadata including the table of contents if present.
 {% endchat %}

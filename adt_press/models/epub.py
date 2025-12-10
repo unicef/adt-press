@@ -93,6 +93,9 @@ def create_epub_file(
 
             # Add image to EPUB with internal path
             img_item = epub.EpubItem(uid=img.image_id, file_name=f"images/{image_id}.png", media_type="image/png", content=img_bytes)
+            
+            # save it for replacement later
+
             book.add_item(img_item)
             processed_image_ids.add(image_id)
 

@@ -80,7 +80,12 @@ async def generate_web_page_html(
     messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
     response: GenerationResponse = await client.chat.completions.create(
-        model=config.model, response_model=GenerationResponse, messages=messages, max_retries=config.max_retries, context=validation_context
+        model=config.model,
+        response_model=GenerationResponse,
+        messages=messages,
+        max_retries=config.max_retries,
+        context=validation_context,
+        timeout=config.timeout,
     )
 
     # Extract formatted texts with inline HTML tags preserved

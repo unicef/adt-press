@@ -38,6 +38,7 @@ async def get_glossary_translation(
         response_model=TranslationResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        timeout=config.timeout,
     )
 
     return GlossaryItem(word=response.word, definition=response.definition, variations=response.variants, emojis=glossary_item.emojis)
