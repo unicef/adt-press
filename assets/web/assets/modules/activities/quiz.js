@@ -11,8 +11,34 @@ const CORRECT_ANSWERS_SCRIPT_ID = 'quiz-correct-answers';
 const EXPLANATIONS_SCRIPT_ID = 'quiz-explanations';
 const QUIZ_SHORTCUT_KEYS = ['1', '2', '3'];
 let quizShortcutHandlerRegistered = false;
+
+const getSubmitButton = () => document.getElementById('submit-button');
+
+const disableQuizSubmitButton = () => {
+  const submitButton = getSubmitButton();
+  if (!submitButton) {
+    return;
+  }
+
+  submitButton.setAttribute('disabled', 'true');
+  submitButton.setAttribute('aria-disabled', 'true');
+  submitButton.setAttribute('tabindex', '-1');
+  submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+};
+
+const enableQuizSubmitButton = () => {
+  const submitButton = getSubmitButton();
+  if (!submitButton) {
+    return;
+  }
+
+  submitButton.removeAttribute('disabled');
+  submitButton.removeAttribute('aria-disabled');
+  submitButton.removeAttribute('tabindex');
+  submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+};
 const focusQuizSubmitButton = () => {
-  const submitButton = document.getElementById('submit-button');
+  const submitButton = getSubmitButton();
   if (!submitButton) {
     return;
   }
@@ -162,8 +188,12 @@ const restoreQuizSelection = (section) => {
     if (selectedOption) {
       markQuizSelection(selectedOption);
       setState('quizSelectedOption', selectedOption);
+      enableQuizSubmitButton();
+      return;
     }
   }
+
+  disableQuizSubmitButton();
 };
 
 const isLetterHidden = (option) => {
@@ -547,6 +577,7 @@ const handleQuizOptionSelection = (option) => {
 
   announceQuizSelection(option);
   saveQuizSelectionState(option);
+  enableQuizSubmitButton();
   focusQuizSubmitButton();
   restoreQuizSubmitButtonToValidate();
 };
@@ -616,6 +647,7 @@ export const resetQuizActivity = (activityId) => {
 
   clearQuizValidationStyling();
   setState('quizSelectedOption', null);
+  disableQuizSubmitButton();
 
   Object.keys(localStorage)
     .filter((key) => key.startsWith(`${activityId}_`) && key.endsWith('_quiz'))
@@ -850,6 +882,7 @@ export const initializeQuizActivity = () => {
 
   applyQuizBackground();
   ensureValidationLiveRegion();
+  disableQuizSubmitButton();
   hydrateQuizData();
 };
 
