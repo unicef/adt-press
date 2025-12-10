@@ -2,7 +2,6 @@ import pytest
 from pydantic import ValidationError
 
 from adt_press.llm.page_sectioning import SectionResponse
-from adt_press.models.section import SectionType
 
 
 class TestPageSectioningValidator:
@@ -11,8 +10,8 @@ class TestPageSectioningValidator:
     def test_valid_sections_with_text_and_image_ids(self):
         """Test that valid sections with correct IDs pass validation."""
         sections_data = [
-            {"section_type": "text_only", "part_ids": ["text-1", "text-2"]},
-            {"section_type": "text_and_images", "part_ids": ["image-1", "text-3"]},
+            {"section_type": "text_only", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["text-1", "text-2"]},
+            {"section_type": "text_and_images", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["image-1", "text-3"]},
         ]
 
         context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
@@ -23,12 +22,17 @@ class TestPageSectioningValidator:
         assert len(response.data) == 2
         assert response.reasoning == "Test reasoning"
         assert response.data[0].part_ids == ["text-1", "text-2"]
-        assert response.data[0].section_type == SectionType.text_only
+        assert response.data[0].section_type == "text_only"
 
     def test_section_with_invalid_text_id(self):
         """Test that sections with invalid text IDs raise validation error."""
         sections_data = [
-            {"section_type": "text_only", "part_ids": ["invalid-text-id", "text-1"]},
+            {
+                "section_type": "text_only",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["invalid-text-id", "text-1"],
+            },
         ]
 
         context = {"text_ids": ["text-1", "text-2"], "image_ids": ["image-1"]}
@@ -44,7 +48,12 @@ class TestPageSectioningValidator:
     def test_section_with_invalid_image_id(self):
         """Test that sections with invalid image IDs raise validation error."""
         sections_data = [
-            {"section_type": "text_and_images", "part_ids": ["text-1", "invalid-image-id"]},
+            {
+                "section_type": "text_and_images",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["text-1", "invalid-image-id"],
+            },
         ]
 
         context = {"text_ids": ["text-1"], "image_ids": ["image-1", "image-2"]}
@@ -60,8 +69,8 @@ class TestPageSectioningValidator:
     def test_mixed_valid_and_invalid_sections(self):
         """Test sections with mix of valid and invalid IDs."""
         sections_data = [
-            {"section_type": "text_only", "part_ids": ["text-1", "invalid-id"]},
-            {"section_type": "text_and_images", "part_ids": ["image-1"]},
+            {"section_type": "text_only", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["text-1", "invalid-id"]},
+            {"section_type": "text_and_images", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["image-1"]},
         ]
 
         context = {"text_ids": ["text-1"], "image_ids": ["image-1"]}
@@ -76,8 +85,13 @@ class TestPageSectioningValidator:
     def test_multiple_sections_same_section_id(self):
         """Test that multiple sections can be created with valid IDs."""
         sections_data = [
-            {"section_type": "activity_multiple_choice", "part_ids": ["text-1", "text-2", "text-3"]},
-            {"section_type": "text_and_images", "part_ids": ["image-1"]},
+            {
+                "section_type": "activity_multiple_choice",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["text-1", "text-2", "text-3"],
+            },
+            {"section_type": "text_and_images", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["image-1"]},
         ]
 
         context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
