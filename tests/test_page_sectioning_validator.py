@@ -10,8 +10,20 @@ class TestPageSectioningValidator:
     def test_valid_sections_with_text_and_image_ids(self):
         """Test that valid sections with correct IDs pass validation."""
         sections_data = [
-            {"section_type": "text_only", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["text-1", "text-2"], "page_number": None},
-            {"section_type": "text_and_images", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["image-1", "text-3"], "page_number": None},
+            {
+                "section_type": "text_only",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["text-1", "text-2"],
+                "page_number": None,
+            },
+            {
+                "section_type": "text_and_images",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["image-1", "text-3"],
+                "page_number": None,
+            },
         ]
 
         context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
@@ -71,8 +83,20 @@ class TestPageSectioningValidator:
     def test_mixed_valid_and_invalid_sections(self):
         """Test sections with mix of valid and invalid IDs."""
         sections_data = [
-            {"section_type": "text_only", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["text-1", "invalid-id"], "page_number": 1},
-            {"section_type": "text_and_images", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["image-1"], "page_number": 2},
+            {
+                "section_type": "text_only",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["text-1", "invalid-id"],
+                "page_number": 1,
+            },
+            {
+                "section_type": "text_and_images",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["image-1"],
+                "page_number": 2,
+            },
         ]
 
         context = {"text_ids": ["text-1"], "image_ids": ["image-1"]}
@@ -91,9 +115,16 @@ class TestPageSectioningValidator:
                 "section_type": "activity_multiple_choice",
                 "background_color": "#FFFFFF",
                 "text_color": "#000000",
-                "part_ids": ["text-1", "text-2", "text-3"], "page_number": 1,
+                "part_ids": ["text-1", "text-2", "text-3"],
+                "page_number": 1,
             },
-            {"section_type": "text_and_images", "background_color": "#FFFFFF", "text_color": "#000000", "part_ids": ["image-1"], "page_number": 1},
+            {
+                "section_type": "text_and_images",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["image-1"],
+                "page_number": 1,
+            },
         ]
 
         context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}

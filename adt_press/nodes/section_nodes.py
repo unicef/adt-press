@@ -33,7 +33,11 @@ def sections_by_page_id(
             if not page_images and not page_texts.groups:
                 page_sections[page.page_id] = PageSections(page_id=page.page_id, sections=[], reasoning="No images or text to section")
             else:
-                sections.append(get_page_sections(page_sectioning_prompt_config, section_types_config, spread_mode, page, page_images, page_texts.groups))
+                sections.append(
+                    get_page_sections(
+                        page_sectioning_prompt_config, section_types_config, spread_mode, page, page_images, page_texts.groups
+                    )
+                )
 
         return await gather_with_limit(sections, page_sectioning_prompt_config.rate_limit)
 
