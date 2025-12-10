@@ -226,43 +226,7 @@ def validate_generated_html_data_ids(
     if not soup.find(True):
         raise ValueError("Generated HTML does not contain any HTML elements.")
 
-    # Define inline text formatting tags that don't require data-id
-    inline_formatting_tags = {
-        "b",
-        "strong",
-        "i",
-        "em",
-        "u",
-        "mark",
-        "s",
-        "strike",
-        "del",
-        "ins",
-        "sub",
-        "sup",
-        "small",
-        "code",
-        "kbd",
-        "var",
-        "samp",
-        "abbr",
-        "cite",
-        "q",
-        "dfn",
-        "time",
-        "span",
-    }
-
-    def has_data_id_in_ancestry(element):
-        """Check if element or any ancestor has a data-id attribute."""
-        current = element
-        while current and current.name:
-            if current.get("data-id"):
-                return True
-            current = current.parent
-        return False
-
-    # Validate text elements
+    # Validate text elements - STRICT: all elements with direct text need data-id
     for element in soup.find_all(True):  # Find all HTML elements
         # Get direct text content, excluding nested elements and comments
         direct_text_nodes = []
@@ -281,16 +245,11 @@ def validate_generated_html_data_ids(
             direct_text = " ".join(direct_text_nodes)
             data_id = element.get("data-id")
 
-            # Allow inline formatting tags to not have data-id if parent has one
             if not data_id:
-                if element.name in inline_formatting_tags and has_data_id_in_ancestry(element):
-                    # This is an inline formatting tag with a parent that has data-id, skip validation
-                    continue
-                else:
-                    raise ValueError(
-                        f"HTML element '{element.name}' contains text but is missing "
-                        f"required data-id attribute. Text content: '{direct_text[:50]}...'"
-                    )
+                raise ValueError(
+                    f"HTML element '{element.name}' contains text but is missing "
+                    f"required data-id attribute. Text content: '{direct_text[:50]}...'"
+                )
 
             # Allow activity-generated text IDs if permitted
             is_generated_activity_text = allow_activity_generated_ids and data_id.startswith("activity_gen_")

@@ -120,6 +120,9 @@ DO NOT call the function with only the reasoning parameter. BOTH parameters are 
 {% endchat %}
 
 {% chat role="user" %}
+This is the base64 image of the entire page from the textbook for context only.
+{{ page_image_path | image }}
+
 Activity Type: {{ section.section_type }}
 Language: {{ language }}
 
