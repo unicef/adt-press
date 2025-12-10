@@ -2,6 +2,7 @@ import { state, setState } from './modules/state.js';
 import { ActivityTypes } from './modules/utils.js'; // Import ActivityTypes first
 import { initializeActivityAudioElements, playActivitySound } from './modules/audio.js';
 import { prepareMultipleChoice } from './modules/activities/multiple_choice.js';
+import { prepareQuiz, resetQuizActivity } from './modules/activities/quiz.js';
 import { prepareSorting } from './modules/activities/sorting.js';
 import { prepareMatching } from './modules/activities/matching.js';
 import { prepareTrueFalse } from './modules/activities/true_false.js';
@@ -68,7 +69,10 @@ const activityHasUserData = (activityType) => {
         else if (activityType === 'activity_fill_in_a_table') {
             return hasNonEmptyInputs('section td input[type="text"], section td textarea');
         }
-        else if (activityType === 'activity_multiple_choice' || activityType === 'activity_quiz') {
+        else if (activityType === 'activity_multiple_choice') {
+            return document.querySelectorAll('section input[type="radio"]:checked').length > 0;
+        }
+        else if (activityType === 'activity_quiz') {
             return document.querySelectorAll('section input[type="radio"]:checked').length > 0;
         }
         else if (activityType === 'activity_true_false') {
@@ -363,8 +367,9 @@ function initializeActivityHandlers() {
         localStorage.removeItem(`${activityId}_selectedOption`);
     };
 
-    // Quiz uses the same reset handler as multiple choice
-    activityResetHandlers[ActivityTypes.QUIZ] = activityResetHandlers[ActivityTypes.MULTIPLE_CHOICE];
+    activityResetHandlers[ActivityTypes.QUIZ] = (activityId) => {
+        resetQuizActivity(activityId);
+    };
 
     activityResetHandlers[ActivityTypes.TRUE_FALSE] = (activityId) => {
         const activitySection = document.querySelector(SELECTORS.TRUE_FALSE);
@@ -420,10 +425,9 @@ function initializeActivityHandlers() {
         validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
     };
 
-    // Quiz uses the same handlers as multiple choice
     activityHandlers[ActivityTypes.QUIZ] = {
-        setup: prepareMultipleChoice,
-        validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
+        setup: prepareQuiz,
+        validate: () => validateInputs(ActivityTypes.QUIZ)
     };
 
     activityHandlers[ActivityTypes.FILL_IN_THE_BLANK] = {

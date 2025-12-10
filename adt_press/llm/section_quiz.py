@@ -7,51 +7,53 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 from adt_press.models.config import QuizPromptConfig
 from adt_press.models.section import PageSection, SectionQuiz
 from adt_press.models.text import PageTextGroup
-from adt_press.utils.encoding import starts_with_emoji
 from adt_press.utils.file import cached_read_text_file
-
-
-class QuizResponse(BaseModel):
-    quiz: SectionQuiz
-    reasoning: str
 
 
 class Quiz(BaseModel):
     question: str
-    options: list[str]
-    explanations: list[str]
-    answer_index: str
+    options: list[dict]
+    answer_index: int
 
     @field_validator("question")
     @classmethod
     def validate_question(cls, v: str, info: ValidationInfo) -> str:
         if len(v) > 200:
             raise ValueError(f"question '{v}' is too long")
-        if not starts_with_emoji(v):
-            raise ValueError(f"question '{v}' does not start with an emoji")
         return v
 
     @field_validator("options")
     @classmethod
-    def validate_options(cls, v: list[str], info: ValidationInfo) -> list[str]:
+    def validate_options(cls, v: list[dict], info: ValidationInfo) -> list[dict]:
         if not v:
             raise ValueError("options list is empty")
-        if len(v) > 4:
-            raise ValueError(f"options list '{v}' is too long")
+        if len(v) != 3:
+            raise ValueError("quiz must include exactly 3 options")
         for option in v:
-            if len(option) > 50:
-                raise ValueError(f"option '{option}' is too long")
-            if not starts_with_emoji(option):
-                raise ValueError(f"option '{option}' does not start with an emoji")
+            text = option.get("text", "")
+            explanation = option.get("explanation", "")
+            if len(text) > 80:
+                raise ValueError(f"option text '{text}' is too long")
+            if len(explanation) > 400:
+                raise ValueError(f"explanation '{explanation}' is too long")
+            if not text:
+                raise ValueError("option text is missing")
+            if not explanation:
+                raise ValueError("option explanation is missing")
         return v
 
     @field_validator("answer_index")
     @classmethod
     def validate_answer_index(cls, v: int, info: ValidationInfo) -> int:
-        options = info.context.get("options", [])
+        options = info.data.get("options", [])
         if v < 0 or v >= len(options):
             raise ValueError(f"answer_index '{v}' is out of range for options list of length {len(options)}")
         return v
+
+
+class QuizResponse(BaseModel):
+    quiz: Quiz
+    reasoning: str
 
 
 async def generate_quiz(config: QuizPromptConfig, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]) -> SectionQuiz:
@@ -73,12 +75,15 @@ async def generate_quiz(config: QuizPromptConfig, sections: list[PageSection], t
 
     after_section = sections[-1]
 
+    option_texts = [option["text"] for option in response.quiz.options]
+    option_explanations = [option["explanation"] for option in response.quiz.options]
+
     return SectionQuiz(
         quiz_id="qiz_" + after_section.section_id,
         section_id=after_section.section_id,
         question=response.quiz.question,
-        options=response.quiz.options,
-        explanations=response.quiz.explanations,
+        options=option_texts,
+        explanations=option_explanations,
         answer_index=response.quiz.answer_index,
         reasoning=response.reasoning,
     )

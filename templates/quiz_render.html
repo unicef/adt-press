@@ -1,4 +1,3 @@
-{% set option_letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
 {% set answers = namespace(mapping={}) %}
 {% set explanations = namespace(mapping={}) %}
 {% for option_id in quiz.option_ids %}
@@ -6,7 +5,7 @@
     {% if quiz.explanation_ids and loop.index0 < quiz.explanation_ids|length %}
         {% set explanation_id = quiz.explanation_ids[loop.index0] %}
         {% if texts[explanation_id] is defined %}
-            {% set _ = explanations.mapping.update({option_id: texts[explanation_id].text}) %}
+            {% set _ = explanations.mapping.update({option_id: explanation_id}) %}
         {% endif %}
     {% endif %}
 {% endfor %}
@@ -54,12 +53,14 @@
                     aria-labelledby="{{ quiz.quiz_id }}-question-label"
                 >
                     {% for option_id in quiz.option_ids %}
-                        {% set option_letter = option_letters[loop.index0] if loop.index0 < option_letters|length else loop.index %}
-                        {% set option_explanation = explanations.mapping.get(option_id, '') %}
+                        {% set option_number = loop.index %}
+                        {% set option_explanation_id = explanations.mapping.get(option_id) %}
+                        {% set option_explanation = texts[option_explanation_id].text if option_explanation_id and texts[option_explanation_id] is defined else '' %}
                         <label
                             class="activity-option w-full max-w-xl cursor-pointer rounded-2xl border-2 border-gray-900 bg-[#FFFAF5] px-8 py-6 text-center text-xl font-medium text-gray-900 shadow-[0_6px_0_0_rgba(0,0,0,0.65)] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300 hover:translate-y-[-2px] hover:shadow-[0_8px_0_0_rgba(0,0,0,0.55)]"
                             data-activity-item="{{ option_id }}"
                             data-explanation="{{ option_explanation | e }}"
+                            {% if option_explanation_id %}data-explanation-id="{{ option_explanation_id }}"{% endif %}
                             tabindex="0"
                         >
                             <input
@@ -72,14 +73,14 @@
                             />
 
                             <div class="option-letter-wrapper sr-only" data-letter-hidden="true">
-                                <span class="option-letter" data-letter-hidden="true">{{ option_letter }}</span>
+                                <span class="option-letter" data-letter-hidden="true">{{ option_number }}</span>
                             </div>
                             <span
                                 id="{{ option_id }}-option-label"
-                                class="option-text block text-lg md:text-2xl"
+                                class="option-text block text-lg md:text-2xl text-gray-900"
                                 data-id="{{ option_id }}"
                             >
-                                {{ texts[option_id].text }}
+                                {{ option_number }}) {{ texts[option_id].text }}
                             </span>
 
                             <div class="feedback-container hidden w-full rounded-md border border-transparent bg-transparent px-3 py-2 text-gray-700" aria-live="polite">

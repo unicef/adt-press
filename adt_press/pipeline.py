@@ -104,6 +104,7 @@ def run_pipeline(config: DictConfig) -> None:
     nodes_to_execute = [
         "metadata_report",
         "report_pages",
+        "report_quizzes",
         "plate_report",
         "glossary_report",
         "web_report",

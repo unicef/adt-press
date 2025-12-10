@@ -2,6 +2,7 @@ import { ActivityTypes, updateSubmitButtonAndToast } from '../utils.js';
 import { translateText } from '../translations.js';
 import { playActivitySound } from '../audio.js';
 import { checkMultipleChoice } from './multiple_choice.js';
+import { checkQuiz } from './quiz.js';
 import { checkFillInTheBlank, clearInputValidationFeedback } from './fill_in_the_blank.js';
 import { checkMatching } from './matching.js';
 import { checkSorting } from './sorting.js';
@@ -23,8 +24,11 @@ export const validateInputs = (activityType) => {
     try {
         switch (activityType) {
             case ActivityTypes.MULTIPLE_CHOICE:
-            case ActivityTypes.QUIZ:
                 checkMultipleChoice();
+                break;
+
+            case ActivityTypes.QUIZ:
+                checkQuiz();
                 break;
 
             case ActivityTypes.FILL_IN_THE_BLANK:

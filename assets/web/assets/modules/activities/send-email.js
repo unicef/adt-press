@@ -145,12 +145,14 @@ async function executeMail(activityType) {
 
     switch (activityType) {
       case ActivityTypes.MULTIPLE_CHOICE:
+      case ActivityTypes.QUIZ: {
+        const activityLabel = activityType === ActivityTypes.QUIZ ? 'Quiz interactivo' : 'Opción múltiple';
         htmlContent = `
           <h2 style="color: #4CAF50; text-align: center;">Respuesta del alumno ${characterEmoji} ${idUser}</h2>
           <h3 style="text-align: center;">Actividad: <a href="${urlPage}">${namePage}</a></h3>
           <h3 style="color: #333;">${instructionPageHtml} </h3>
           <h3 style="color: #333;">Página: ${pageNumber} </h3>
-          <h4>Tipo: Opción múltiple</h4>
+          <h4>Tipo: ${activityLabel}</h4>
           <h4 style="color: #555;">Intentos: ${intentCount}</h4>
 
 
@@ -166,6 +168,7 @@ async function executeMail(activityType) {
           </div>
         `;
         break;
+      }
 
       case ActivityTypes.FILL_IN_THE_BLANK:
         htmlContent = `
