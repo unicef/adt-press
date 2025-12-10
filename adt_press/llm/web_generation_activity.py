@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString
 from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import HTMLPromptConfig, PromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.encoding import CleanTextBaseModel
@@ -138,9 +138,24 @@ async def generate_web_page_activity(
     texts: list[PlateText],
     images: list[PlateImage],
     language_code: str,
+    activity_prompts_config: dict[str, HTMLPromptConfig],
     activity_rendering_enabled: bool = True,
 ) -> WebPage:
     language = LANGUAGE_MAP[language_code]
+
+    # Override config with activity-specific config if available
+    section_type_key = section.section_type.value
+    if section_type_key in activity_prompts_config:
+        # Use the activity-specific config for this section type
+        activity_config = activity_prompts_config[section_type_key]
+        config = activity_config
+        examples = activity_config.examples
+    elif section_type_key.startswith("activity_"):
+        # If it's an activity section but not in config, raise an error
+        raise ValueError(
+            f"No activity-specific prompt configuration found for section type: {section_type_key}. "
+            f"Available activity types: {list(activity_prompts_config.keys())}"
+        )
 
     context = dict(
         section=section,

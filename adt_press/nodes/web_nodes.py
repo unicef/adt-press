@@ -26,6 +26,7 @@ def web_pages(
     layout_types_config: dict[str, LayoutType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
+    activity_prompts_config: dict[str, HTMLPromptConfig],
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -86,7 +87,19 @@ def web_pages(
             elif strategy.render_type == "template":
                 web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
             elif strategy.render_type == "activity":
-                web_pages.append(generate_web_page_activity(strategy_name, config, config.examples, section, groups, texts, images, plate_language_config))
+                web_pages.append(
+                    generate_web_page_activity(
+                        strategy_name,
+                        config,
+                        config.examples,
+                        section,
+                        groups,
+                        texts,
+                        images,
+                        plate_language_config,
+                        activity_prompts_config,
+                    )
+                )
 
         return await gather_with_limit(web_pages, 300)
 
