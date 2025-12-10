@@ -1,11 +1,10 @@
 # mypy: ignore-errors
 import re
 
-import instructor
 from banks import Prompt
-from litellm import acompletion
 from pydantic import Field, field_validator
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.plate import PlateSection, PlateText
 from adt_press.models.section import ActivityAnswer
@@ -16,7 +15,7 @@ from adt_press.utils.languages import LANGUAGE_MAP
 
 class ActivityAnswersResponse(CleanTextBaseModel):
     reasoning: str = Field(..., description="Brief explanation of answer determination")
-    answers: dict[str, str] = Field(
+    answers: dict[str, str | bool | int | float] = Field(
         default_factory=dict,
         description="Dictionary mapping activity item IDs to their correct answers",
     )
@@ -51,7 +50,7 @@ async def generate_activity_answers(
     template_path = config.template_path
     prompt = Prompt(cached_read_text_file(template_path))
 
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
 
     response: ActivityAnswersResponse = await client.chat.completions.create(
         model=config.model,

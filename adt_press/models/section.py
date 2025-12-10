@@ -35,7 +35,7 @@ class SectionGlossary(BaseModel):
 
 class ActivityAnswer(BaseModel):
     section_id: str
-    answers: dict[str, str]
+    answers: dict[str, str | bool | int | float]
     reasoning: str
 
 
