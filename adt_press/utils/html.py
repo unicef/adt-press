@@ -168,3 +168,181 @@ def format_html(html: str) -> str:
     """Format HTML with proper indentation."""
     soup = BeautifulSoup(html, "html.parser")
     return soup.prettify()
+
+
+def extract_formatted_texts(html_content: str) -> dict[str, str]:
+    """Extract formatted HTML text content from generated HTML by data-id.
+
+    Returns a mapping of text_id -> inner_html (with inline formatting preserved).
+    Example: {"text-1": "This is <b>bold</b> text"}
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+    formatted_texts = {}
+
+    # Find all elements with data-id
+    for element in soup.find_all(attrs={"data-id": True}):
+        data_id = element.get("data-id")
+        if data_id:
+            # Get inner HTML (preserves inline formatting tags)
+            inner_html = "".join(str(child) for child in element.children)
+            # Clean up and store
+            formatted_texts[data_id] = inner_html.strip()
+
+    return formatted_texts
+
+
+def validate_generated_html_data_ids(
+    html_content: str,
+    text_ids: set[str],
+    image_ids: set[str],
+    section_type: str | None = None,
+    activity_rendering_enabled: bool = True,
+    allow_activity_generated_ids: bool = False,
+) -> str:
+    """Validate and sanitize generated HTML content.
+
+    Args:
+        html_content: The HTML content to validate
+        text_ids: Set of valid text IDs
+        image_ids: Set of valid image IDs
+        section_type: The section type (e.g., "activity_multiple_choice")
+        activity_rendering_enabled: Whether activity rendering is enabled
+        allow_activity_generated_ids: Whether to allow activity_gen_* IDs
+
+    Returns:
+        The validated HTML content
+
+    Raises:
+        ValueError: If validation fails
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Strip document wrappers if LLM wrapped content in html/body tags
+    if soup.body:
+        # Extract just the body contents
+        html_content = "".join(str(child) for child in soup.body.contents)
+        soup = BeautifulSoup(html_content, "html.parser")
+
+    if not soup.find(True):
+        raise ValueError("Generated HTML does not contain any HTML elements.")
+
+    # Define inline text formatting tags that don't require data-id
+    inline_formatting_tags = {
+        "b",
+        "strong",
+        "i",
+        "em",
+        "u",
+        "mark",
+        "s",
+        "strike",
+        "del",
+        "ins",
+        "sub",
+        "sup",
+        "small",
+        "code",
+        "kbd",
+        "var",
+        "samp",
+        "abbr",
+        "cite",
+        "q",
+        "dfn",
+        "time",
+        "span",
+    }
+
+    def has_data_id_in_ancestry(element):
+        """Check if element or any ancestor has a data-id attribute."""
+        current = element
+        while current and current.name:
+            if current.get("data-id"):
+                return True
+            current = current.parent
+        return False
+
+    # Validate text elements
+    for element in soup.find_all(True):  # Find all HTML elements
+        # Get direct text content, excluding nested elements and comments
+        direct_text_nodes = []
+        for child in element.children:
+            # Skip HTML comments
+            if isinstance(child, Comment):
+                continue
+            # Only include NavigableString (text nodes), not nested tags
+            if isinstance(child, NavigableString):
+                text = str(child).strip()
+                if text:  # Only non-empty text
+                    direct_text_nodes.append(text)
+
+        # Check if element has meaningful direct text content
+        if direct_text_nodes:
+            direct_text = " ".join(direct_text_nodes)
+            data_id = element.get("data-id")
+
+            # Allow inline formatting tags to not have data-id if parent has one
+            if not data_id:
+                if element.name in inline_formatting_tags and has_data_id_in_ancestry(element):
+                    # This is an inline formatting tag with a parent that has data-id, skip validation
+                    continue
+                else:
+                    raise ValueError(
+                        f"HTML element '{element.name}' contains text but is missing "
+                        f"required data-id attribute. Text content: '{direct_text[:50]}...'"
+                    )
+
+            # Allow activity-generated text IDs if permitted
+            is_generated_activity_text = allow_activity_generated_ids and data_id.startswith("activity_gen_")
+
+            if data_id not in text_ids and not is_generated_activity_text:
+                raise ValueError(
+                    f"HTML element '{element.name}' has invalid data-id='{data_id}'. Must be one of text IDs: {', '.join(sorted(text_ids))}"
+                )
+
+    # Validate image elements
+    for img_element in soup.find_all("img"):
+        data_id = img_element.get("data-id")
+        if not data_id:
+            raise ValueError(f"Image element is missing required data-id attribute. Image attributes: {dict(img_element.attrs)}")
+
+        if data_id not in image_ids:
+            raise ValueError(f"Image element has invalid data-id='{data_id}'. Must be one of image IDs: {', '.join(sorted(image_ids))}")
+
+    # Ensure required structural elements exist
+    container = soup.find("div", id="content")
+    if not container:
+        raise ValueError("Generated HTML is missing the main <div id='content'> container.")
+
+    container_classes = container.get("class", [])
+    if "container" not in container_classes:
+        raise ValueError("The main content container must include the 'container' class.")
+
+    sections = soup.find_all("section")
+    if not sections:
+        raise ValueError("Generated HTML must include a <section> element.")
+
+    if len(sections) != 1:
+        raise ValueError("Generated HTML must include exactly one <section> element.")
+
+    section_element = sections[0]
+
+    if section_type:
+        data_section_type = section_element.get("data-section-type")
+        if data_section_type != section_type:
+            raise ValueError(f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'.")
+
+        # Determine expected role based on section type AND activity rendering status
+        if section_type.startswith("activity_") and activity_rendering_enabled:
+            expected_role = "activity"
+        else:
+            expected_role = "article"
+
+        role = section_element.get("role")
+        if role != expected_role:
+            raise ValueError(f"Section role attribute is invalid. Expected '{expected_role}', got '{role}'.")
+
+    if not soup.find(attrs={"data-id": True}):
+        raise ValueError("Generated HTML must include at least one element with a data-id attribute.")
+
+    return html_content

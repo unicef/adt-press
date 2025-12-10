@@ -20,3 +20,7 @@ class WebPage(BaseModel):
     render_strategy: str = ""
     activity_answers: dict[str, str] = Field(default_factory=dict)
     activity_reasoning: str = ""
+    formatted_texts: dict[str, str] = Field(
+        default_factory=dict,
+        description="Formatted HTML text content for each text_id (for translations.json)",
+    )

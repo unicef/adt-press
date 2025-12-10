@@ -9,7 +9,6 @@ from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
-    PromptConfig,
     RenderStrategy,
     SectionType,
     TemplateConfig,
@@ -65,9 +64,6 @@ def web_pages(
             section_type_obj = section_types_config.get(section.section_type)
             if not section_type_obj:
                 raise ValueError(f"Unknown section type: {section.section_type}")
-
-            # Derive section type info early
-            is_activity_section = section.section_type.startswith("activity_")
 
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":

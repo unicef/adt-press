@@ -100,7 +100,7 @@ async def get_page_sections(
             section_type=types_by_id[s.section_type],
             part_ids=s.part_ids.copy(),
             background_color=s.background_color,
-            text_color=s.text_color,            
+            text_color=s.text_color,
         )
         sections.append(section)
 
