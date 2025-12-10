@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from adt_press.models.section import GlossaryItem, SectionType
+from adt_press.models.section import GlossaryItem
 
 
 class PlateText(BaseModel):
@@ -23,14 +23,13 @@ class PlateImage(BaseModel):
 
 class PlateSection(BaseModel):
     section_id: str
-    section_type: SectionType
+    section_type: str
     page_number: int | None
     page_image_path: str
     part_ids: list[str]
     explanation_id: str | None
     background_color: str
     text_color: str
-    layout_type: str
 
 
 class PlateChapter(BaseModel):

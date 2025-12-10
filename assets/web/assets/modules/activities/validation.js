@@ -2,11 +2,11 @@ import { ActivityTypes, updateSubmitButtonAndToast } from '../utils.js';
 import { translateText } from '../translations.js';
 import { playActivitySound } from '../audio.js';
 import { checkMultipleChoice } from './multiple_choice.js';
-import { checkFillInTheBlank, clearInputValidationFeedback } from './fill_in_blank.js';
+import { checkFillInTheBlank, clearInputValidationFeedback } from './fill_in_the_blank.js';
 import { checkMatching } from './matching.js';
 import { checkSorting } from './sorting.js';
 import { checkTrueFalse } from './true_false.js';
-import { checkTableInputs } from './fill_in_table.js';
+import { checkTableInputs } from './fill_in_a_table.js';
 import { isLikelySpanish } from './gibberish_detector.js';
 import { executeMail } from './send-email.js';
 import { containsProfanity } from './profanity_detector.js';
@@ -145,7 +145,7 @@ const validateOpenEndedAnswer = async () => {
          localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
      
          
-         localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+         localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 
         executeMail(ActivityTypes.OPEN_ENDED_ANSWER);
     }

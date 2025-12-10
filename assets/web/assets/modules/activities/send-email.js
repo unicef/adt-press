@@ -326,7 +326,7 @@ async function executeMail(activityType) {
       htmlContent: htmlContent,
     };
 
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    /*const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         "Accept": "application/json",
@@ -339,7 +339,7 @@ async function executeMail(activityType) {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Error al enviar el correo: ${response.status} - ${errorText}`);
-    }
+    }*/
 
   } catch (error) {
     console.error("❌ Error en el envío del correo:", error);

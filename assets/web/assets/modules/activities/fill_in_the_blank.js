@@ -300,7 +300,7 @@ const handleValidationResult = (validationResult) => {
         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
     
         
-        localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
         executeMail(ActivityTypes.FILL_IN_THE_BLANK);
     }
 

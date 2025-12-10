@@ -2,6 +2,7 @@ import os
 
 import structlog
 from hamilton.function_modifiers import cache
+from hamilton.function_modifiers import config as when_config
 from omegaconf import DictConfig, OmegaConf
 from pydantic import BaseModel
 
@@ -9,12 +10,12 @@ from adt_press.llm.language_detection import detect_input_language
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
-    LayoutType,
     MetadataPromptConfig,
     PageRangeConfig,
     PromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    SectionType,
     SpeechPromptConfig,
 )
 from adt_press.models.text import PageTexts
@@ -156,13 +157,21 @@ def page_grouping_config(config: DictConfig) -> str:
 
 
 @cache(behavior="recompute")
-def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
-    types = dict[str, LayoutType]()
-    for name, layout_type in config["layout_types"].items():
-        params = dict(layout_type)
+def section_types_config(config: DictConfig, default_render_strategy_config: str) -> dict[str, SectionType]:
+    types = dict[str, SectionType]()
+    for name, section_type in config["section_types"].items():
+        params = dict(section_type)
         params["name"] = name
-        types[name] = LayoutType.model_validate(params)
+        # Use default_render_strategy if not specified in section_type
+        if "render_strategy" not in params:
+            params["render_strategy"] = default_render_strategy_config
+        types[name] = SectionType.model_validate(params)
     return types
+
+
+@cache(behavior="recompute")
+def default_render_strategy_config(config: DictConfig) -> str:
+    return str(config.get("default_render_strategy", "html"))
 
 
 @cache(behavior="recompute")
@@ -249,18 +258,86 @@ def text_easy_read_prompt_config(config: DictConfig) -> PromptConfig:
 
 
 @cache(behavior="recompute")
+def activity_answers_config(config: DictConfig) -> PromptConfig:
+    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["activity_answers"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+@when_config.when(activity_strategy="llm")
+def activity_prompts_config__llm(config: DictConfig) -> dict[str, HTMLPromptConfig]:
+    """Load activity-specific prompt configs into a dictionary keyed by section type."""
+    activity_types = [
+        "activity_sorting",
+        "activity_matching",
+        "activity_fill_in_a_table",
+        "activity_true_false",
+        "activity_open_ended_answer",
+        "activity_fill_in_the_blank",
+        "activity_multiple_choice",
+    ]
+
+    activity_configs = {}
+    for activity_type in activity_types:
+        if activity_type in config["prompts"]:
+            activity_configs[activity_type] = HTMLPromptConfig.model_validate(
+                prompt_config_with_model(config["prompts"][activity_type], config["default_model"])
+            )
+
+    return activity_configs
+
+
+@cache(behavior="recompute")
+@when_config.when(activity_strategy="none")
+def activity_prompts_config__none(config: DictConfig) -> dict[str, HTMLPromptConfig]:
+    """Return empty dict when activity generation is disabled."""
+    return {}
+
+
+@cache(behavior="recompute")
+@when_config.when(activity_strategy="llm")
+def activity_answers_prompts_config__llm(config: DictConfig) -> dict[str, PromptConfig]:
+    """Load activity-specific answer generation prompt configs into a dictionary keyed by section type."""
+    activity_types = [
+        "activity_sorting",
+        "activity_matching",
+        "activity_fill_in_a_table",
+        "activity_true_false",
+        "activity_fill_in_the_blank",
+        "activity_multiple_choice",
+    ]
+
+    answer_configs = {}
+
+    for activity_type in activity_types:
+        answer_key = f"{activity_type}_answers"
+        if answer_key in config["prompts"]:
+            answer_configs[activity_type] = PromptConfig.model_validate(
+                prompt_config_with_model(config["prompts"][answer_key], config["default_model"])
+            )
+
+    return answer_configs
+
+
+@cache(behavior="recompute")
+@when_config.when(activity_strategy="none")
+def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, PromptConfig]:
+    """Return empty dict when activity answer generation is disabled."""
+    return {}
+
+
+@cache(behavior="recompute")
 def speech_prompt_config(config: DictConfig) -> PromptConfig:
     return SpeechPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["speech_generation"], config["default_model"]))
 
 
 @cache(behavior="recompute")
-def section_metadata_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_metadata"], config["default_model"]))
+def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
+    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_html"], config["default_model"]))
 
 
 @cache(behavior="recompute")
-def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
-    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_html"], config["default_model"]))
+def web_generation_activity_prompt_config(config: DictConfig) -> HTMLPromptConfig:
+    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_activity"], config["default_model"]))
 
 
 @cache(behavior="recompute")
@@ -287,6 +364,7 @@ def strategy_config(config: DictConfig) -> dict[str, str]:
             "glossary_strategy": config["glossary_strategy"],
             "explanation_strategy": config["explanation_strategy"],
             "easy_read_strategy": config["easy_read_strategy"],
+            "activity_strategy": config["activity_strategy"],
             "speech_strategy": config["speech_strategy"],
         }
     )
