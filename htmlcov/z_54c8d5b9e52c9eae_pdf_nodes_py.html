@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for adt_press/nodes/pdf_nodes.py: 98%</title>
+    <title>Coverage for adt_press/nodes/pdf_nodes.py: 90%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_8432e98f.css" type="text/css">
     <script src="coverage_html_cb_bcae5fc4.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>adt_press&#8201;/&#8201;nodes&#8201;/&#8201;pdf_nodes.py</b>:
-            <span class="pc_cov">98%</span>
+            <span class="pc_cov">90%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">110 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">108<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">99<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">11<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_54c8d5b9e52c9eae_plate_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.12.0">coverage.py v7.12.0</a>,
-            created at 2025-12-08 18:16 +0000
+            created at 2025-12-10 20:39 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -132,17 +132,17 @@
     <p class="run run2"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="nam">text_easy_read_prompt_config</span><span class="op">:</span> <span class="nam">PromptConfig</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">    <span class="nam">processed_pdf_texts</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">PageTexts</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t"><span class="op">)</span> <span class="op">-></span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">EasyReadText</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="key">async</span> <span class="key">def</span> <span class="nam">get_easy_reads</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">        <span class="nam">tasks</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="key">for</span> <span class="nam">page_texts</span> <span class="key">in</span> <span class="nam">processed_pdf_texts</span><span class="op">.</span><span class="nam">values</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">            <span class="key">for</span> <span class="nam">group</span> <span class="key">in</span> <span class="nam">page_texts</span><span class="op">.</span><span class="nam">groups</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">                <span class="key">for</span> <span class="nam">text</span> <span class="key">in</span> <span class="nam">group</span><span class="op">.</span><span class="nam">texts</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">                    <span class="nam">tasks</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">get_text_easy_read</span><span class="op">(</span><span class="nam">input_language_config</span><span class="op">,</span> <span class="nam">text_easy_read_prompt_config</span><span class="op">,</span> <span class="nam">text</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="key">async</span> <span class="key">def</span> <span class="nam">get_easy_reads</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">        <span class="nam">tasks</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="key">for</span> <span class="nam">page_texts</span> <span class="key">in</span> <span class="nam">processed_pdf_texts</span><span class="op">.</span><span class="nam">values</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">            <span class="key">for</span> <span class="nam">group</span> <span class="key">in</span> <span class="nam">page_texts</span><span class="op">.</span><span class="nam">groups</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">                <span class="key">for</span> <span class="nam">text</span> <span class="key">in</span> <span class="nam">group</span><span class="op">.</span><span class="nam">texts</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">                    <span class="nam">tasks</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">get_text_easy_read</span><span class="op">(</span><span class="nam">input_language_config</span><span class="op">,</span> <span class="nam">text_easy_read_prompt_config</span><span class="op">,</span> <span class="nam">text</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="key">return</span> <span class="key">await</span> <span class="nam">gather_with_limit</span><span class="op">(</span><span class="nam">tasks</span><span class="op">,</span> <span class="nam">text_easy_read_prompt_config</span><span class="op">.</span><span class="nam">rate_limit</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="key">return</span> <span class="key">await</span> <span class="nam">gather_with_limit</span><span class="op">(</span><span class="nam">tasks</span><span class="op">,</span> <span class="nam">text_easy_read_prompt_config</span><span class="op">.</span><span class="nam">rate_limit</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="nam">results</span> <span class="op">=</span> <span class="nam">run_async_task</span><span class="op">(</span><span class="nam">get_easy_reads</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">    <span class="key">return</span> <span class="op">{</span><span class="nam">easy_read</span><span class="op">.</span><span class="nam">text_id</span><span class="op">:</span> <span class="nam">easy_read</span> <span class="key">for</span> <span class="nam">easy_read</span> <span class="key">in</span> <span class="nam">results</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="nam">results</span> <span class="op">=</span> <span class="nam">run_async_task</span><span class="op">(</span><span class="nam">get_easy_reads</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">    <span class="key">return</span> <span class="op">{</span><span class="nam">easy_read</span><span class="op">.</span><span class="nam">text_id</span><span class="op">:</span> <span class="nam">easy_read</span> <span class="key">for</span> <span class="nam">easy_read</span> <span class="key">in</span> <span class="nam">results</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t"><span class="op">@</span><span class="nam">config</span><span class="op">.</span><span class="nam">when</span><span class="op">(</span><span class="nam">easy_read_strategy</span><span class="op">=</span><span class="str">"none"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -338,7 +338,7 @@
             <a class="nav" href="z_54c8d5b9e52c9eae_plate_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.12.0">coverage.py v7.12.0</a>,
-            created at 2025-12-08 18:16 +0000
+            created at 2025-12-10 20:39 +0000
         </p>
     </div>
 </footer>
