@@ -16,10 +16,10 @@ class RenderType(str, enum.Enum):
     activity = "activity"
 
 
-class LayoutType(BaseModel):
+class SectionType(BaseModel):
     name: str
     description: str = ""
-    render_strategy: str
+    render_strategy: str = "html"
 
 
 class RenderStrategy(BaseModel):

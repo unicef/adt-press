@@ -38,56 +38,87 @@ custom_plate_path: ""
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
 
-# what strategy is used to render sections into web pages, dynamic will choose based on layout type 
+# what strategy is used to render sections into web pages, dynamic will choose based on section type 
 render_strategy: dynamic
 
-layout_types:
-  cover_page:
-    description: "Cover page of the book, typically includes title, author, and publisher information."
+# the default render strategy used for section types when not explicitly specified
+default_render_strategy: html
+
+section_types:
+  front_cover:
+    description: "For the front cover page of the textbook that is the first page. There can only be one front cover page. IMPORTANT! Only the first page can be a front cover page."
     render_strategy: two_column
 
-  divider_page:
-    description: "Divider or chapter title pages that separate sections or chapters within the book."
+  inside_cover:
+    description: "For an inside cover page that can contain the title."
+    render_strategy: two_column
+
+  back_cover:
+    description: "For a back cover page that is the last page of the textbook."
+    render_strategy: two_column
+
+  separator:
+    description: "For a separator page that breaks up the text into different logical sections."
     render_strategy: single_column
 
-  novel_text_and_images:
-    description: "Novel pages with text and embedded images, including poetry. Text flows around images, or text and images would be best laid out in two column format."
-    render_strategy: two_column
-
-  novel_text_only:
-    description: "Novel pages with only text content, including poetry. Simple flowing text layout."
-    render_strategy: two_column
-
-  novel_images_only:
-    description: "Novel pages with only images, including spreads, such as illustrated novels or photo essays."
-    render_strategy: two_column
-
-  mathbook:
-    description: "Math textbook pages with equations, diagrams, and structured layouts typical of educational math content."
+  credits:
+    description: "For a credits page that lists the credits and acknowledgements of the textbook."
     render_strategy: html
 
-  storybook_text_images:
-    description: "Storybook pages with integrated text and illustrations. Often text is overlapping, however it will work in a two column format. If the overlapping is too complex like speech bubbles, the comic_overlay strategy will be used instead."
+  foreword:
+    description: "For a foreword page that can be an introduction, overview, or note from the author."
     render_strategy: two_column
 
-  storybook_images_only:
-    description: "Storybook pages with only illustrations, no text content."
+  table_of_contents:
+    description: "For a table of contents page."
+    render_strategy: html
+
+  boxed_text:
+    description: "For text that is contained in a box or callout section."
     render_strategy: two_column
 
-  comic_overlay:
-    description: "Visually rich layouts that are image focused with text overlayed positionally. For examples comics, storybooks, graphic novels features pages with speech bubbles, captions, and text overlays on images. Complex spatial relationships between text and visuals."
-    render_strategy: overlay
+  text_only:
+    description: "For a reading section with only text."
+    render_strategy: two_column
 
   text_and_images:
-    description: "Textbook pages with complex multi-element layouts including sidebars, callout boxes, diagrams, and non-linear reading flow."
+    description: "For a reading section with text and images."
     render_strategy: html
 
-  textbook_activity:
-    description: "Activity or workbook pages with interactive elements, fill-in-blanks, exercises, and structured activity layouts."
+  images_only:
+    description: "For a section with only images."
+    render_strategy: two_column
+
+  activity_matching:
+    description: "For an interactive matching activity where you match items in a list to items in another list. In general, you can only match one item from the first list to one item in the second list. If you have fewer items in the second list - this is likely a 'sorting activity'."
     render_strategy: activity
-  
+
+  activity_fill_in_a_table:
+    description: "For an interactive table to fill in."
+    render_strategy: activity
+
+  activity_multiple_choice:
+    description: "For an interactive multiple choice activity with a question and two or more options with only one right answer. e.g. 'circle the correct answer'."
+    render_strategy: activity
+
+  activity_true_false:
+    description: "For a true or false activity with a question and either a true or false answer."
+    render_strategy: activity
+
+  activity_open_ended_answer:
+    description: "For an activity section with only open ended text response."
+    render_strategy: activity
+
+  activity_fill_in_the_blank:
+    description: "For a fill in the blank activity with one or more blanks to fill in, with a very short answer."
+    render_strategy: activity
+
+  activity_sorting:
+    description: "For a sorting activity with a collection of text or images that need to be sorted into different categories. You can have more items in the list to be sorted than categories to sort into."
+    render_strategy: activity
+
   other:
-    description: "Pages that do not fit into the other defined layout types, requiring custom handling."
+    description: "For any other section type that does not fit the above categories."
     render_strategy: html
 
 render_strategies:
@@ -197,10 +228,6 @@ prompts:
   section_glossary:
     model: default
     template_path: prompts/section_glossary.jinja2
-
-  section_metadata:
-    model: default
-    template_path: prompts/section_metadata.jinja2
 
   text_easy_read:
     model: default

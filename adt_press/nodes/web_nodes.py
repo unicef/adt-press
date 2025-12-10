@@ -7,7 +7,14 @@ from hamilton.function_modifiers import cache
 from adt_press.llm.web_generation_activity import generate_web_page_activity
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_template import generate_web_page_template
-from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderStrategy, TemplateConfig, TemplateRenderConfig
+from adt_press.models.config import (
+    HTMLPromptConfig,
+    PromptConfig,
+    RenderStrategy,
+    SectionType,
+    TemplateConfig,
+    TemplateRenderConfig,
+)
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
@@ -23,7 +30,7 @@ def web_pages(
     plate_language_config: str,
     plate: Plate,
     default_model_config: str,
-    layout_types_config: dict[str, LayoutType],
+    section_types_config: dict[str, SectionType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
@@ -54,19 +61,23 @@ def web_pages(
                 elif part_id.startswith("img_"):
                     images.append(images_by_id[part_id])
 
-            layout_type = layout_types_config.get(section.layout_type)
-            if not layout_type:
-                raise ValueError(f"Unknown layout type: {section.layout_type}")
+            # Get section type configuration
+            section_type_obj = section_types_config.get(section.section_type)
+            if not section_type_obj:
+                raise ValueError(f"Unknown section type: {section.section_type}")
+
+            # Derive section type info early
+            is_activity_section = section.section_type.startswith("activity_")
 
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":
-                strategy_name = layout_type.render_strategy
+                # Use section_type's render_strategy instead of layout_type's
+                strategy_name = section_type_obj.render_strategy
 
             strategy = render_strategies_config.get(strategy_name)
-            if not strategy:
-                raise ValueError(f"Unknown render strategy: {strategy_name}")
-
-            config = cached_configs.get(strategy_name)
+            specific_activity_config = activity_prompts_config.get(section.section_type)
+            cache_key = f"{strategy_name}::{section.section_type}" if specific_activity_config else strategy_name
+            config = cached_configs.get(cache_key)
             if not config:
                 if "model" in strategy.config and strategy.config["model"] == "default":
                     strategy.config["model"] = default_model_config

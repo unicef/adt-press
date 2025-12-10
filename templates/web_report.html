@@ -23,13 +23,7 @@
         </div>
 
         {% with section = sections[page.section_id] %}
-        {% if section.section_type.name is defined %}
-            {% set section_type = section.section_type.name %}
-        {% else %}
-            {% set section_type = section.section_type %}
-        {% endif %}
-        {% set section_type_display = section_type.replace('ExtractedSectionType.', '') %}
-        {% set is_activity = section_type_display.startswith('activity_') %}
+        {% set is_activity = section.section_type.startswith('activity_') %}
         {% set has_answers = page.activity_answers and page.activity_answers|length > 0 %}
         
         <!-- Section Metadata and Activity Answers (side by side) -->
@@ -51,7 +45,7 @@
                             <div class="flex items-center gap-2">
                                 <div class="text-sm">
                                     <div class="font-medium text-gray-700">Section Type</div>
-                                    <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded font-mono">{{ section_type_display }}</span>
+                                    <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded font-mono">{{ section.section_type }}</span>
                                 </div>
                             </div>
                             
@@ -73,14 +67,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Layout Type -->
-                            <div class="flex items-center gap-2">
-                                <div class="text-sm">
-                                    <div class="font-medium text-gray-700">Layout Type</div>
-                                    <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ section.layout_type }}</span>
-                                </div>
-                            </div>
-
                             <!-- Render Strategy -->
                             <div class="flex items-center gap-2">
                                 <div class="text-sm">
@@ -159,12 +145,12 @@
                 </div>
                 <!-- Metadata Content -->
                 <div class="p-3">
-                    <div class="grid grid-cols-1 gap-3">
+                    <div class="grid grid-cols-2 gap-3">
                         <!-- Section Type -->
                         <div class="flex items-center gap-2">
                             <div class="text-sm">
                                 <div class="font-medium text-gray-700">Section Type</div>
-                                <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded font-mono">{{ section_type_display }}</span>
+                                <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded font-mono">{{ section.section_type }}</span>
                             </div>
                         </div>
                         
@@ -186,14 +172,6 @@
                             </div>
                         </div>
                         
-                        <!-- Layout Type -->
-                        <div class="flex items-center gap-2">
-                            <div class="text-sm">
-                                <div class="font-medium text-gray-700">Layout Type</div>
-                                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ section.layout_type }}</span>
-                            </div>
-                        </div>
-
                         <!-- Render Strategy -->
                         <div class="flex items-center gap-2">
                             <div class="text-sm">

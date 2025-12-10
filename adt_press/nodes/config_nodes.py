@@ -8,12 +8,12 @@ from pydantic import BaseModel
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
-    LayoutType,
     MetadataPromptConfig,
     PageRangeConfig,
     PromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    SectionType,
     SpeechPromptConfig,
 )
 from adt_press.utils.config import prompt_config_with_model
@@ -78,13 +78,21 @@ def page_grouping_config(config: DictConfig) -> str:
 
 
 @cache(behavior="recompute")
-def layout_types_config(config: DictConfig) -> dict[str, LayoutType]:
-    types = dict[str, LayoutType]()
-    for name, layout_type in config["layout_types"].items():
-        params = dict(layout_type)
+def section_types_config(config: DictConfig, default_render_strategy_config: str) -> dict[str, SectionType]:
+    types = dict[str, SectionType]()
+    for name, section_type in config["section_types"].items():
+        params = dict(section_type)
         params["name"] = name
-        types[name] = LayoutType.model_validate(params)
+        # Use default_render_strategy if not specified in section_type
+        if "render_strategy" not in params:
+            params["render_strategy"] = default_render_strategy_config
+        types[name] = SectionType.model_validate(params)
     return types
+
+
+@cache(behavior="recompute")
+def default_render_strategy_config(config: DictConfig) -> str:
+    return str(config.get("default_render_strategy", "html"))
 
 
 @cache(behavior="recompute")
@@ -236,11 +244,6 @@ def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, Promp
 @cache(behavior="recompute")
 def speech_prompt_config(config: DictConfig) -> PromptConfig:
     return SpeechPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["speech_generation"], config["default_model"]))
-
-
-@cache(behavior="recompute")
-def section_metadata_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_metadata"], config["default_model"]))
 
 
 @cache(behavior="recompute")

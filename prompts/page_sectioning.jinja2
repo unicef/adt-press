@@ -21,35 +21,24 @@ Section the text and images and provide a json output of this format:
     "data": [
         {
             "section_type": "<section_type>",
-            "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...]
+            "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...],
+            "background_color": "#hexcode",
+            "text_color": "#hexcode"
         }
     ]
 }
 
 `part_ids` MUST contain the text ids and/or image ids that belong to this section.
 
+For background_color, MUST provide a hex color code that best represents the predominant background color you can see in this section. Choose colors that would provide good readability and contrast with text. Favor lighter backgrounds (like #ffffff, #f8f9fa, #f5f5f5) that work well with dark text unless the visual clearly shows a darker background theme. Default to #ffffff if uncertain.
+
+For text_color, MUST provide a hex color code that best represents the predominant text color you observe in this section. IMPORTANT: There should always be high contrast between background and text colors for readability. Default to black (#000000) or very dark colors (#333333, #2c3e50) unless you clearly observe colored text throughout the section. The background and text colors you choose must have sufficient contrast to be readable together. Default to #000000 if uncertain.
+
 <section_type_definition>
 "section_type" must only be one of:
-- "front_cover": For the front cover page the textbook that is the first page. There can only be one front cover page. IMPORTANT! Only the first page can be a front cover page.
-- "inside_cover": For an inside cover page that can contain the title.
-- "back_cover" For a back cover page that is the last page of the textbook.
-- "separator": For a separator page that breaks up the text into different logical sections.
-- "credits": For a credits page that lists the credits and aknowledgements of the textbook.
-- "foreword": For a foreward page that can be an introduction, overview, or note from the author.
-- "table_of_contents": For a table of contents page.
-- "text_only": For a reading section with only text.
-- "text_and_images": For a reading section with text and images.
-- "images_only": For a section with only images.
-- "activity_matching": For an interactive matching activity where you match items in a list to items in another list. In general, you can only match one item from the first list to one item in the second list. If you have less items in the second list - this is likely a 'sorting activity'.
-- "activity_fill_in_a_table": For a an interactive table to fill in.
-- "activity_multiple_choice": For a an interactive multiple choice activity with a question and two or more options with only one right answer. e.g. "circle the correct answer".
-- "activity_true_false": For a true or false activity with a question and eith a true or false answer.
-- "activity_open_ended_answer": For an activity section with only open ended text response.
-- "activity_fill_in_the_blank": For a fill in the blank activity with one or more blanks to fill in, with a very short answer.
-- "activity_labeling": For a labeling activity where you must label parts of an image.
-- "activity_multiselect": For a multiselect activity with where you can DEFINITELY CHOOSE MORE THAN than one option as the answer to a question (AND THERE ARE LIKELY TWO OR MORE CORRECT ANSWERS).
-- "activity_sorting": For a sorting activity with a collection of text or images that need to be sorted into different categories. You can have more items in the list to the sorted than categories to sort into.
-- "other": For any other section type that does not fit the above categories.
+{% for section_type in section_types.values() -%}
+- "{{ section_type.name }}": {{ section_type.description }}
+{% endfor -%}
 </section_type_definition>
 
 <section_definition>
