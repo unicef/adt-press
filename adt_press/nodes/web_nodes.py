@@ -9,6 +9,7 @@ from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
+    PromptConfig,
     RenderStrategy,
     SectionType,
     TemplateConfig,
@@ -33,6 +34,7 @@ def web_pages(
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
+    activity_answers_prompts_config: dict[str, PromptConfig],
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -105,6 +107,7 @@ def web_pages(
                         images,
                         plate_language_config,
                         activity_prompts_config,
+                        activity_answers_prompts_config,
                     )
                 )
 
@@ -184,7 +187,14 @@ def package_adt_web(
         render_template(
             template_config,
             "webpage.html",
-            dict(content=content, webpage=webpage, section=section, language=plate_language_config, webpage_number=webpage_index + 1),
+            dict(
+                content=content,
+                webpage=webpage,
+                section=section,
+                language=plate_language_config,
+                webpage_number=webpage_index + 1,
+                activity_answers=webpage.activity_answers,  # Add this
+            ),
             output_name=f"adt/{webpage.section_id}.html",
         )
 

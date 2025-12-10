@@ -36,15 +36,16 @@ async def generate_activity_answers(
     texts: list[PlateText],
     content: str,
     language_code: str,
-) -> ActivityAnswersResponse:
+) -> ActivityAnswer:
     language = LANGUAGE_MAP[language_code]
 
     context = dict(
-        section=dict(section_id=section.section_id, section_type=section),
+        section=dict(section_id=section.section_id, section_type=section.section_type),
         texts=[dict(text_id=t.text_id, text=t.text, text_type=t.text_type) for t in texts],
         activity_html=content,
         language=language,
-        examples=[],  # Prevent Undefined error in templates that iterate over examples
+        page_image_path=section.page_image_path,
+        examples=[],
     )
 
     template_path = config.template_path

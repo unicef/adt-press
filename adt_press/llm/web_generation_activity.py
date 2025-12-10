@@ -57,6 +57,7 @@ async def generate_web_page_activity(
     images: list[PlateImage],
     language_code: str,
     activity_prompts_config: dict[str, HTMLPromptConfig],
+    activity_answers_prompts_config: dict[str, PromptConfig],
     activity_rendering_enabled: bool = True,
 ) -> WebPage:
     language = LANGUAGE_MAP[language_code]
@@ -136,6 +137,28 @@ async def generate_web_page_activity(
     # Combine original text IDs with generated ones, preserving order
     combined_text_ids = list(dict.fromkeys([t.text_id for t in texts] + [t.text_id for t in generated_texts]))
 
+    # Generate activity answers if config available
+    activity_answers = {}
+    activity_reasoning = ""
+
+    if section_type_key in activity_answers_prompts_config:
+        from adt_press.llm.activity_answers import generate_activity_answers
+
+        answers_config = activity_answers_prompts_config[section_type_key]
+
+        # Combine original texts with generated texts for context
+        all_texts = texts + generated_texts
+
+        answers_result = await generate_activity_answers(
+            config=answers_config,
+            section=section,
+            texts=all_texts,
+            content=response.content,
+            language_code=language_code,
+        )
+        activity_answers = answers_result.answers
+        activity_reasoning = answers_result.reasoning
+
     # The content is already sanitized and validated by the field_validator
     return WebPage(
         text_id=texts[0].text_id if texts else "",
@@ -146,5 +169,7 @@ async def generate_web_page_activity(
         text_ids=combined_text_ids,
         render_strategy=render_strategy,
         generated_texts=generated_texts,
-        formatted_texts=formatted_texts,  # Add this line
+        formatted_texts=formatted_texts,
+        activity_answers=activity_answers,
+        activity_reasoning=activity_reasoning,
     )
