@@ -252,6 +252,11 @@ def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
 
 
 @cache(behavior="recompute")
+def web_generation_activity_prompt_config(config: DictConfig) -> HTMLPromptConfig:
+    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_activity"], config["default_model"]))
+
+
+@cache(behavior="recompute")
 def web_generation_rows_prompt_config(config: DictConfig) -> RenderPromptConfig:
     return RenderPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_rows"], config["default_model"]))
 

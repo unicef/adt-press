@@ -145,11 +145,10 @@ render_strategies:
       model: default
       template_path: prompts/web_generation_html.jinja2
       max_retries: 25
-
       example_dirs: []
 
   activity:
-    render_type: html
+    render_type: activity
     config:
       model: default
       template_path: prompts/activities/generic.jinja2
