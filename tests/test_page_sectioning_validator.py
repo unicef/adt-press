@@ -26,15 +26,19 @@ class TestPageSectioningValidator:
             },
         ]
 
-        context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
+        context = {
+            "text_ids": ["text-1", "text-2", "text-3"],
+            "image_ids": ["image-1"],
+            "section_types": ["text_only", "text_and_images"],  # Add section_types
+        }
 
         # This should not raise any validation errors
         response = SectionResponse.model_validate({"reasoning": "Test reasoning", "data": sections_data}, context=context)
 
         assert len(response.sections) == 2
         assert response.reasoning == "Test reasoning"
-        assert response.data[0].part_ids == ["text-1", "text-2"]
-        assert response.data[0].section_type == "text_only"
+        assert response.sections[0].part_ids == ["text-1", "text-2"]  # Use sections, not data
+        assert response.sections[0].section_type == "text_only"
 
     def test_section_with_invalid_text_id(self):
         """Test that sections with invalid text IDs raise validation error."""
@@ -48,7 +52,11 @@ class TestPageSectioningValidator:
             },
         ]
 
-        context = {"text_ids": ["text-1", "text-2"], "image_ids": ["image-1"]}
+        context = {
+            "text_ids": ["text-1", "text-2"],
+            "image_ids": ["image-1"],
+            "section_types": ["text_only"],  # Add section_types
+        }
 
         with pytest.raises(ValidationError) as exc_info:
             SectionResponse.model_validate({"reasoning": "Test", "data": sections_data}, context=context)
@@ -70,7 +78,11 @@ class TestPageSectioningValidator:
             },
         ]
 
-        context = {"text_ids": ["text-1"], "image_ids": ["image-1", "image-2"]}
+        context = {
+            "text_ids": ["text-1"],
+            "image_ids": ["image-1", "image-2"],
+            "section_types": ["text_and_images"],  # Add section_types
+        }
 
         with pytest.raises(ValidationError) as exc_info:
             SectionResponse.model_validate({"reasoning": "Test", "data": sections_data}, context=context)
@@ -99,7 +111,11 @@ class TestPageSectioningValidator:
             },
         ]
 
-        context = {"text_ids": ["text-1"], "image_ids": ["image-1"]}
+        context = {
+            "text_ids": ["text-1"],
+            "image_ids": ["image-1"],
+            "section_types": ["text_only", "text_and_images"],  # Add section_types
+        }
 
         with pytest.raises(ValidationError) as exc_info:
             SectionResponse.model_validate({"reasoning": "Test", "data": sections_data}, context=context)
@@ -127,7 +143,11 @@ class TestPageSectioningValidator:
             },
         ]
 
-        context = {"text_ids": ["text-1", "text-2", "text-3"], "image_ids": ["image-1"]}
+        context = {
+            "text_ids": ["text-1", "text-2", "text-3"],
+            "image_ids": ["image-1"],
+            "section_types": ["activity_multiple_choice", "text_and_images"],  # Add section_types
+        }
 
         # This should pass validation
         response = SectionResponse.model_validate({"reasoning": "Multiple choice activity", "data": sections_data}, context=context)
@@ -136,3 +156,28 @@ class TestPageSectioningValidator:
         # Check that first section has all text ids
         assert response.sections[0].part_ids == ["text-1", "text-2", "text-3"]
         assert response.sections[1].part_ids == ["image-1"]
+
+    def test_section_with_invalid_section_type(self):
+        """Test that sections with invalid section_type raise validation error."""
+        sections_data = [
+            {
+                "section_type": "invalid_section_type",
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "part_ids": ["text-1"],
+                "page_number": 1,
+            },
+        ]
+
+        context = {
+            "text_ids": ["text-1"],
+            "image_ids": [],
+            "section_types": ["text_only", "text_and_images"],
+        }
+
+        with pytest.raises(ValidationError) as exc_info:
+            SectionResponse.model_validate({"reasoning": "Test", "data": sections_data}, context=context)
+
+        error_msg = str(exc_info.value)
+        assert "invalid section_type='invalid_section_type'" in error_msg
+        assert "Section at index 0" in error_msg
