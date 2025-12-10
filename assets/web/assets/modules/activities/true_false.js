@@ -270,7 +270,7 @@ const clearFeedbackForQuestion = (questionName) => {
     // Announce the change to screen readers
     const announcement = document.getElementById('validation-results-announcement');
     if (announcement) {
-        announcement.textContent = translateText("Selección cambiada, vuelve a enviar tu respuesta");
+        announcement.textContent = translateText('selection-changed-resubmit');
     }
 };
 

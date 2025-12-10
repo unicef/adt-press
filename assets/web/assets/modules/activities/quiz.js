@@ -9,6 +9,53 @@ import { highlightElement, unhighlightElement, updatePlayPauseIcon } from '../ui
 const QUIZ_SECTION_SELECTOR = 'section[role="activity"][data-section-type="activity_quiz"]';
 const CORRECT_ANSWERS_SCRIPT_ID = 'quiz-correct-answers';
 const EXPLANATIONS_SCRIPT_ID = 'quiz-explanations';
+const QUIZ_SHORTCUT_KEYS = ['1', '2', '3'];
+let quizShortcutHandlerRegistered = false;
+const focusQuizSubmitButton = () => {
+  const submitButton = document.getElementById('submit-button');
+  if (!submitButton) {
+    return;
+  }
+
+  submitButton.classList.remove('hidden');
+  submitButton.removeAttribute('aria-hidden');
+  submitButton.removeAttribute('tabindex');
+
+  requestAnimationFrame(() => {
+    if (typeof submitButton.focus === 'function') {
+      try {
+        submitButton.focus({ preventScroll: true });
+      } catch (_error) {
+        submitButton.focus();
+      }
+    }
+  });
+};
+
+const focusFirstQuizOption = () => {
+  const quizSection = document.querySelector(QUIZ_SECTION_SELECTOR);
+  if (!quizSection) {
+    return;
+  }
+
+  const firstOption = quizSection.querySelector('.activity-option');
+  if (!firstOption) {
+    return;
+  }
+
+  const radio = firstOption.querySelector('input[type="radio"]');
+  const target = radio || firstOption;
+
+  requestAnimationFrame(() => {
+    if (typeof target.focus === 'function') {
+      try {
+        target.focus({ preventScroll: true });
+      } catch (_error) {
+        target.focus();
+      }
+    }
+  });
+};
 
 const ensureValidationLiveRegion = () => {
   if (document.getElementById('validation-results-announcement')) {
@@ -171,6 +218,10 @@ const clearQuizValidationStyling = () => {
       const feedbackText = feedback.querySelector('.feedback-text');
 
       if (feedbackIcon) {
+    const shadowInput = option.querySelector('input[type="radio"]');
+    if (shadowInput) {
+      shadowInput.setAttribute('tabindex', '-1');
+    }
         feedbackIcon.className = 'feedback-icon';
         feedbackIcon.textContent = '';
       }
@@ -194,7 +245,7 @@ const clearQuizValidationStyling = () => {
 
   const validationResults = document.getElementById('validation-results-announcement');
   if (validationResults) {
-    validationResults.textContent = translateText('Selección cambiada, vuelve a enviar tu respuesta');
+    validationResults.textContent = translateText('selection-changed-resubmit');
   }
 
   if (audioBindingsCleared) {
@@ -489,13 +540,64 @@ const handleQuizOptionSelection = (option) => {
   resetQuizOptions(radioGroup);
   markQuizSelection(option);
   setState('quizSelectedOption', option);
+  playActivitySound('drop');
 
   radioGroup.querySelectorAll('.activity-option').forEach((opt) => opt.setAttribute('aria-checked', 'false'));
   option.setAttribute('aria-checked', 'true');
 
   announceQuizSelection(option);
   saveQuizSelectionState(option);
+  focusQuizSubmitButton();
   restoreQuizSubmitButtonToValidate();
+};
+
+const isTypingTarget = (target) => {
+  if (!target) {
+    return false;
+  }
+
+  const tagName = target.tagName?.toLowerCase();
+  const interactiveTags = ['input', 'textarea', 'select'];
+  if (interactiveTags.includes(tagName)) {
+    return true;
+  }
+
+  return Boolean(target.isContentEditable);
+};
+
+const handleQuizShortcutKeydown = (event) => {
+  if (!QUIZ_SHORTCUT_KEYS.includes(event.key)) {
+    return;
+  }
+
+  if (isTypingTarget(event.target)) {
+    return;
+  }
+
+  const quizSection = document.querySelector(QUIZ_SECTION_SELECTOR);
+  if (!quizSection) {
+    return;
+  }
+
+  const options = quizSection.querySelectorAll('.activity-option');
+  const index = Number(event.key) - 1;
+  const option = options[index];
+  if (!option) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  handleQuizOptionSelection(option);
+};
+
+const registerQuizShortcutHandler = () => {
+  if (quizShortcutHandlerRegistered) {
+    return;
+  }
+
+  document.addEventListener('keydown', handleQuizShortcutKeydown);
+  quizShortcutHandlerRegistered = true;
 };
 
 export const resetQuizActivity = (activityId) => {
@@ -520,6 +622,28 @@ export const resetQuizActivity = (activityId) => {
     .forEach((key) => localStorage.removeItem(key));
 };
 
+const attachQuizRetryHandler = () => {
+  const submitButton = document.getElementById('submit-button');
+  if (!submitButton) {
+    return;
+  }
+
+  if (state.retryHandler) {
+    submitButton.removeEventListener('click', state.retryHandler);
+  }
+
+  const quizRetryHandler = () => {
+    playActivitySound('reset');
+    const activityId = getQuizActivityId();
+    resetQuizActivity(activityId);
+    restoreQuizSubmitButtonToValidate();
+    focusFirstQuizOption();
+  };
+
+  state.retryHandler = quizRetryHandler;
+  submitButton.addEventListener('click', quizRetryHandler, { once: false });
+};
+
 export const prepareQuiz = (section) => {
   setState('quizSelectedOption', null);
   restoreQuizSelection(section);
@@ -541,6 +665,10 @@ export const prepareQuiz = (section) => {
 
     const optionLetter = option.querySelector('.option-letter')?.textContent || '';
     const imgAlt = option.querySelector('img')?.alt || '';
+    const shadowInput = option.querySelector('input[type="radio"]');
+    if (shadowInput) {
+      shadowInput.setAttribute('tabindex', '-1');
+    }
 
     option.setAttribute('aria-label', `Option ${optionLetter}: ${imgAlt}`);
     option.setAttribute('role', 'radio');
@@ -567,7 +695,19 @@ export const prepareQuiz = (section) => {
   if (radioGroup) {
     radioGroup.setAttribute('role', 'radiogroup');
     radioGroup.setAttribute('aria-labelledby', 'question-label');
+
+    let shortcutHint = radioGroup.querySelector('.quiz-shortcut-hint');
+    if (!shortcutHint) {
+      shortcutHint = document.createElement('p');
+      shortcutHint.className = 'quiz-shortcut-hint sr-only';
+      shortcutHint.setAttribute('aria-live', 'polite');
+      radioGroup.prepend(shortcutHint);
+    }
+
+    shortcutHint.textContent = translateText('quiz-shortcut-hint');
   }
+
+  registerQuizShortcutHandler();
 };
 
 export const checkQuiz = () => {
@@ -594,6 +734,10 @@ export const checkQuiz = () => {
   }
 
   updateSubmitButtonAndToast(isCorrect, translateText('next-activity'), ActivityTypes.QUIZ);
+
+  if (!isCorrect) {
+    attachQuizRetryHandler();
+  }
 };
 
 const styleQuizOption = (option, isCorrect) => {
@@ -609,6 +753,25 @@ const styleQuizOption = (option, isCorrect) => {
 
   option.classList.add(isCorrect ? 'bg-green-50' : 'bg-red-50');
   option.setAttribute('aria-invalid', isCorrect ? 'false' : 'true');
+};
+
+const playQuizFeedbackAudioSequence = (isCorrect, feedbackText, explanationId) => {
+  const soundKey = isCorrect ? 'success' : 'error';
+  const soundEffect = playActivitySound(soundKey);
+
+  if (!state.readAloudMode) {
+    return;
+  }
+
+  const startExplanationPlayback = () => {
+    playQuizExplanationAudio(feedbackText, explanationId);
+  };
+
+  if (soundEffect && typeof soundEffect.addEventListener === 'function') {
+    soundEffect.addEventListener('ended', startExplanationPlayback, { once: true });
+  } else {
+    startExplanationPlayback();
+  }
 };
 
 const showQuizFeedback = (option, isCorrect) => {
@@ -643,7 +806,6 @@ const showQuizFeedback = (option, isCorrect) => {
 
     feedbackContainer.setAttribute('role', 'status');
     feedbackContainer.setAttribute('aria-live', 'polite');
-    playActivitySound('success');
 
     const storedActivities = localStorage.getItem('completedActivities');
     let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
@@ -669,16 +831,13 @@ const showQuizFeedback = (option, isCorrect) => {
     bindingsChanged = bindQuizFeedbackAudioId(feedbackText, explanationId) || bindingsChanged;
 
     feedbackContainer.setAttribute('role', 'alert');
-    playActivitySound('error');
   }
 
   if (bindingsChanged) {
     gatherAudioElements();
   }
 
-  if (state.readAloudMode) {
-    playQuizExplanationAudio(feedbackText, explanationId);
-  }
+  playQuizFeedbackAudioSequence(isCorrect, feedbackText, explanationId);
 };
 
 export const initializeQuizActivity = () => {

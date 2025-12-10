@@ -15,6 +15,7 @@ For the quiz format:
   - Every option object must include both `text` and `explanation` fields
   - The explanation inside each option must describe that specific option
   - The option at `answer_index` must have the congratulatory/correct explanation, and the others must provide gentle corrections
+  - Each explanation option should start with an emoji: ❌ for incorrect answers and ✅ for the correct answer
 
 Return your response as JSON with this exact structure:
 {
@@ -26,7 +27,7 @@ Return your response as JSON with this exact structure:
     },
     {
       "text": "2) Option 2 text",
-      "explanation": "🎉 Correct! [explanation reinforcing why option 2 is right]"
+      "explanation": "✅ Correct! [explanation reinforcing why option 2 is right]"
     },
     {
       "text": "3) Option 3 text",

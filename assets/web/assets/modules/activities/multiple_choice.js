@@ -52,6 +52,10 @@ export const prepareMultipleChoice = (section) => {
         // Set proper ARIA attributes
         const optionLetter = option.querySelector('.option-letter')?.textContent || '';
         const imgAlt = option.querySelector('img')?.alt || '';
+        const shadowInput = option.querySelector('input[type="radio"]');
+        if (shadowInput) {
+            shadowInput.setAttribute('tabindex', '-1');
+        }
 
         // Create a more descriptive label that includes the image description
         option.setAttribute('aria-label', `Option ${optionLetter}: ${imgAlt}`);
@@ -90,6 +94,16 @@ export const prepareMultipleChoice = (section) => {
     if (radioGroup) {
         radioGroup.setAttribute('role', 'radiogroup');
         radioGroup.setAttribute('aria-labelledby', 'question-label');
+
+        let shortcutHint = radioGroup.querySelector('.quiz-shortcut-hint');
+        if (!shortcutHint) {
+            shortcutHint = document.createElement('p');
+            shortcutHint.className = 'quiz-shortcut-hint sr-only';
+            shortcutHint.setAttribute('aria-live', 'polite');
+            radioGroup.prepend(shortcutHint);
+        }
+
+        shortcutHint.textContent = translateText('quiz-shortcut-hint');
     }
 };
 const saveSelectionState = (option) => {
@@ -209,6 +223,11 @@ const selectOption = (option) => {
     saveSelectionState(option);
 
     restoreSubmitButtonToValidate();
+
+    const shortcutHint = radioGroup?.querySelector('.quiz-shortcut-hint');
+    if (shortcutHint) {
+        shortcutHint.textContent = translateText('quiz-shortcut-hint');
+    }
 };
 
 // New function to clear all validation styling
@@ -257,7 +276,7 @@ const clearAllValidationStyling = () => {
     // Announce change to screen readers
     const validationResults = document.getElementById('validation-results-announcement');
     if (validationResults) {
-        validationResults.textContent = translateText("Selección cambiada, vuelve a enviar tu respuesta");
+        validationResults.textContent = translateText('selection-changed-resubmit');
     }
 };
 
