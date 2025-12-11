@@ -89,12 +89,12 @@ def package_webpub(
 
     def section_number_for_page(webpage: WebPage) -> int:
         section = sections_by_id.get(webpage.section_id)
-        if section:
+        if section and section.page_number is not None:
             return section.page_number
         quiz = quizzes_by_id.get(webpage.section_id)
         if quiz:
             parent_section = sections_by_id.get(quiz.section_id)
-            if parent_section:
+            if parent_section and parent_section.page_number is not None:
                 return parent_section.page_number
         log.warning("webpage references unknown section; defaulting page number", section_id=webpage.section_id)
         return 0
