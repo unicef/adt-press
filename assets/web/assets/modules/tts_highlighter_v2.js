@@ -29,31 +29,31 @@ async function loadTimecodeForElement(elementId) {
   if (timecodeCache[elementId]) {
     return timecodeCache[elementId];
   }
-  
+
   // Format: timecodes/[lang]/timecode_output.json
   const timecodeJsonUrl = `./content/i18n/${state.currentLanguage}/timecode/timecode_output.json`;
-  
+
   try {
     const response = await fetch(timecodeJsonUrl);
     if (!response.ok) {
       console.warn(`Timecode file not found for ${elementId}: ${response.statusText}`);
       return null;
     }
-    
+
     const jsonData = await response.json();
-    
+
     // Extract the actual timecode data from the nested structure
     // The file contains { "element-id": { timecode data } }
     const timecodeData = jsonData[elementId];
-    
+
     if (!timecodeData) {
       console.warn(`Timecode file found but no data for ${elementId}`);
       return null;
     }
-    
+
     // Store in cache
     timecodeCache[elementId] = timecodeData;
-    
+
     return timecodeData;
   } catch (error) {
     console.error(`Error loading timecode for ${elementId}:`, error);
@@ -84,37 +84,36 @@ async function attachWordHighlighter(audio) {
   const currentIndex = state.currentIndex;
   if (currentIndex < 0 || currentIndex >= audioElements.length) return;
   const { element, id: dataId } = audioElements[currentIndex];
-  
+
   // Get the translation key with proper easy-read handling
   let translationKey = dataId;
   let timecodeKey = dataId;
-  
+
   if (state.easyReadMode) {
     // Check if element is a header
     const isHeader = element.tagName.toLowerCase().match(/^h[1-6]$/);
-    
+
     // Check if element is inside excluded areas
     const wordCard = element.closest('.word-card');
     const activityItem = element.closest('[data-activity-item]');
     const navList = element.closest('.nav__list');
     const activityText = element.closest('.activity-text');
-    const isExcluded = wordCard !== null || activityItem !== null || 
-                        navList !== null || activityText !== null;
-    
+    const isExcluded = wordCard !== null || activityItem !== null ||
+      navList !== null || activityText !== null;
+
     // Use easyread translation if not a header and not in excluded areas
     if (!isHeader && !isExcluded) {
       const easyReadKey = `${dataId}_easy_read`;
       if (state.translations && state.translations.hasOwnProperty(easyReadKey)) {
         translationKey = easyReadKey;
-        
+
         // Try to use the easyread key for timecode files too
         const easyReadTimecodeKey = easyReadKey;
         const fallbackTimecodeKey = dataId;
-        
+
         // Check if we need to log the fallback
         const easyReadTimecode = await loadTimecodeForElement(easyReadTimecodeKey);
         if (!easyReadTimecode) {
-          console.log(`Using fallback timecode data for ${easyReadTimecodeKey} -> ${fallbackTimecodeKey}`);
           timecodeKey = fallbackTimecodeKey;
         } else {
           timecodeKey = easyReadTimecodeKey;
@@ -122,28 +121,26 @@ async function attachWordHighlighter(audio) {
       }
     }
   }
-  
+
   // Load the timecode data for this element
   const timecodeData = await loadTimecodeForElement(timecodeKey);
-  
+
   if (!timecodeData) {
     console.warn(`No timecode data found for ${timecodeKey}`);
     return;
   }
-  
-  const wordTimestamps = (timecodeData.timecodes && timecodeData.timecodes[1] && 
-                         timecodeData.timecodes[1].word_timestamps) || [];
+
+  const wordTimestamps = (timecodeData.timecodes && timecodeData.timecodes[1] &&
+    timecodeData.timecodes[1].word_timestamps) || [];
   if (wordTimestamps.length === 0) {
     console.warn(`No word timestamps found for ${timecodeKey}`);
     return;
   }
-  
-  const translatedText = state.translations && state.translations[translationKey] 
-                         ? state.translations[translationKey] 
-                         : element.textContent;
 
-  console.log(`Audio highlighter using text: "${translatedText}" for element with data-id: ${dataId} (timecode key: ${timecodeKey})`);
-  
+  const translatedText = state.translations && state.translations[translationKey]
+    ? state.translations[translationKey]
+    : element.textContent;
+
   // Check if this is an image element - if so, create a subtitle popup
   const isImage = element.tagName.toLowerCase() === 'img';
   if (isImage) {
@@ -164,7 +161,7 @@ async function attachWordHighlighter(audio) {
     wrapTextInSpans(targetElement, wordTimestamps, translatedText);
     targetElement.dataset.wordsWrapped = "true";
   }
-  
+
   // Clear highlights on other text elements.
   document.querySelectorAll('[data-words-wrapped="true"]').forEach(el => {
     if (el !== targetElement) {
@@ -175,7 +172,7 @@ async function attachWordHighlighter(audio) {
       });
     }
   });
-  
+
   // Highlight the first word when we start
   const firstSpan = targetElement.querySelector('span[data-word-index="0"]');
   if (firstSpan) {
@@ -188,14 +185,14 @@ async function attachWordHighlighter(audio) {
     firstSpan.classList.add("rounded-lg");
     firstSpan.classList.add("text-black");
   }
-  
+
   // Detach any existing listeners first to avoid duplicates
   detachCurrentListener();
-  
+
   // Attach a timeupdate listener
   currentListener = () => updateWordHighlighting(audio, targetElement, wordTimestamps);
   audio.addEventListener("timeupdate", currentListener);
-  
+
   // Add an ended listener to clear highlights when audio finishes
   endedListener = () => {
     clearHighlights();
@@ -204,7 +201,7 @@ async function attachWordHighlighter(audio) {
     }
   };
   audio.addEventListener("ended", endedListener);
-  
+
   // Also listen for play event to ensure first word gets highlighted
   audio.addEventListener("play", () => {
     const firstSpan = targetElement.querySelector('span[data-word-index="0"]');
@@ -219,21 +216,21 @@ async function attachWordHighlighter(audio) {
       firstSpan.classList.add("text-black");
     }
   });
-  
+
   // Listen for index changes to clear highlights when moving to next item
   document.removeEventListener("audioIndexChanged", clearHighlights); // Remove existing listener first
   document.addEventListener("audioIndexChanged", clearHighlights);
-  
+
   audio._wordHighlighterAttached = true;
 }
 
 function wrapTextInSpans(element, wordTimestamps, translatedText) {
   const glossaryMapping = {};
   const glossaryElements = element.querySelectorAll('.glossary-term');
-  
+
   // Use the provided translated text instead of element.textContent
   const originalText = translatedText || element.textContent;
-  
+
   // Helper function to normalize text by removing punctuation
   const normalizeText = (text) => {
     return text.toLowerCase().trim().replace(/[.,;:!?()]/g, '');
@@ -243,7 +240,7 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
   glossaryElements.forEach(termElement => {
     const termText = termElement.textContent.trim();
     const normalizedText = normalizeText(termText);
-    
+
     glossaryMapping[normalizedText] = {
       classes: Array.from(termElement.classList),
       role: termElement.getAttribute('role'),
@@ -252,29 +249,29 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
       originalText: termText // Keep the original text with punctuation
     };
   });
-  
+
   // Create a working copy of timestamps that we can modify
   const modifiedTimestamps = [...wordTimestamps];
-  
+
   // Step 1: Sort glossary terms by length (longest first) to handle overlapping terms
   // This ensures "bosque tropical" is processed before "bosque"
   const sortedGlossaryTerms = Object.keys(glossaryMapping)
     .sort((a, b) => b.split(/\s+/).length - a.split(/\s+/).length);
-  
+
   // Step 2: Look for multi-word glossary terms and mark them
   sortedGlossaryTerms.forEach(term => {
     const words = term.split(/\s+/);
-    
+
     // Find potential matches in our timestamps
     for (let i = 0; i < modifiedTimestamps.length - words.length + 1; i++) {
       // Skip if this position is already part of a glossary term
       if (modifiedTimestamps[i].isPartOfGlossaryTerm) continue;
-      
+
       // Get the sequence of words at this position and normalize for comparison
       const sequence = modifiedTimestamps.slice(i, i + words.length)
         .map(ts => normalizeText(ts.text))
         .join(' ');
-      
+
       // If we found a match
       if (sequence === term) {
         // Flag each word in this sequence as part of a glossary term
@@ -287,13 +284,13 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
       }
     }
   });
-  
+
   // Step 3: Generate HTML with special handling for glossary terms
   let html = [];
   let i = 0;
   while (i < modifiedTimestamps.length) {
     const ts = modifiedTimestamps[i];
-    
+
     // If this is the start of a multi-word glossary term
     if (ts.isPartOfGlossaryTerm && ts.glossaryTermIndex === i) {
       // Get the full text of the multi-word term with original punctuation
@@ -301,10 +298,10 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
         .slice(i, i + ts.glossaryTermLength)
         .map(w => w.text)
         .join(' ');
-      
+
       const termAttr = glossaryMapping[ts.glossaryTerm];
       const classList = termAttr.classes.join(' ');
-      
+
       // Create a single span for the entire term
       html.push(`<span 
         data-word-index="${i}" 
@@ -313,7 +310,7 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
         tabindex="${termAttr.tabindex || '0'}"
         data-glossary-term="true"
       >${termText}</span>`);
-      
+
       // Skip ahead past all words in this term
       i += ts.glossaryTermLength;
     }
@@ -321,11 +318,11 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
     else {
       // Check if this word (without punctuation) is a glossary term
       const normalizedWord = normalizeText(ts.text);
-      
+
       if (glossaryMapping[normalizedWord]) {
         const termAttr = glossaryMapping[normalizedWord];
         const classList = termAttr.classes.join(' ');
-        
+
         html.push(`<span 
           data-word-index="${i}" 
           class="${classList}" 
@@ -333,7 +330,7 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
           tabindex="${termAttr.tabindex || '0'}"
           data-glossary-term="true"
         >${ts.text}</span>`);
-      } 
+      }
       // Regular word
       else if (!ts.isPartOfGlossaryTerm) {
         html.push(`<span data-word-index="${i}">${ts.text}</span>`);
@@ -342,9 +339,9 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
       i++;
     }
   }
-  
+
   element.innerHTML = html.join(' ');
-  
+
   // Add event parameter to the click handler
   element.querySelectorAll('[data-glossary-term="true"]').forEach(term => {
     term.addEventListener('click', (event) => {  // Note the event parameter here
@@ -354,7 +351,7 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
 
       // Set a flag to prevent audio playback
       window._isGlossaryTermClick = true;
-      
+
       // Stop any currently playing audio
       if (state.isPlaying || state.currentAudio) {
         stopAudio();
@@ -363,7 +360,7 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
 
       // Show the glossary definition popup
       showGlossaryDefinition(event);
-      
+
       // Clear the flag after a short delay
       setTimeout(() => {
         window._isGlossaryTermClick = false;
@@ -375,7 +372,7 @@ function wrapTextInSpans(element, wordTimestamps, translatedText) {
 function updateWordHighlighting(audio, element, wordTimestamps) {
   const currentTime = audio.currentTime;
   let activeIndex = -1;
-  
+
   // Check if we're past the last word's end time
   const lastWord = wordTimestamps[wordTimestamps.length - 1];
   if (lastWord && currentTime > lastWord.end + TOLERANCE) {
@@ -383,7 +380,7 @@ function updateWordHighlighting(audio, element, wordTimestamps) {
     clearHighlights();
     return;
   }
-  
+
   // Special case for before the first word
   if (currentTime < wordTimestamps[0].start) {
     activeIndex = 0;
@@ -398,19 +395,19 @@ function updateWordHighlighting(audio, element, wordTimestamps) {
     for (let i = 0; i < wordTimestamps.length; i++) {
       if (currentTime >= wordTimestamps[i].start) {
         activeIndex = i;
-        
+
         // Check if we're very close to the next word's start time
         // This helps catch small words that might be skipped
-        if (i < wordTimestamps.length - 1 && 
-            currentTime > wordTimestamps[i + 1].start - TOLERANCE) {
+        if (i < wordTimestamps.length - 1 &&
+          currentTime > wordTimestamps[i + 1].start - TOLERANCE) {
           activeIndex = i + 1;
         }
-        
+
         // Check if we're past the current word's end time
         if (currentTime > wordTimestamps[i].end + TOLERANCE) {
           // If we're between words, clear highlighting
-          const isInGap = i < wordTimestamps.length - 1 && 
-                         currentTime < wordTimestamps[i + 1].start - TOLERANCE;
+          const isInGap = i < wordTimestamps.length - 1 &&
+            currentTime < wordTimestamps[i + 1].start - TOLERANCE;
           if (isInGap) {
             clearHighlights();
             return;
@@ -421,12 +418,12 @@ function updateWordHighlighting(audio, element, wordTimestamps) {
       }
     }
   }
-  
+
   // If no suitable word was found, default to the first word
   if (activeIndex === -1) {
     activeIndex = 0;
   }
-  
+
   // Remove highlight from all spans.
   const spans = element.querySelectorAll("span[data-word-index]");
   spans.forEach(span => {
@@ -434,7 +431,7 @@ function updateWordHighlighting(audio, element, wordTimestamps) {
     span.classList.remove("rounded-lg");
     span.classList.remove("text-black");
   });
-  
+
   // Highlight the active word.
   const activeSpan = element.querySelector(`span[data-word-index="${activeIndex}"]`);
   if (activeSpan) {

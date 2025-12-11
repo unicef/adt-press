@@ -204,20 +204,6 @@ const applyTranslationToElements = (key, translationKey) => {
                     return;
                 }
 
-                // Check if the element is a header
-                const isHeader = element.tagName.toLowerCase().match(/^h[1-6]$/);
-
-                // Only modify text size classes for non-header elements
-                if (!isHeader) {
-                    // Remove text size class only for non-headers
-                    element.classList.remove('text-2xl');
-
-                    // Add text-2xl class for non-header elements in easy-read mode
-                    if (isEasyRead) {
-                        element.classList.add('text-2xl');
-                    }
-                }
-
                 // Set the content with proper line breaks
                 element.innerHTML = translatedText;
             }
@@ -365,8 +351,6 @@ export const cycleLanguage = () => {
     // Find the next language
     const nextIndex = (currentIndex + 1) % options.length;
     const nextLanguage = options[nextIndex].value;
-
-    console.log(`Cycling language from ${currentLanguage} to ${nextLanguage}`);
 
     // Update the dropdown value
     languageDropdown.value = nextLanguage;

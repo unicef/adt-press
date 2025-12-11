@@ -14,7 +14,6 @@ import {
   handleInitializationError,
   showMainContent,
 } from "./modules/error_utils.js";
-import { loadMerriweatherFont } from "./modules/font_utils.js";
 import {
   initializeLanguageDropdown,
   cacheInterfaceElements,
@@ -96,12 +95,12 @@ const basePath = window.location.pathname.substring(
 // Create a centralized asset loader
 const assetLoader = {
   cache: new Map(),
-  
+
   async load(paths) {
     try {
-      const promises = paths.map(path => 
-        this.cache.has(path) ? 
-          Promise.resolve(this.cache.get(path)) : 
+      const promises = paths.map(path =>
+        this.cache.has(path) ?
+          Promise.resolve(this.cache.get(path)) :
           fetch(path)
             .then(response => {
               if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -112,7 +111,7 @@ const assetLoader = {
               return content;
             })
       );
-      
+
       return await Promise.all(promises);
     } catch (error) {
       console.error("Error loading assets:", error);
@@ -124,7 +123,7 @@ const assetLoader = {
 // Element cache to avoid repetitive DOM lookups
 const elementCache = {
   _cache: new Map(),
-  
+
   get(id) {
     if (!this._cache.has(id)) {
       const element = document.getElementById(id);
@@ -132,7 +131,7 @@ const elementCache = {
     }
     return this._cache.get(id);
   },
-  
+
   getAll(selector) {
     const key = `selector:${selector}`;
     if (!this._cache.has(key)) {
@@ -141,7 +140,7 @@ const elementCache = {
     }
     return this._cache.get(key);
   },
-  
+
   clear() {
     this._cache.clear();
   }
@@ -166,37 +165,35 @@ window.addEventListener("beforeunload", () => {
 // Create a structured initialization sequence
 async function initializeApp() {
   try {
-    showLoadingIndicator();
     addFavicons();
-    
+
     // Ensure DOM is ready
     await waitForDOM();
-    
+
     // Initialize in a specific sequence with dependencies
     const initSequence = [
-      { 
-        name: "Core", 
-        fn: initializeCoreFunctionality 
+      {
+        name: "Core",
+        fn: initializeCoreFunctionality
       },
-      { 
-        name: "EventListeners", 
-        fn: setupEventListeners, 
-        dependencies: ["Core"] 
+      {
+        name: "EventListeners",
+        fn: setupEventListeners,
+        dependencies: ["Core"]
       },
-      { 
-        name: "UI", 
-        fn: initializeUIComponents, 
-        dependencies: ["Core", "EventListeners"] 
+      {
+        name: "UI",
+        fn: initializeUIComponents,
+        dependencies: ["Core", "EventListeners"]
       },
-      { 
-        name: "Final", 
-        fn: finalizeInitialization, 
-        dependencies: ["UI"] 
+      {
+        name: "Final",
+        fn: finalizeInitialization,
+        dependencies: ["UI"]
       }
     ];
-    
+
     for (const step of initSequence) {
-      console.log(`Initializing: ${step.name}`);
       await step.fn();
     }
   } catch (error) {
@@ -204,7 +201,6 @@ async function initializeApp() {
     handleInitializationError(error);
   } finally {
     showMainContent();
-    hideLoadingIndicator();
   }
 }
 
@@ -224,7 +220,7 @@ function addFavicons() {
     const exists = Array.from(document.head.querySelectorAll('link')).some(
       link => link.rel === linkData.rel && link.href.includes(linkData.href.split('/').pop())
     );
-    
+
     if (!exists) {
       const link = document.createElement('link');
       for (const [attr, value] of Object.entries(linkData)) {
@@ -298,7 +294,6 @@ async function initializeCoreFunctionality() {
 
     // Set initial language (without validation since config not loaded yet)
     initializeLanguage();
-  loadMerriweatherFont();
     initCharacterDisplay();
 
     // Initialize components after HTML is definitely loaded
@@ -320,7 +315,7 @@ async function initializeCoreFunctionality() {
     // Initialize page numbering
     updatePageNumber();
     await setupTranslations();
-    
+
     return true;
   } catch (error) {
     console.error("Error in core initialization:", error);
@@ -336,7 +331,7 @@ function initializeLanguage() {
 
   // Simple validation: check if cookie language exists in available languages
   let selectedLanguage = cookieLanguage;
-  
+
   if (cookieLanguage && availableLanguages.length > 0 && !availableLanguages.includes(cookieLanguage)) {
     console.warn(`Cookie language "${cookieLanguage}" not available. Available languages:`, availableLanguages);
     // Clear invalid cookie on root path
@@ -400,10 +395,10 @@ async function injectComponents(interfaceHTML, navHTML, config) {
 
       interfaceContainer.innerHTML = interfaceHTML;
       navContainer.innerHTML = navHTML;
-      
+
       // Clear cache since DOM has changed
       elementCache.clear();
-      
+
       cacheInterfaceElements();
     }
 
@@ -419,11 +414,11 @@ function setupConfig(config) {
   if (config.title && config.title !== PLACEHOLDER_TITLE) {
     document.title = config.title;
   }
-  
+
   // Set available languages meta tag
   if (config.languages && config.languages.available) {
     const availableLanguagesStr = config.languages.available.join(',');
-    
+
     // Create or update the meta tag
     let availableLanguagesMeta = document.querySelector('meta[name="available-languages"]');
     if (!availableLanguagesMeta) {
@@ -433,10 +428,10 @@ function setupConfig(config) {
     }
     availableLanguagesMeta.content = availableLanguagesStr;
   }
-  
+
   // Store the config for access throughout the application
   window.appConfig = config;
-  
+
   // Apply feature flags
   applyFeatureFlags(config.features || {});
 }
@@ -447,13 +442,13 @@ function applyFeatureFlags(features) {
   Object.entries(features).forEach(([feature, enabled]) => {
     // Convert camelCase to kebab-case for element IDs
     const kebabFeature = feature.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-    
+
     // Handle special cases that don't follow the toggle pattern
     if (feature === 'notepad') {
       // Hide/show notepad button and content
       const notepadButton = document.getElementById('notepad-button');
       const notepadContent = document.getElementById('notepad-content');
-      
+
       if (notepadButton) {
         notepadButton.classList.toggle('hidden', !enabled);
       }
@@ -463,12 +458,12 @@ function applyFeatureFlags(features) {
     } else if (feature === 'showAutoHideButton') {
       // Hide/show the auto-hide menu toggle button
       const toggleStateElement = document.getElementById('toggle-state');
-      
+
       if (toggleStateElement) {
         // Find the container (the div that wraps the toggle)
-        const container = toggleStateElement.closest('.flex.justify-between.items-left') || 
-                         toggleStateElement.parentElement;
-        
+        const container = toggleStateElement.closest('.flex.justify-between.items-left') ||
+          toggleStateElement.parentElement;
+
         if (container) {
           container.classList.toggle('hidden', !enabled);
         }
@@ -492,26 +487,26 @@ function applyFeatureFlags(features) {
     } else if (feature === 'characterDisplay') {
       // Hide/show the character profile row
       const characterProfileRow = document.getElementById('character-profile-row');
-      
+
       if (characterProfileRow) {
         characterProfileRow.classList.toggle('hidden', !enabled);
       }
     } else {
       // Find the toggle element for other features
       const toggleElement = elementCache.get(`toggle-${kebabFeature}`);
-      
+
       // If the toggle exists but feature is disabled, hide its container
       if (toggleElement) {
-        const container = toggleElement.closest('.setting-item') || 
-                         toggleElement.closest('.feature-container') || 
-                         toggleElement.parentElement;
-        
+        const container = toggleElement.closest('.setting-item') ||
+          toggleElement.closest('.feature-container') ||
+          toggleElement.parentElement;
+
         if (container) {
           container.classList.toggle('hidden', !enabled);
         }
       }
     }
-    
+
     // Also store in the state for programmatic checks
     setState(`${feature}Enabled`, enabled);
   });
@@ -544,24 +539,24 @@ function setupEventListeners() {
     "nav-popup": toggleNav,
     "nav-close": toggleNav,
   };
-  
+
   // Add notepad handlers only if notepad feature is enabled
   if (isFeatureEnabled('notepad')) {
     clickHandlers["notepad-button"] = toggleNotepad;
     clickHandlers["close-notepad"] = toggleNotepad;
     clickHandlers["save-notepad"] = saveNotes;
   }
-  
+
   // Attach all click handlers
   Object.entries(clickHandlers).forEach(([id, handler]) => {
     const element = elementCache.get(id);
     if (element) element.addEventListener("click", handler);
   });
-  
+
   // Handle special cases
   const languageDropdown = elementCache.get("language-dropdown");
   if (languageDropdown) languageDropdown.addEventListener("change", switchLanguage);
-  
+
   // Set up notepad auto-save - only if notepad feature is enabled
   if (isFeatureEnabled('notepad')) {
     const notepadTextarea = elementCache.get("notepad-textarea");
@@ -573,11 +568,11 @@ function setupEventListeners() {
       });
     }
   }
-  
+
   // Global listeners
   document.addEventListener("click", handleNavigation);
   document.addEventListener("keydown", handleKeyboardShortcuts);
-  
+
   // Purple links
   const purpleLinks = elementCache.getAll('.purple-link-button');
   purpleLinks.forEach(link => {
@@ -585,7 +580,7 @@ function setupEventListeners() {
       localStorage.setItem('originatingPage', window.location.href);
     });
   });
-  
+
   setupClickOutsideHandler();
 }
 
@@ -598,7 +593,7 @@ function setupAudioListeners() {
     ["audio-next", playNextAudio],
     ["read-aloud-speed", togglePlayBarSettings]
   ];
-  
+
   audioControls.forEach(([id, handler]) => {
     const element = elementCache.get(id);
     if (element) element.addEventListener("click", handler);
@@ -619,7 +614,7 @@ async function initializeUIComponents() {
     initializeSidebar();
     initializeTabs();
     adjustLayout();
-    
+
     // Initialize features based on config
     if (window.appConfig?.features) {
       // Audio features
@@ -628,7 +623,7 @@ async function initializeUIComponents() {
         initializeAudioSpeed();
         setupAudioListeners();
         initializeTtsQuickToggle();
-        
+
         // Show play bar if needed
         if (state.readAloudMode) {
           initializeAudioElements();
@@ -636,17 +631,17 @@ async function initializeUIComponents() {
           if (playBar) playBar.classList.remove("hidden");
         }
       }
-      
+
       // Glossary
       if (isFeatureEnabled('glossary')) {
         initializeGlossary();
       }
-      
+
       // ELI5
       if (isFeatureEnabled('eli5')) {
         initializeEli5();
       }
-      
+
       // Notepad
       if (isFeatureEnabled('notepad')) {
         initializeNotepad();
@@ -665,7 +660,7 @@ async function initializeUIComponents() {
 
       // Load state modes - only if features are enabled
       const stateInitTasks = [];
-      
+
       if (isFeatureEnabled('easyRead')) stateInitTasks.push(loadEasyReadMode);
       // Always load state mode to maintain consistency, regardless of button visibility
       stateInitTasks.push(loadStateMode);
@@ -677,13 +672,13 @@ async function initializeUIComponents() {
         stateInitTasks.push(loadSavedNotes());
         stateInitTasks.push(loadNotepad);
       }
-      if (isFeatureEnabled('autoplay')) { 
+      if (isFeatureEnabled('autoplay')) {
         setAutoplayContainerVisibility(true);
         stateInitTasks.push(loadAutoplayState);
       } else {
         setAutoplayContainerVisibility(false);
       }
-      if (isFeatureEnabled('describeImages')){
+      if (isFeatureEnabled('describeImages')) {
         setDescribeImagesContainerVisibility(true);
         stateInitTasks.push(loadDescribeImagesState);
       }
@@ -699,7 +694,7 @@ async function initializeUIComponents() {
       if (stateInitTasks.length > 0) {
         await Promise.all(stateInitTasks.map(task => Promise.resolve().then(task)));
       }
-      
+
     } else {
       // Fallback to the original behavior if config isn't available
       const initGroups = [
@@ -707,7 +702,7 @@ async function initializeUIComponents() {
       ];
       await Promise.all(initGroups.map(group => group()));
     }
-    
+
     // Activities should be initialized after UI components
     if (isFeatureEnabled('activities', true)) {
       prepareActivity();
@@ -731,34 +726,34 @@ const finalizeInitialization = async () => {
     if (isFeatureEnabled('readAloud') && isFeatureEnabled('autoplay')) {
       initializeAutoplay();
     }
-    
+
     // Run these tasks in parallel
     const finalTasks = [
       // Navigation
       () => initializeNavigation(),
-      
+
       // Reference page functionality
       () => initializeReferencePage(),
-      
+
       // Glossary terms
       () => {
         if (isFeatureEnabled('glossary')) {
           highlightGlossaryTerms();
         }
       },
-      
+
       // Math rendering
       () => {
         if (window.MathJax) {
           window.MathJax.typeset();
         }
       },
-      
+
       // Adjust layout after all content is ready
       () => {
         adjustLayout();
       },
-      
+
       // Initialize tutorial via lazy loading
       async () => {
         if (!isFeatureEnabled('showTutorial', true)) {
@@ -770,7 +765,7 @@ const finalizeInitialization = async () => {
           tutorialModule.init();
         }
       },
-      
+
       // Analytics
       async () => {
         // Check if analytics is enabled in config
@@ -778,9 +773,9 @@ const finalizeInitialization = async () => {
           const analyticsModule = await lazyLoad.load('analytics', () => import('./modules/analytics.js'));
           analyticsModule.initMatomo(window.appConfig.analytics);
         }
-}
+      }
     ];
-    
+
     // Execute all tasks in parallel
     await Promise.all(finalTasks.map(task => Promise.resolve().then(task)));
   }, 100);
@@ -799,19 +794,19 @@ function displayCharacterInSettings() {
   if (profileRow && profileRow.classList.contains('hidden')) {
     profileRow.classList.remove('hidden');
   }
-  
+
   if (characterInfo) {
     try {
       const character = JSON.parse(characterInfo);
       const emojiElement = elementCache.get('settings-character-emoji');
       const nameElement = elementCache.get('settings-character-name');
       const studentIDElements = elementCache.getAll('#student-id');
-      
+
       if (emojiElement && nameElement) {
         emojiElement.textContent = character.emoji || '👤';
         nameElement.textContent = character.fullName || localStorage.getItem('nameUser') || 'Guest';
       }
-      
+
       // Update any student ID elements in the settings
       if (studentID && studentIDElements.length > 0) {
         studentIDElements.forEach(element => {
@@ -827,7 +822,7 @@ function displayCharacterInSettings() {
 // Lazy load module function
 const lazyLoad = {
   _modules: {},
-  
+
   async load(name, loader) {
     if (!this._modules[name]) {
       this._modules[name] = await loader();
@@ -842,13 +837,13 @@ export const isFeatureEnabled = (featureName, defaultValue = false) => {
   if (typeof window.appConfig?.features?.[featureName] !== 'undefined') {
     return window.appConfig.features[featureName] === true;
   }
-  
+
   // Fall back to state object
   const stateKey = `${featureName}Enabled`;
   if (typeof state[stateKey] !== 'undefined') {
     return state[stateKey] === true;
   }
-  
+
   return defaultValue;
 }
 

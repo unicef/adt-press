@@ -49,14 +49,14 @@ const hasNonEmptyInputs = (selector) => {
 // Checks if an activity has user data based on activity type
 const activityHasUserData = (activityType) => {
     const activityId = getActivityIdFromPath();
-    
+
     // Common checks for localStorage data
-    const hasLocalStorageData = Object.keys(localStorage).some(key => 
-        key.startsWith(`${activityId}_`) && 
+    const hasLocalStorageData = Object.keys(localStorage).some(key =>
+        key.startsWith(`${activityId}_`) &&
         key !== `${activityId}_success`
     );
 
-    if (!hasLocalStorageData){
+    if (!hasLocalStorageData) {
         // Use a function lookup pattern instead of switch
         if (activityType === 'activity_open_ended_answer') {
             return hasNonEmptyInputs('section textarea, section input[type="text"]');
@@ -91,7 +91,7 @@ const activityHasUserData = (activityType) => {
 export const checkForUserData = () => {
     const activitySection = document.querySelector('section[role="activity"]');
     if (!activitySection) return false;
-    
+
     const activityType = activitySection.dataset.sectionType;
     return activityHasUserData(activityType);
 };
@@ -100,10 +100,10 @@ export const checkForUserData = () => {
 export const updateResetButtonVisibility = () => {
     const resetButton = document.getElementById("reset-button");
     if (!resetButton) return;
-    
+
     // Check if there's any user data for this activity
     const hasUserData = checkForUserData();
-    
+
     // Toggle visibility
     resetButton.classList.toggle("hidden", !hasUserData);
 };
@@ -168,20 +168,20 @@ const resetSubmitButton = () => {
 const clearAllFeedback = () => {
     // Elements to remove completely
     const elementsToRemove = [
-        ".feedback-icon", 
+        ".feedback-icon",
         "[class^='feedback-icon-for-']",
         ".mark",
         ".validation-mark",
         ".sr-only"
     ].join(", ");
-    
+
     document.querySelectorAll(elementsToRemove).forEach(el => el.remove());
-    
+
     // Elements to clear content
     document.querySelectorAll(".feedback-container").forEach(container => {
         container.innerHTML = '';
     });
-    
+
     // Clear validation styling on inputs
     document.querySelectorAll("input, textarea").forEach(input => {
         input.classList.remove(
@@ -189,11 +189,11 @@ const clearAllFeedback = () => {
             ...CLASS_NAMES.VALIDATION.ERROR,
             ...CLASS_NAMES.VALIDATION.WARNING
         );
-        
+
         ["aria-invalid", "aria-describedby", "data-has-gibberish-feedback", "data-has-profanity-feedback"]
             .forEach(attr => input.removeAttribute(attr));
     });
-    
+
     // Clear styling on activity options
     document.querySelectorAll(".activity-option span, .statement-option, .placed-word").forEach(el => {
         el.classList.remove(
@@ -203,7 +203,7 @@ const clearAllFeedback = () => {
             "border-2"
         );
     });
-    
+
     // Reset toast
     const toast = document.getElementById("toast");
     if (toast) {
@@ -215,7 +215,7 @@ const clearAllFeedback = () => {
             "bg-orange-200", "text-orange-700"
         );
     }
-    
+
     // Reset feedback element
     const feedbackElement = document.getElementById("feedback");
     if (feedbackElement) {
@@ -374,7 +374,7 @@ function initializeActivityHandlers() {
 
 // Store the handlers in state when prepareActivity is called
 let activityResetHandlers;
-let activityHandlers; 
+let activityHandlers;
 
 // Function to handle activity reset
 const handleResetActivity = () => {
@@ -416,14 +416,14 @@ const setupActivitySection = (section, activityType, submitButton) => {
     }
 
     const handler = activityHandlers[activityType];
-    
+
     if (handler) {
         handler.setup(section);
         setState('validateHandler', handler.validate);
     } else {
         console.error("Unknown activity type:", activityType);
     }
-    
+
     if (state.validateHandler) {
         submitButton.removeEventListener("click", state.validateHandler);
         submitButton.addEventListener("click", state.validateHandler);

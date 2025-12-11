@@ -20,33 +20,33 @@ import { trackToggleEvent, trackEvent } from './analytics.js';
 import { isFeatureEnabled } from '../base.js';
 
 document.addEventListener('click', (event) => {
-  // Check for clicks on any element with glossary-term class or data-glossary-term attribute
-  const glossaryTerm = event.target.closest('.glossary-term, [data-glossary-term="true"]');
-  
-  if (glossaryTerm) {
-    // Import the showGlossaryDefinition function
-    import('./interface.js').then(module => {
-      // Call the function directly with the event
-      module.showGlossaryDefinition(event);
-    });
-    
-    // Set flag to prevent audio playback
-    window._isGlossaryTermClick = true;
-    
-    // Stop any currently playing audio
-    if (state.isPlaying || state.currentAudio) {
-      stopAudio();
-      unhighlightAllElements();
+    // Check for clicks on any element with glossary-term class or data-glossary-term attribute
+    const glossaryTerm = event.target.closest('.glossary-term, [data-glossary-term="true"]');
+
+    if (glossaryTerm) {
+        // Import the showGlossaryDefinition function
+        import('./interface.js').then(module => {
+            // Call the function directly with the event
+            module.showGlossaryDefinition(event);
+        });
+
+        // Set flag to prevent audio playback
+        window._isGlossaryTermClick = true;
+
+        // Stop any currently playing audio
+        if (state.isPlaying || state.currentAudio) {
+            stopAudio();
+            unhighlightAllElements();
+        }
+
+        // Clear the flag after a delay
+        setTimeout(() => {
+            window._isGlossaryTermClick = false;
+        }, 100);
+
+        return false;
     }
-    
-    // Clear the flag after a delay
-    setTimeout(() => {
-      window._isGlossaryTermClick = false;
-    }, 100);
-    
-    return false;
-  }
-}, {capture: true}); // Use capture to ensure this runs before other handlers
+}, { capture: true }); // Use capture to ensure this runs before other handlers
 
 /**
  * Loads the autoplay state from cookies and updates UI.
@@ -72,12 +72,12 @@ export const loadDescribeImagesState = () => {
         setState('describeImagesMode', false);
         setCookie("describeImagesMode", "false", 7);
     }
-    
+
     // Always sync UI with state (this line was commented out)
     toggleButtonState("toggle-describe-images", state.describeImagesMode);
-    
+
     // Regather audio elements to ensure correct initial state
-    if (state.describeImagesMode){
+    if (state.describeImagesMode) {
         gatherAudioElements();
     }
 };
@@ -101,7 +101,7 @@ export const loadGlossaryState = async () => {
     if (glossaryModeCookie !== null) {
         setState('glossaryMode', glossaryModeCookie === "true");
         toggleButtonState("toggle-glossary", state.glossaryMode);
-        
+
         if (state.glossaryMode) {
             await loadGlossaryTerms();
             highlightGlossaryTerms();
@@ -157,7 +157,6 @@ export const toggleDescribeImages = () => {
 export const initializeAutoplay = () => {
     // Don't automatically start playing on page load
     if (state.readAloudMode && state.autoplayMode) {
-        console.log('Audio will start playing after user interaction');
         setState('isPlaying', true);
         setPlayPauseIcon();
 
@@ -208,10 +207,10 @@ export const initializeAudioElements = () => {
         if (element._audioHandler) {
             element.removeEventListener('click', element._audioHandler);
         }
-        
+
         // Create and store new handler
         element._audioHandler = () => handleAudioElementClick(element, state.audioElements);
-        
+
         // Add the new listener
         element.addEventListener('click', element._audioHandler);
     });
@@ -224,21 +223,18 @@ export const initializeAudioElements = () => {
 export const deactivateAudioElements = () => {
     // Check if there are any audio elements to process
     if (!state.audioElements || state.audioElements.length === 0) {
-        console.log('No audio elements to deactivate');
         return;
     }
-    
-    console.log(`Deactivating click handlers for ${state.audioElements.length} audio elements`);
-    
+
     // Remove handlers from all elements in the state.audioElements array
     state.audioElements.forEach(({ element }) => {
         if (element && element._audioHandler) {
             // Remove the event listener using the stored handler reference
             element.removeEventListener('click', element._audioHandler);
-            
+
             // Clear the stored handler reference to free memory
             element._audioHandler = null;
-            
+
             // Remove visual indication that the element is clickable (if any)
             element.classList.remove('audio-clickable');
         }
@@ -248,13 +244,12 @@ export const deactivateAudioElements = () => {
 const handleAudioElementClick = (element, elements) => {
     // First check the global glossary click flag
     if (window._isGlossaryTermClick === true) {
-        console.log('Preventing audio for glossary term click (global flag)');
         return;
     }
-    
+
     // Then check element classes/attributes
-    const isGlossaryTerm = 
-        element.classList.contains('glossary-highlighted') || 
+    const isGlossaryTerm =
+        element.classList.contains('glossary-highlighted') ||
         element.classList.contains('glossary-term') ||
         element.hasAttribute('data-glossary-term') ||
         element.closest('.glossary-term-highlight') ||
@@ -262,10 +257,9 @@ const handleAudioElementClick = (element, elements) => {
         element.closest('[data-glossary-term]');
 
     if (isGlossaryTerm) {
-        console.log('Preventing audio for glossary term click (element check)');
         return;
     }
-    
+
     if (state.readAloudMode) {
         const isImage = element.tagName.toLowerCase() === "img";
 
@@ -438,12 +432,11 @@ const handleEli5State = () => {
 const displayEli5Content = () => {
     const eli5Id = document.querySelector('section[data-eli5-id]')?.getAttribute("data-eli5-id");
     if (!eli5Id) {
-        console.log('ELI5 section not found on this page, skipping content display');
         return;
     }
-    
+
     const eli5Text = state.translations[eli5Id];
-    
+
     if (eli5Text) {
         const eli5Container = document.getElementById("eli5-content-text");
         if (eli5Container) {
@@ -531,13 +524,12 @@ export const handleEli5Popup = () => {
     const eli5Content = document.getElementById('eli5-content');
     const closeButton = document.getElementById('close-eli5-content');
     const mainSection = document.querySelector('section[data-eli5-id]');
-    
+
     // Check if elements exist before proceeding
     if (!explainButton || !eli5Content || !closeButton || !mainSection) {
-        console.log('ELI5 elements not found on this page, skipping initialization');
         return;
     }
-    
+
     const eli5Id = mainSection.getAttribute("data-eli5-id");
 
     // Toggle the visibility when the button is clicked
@@ -584,7 +576,6 @@ const handleEli5ModeToggle = () => {
     if (state.eli5Mode) {
         const mainSection = document.querySelector('section[data-eli5-id]');
         if (!mainSection) {
-            console.log('ELI5 section not found on this page');
             if (explainButton) {
                 explainButton.classList.add('hidden');
             }
@@ -749,13 +740,13 @@ export const announceToScreenReader = (message, assertive = false) => {
 
     // Clear existing content first
     announcement.textContent = '';
-    
+
     // Set the politeness based on the assertive parameter
     announcement.setAttribute('aria-live', assertive ? 'assertive' : 'polite');
-    
+
     // Add lang attribute to ensure Spanish pronunciation
     announcement.setAttribute('lang', 'es');
-    
+
     // Set the message after a small delay to ensure screen readers detect the change
     setTimeout(() => {
         announcement.textContent = message;
@@ -784,7 +775,7 @@ export const populateGlossaryTerms = () => {
         if (glossaryList && glossaryTerms) {
             // Step 1: Collect and organize terms by first letter (normalized to group accented letters)
             const termsByLetter = {};
-            
+
             Object.entries(glossaryTerms).forEach(([key, data]) => {
                 if (!addedTerms.has(key.toLowerCase())) {
                     // Get first letter, normalize it to remove diacritics, and ensure it's uppercase
@@ -793,12 +784,12 @@ export const populateGlossaryTerms = () => {
                         .normalize('NFD')
                         .replace(/[\u0300-\u036f]/g, '')
                         .toUpperCase();
-                    
+
                     // Use the normalized letter as the key for grouping
                     if (!termsByLetter[firstLetterNormalized]) {
                         termsByLetter[firstLetterNormalized] = [];
                     }
-                    
+
                     // Add the term data to the appropriate letter group
                     termsByLetter[firstLetterNormalized].push({
                         term: key,
@@ -807,7 +798,7 @@ export const populateGlossaryTerms = () => {
                         definition: data.definition,
                         originalFirstLetter: firstLetterWithAccent // Store for potential display
                     });
-                    
+
                     addedTerms.add(key.toLowerCase());
                 }
             });
@@ -819,23 +810,23 @@ export const populateGlossaryTerms = () => {
             sortedLetters.forEach(letter => {
                 // Determine the display letter (we could use the first term's original letter)
                 const letterGroup = termsByLetter[letter];
-                
+
                 // Find if there's any accented version of this letter in the group
                 // Otherwise, use the normalized letter itself
                 const displayLetter = letter;
-                
+
                 // Create a letter heading
                 const letterHeading = document.createElement('div');
                 letterHeading.classList.add('glossary-letter-grouping', 'text-2xl', 'font-bold', 'mt-6', 'mb-3', 'text-blue-700', 'pb-4');
                 letterHeading.textContent = displayLetter;
                 glossaryList.appendChild(letterHeading);
-                
+
                 // Sort terms within this letter group alphabetically
                 // We use localeCompare with sensitivity: 'base' to treat accented letters the same
-                letterGroup.sort((a, b) => 
+                letterGroup.sort((a, b) =>
                     a.term.localeCompare(b.term, undefined, { sensitivity: 'base' })
                 );
-                
+
                 // Create and append each term in this letter group
                 letterGroup.forEach(item => {
                     createGlossaryItem(glossaryList, item.displayTerm, item.emoji, item.definition, item.term);
@@ -864,41 +855,41 @@ export const populateGlossaryTerms = () => {
 
                 if (termData && matchedMainTerm) {
                     const { emoji, definition } = termData;
-                
+
                     // Create a container for each glossary item
                     const glossaryItem = document.createElement('div');
-                    glossaryItem.classList.add('mb-4', 
-                        'border-b', 
-                        'border-gray-300', 
-                        'pb-4', 
-                        'glossary-page-item', 
+                    glossaryItem.classList.add('mb-4',
+                        'border-b',
+                        'border-gray-300',
+                        'pb-4',
+                        'glossary-page-item',
                         'cursor-pointer',
                         'focus:outline-none',
                         'focus:ring-2',
                         'focus:ring-blue-700',
                         'focus:ring-opacity-50'
                     );
-                    
+
                     // Make the container focusable with proper keyboard support - added these lines
                     glossaryItem.setAttribute('tabindex', '0');
                     glossaryItem.setAttribute('role', 'button');
                     glossaryItem.setAttribute('aria-label', `${term}${emoji ? ' ' + emoji : ''}`);
-                
+
                     // Use the exact matched text from the page for display
                     const termTitleText = term.charAt(0).toUpperCase() + term.slice(1);
-                
+
                     // Create the term element as a title
                     const termTitle = document.createElement('div');
                     termTitle.classList.add('font-bold', 'text-lg', 'glossary-page-term');
                     termTitle.textContent = emoji ? (termTitleText + " " + emoji) : termTitleText;
                     glossaryItem.appendChild(termTitle);
-                
+
                     // Create the definition element
                     const definitionElement = document.createElement('div');
                     definitionElement.classList.add('mt-2', 'text-gray-700', 'mb-2');
                     definitionElement.textContent = definition;
                     glossaryItem.appendChild(definitionElement);
-                    
+
                     // Add keyboard support - added these event listeners
                     glossaryItem.addEventListener('keydown', (event) => {
                         if (event.key === 'Enter' || event.key === ' ') {
@@ -906,16 +897,16 @@ export const populateGlossaryTerms = () => {
                             // Optionally add any action you want when this item is activated
                         }
                     });
-                    
+
                     // Add focus and hover visual indicators - added these event listeners
                     glossaryItem.addEventListener('focus', () => {
                         glossaryItem.classList.add('bg-gray-100');
                     });
-                    
+
                     glossaryItem.addEventListener('blur', () => {
                         glossaryItem.classList.remove('bg-gray-100');
                     });
-                
+
                     // Append the glossary item to the list
                     glossaryPageList.appendChild(glossaryItem);
                 }
@@ -947,18 +938,18 @@ const createGlossaryItem = (glossaryList, term, emoji, definition, variation) =>
     // Create a container for each glossary item
     const glossaryItem = document.createElement('div');
     glossaryItem.classList.add(
-        'mb-4', 
-        'border-b', 
-        'border-gray-300', 
-        'pb-4', 
-        'glossary-item', 
+        'mb-4',
+        'border-b',
+        'border-gray-300',
+        'pb-4',
+        'glossary-item',
         'cursor-pointer',
         'focus:outline-none',
         'focus:ring-2',
         'focus:ring-blue-500',
         'focus:ring-opacity-50'
     );
-    
+
     // Make the container focusable with proper keyboard support
     glossaryItem.setAttribute('tabindex', '0');
     glossaryItem.setAttribute('role', 'button');
@@ -968,7 +959,7 @@ const createGlossaryItem = (glossaryList, term, emoji, definition, variation) =>
     const termElement = document.createElement('div');
     termElement.classList.add('font-bold', 'text-lg', 'glossary-term');
     termElement.textContent = term;
-    
+
     // Add emoji if present
     if (emoji) {
         const emojiSpan = document.createElement('span');
@@ -995,28 +986,28 @@ const createGlossaryItem = (glossaryList, term, emoji, definition, variation) =>
         if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
             return;
         }
-        
+
         if (event.type === 'keydown' && event.key === ' ') {
             event.preventDefault(); // Prevent page scroll on Space key
         }
-        
+
         const glossaryContent = document.getElementById('glossary-content');
         const glossaryTermDetails = document.getElementById('glossary-term-details');
         const glossaryTermContent = document.getElementById('glossary-term-content');
-        
+
         // Remember the originating item for later focus return
         glossaryTermDetails.dataset.sourceItemId = glossaryItem.id;
-        
+
         // Ensure the glossary item has a unique ID for focus return
         if (!glossaryItem.id) {
             glossaryItem.id = `glossary-item-${variation.replace(/\s+/g, '-').toLowerCase()}`;
         }
-        
+
         // Get the term data and format content as before
         const originalTerm = variation;
         const termData = state.glossaryTerms[originalTerm];
         let variationsHtml = '';
-        
+
         if (termData && termData.variations && termData.variations.length > 0) {
             const joinedVariations = termData.variations.join(', ');
             const formattedVariations = joinedVariations.charAt(0).toUpperCase() + joinedVariations.slice(1);
@@ -1043,13 +1034,13 @@ const createGlossaryItem = (glossaryList, term, emoji, definition, variation) =>
         // Hide glossary content and show term details
         glossaryContent.classList.add('hidden');
         glossaryTermDetails.classList.remove('hidden');
-        
+
         // Set focus to the close button for keyboard navigation
         const closeButton = document.getElementById('close-glossary-term-details');
         if (closeButton) {
             setTimeout(() => closeButton.focus(), 10);
         }
-        
+
         // Announce to screen readers
         announceToScreenReader(`Showing details for ${term}`);
     };
@@ -1057,12 +1048,12 @@ const createGlossaryItem = (glossaryList, term, emoji, definition, variation) =>
     // Add both click and keyboard event listeners
     glossaryItem.addEventListener('click', showDetails);
     glossaryItem.addEventListener('keydown', showDetails);
-    
+
     // Add focus indicators
     glossaryItem.addEventListener('focus', () => {
         glossaryItem.classList.add('bg-gray-100');
     });
-    
+
     glossaryItem.addEventListener('blur', () => {
         glossaryItem.classList.remove('bg-gray-100');
     });
@@ -1087,7 +1078,7 @@ export const initializeGlossary = () => {
     if (glossaryButton && glossaryButtonContainer) {
         glossaryButtonContainer.classList.remove('hidden');
     }
-    
+
     populateGlossaryTerms();
 
     if (glossaryButton && glossaryContent && backToSidebarButton && sidebarContent) {
@@ -1098,7 +1089,7 @@ export const initializeGlossary = () => {
             sidebarContent.classList.add('hidden');
             glossaryContent.classList.remove('hidden');
         }
-        
+
         // Update click handlers to save state
         glossaryButton.addEventListener('click', () => {
             sidebarContent.classList.add('hidden');
@@ -1151,14 +1142,14 @@ export const initializeGlossary = () => {
                 bookTab.classList.add("text-blue-700", "border-b-4", "-mb-1", "border-blue-700");
                 pageTab.classList.remove("border-b-4", "border-blue-700", "text-blue-700", "-mb-1");
             }
-            
+
             // Save the tab state to a cookie
             setCookie("activeGlossaryTabIndex", tabIndex, 7); // Save for 7 days
         };
 
         // Check if we have a saved tab preference
         const savedTabIndex = getCookie("activeGlossaryTabIndex");
-        
+
         // Apply the saved tab or default to the first tab
         if (savedTabIndex !== null && savedTabIndex !== undefined && savedTabIndex !== "") {
             // Apply the saved tab
@@ -1167,7 +1158,7 @@ export const initializeGlossary = () => {
             // Default to first tab (index 0)
             setActiveTab(0);
         }
-        
+
         // Event listeners for tab switching
         pageTab.addEventListener('click', () => {
             setActiveTab(0);
@@ -1182,34 +1173,34 @@ export const initializeGlossary = () => {
         filterInput.addEventListener('input', () => {
             // Normalize the filter value: lowercase and remove diacritics
             const filterValue = filterInput.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            
+
             // Get all terms and letter headings
             const terms = glossaryTermsBook.querySelectorAll('.glossary-item');
             const letterHeadings = glossaryTermsBook.querySelectorAll('.glossary-letter-grouping');
-            
+
             let hasResults = false;
-            
+
             // Create a map to track which letter headings have visible terms
             const letterHeadingsVisibility = new Map();
-            
+
             // Initialize all letter headings as not having visible terms
             letterHeadings.forEach(heading => {
                 letterHeadingsVisibility.set(heading, false);
             });
-            
+
             // First pass: Filter the terms and mark which letter headings have visible terms
             terms.forEach(term => {
                 // Get both visible text and stored search terms (which include variations)
                 const termText = term.textContent.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
                 const searchTerms = (term.dataset.searchTerms || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-                
+
                 // Check if this term matches the filter
                 const isVisible = termText.includes(filterValue) || searchTerms.includes(filterValue);
-                
+
                 if (isVisible) {
                     term.classList.remove('hidden');
                     hasResults = true;
-                    
+
                     // Find the previous letter heading for this term
                     let currentElement = term;
                     while (currentElement.previousElementSibling) {
@@ -1224,7 +1215,7 @@ export const initializeGlossary = () => {
                     term.classList.add('hidden');
                 }
             });
-            
+
             // Second pass: Update visibility of letter headings
             letterHeadings.forEach(heading => {
                 if (letterHeadingsVisibility.get(heading)) {
@@ -1233,7 +1224,7 @@ export const initializeGlossary = () => {
                     heading.classList.add('hidden');
                 }
             });
-            
+
             // Show or hide the no results message
             let noResultsMessage = document.getElementById('no-results-message');
             if (!noResultsMessage) {
@@ -1272,7 +1263,7 @@ export const initializeTabs = () => {
                 settingsTab.setAttribute('aria-selected', 'false');
                 assistantContent.classList.remove('hidden');
                 settingsContent.classList.add('hidden');
-                assistantTab.classList.add("text-blue-700", "border-b-4", "-mb-1",  "border-blue-700");
+                assistantTab.classList.add("text-blue-700", "border-b-4", "-mb-1", "border-blue-700");
                 settingsTab.classList.remove("border-b-4", "-mb-1", "border-blue-700", "text-blue-700");
             } else {
                 // Settings tab
@@ -1284,14 +1275,14 @@ export const initializeTabs = () => {
                 settingsTab.classList.add("text-blue-700", "border-b-4", "-mb-1", "border-blue-700");
                 assistantTab.classList.remove("border-b-4", "-mb-1", "border-blue-700", "text-blue-700");
             }
-            
+
             // Save the tab state to a cookie
             setCookie("activeTabIndex", tabIndex, 7); // Save for 7 days
         };
 
         // Check if we have a saved tab preference
         const savedTabIndex = getCookie("activeTabIndex");
-        
+
         // Apply the saved tab or default to the first tab
         if (savedTabIndex !== null && savedTabIndex !== undefined && savedTabIndex !== "") {
             // Apply the saved tab
@@ -1300,7 +1291,7 @@ export const initializeTabs = () => {
             // Default to first tab (index 0)
             setActiveTab(0);
         }
-        
+
         // Keep existing event listeners, but use the new function
         assistantTab.addEventListener('click', () => {
             setActiveTab(0);
@@ -1319,32 +1310,26 @@ export const initializeTabs = () => {
 export const checkIfReferencePage = () => {
     // Get the originating page from localStorage
     const originatingPage = localStorage.getItem('originatingPage');
-    
+
     // If no originating page exists, this isn't a reference context
     if (!originatingPage) {
-        console.log("No originating page found");
         return false;
     }
-    
+
     // Check if we've navigated back to the originating page by some other means
     const currentUrl = window.location.href;
     if (originatingPage === currentUrl) {
-        console.log("We're back at the originating page, clearing reference data");
         // Clear the originating page data since we're back at the source
         localStorage.removeItem('originatingPage');
         setState('originatingPage', null);
         setState('isReferencePage', false);
         return false;
     }
-    
-    // Regular case: We're on a different page with an originating page set
-    console.log("Originating page:", originatingPage);
-    console.log("Current page is reference page: true");
-    
+
     // Update state
     setState('isReferencePage', true);
     setState('originatingPage', originatingPage);
-    
+
     return true;
 };
 
@@ -1352,16 +1337,11 @@ export const checkIfReferencePage = () => {
  * Initializes reference page functionality
  */
 export const initializeReferencePage = () => {
-    console.log("Initializing reference page functionality");
-    
     // Check if we should display a return button (based on localStorage)
     const shouldShowReturnButton = checkIfReferencePage();
-    
+
     if (shouldShowReturnButton) {
-        console.log("Return button should be displayed");
         displayReturnButton();
-    } else {
-        console.log("No return button needed on this page");
     }
 };
 
@@ -1369,31 +1349,27 @@ export const initializeReferencePage = () => {
  * Creates and displays the return button on reference pages
  */
 export const displayReturnButton = () => {
-    console.log("Creating return button");
-    
     // Get originating page from state
     const originatingPage = getState('originatingPage');
     if (!originatingPage) {
-        console.log("No originating page found in state");
         return;
     }
-    
+
     // Check if return button already exists
     if (document.querySelector('.return-button')) {
-        console.log("Return button already exists");
         return;
     }
-    
+
     // Create return button with translated text
     const returnButton = document.createElement('button');
-    
+
     // Get translation if available, otherwise use default text
     const translations = getState('translations') || {};
     const buttonText = translations['return-button'] || 'Regresar'; // Spanish default
-    
+
     // Add arrow icon before text
     returnButton.innerHTML = `<i class="fas fa-arrow-left mr-1"></i> ${buttonText}`;
-    
+
     // Apply styles to make it appear in the top right
     returnButton.classList.add(
         'return-button',
@@ -1422,38 +1398,32 @@ export const displayReturnButton = () => {
     returnButton.setAttribute('tabindex', '0'); // Make it focusable for keyboard navigation
     returnButton.setAttribute('aria-live', 'polite'); // For screen readers
     returnButton.setAttribute('aria-pressed', 'false'); // For screen readers
-    
-    console.log("Return button created with fixed positioning");
-    
+
     // Add click event to return to originating page
     returnButton.addEventListener('click', () => {
-        console.log("Return button clicked, navigating to:", originatingPage);
-        
+
         // Clear the originating page from localStorage and state
         localStorage.removeItem('originatingPage');
         setState('originatingPage', null);
         setState('isReferencePage', false);
-        
-        console.log("Cleared originating page data");
-        
+
         // Cache interface elements before navigating
         cacheInterfaceElements();
-        
+
         // Add fade-out animation
         const mainContent = document.querySelector('body > .container');
         if (mainContent) {
             mainContent.classList.add("opacity-0");
         }
-        
+
         // Navigate back to originating page
         setTimeout(() => {
             window.location.href = originatingPage;
         }, 150);
     });
-    
+
     // Add the button directly to the body
     document.body.appendChild(returnButton);
-    console.log("Return button added with fixed positioning");
 };
 
 /**
@@ -1533,7 +1503,7 @@ export const unhighlightElement = (element) => {
         'bg-blue-100',
         'text-black'
     );
-    
+
 };
 
 /**

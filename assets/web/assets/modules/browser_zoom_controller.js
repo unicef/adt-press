@@ -14,7 +14,6 @@
 
 // Track current zoom state
 let currentZoom = 1;
-console.log('currentZoom:', currentZoom);
 
 /**
  * Check if running on Windows with high DPI scaling
@@ -33,8 +32,7 @@ export function isHighDpiWindows() {
 function isChromiumOrSafari() {
   const isChrome = !!window.chrome;
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  
-  console.log('Browser detection:', { isChrome, isSafari });
+
   return isChrome || isSafari;
 }
 
@@ -44,27 +42,27 @@ function isChromiumOrSafari() {
  */
 export function setNativeZoom(zoomLevel) {
   // Validate zoom level
-//   if (typeof zoomLevel !== 'number' || zoomLevel <= 0) {
-//     console.error('Invalid zoom level. Must be a positive number.');
-//     return;
-//   }
+  //   if (typeof zoomLevel !== 'number' || zoomLevel <= 0) {
+  //     console.error('Invalid zoom level. Must be a positive number.');
+  //     return;
+  //   }
 
   // Force zoom via direct style application (most reliable approach)
   document.body.style.zoom = zoomLevel;
 
   // Store current zoom for reference
   currentZoom = zoomLevel;
-  
+
   // Save zoom level for persistence
   localStorage.setItem('pageZoomLevel', zoomLevel.toString());
-  
+
   // For Chrome/Safari/Edge, use the native zoom property
   if (isChromiumOrSafari()) {
     document.body.style.zoom = zoomLevel;
     adjustInterfaceForNativeZoom(zoomLevel);
     return;
   }
-  
+
   // For Firefox and others, use CSS transform with additional adjustments
   applyTransformZoom(zoomLevel);
 }
@@ -80,10 +78,10 @@ function applyTransformZoom(zoomLevel) {
   const interfaceContainer = document.getElementById('interface-container');
   const navContainer = document.getElementById('nav-container');
   const sidebar = document.getElementById('sidebar');
-  
+
   // Calculate inverse zoom for compensating dimensions
   const inverseZoom = 1 / zoomLevel;
-  
+
   // Apply zoom to body
   if (body) {
     body.style.transform = `scale(${zoomLevel})`;
@@ -92,18 +90,18 @@ function applyTransformZoom(zoomLevel) {
     body.style.minHeight = `${inverseZoom * 100}vh`;
     body.style.overflow = 'hidden';
   }
-  
+
   // Adjust main content container
   if (contentContainer) {
     // Reset any previous transform that might be set directly on the container
     contentContainer.style.transform = 'none';
-    
+
     // Adjust dimensions to fill the viewport at scaled size
     contentContainer.style.minHeight = `calc(${inverseZoom * 100}vh - ${inverseZoom * 100}px)`;
     contentContainer.style.width = '100%';
     contentContainer.style.maxWidth = 'none';
   }
-  
+
   // Ensure interface elements stay correctly positioned
   if (interfaceContainer) {
     interfaceContainer.style.position = 'fixed';
@@ -114,7 +112,7 @@ function applyTransformZoom(zoomLevel) {
     interfaceContainer.style.transformOrigin = 'bottom left';
     interfaceContainer.style.zIndex = '9999';
   }
-  
+
   // Adjust navigation container
   if (navContainer) {
     navContainer.style.position = 'fixed';
@@ -122,14 +120,14 @@ function applyTransformZoom(zoomLevel) {
     navContainer.style.transformOrigin = 'top left';
     navContainer.style.zIndex = '9999';
   }
-  
+
   // Adjust sidebar positioning if it's open
   if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
     sidebar.style.transform = `scale(${zoomLevel})`;
     sidebar.style.transformOrigin = 'top right';
     sidebar.style.right = '0';
   }
-  
+
   // Dispatch custom event for other components that might need to adjust
   window.dispatchEvent(new CustomEvent('zoomchange', { detail: { zoomLevel } }));
 }
@@ -141,17 +139,17 @@ function applyTransformZoom(zoomLevel) {
 function adjustInterfaceForNativeZoom(zoomLevel) {
   const bottomInterface = document.querySelector('.fixed.bottom-0');
   const sidebar = document.getElementById('sidebar');
-  
+
   if (bottomInterface) {
     // Ensure bottom interface stays at the bottom with native zoom
     bottomInterface.style.bottom = '0';
   }
-  
+
   if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
     // Ensure sidebar stays properly positioned
     sidebar.style.right = '0';
   }
-  
+
   // Dispatch custom event for other components that might need to adjust
   window.dispatchEvent(new CustomEvent('zoomchange', { detail: { zoomLevel } }));
 }
@@ -161,45 +159,45 @@ function adjustInterfaceForNativeZoom(zoomLevel) {
  */
 export function resetZoom() {
   setNativeZoom(1);
-  
+
   // Clean up any additional styles that were set
   const contentContainer = document.querySelector('.container.content');
   const interfaceContainer = document.getElementById('interface-container');
   const navContainer = document.getElementById('nav-container');
   const sidebar = document.getElementById('sidebar');
-  
+
   // Reset body styles
   document.body.style.transform = '';
   document.body.style.width = '';
   document.body.style.minHeight = '';
   document.body.style.overflow = '';
-  
+
   // Reset content container
   if (contentContainer) {
     contentContainer.style.minHeight = '';
     contentContainer.style.width = '';
     contentContainer.style.maxWidth = '';
   }
-  
+
   // Reset interface container
   if (interfaceContainer) {
     interfaceContainer.style.position = '';
     interfaceContainer.style.transform = '';
     interfaceContainer.style.width = '';
   }
-  
+
   // Reset navigation container
   if (navContainer) {
     navContainer.style.position = '';
     navContainer.style.transform = '';
   }
-  
+
   // Reset sidebar
   if (sidebar) {
     sidebar.style.transform = '';
     sidebar.style.right = '';
   }
-  
+
   // Remove zoom level from storage
   localStorage.removeItem('pageZoomLevel');
 }
@@ -230,7 +228,7 @@ export function applyStoredZoom() {
 export function initializeZoomController() {
   // Apply any stored zoom level
   const zoomApplied = applyStoredZoom();
-  
+
   // Listen for resize events to maintain zoom layout
   window.addEventListener('resize', () => {
     if (currentZoom !== 1) {
@@ -238,7 +236,7 @@ export function initializeZoomController() {
       setNativeZoom(currentZoom);
     }
   });
-  
+
   // Add event listener for "z" key to toggle zoom for testing
   document.addEventListener('keydown', (e) => {
     // Alt+Z for zoom to 75%
@@ -246,21 +244,20 @@ export function initializeZoomController() {
       setNativeZoom(currentZoom === 0.75 ? 1 : 0.75);
     }
   });
-  
+
   return zoomApplied;
 }
 
 // Add a direct test function that can be called from console
 export function testZoomNow() {
-    console.log('Direct zoom test');
-    try {
-      document.body.style.zoom = 0.75;
-      return true;
-    } catch (err) {
-      console.error('Error applying zoom:', err);
-      return false;
-    }
+  try {
+    document.body.style.zoom = 0.75;
+    return true;
+  } catch (err) {
+    console.error('Error applying zoom:', err);
+    return false;
   }
+}
 
 /**
  * Create floating zoom controls UI
@@ -271,12 +268,12 @@ export function createZoomControls() {
   if (existingControls) {
     existingControls.remove();
   }
-  
+
   // Create controls container
   const controls = document.createElement('div');
   controls.id = 'zoom-controls';
   controls.className = 'fixed bottom-20 left-4 bg-white rounded-lg shadow-lg p-2 z-50 flex items-center space-x-2 border border-gray-200';
-  
+
   // Add zoom out button
   const zoomOutBtn = document.createElement('button');
   zoomOutBtn.className = 'p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500';
@@ -285,14 +282,14 @@ export function createZoomControls() {
   zoomOutBtn.addEventListener('click', () => {
     setNativeZoom(0.75);
   });
-  
+
   // Add reset button
   const resetBtn = document.createElement('button');
   resetBtn.className = 'p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500';
   resetBtn.innerHTML = '<i class="fas fa-undo"></i>';
   resetBtn.setAttribute('aria-label', 'Reset zoom');
   resetBtn.addEventListener('click', resetZoom);
-  
+
   // Add zoom in button
   const zoomInBtn = document.createElement('button');
   zoomInBtn.className = 'p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500';
@@ -301,27 +298,27 @@ export function createZoomControls() {
   zoomInBtn.addEventListener('click', () => {
     setNativeZoom(1.25);
   });
-  
+
   // Add zoom level display
   const zoomLevel = document.createElement('span');
   zoomLevel.id = 'zoom-level-display';
   zoomLevel.className = 'text-sm font-medium text-gray-700 px-2';
   zoomLevel.textContent = '100%';
-  
+
   // Update zoom level display when zoom changes
   window.addEventListener('zoomchange', (e) => {
     const level = e.detail.zoomLevel;
     zoomLevel.textContent = `${Math.round(level * 100)}%`;
   });
-  
+
   // Assemble controls
   controls.appendChild(zoomOutBtn);
   controls.appendChild(resetBtn);
   controls.appendChild(zoomInBtn);
   controls.appendChild(zoomLevel);
-  
+
   // Add to document
   document.body.appendChild(controls);
-  
+
   return controls;
 }

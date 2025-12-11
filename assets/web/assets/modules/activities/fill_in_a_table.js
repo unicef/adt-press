@@ -16,11 +16,8 @@ export const prepareFillInTable = (section) => {
 
 async function initializeDictionary() {
     // Initialize the TextValidator dictionary early
-    console.log('Pre-initializing TextValidator dictionary...');
     const textValidator = new TextValidator();
     await textValidator.ensureInitialized();
-    console.log('TextValidator dictionary pre-initialized with', 
-                textValidator.spanishWords ? textValidator.spanishWords.size : 0, 'words');
 
     // Store the validator in a global property so it can be accessed elsewhere
     window.globalTextValidator = textValidator;
@@ -67,7 +64,7 @@ const handleTableInputChange = (event) => {
     );
 
     //validateTableInput(input);
-    
+
 };
 
 const handleTableInputFocus = (event) => {
@@ -87,13 +84,13 @@ const handleTableInputBlur = (event) => {
 };
 
 export const checkTableInputs = () => {
-    
+
     const inputs = document.querySelectorAll('section input[type="text"]:not(#filter-input), section textarea:not(#filter-input)');
     clearTableFeedback();
 
     const validationResult = validateTableInputs(inputs);
     const hasGibberish = checkForGibberish(inputs);
-    
+
     // Add gibberish check to validation result object
     const enhancedValidationResult = {
         ...validationResult,
@@ -117,20 +114,20 @@ const validateTableInputs = (inputs) => {
     let unfilledCount = 0;
     let correctCount = 0;
     const activityId = location.pathname
-    .substring(location.pathname.lastIndexOf("/") + 1)
-    .split(".")[0];
+        .substring(location.pathname.lastIndexOf("/") + 1)
+        .split(".")[0];
     let key = activityId + "-intentos";
     let intentCount = localStorage.getItem(key);
     if (intentCount === null) {
-            localStorage.setItem(key, "0");
-            intentCount = 0;
-        } else {
-            intentCount = parseInt(intentCount, 10);
-        }
+        localStorage.setItem(key, "0");
+        intentCount = 0;
+    } else {
+        intentCount = parseInt(intentCount, 10);
+    }
 
-        intentCount++;
-        localStorage.setItem(key, intentCount.toString()); 
-    
+    intentCount++;
+    localStorage.setItem(key, intentCount.toString());
+
     // Check filled-not-required class is on the table.
     const filledNotRequired = document.getElementsByClassName("filled-not-required").length > 0;
 
@@ -157,10 +154,10 @@ const validateSingleTableInput = (input) => {
     const value = input.value.trim();
     const dataActivityItem = input.getAttribute("data-activity-item");
     const dataAriaId = input.getAttribute("data-aria-id");
-   
+
     // Check if this table is "filled-not-required"
     const filledNotRequired = document.getElementsByClassName("filled-not-required").length > 0;
-   
+
     let correctAnswer;
     try {
         // First check if we have a global correctAnswers object
@@ -169,9 +166,9 @@ const validateSingleTableInput = (input) => {
         } else if (typeof correctAnswers !== 'undefined' && correctAnswers[dataAriaId]) {
             // Try using data-aria-id if data-activity-item didn't work
             correctAnswer = correctAnswers[dataAriaId];
-        // } else if (input.getAttribute("data-correct-answer")) {
-        //     // Otherwise check for inline data-correct-answer attribute
-        //     correctAnswer = input.getAttribute("data-correct-answer");
+            // } else if (input.getAttribute("data-correct-answer")) {
+            //     // Otherwise check for inline data-correct-answer attribute
+            //     correctAnswer = input.getAttribute("data-correct-answer");
         } else {
             // If no correct answer is defined, accept any non-empty input
             correctAnswer = null;
@@ -183,9 +180,9 @@ const validateSingleTableInput = (input) => {
 
     // Determine if the input is valid
     const isFilled = value !== "";
-    
+
     // For tables with filled-not-required, we should treat empty fields as valid
-    const isCorrect = filledNotRequired && !isFilled ? 
+    const isCorrect = filledNotRequired && !isFilled ?
         true : // Empty is fine when not required
         (correctAnswer ? correctAnswer.toLowerCase() === value.toLowerCase() : isFilled);
 
@@ -231,14 +228,14 @@ const clearTableInputValidationFeedback = (input) => {
     const dataActivityItem = input.getAttribute("data-activity-item");
     const dataAriaId = input.getAttribute("data-aria-id");
     const inputId = input.id || '';
-    
+
     // Clear icon feedback
     const selectors = [
         `.feedback-icon-for-${dataActivityItem}`,
         `.feedback-icon-for-${dataAriaId}`,
         `.feedback-icon-for-${inputId}`
     ];
-    
+
     selectors.forEach(selector => {
         const icons = document.querySelectorAll(selector);
         icons.forEach(icon => {
@@ -247,27 +244,27 @@ const clearTableInputValidationFeedback = (input) => {
             }
         });
     });
-    
+
     // Reset input styling
     input.classList.remove(
         "border-green-500", "focus:border-green-500", "focus:ring-green-200",
         "border-red-500", "focus:border-red-500", "focus:ring-red-200",
         "focus:ring"
     );
-    
+
     // Reset cell styling
     const cell = input.closest('td, th');
     if (cell) {
         cell.classList.remove('bg-red-50', 'bg-green-50', 'border-red-300', 'border-green-300');
     }
-    
+
     // Reset ARIA attributes
     input.removeAttribute("aria-invalid");
     const originalLabel = input.getAttribute("aria-label") || "";
     if (originalLabel.includes(" - ")) {
         input.setAttribute("aria-label", originalLabel.split(" - ")[0]);
     }
-    
+
     // Remove padding if it was added
     input.style.paddingRight = '';
 };
@@ -275,39 +272,35 @@ const clearTableInputValidationFeedback = (input) => {
 const handleTableValidationResult = (validationResult) => {
     const { allFilled, unfilledCount, correctCount, hasGibberish, isValid } = validationResult;
 
-    console.log(allFilled)
-    console.log(isValid)
-
     if (allFilled && isValid) {
         playActivitySound('success');
         localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
 
         // Obtener el ID de la actividad desde la URL
         const activityId = location.pathname
-        .substring(location.pathname.lastIndexOf("/") + 1)
-        .split(".")[0];
+            .substring(location.pathname.lastIndexOf("/") + 1)
+            .split(".")[0];
 
 
-         // Recuperar el arreglo de actividades completadas del localStorage
-         let key = activityId + "-intentos";
-         let intentCount = localStorage.getItem(key);
-         const storedActivities = localStorage.getItem("completedActivities");
-         let completedActivities = storedActivities ? JSON.parse(storedActivities) : []; 
-     
-         const namePage = localStorage.getItem("namePage");
-         const timeDone = new Date().toLocaleString("es-ES");
-         const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
-     
-         // Remover cualquier entrada anterior con el mismo activityId
-         completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
-     
-         // Agregar la nueva entrada actualizada
-         completedActivities.push(newActivityId);
-         console.log("hola")
-         // Guardar en localStorage
-         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
-     
-         executeMail(ActivityTypes.FILL_IN_A_TABLE);
+        // Recuperar el arreglo de actividades completadas del localStorage
+        let key = activityId + "-intentos";
+        let intentCount = localStorage.getItem(key);
+        const storedActivities = localStorage.getItem("completedActivities");
+        let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
+
+        const namePage = localStorage.getItem("namePage");
+        const timeDone = new Date().toLocaleString("es-ES");
+        const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
+
+        // Remover cualquier entrada anterior con el mismo activityId
+        completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
+
+        // Agregar la nueva entrada actualizada
+        completedActivities.push(newActivityId);
+        // Guardar en localStorage
+        localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
+
+        executeMail(ActivityTypes.FILL_IN_A_TABLE);
     } else {
         playActivitySound('error');
     }
@@ -323,12 +316,11 @@ const handleTableValidationResult = (validationResult) => {
 const validateTableInput = (input) => {
     const value = input.value.trim();
     const dataActivityItem = input.getAttribute("data-activity-item");
-    
+
     let correctAnswer;
     try {
         correctAnswer = correctAnswers?.[dataActivityItem] ?? null;
     } catch (error) {
-        console.log("No correct answer found:");
         correctAnswer = null;
     }
 
@@ -355,15 +347,15 @@ const saveTableInputState = (input) => {
     const activityId = location.pathname
         .substring(location.pathname.lastIndexOf("/") + 1)
         .split(".")[0];
-    
+
     // Use data-aria-id as the primary identifier, fall back to id or data-activity-item
     const inputId = input.getAttribute("data-aria-id") || input.id || input.getAttribute("data-activity-item");
-    
+
     if (!inputId) {
         console.warn("Input element has no identifier for storage:", input);
         return;
     }
-    
+
     const localStorageKey = `${activityId}_${inputId}`;
     localStorage.setItem(localStorageKey, input.value);
 };
@@ -373,27 +365,27 @@ const loadInputState = (inputs) => {
         const activityId = location.pathname
             .substring(location.pathname.lastIndexOf("/") + 1)
             .split(".")[0];
-        
+
         // Use data-aria-id as the primary identifier, fall back to id or data-activity-item
         const inputId = input.getAttribute("data-aria-id") || input.id || input.getAttribute("data-activity-item");
-        
+
         if (!inputId) {
             console.warn("Input element has no identifier for loading:", input);
             return;
         }
-        
+
         const localStorageKey = `${activityId}_${inputId}`;
         const savedValue = localStorage.getItem(localStorageKey);
-        
+
         if (savedValue !== null) {
             input.value = savedValue;
-            
+
             // Optionally validate the input after loading to show feedback
             // This makes the saved state visually validated immediately on page load
             validateTableInput(input);
         }
     });
-    
+
     // Store the page name for activity completion tracking
     localStorage.setItem("namePage", document.querySelector("h1")?.innerText || document.title);
 };

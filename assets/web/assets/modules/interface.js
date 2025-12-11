@@ -44,7 +44,7 @@ const focusFirstSidebarElement = () => {
 
   // Query only visible, non-hidden focusable elements within the currently visible tab
   const focusableElements = sidebar.querySelectorAll(SIDEBAR_FOCUSABLE_SELECTOR);
-  
+
   // Find first truly visible element (not in a hidden tab)
   const firstInteractive = Array.from(focusableElements).find(el => {
     const tabContent = el.closest('.tab-content');
@@ -160,7 +160,6 @@ export const initializeLanguageDropdown = async () => {
           throw new Error("Language dropdown not found after maximum retries");
         }
         retryCount++;
-        console.log(`Language dropdown not found, attempt ${retryCount} of ${MAX_RETRIES}`);
         await new Promise(resolve => setTimeout(resolve, 200));
         return tryInitialize();
       }
@@ -614,7 +613,6 @@ export const toggleGlossaryMode = () => {
 export const highlightGlossaryTerms = () => {
   if (!state.glossaryMode || !glossaryTerms) return;
 
-  console.log("Starting glossary highlighting");
   // Remove any existing highlights first
   removeGlossaryHighlights();
 
@@ -904,7 +902,7 @@ export const showGlossaryDefinition = async (event) => {
     const glossaryTermsPage = document.getElementById('glossary-terms-page');
 
     // Make sure the sidebar is open
-  if (sidebar && sidebar.getAttribute('aria-expanded') !== 'true') {
+    if (sidebar && sidebar.getAttribute('aria-expanded') !== 'true') {
       toggleSidebar();
 
       // Add small delay to ensure sidebar is open before proceeding
@@ -1131,7 +1129,7 @@ export const toggleStateMode = () => {
  */
 export const loadStateMode = () => {
   const stateModeCookie = getCookie("stateMode");
-  
+
   // Only apply state if the cookie has a value and the feature is enabled
   if (stateModeCookie !== "" && stateModeCookie !== null) {
     const isEnabled = stateModeCookie === "true";
@@ -1187,7 +1185,7 @@ export const togglePlayBarSettings = () => {
   const readAloudSettings = document.getElementById("read-aloud-settings");
   const triggerButton = document.getElementById("read-aloud-speed");
   const isHidden = readAloudSettings.classList.contains("opacity-0");
-  
+
   if (isHidden) {
     // Show settings
     readAloudSettings.classList.add(
@@ -1203,7 +1201,7 @@ export const togglePlayBarSettings = () => {
     readAloudSettings.setAttribute("aria-hidden", "false");
     readAloudSettings.removeAttribute("inert");
     triggerButton?.setAttribute("aria-expanded", "true");
-    
+
     // Focus first menu item after a brief delay for transition
     setTimeout(() => {
       const firstMenuItem = readAloudSettings.querySelector('[role="menuitem"]');
@@ -1220,7 +1218,7 @@ export const togglePlayBarSettings = () => {
     readAloudSettings.setAttribute("aria-hidden", "true");
     readAloudSettings.setAttribute("inert", "");
     triggerButton?.setAttribute("aria-expanded", "false");
-    
+
     // Return focus to trigger button
     triggerButton?.focus();
   }
@@ -1292,8 +1290,8 @@ export const formatNavigationItems = () => {
 
     const metadataHtml = metadataSegments.length
       ? `<div class='text-xs text-gray-500 flex flex-wrap items-center gap-2'>${metadataSegments.join(
-          "<span class='text-gray-300'>•</span>"
-        )}</div>`
+        "<span class='text-gray-300'>•</span>"
+      )}</div>`
       : "";
 
     const pdfBadge = pdfPageLabel
@@ -1440,87 +1438,6 @@ export const extractPageTerms = () => {
   return Array.from(termMap.values()).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 };
 
-// export const adjustPageScale = () => {
-//   const container = document.getElementById("content");
-//   if (!container) return;
-/*
-const viewportHeight = window.innerHeight;
-const pixelRatio = window.devicePixelRatio;
-
-// Calculate the scale factor based only on the height
-const scaleY = viewportHeight / container.offsetHeight;
-const scale = scaleY / pixelRatio;
-
-// Apply the scale to the container
-container.style.transform = `scale(${scale})`;
-container.style.transformOrigin = 'top left'; // Ensure scaling starts from the top-left corner*/
-//};
-
-// export const adjustPageScale = () => {
-//   // Target the html element for the most global effect
-//   const htmlElement = document.documentElement;
-
-//   // Apply a 90% scale to simulate zooming out
-//   htmlElement.style.transform = 'scale(0.9)';
-//   htmlElement.style.transformOrigin = 'top center';
-
-//   // Adjust the width to prevent horizontal scrollbar
-//   // When scaled down to 90%, we need to make the width about 111% (1/0.9)
-//   htmlElement.style.width = '111.1%';
-
-//   // Compensate for the extra space created at the bottom
-//   htmlElement.style.height = '111.1%';
-
-//   // Adjust the margin to center the content
-//   htmlElement.style.marginLeft = '-5.55%'; // Half of the extra width (11.1% / 2)
-
-//   console.log('Applied 90% zoom simulation to entire page');
-// }
-
-// export const adjustPageScale = () => {
-//   const body = document.body;
-//   const pixelRatio = window.devicePixelRatio;
-
-//   // More modern detection of Windows platform
-//   const isWindows = () => {
-//     // Try modern API first
-//     if (navigator.userAgentData && navigator.userAgentData.platform) {
-//       return navigator.userAgentData.platform === 'Windows';
-//     }
-
-//     // Fallback to user agent string checking
-//     return navigator.userAgent.indexOf('Win') !== -1;
-//   };
-
-//   // For Windows with high DPI settings, we need special handling
-//   if (pixelRatio > 1 && isWindows()) {
-
-//     const fixedScale = 0.9;
-
-//     const compensationFactor = (100 / fixedScale);
-
-//     // Rest of your scaling code
-//     document.documentElement.style.setProperty('--page-scale', 1/pixelRatio);
-//     body.style.transform = `scale(${fixedScale})`;
-//     body.style.transformOrigin = 'top left';
-//     body.style.width = `${compensationFactor}%`;
-//     body.style.height = `${compensationFactor}%`;
-
-//     console.log(`Adjusted scale to fixed 90%, scaling entire body. Device pixel ratio: ${pixelRatio}`);
-//   } else {
-//     // Reset any scaling for standard displays
-//     document.documentElement.style.removeProperty('--page-scale');
-//     body.style.transform = '';
-//     body.style.width = '';
-//     body.style.height = '';
-//   }
-// };
-
-// document.addEventListener('DOMContentLoaded', function() {
-//   // Initialize simple zoom
-//   initSimpleZoom();
-// });
-
 /**
  * Checks for Windows scaling and shows a notification if needed.
  * Also initializes the zoom controller.
@@ -1529,12 +1446,8 @@ export const checkWindowsScaling = () => {
   // Initialize the zoom controller first
   initializeZoomController();
 
-  console.log('Checking Windows scaling...', isHighDpiWindows());
-
   // Only show notification if we're on Windows with high DPI and haven't shown it before
   if (isHighDpiWindows() && localStorage.getItem('hasSeenScalingNotice') !== 'true') {
-    //if (true) {
-    console.log('High DPI Windows detected, showing notification');
 
     // Create notification container
     const notification = document.createElement('div');
@@ -1561,53 +1474,11 @@ export const checkWindowsScaling = () => {
       </div>
     `;
 
-    // <button id="apply-zoom-out" onclick="this.closest('.fixed').remove(); console.log('Zoom applied')" class="text-sm px-3 py-1 bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors">
-    //       Zoom to 75%
-    //     </button>
-    //     <button id="show-zoom-controls" class="text-sm px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded transition-colors">
-    //       Show zoom controls
-    //     </button>
-
     // Add to document
     document.body.appendChild(notification);
 
-    // const applyZoomNew = () => {
-
-    //       // Apply zoom to body
-    //       if (body) {
-    //         body.style.transform = `scale(${zoomLevel})`;
-    //         body.style.transformOrigin = 'top center';
-    //         body.style.width = `${inverseZoom * 100}%`;
-    //         body.style.minHeight = `${inverseZoom * 100}vh`;
-    //         body.style.overflowY = 'auto'; // Allow vertical scrolling
-    //         body.style.overflowX = 'hidden'; // Prevent horizontal scrolling
-    //       }
-    //     };
-
-    // // Add zoom out handler
-    // document.getElementById('apply-zoom-out').addEventListener('click', () => {
-    //   // Set zoom to compensate for 150% scaling (1/1.5 ≈ 0.67)
-    //   console.log('zooming out');
-
-    //   document.body.style.zoom = 0.75;
-    //   //setNativeZoom(0.75);
-
-    //   // Show zoom controls
-    //   createZoomControls();
-
-    //   // Close notification
-    //   notification.remove();
-    // });
-
-    // Add show controls handler
-    // document.getElementById('show-zoom-controls').addEventListener('click', () => {
-    //   createZoomControls();
-    //   notification.remove();
-    // });
-
     // Add dismiss handler
     document.getElementById('dismiss-scaling-notice').addEventListener('click', () => {
-      console.log('Dismissing scaling notice');
       // Close notification
       notification.remove();
       localStorage.setItem('hasSeenScalingNotice', 'true');
@@ -1634,14 +1505,12 @@ export const createZoomResetButton = () => {
 function removeResetZoomButton() {
   const existingButton = document.getElementById('zoom-reset-button');
   if (existingButton) {
-    console.log('Removing zoom reset button');
     existingButton.remove();
   }
 }
 
 // Add a direct zoom function to test functionality
 export const testZoom = (level) => {
-  console.log(`Testing zoom at level: ${level}`);
   return setNativeZoom(level);
 };
 
@@ -1654,7 +1523,6 @@ export const showZoomResetButton = () => {
 
 // Initial check on load - using window.onload instead of DOMContentLoaded to ensure everything is loaded
 window.addEventListener('load', () => {
-  console.log('Window loaded, checking scaling...');
   setTimeout(checkWindowsScaling, 500); // Slight delay to ensure everything is ready
 });
 

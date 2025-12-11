@@ -86,8 +86,6 @@ const saveSelectionState = (option) => {
     };
 
     localStorage.setItem(storageKey, JSON.stringify(selectedData));
-
-    console.log(`Selection saved: ${storageKey}`, selectedData);
 };
 
 const restorePreviousSelection = (section) => {
@@ -109,25 +107,19 @@ const restorePreviousSelection = (section) => {
         if (selectedOption) {
             selectClickedOption(selectedOption);
             setState('selectedOption', selectedOption);
-            console.log(`Selection restored: ${storageKey}`, savedSelection);
         }
     }
 };
 
 
 const selectOption = (option) => {
-    console.log("=== Selecting option ===");
-
     // Clear all validation styling before selecting a new option
     clearAllValidationStyling();
 
     const activityItem = getActivityItem(option);
-    console.log("Option selected:", option);
-    console.log("Activity item found:", activityItem);
 
     const radioGroup = option.closest('[role="radiogroup"]') || option.closest('[role="group"]');
     if (!radioGroup) {
-        console.log("No radio group found");
         return;
     }
 
@@ -161,45 +153,45 @@ const clearAllValidationStyling = () => {
         mark.classList.add('hidden');
         mark.textContent = '';
     });
-    
+
     // Reset all option containers
     document.querySelectorAll(".activity-option").forEach(option => {
         option.classList.remove('bg-green-50', 'bg-red-50');
         option.removeAttribute('aria-invalid');
-        
+
         // Reset all feedback containers
         const feedback = option.querySelector('.feedback-container');
         if (feedback) {
             feedback.classList.add('hidden');
-            
+
             // Clear feedback content
             const feedbackIcon = feedback.querySelector('.feedback-icon');
             const feedbackText = feedback.querySelector('.feedback-text');
-            
+
             if (feedbackIcon) {
                 feedbackIcon.className = 'feedback-icon';
                 feedbackIcon.textContent = '';
             }
-            
+
             if (feedbackText) {
                 feedbackText.className = 'feedback-text';
                 feedbackText.textContent = '';
             }
         }
-        
+
         // Reset letter circle styling
         const letterCircle = option.querySelector('.option-letter')?.parentElement;
         if (letterCircle) {
             letterCircle.className = 'w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center';
         }
-        
+
         // Reset the letter color
         const letter = option.querySelector('.option-letter');
         if (letter) {
             letter.className = 'option-letter text-gray-500';
         }
     });
-    
+
     // Announce change to screen readers
     const validationResults = document.getElementById('validation-results-announcement');
     if (validationResults) {
@@ -209,8 +201,6 @@ const clearAllValidationStyling = () => {
 
 const resetOptions = (radioGroup) => {
     radioGroup.querySelectorAll(".activity-option").forEach((opt) => {
-        console.log("Resetting option:", opt);
-
         // Reset aria attributes
         opt.setAttribute('aria-checked', 'false');
 
@@ -280,11 +270,7 @@ const getActivityItem = (element) => {
 };
 
 export const checkMultipleChoice = () => {
-    console.log("=== Starting validation ===");
-
     if (!state.selectedOption) {
-        console.log("No option selected");
-        
         // Add announcement for screen readers
         const liveRegion = document.getElementById('toast');
         if (liveRegion) {
@@ -295,7 +281,7 @@ export const checkMultipleChoice = () => {
                 liveRegion.classList.add('hidden');
             }, 3000);
         }
-        
+
         return;
     }
 
@@ -308,7 +294,7 @@ export const checkMultipleChoice = () => {
     // Add this line to update reset button visibility
     if (typeof updateResetButtonVisibility === 'function') {
         updateResetButtonVisibility();
-      }
+    }
     updateSubmitButtonAndToast(
         isCorrect,
         translateText("next-activity"),
@@ -337,49 +323,49 @@ const showFeedback = (option, isCorrect) => {
     feedbackContainer.classList.remove('hidden');
 
     const activityId = location.pathname
-    .substring(location.pathname.lastIndexOf("/") + 1)
-    .split(".")[0];
+        .substring(location.pathname.lastIndexOf("/") + 1)
+        .split(".")[0];
     let key = activityId + "-intentos";
     let intentCount = localStorage.getItem(key);
     if (intentCount === null) {
-            localStorage.setItem(key, "0");
-            intentCount = 0;
-        } else {
-            intentCount = parseInt(intentCount, 10);
-        }
+        localStorage.setItem(key, "0");
+        intentCount = 0;
+    } else {
+        intentCount = parseInt(intentCount, 10);
+    }
 
-        intentCount++;
-        localStorage.setItem(key, intentCount.toString()); 
+    intentCount++;
+    localStorage.setItem(key, intentCount.toString());
 
     if (isCorrect) {
         feedbackIcon.className = 'feedback-icon w-5 h-5 rounded-full flex items-center justify-center text-sm bg-green-100 text-green-700';
         feedbackIcon.textContent = '✓';
         feedbackText.className = 'feedback-text text-sm font-medium text-green-700';
         feedbackText.textContent = translateText('multiple-choice-correct-answer');
-        
+
         // Set ARIA attributes for feedback
         feedbackContainer.setAttribute('role', 'status');
         feedbackContainer.setAttribute('aria-live', 'polite');
-        
+
         playActivitySound('success');
 
         // Recuperar el arreglo de actividades completadas del localStorage
         const storedActivities = localStorage.getItem("completedActivities");
-        let completedActivities = storedActivities ? JSON.parse(storedActivities) : []; 
-    
+        let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
+
         const namePage = localStorage.getItem("namePage");
         const timeDone = new Date().toLocaleString("es-ES");
         const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
-    
+
         // Remover cualquier entrada anterior con el mismo activityId
         completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
-    
+
         // Agregar la nueva entrada actualizada
         completedActivities.push(newActivityId);
-    
+
         // Guardar en localStorage
         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
-    
+
         localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
         executeMail(ActivityTypes.MULTIPLE_CHOICE);
     } else {
@@ -387,10 +373,10 @@ const showFeedback = (option, isCorrect) => {
         feedbackIcon.textContent = '✗';
         feedbackText.className = 'feedback-text text-sm font-medium text-red-700';
         feedbackText.textContent = translateText('multiple-choice-try-again');
-        
+
         // Set ARIA attributes for feedback
         feedbackContainer.setAttribute('role', 'alert');
-        
+
         playActivitySound('error');
     }
 };
