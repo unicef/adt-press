@@ -181,14 +181,21 @@ def metadata_report(
 def web_report(
     template_config: TemplateConfig,
     web_pages: list[WebPage],
+    plate: Plate,
     plate_sections_by_id: dict[str, PlateSection],
 ) -> str:
+    sections_lookup = dict(plate_sections_by_id)
+    for quiz in plate.quizzes:
+        parent_section = plate_sections_by_id.get(quiz.section_id)
+        if parent_section and quiz.quiz_id not in sections_lookup:
+            sections_lookup[quiz.quiz_id] = parent_section
+
     return render_template(
         template_config,
         "templates/web_report.html",
         dict(
             web_pages=web_pages,
-            sections=plate_sections_by_id,
+            sections=sections_lookup,
         ),
     )
 
