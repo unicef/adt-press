@@ -169,6 +169,46 @@ def install_fontawesome(run_output_dir_config: str) -> None:
             shutil.copytree(source_fa_dir, fontawesome_dir, dirs_exist_ok=True)
 
 
+def install_mathjax(run_output_dir_config: str) -> None:
+    """Install MathJax via npm and copy to assets/libs directory."""
+    adt_dir = os.path.join(run_output_dir_config, "adt")
+    build_dir = os.path.join(run_output_dir_config, "build")
+    mathjax_dir = os.path.join(adt_dir, "assets", "libs", "mathjax")
+
+    # Remove existing mathjax
+    if os.path.exists(mathjax_dir):
+        shutil.rmtree(mathjax_dir)
+
+    # Create mathjax directory
+    os.makedirs(mathjax_dir, exist_ok=True)
+
+    try:
+        # Install MathJax via npm
+        subprocess.run(
+            ["npm", "install", "mathjax@3"],
+            cwd=build_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        # Get MathJax source directory
+        mathjax_source = os.path.join(build_dir, "node_modules", "mathjax")
+
+        # Copy the es5 directory which contains the browser-ready files
+        es5_source_dir = os.path.join(mathjax_source, "es5")
+        es5_target_dir = os.path.join(mathjax_dir, "es5")
+        if os.path.exists(es5_source_dir):
+            shutil.copytree(es5_source_dir, es5_target_dir)
+
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Could not install MathJax: {e}")
+        # Fallback to copying from local assets if npm install fails
+        source_mathjax_dir = os.path.join("assets", "web", "assets", "libs", "mathjax")
+        if os.path.exists(source_mathjax_dir):
+            shutil.copytree(source_mathjax_dir, mathjax_dir, dirs_exist_ok=True)
+
+
 def run_npm_build(run_output_dir_config: str) -> None:
     """Run npm install and tailwindcss build commands in the ADT output directory."""
     build_dir = os.path.join(run_output_dir_config, "build")
@@ -190,6 +230,53 @@ def run_npm_build(run_output_dir_config: str) -> None:
         capture_output=True,
         text=True,
     )
+
+
+def bundle_javascript(run_output_dir_config: str) -> None:
+    """Bundle and minify JavaScript files using esbuild."""
+    adt_dir = os.path.join(run_output_dir_config, "adt")
+    assets_dir = os.path.join(adt_dir, "assets")
+    build_dir = os.path.join(run_output_dir_config, "build")
+
+    try:
+        # Install esbuild if not already installed
+        subprocess.run(
+            ["npm", "install", "esbuild"],
+            cwd=build_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        # Bundle base.js with all dependencies (activity.js is already imported in base.js)
+        # Use absolute paths so esbuild can find files regardless of working directory
+        base_input = os.path.abspath(os.path.join(assets_dir, "base.js"))
+        base_output = os.path.abspath(os.path.join(assets_dir, "base.bundle.min.js"))
+
+        subprocess.run(
+            [
+                "npx",
+                "esbuild",
+                base_input,
+                "--bundle",
+                "--minify",
+                "--sourcemap",
+                "--format=esm",
+                "--target=es2020",
+                f"--outfile={base_output}",
+            ],
+            cwd=build_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Could not bundle JavaScript: {e}")
+        print(f"Error output: {e.stderr}")
+        if e.stdout:
+            print(f"Standard output: {e.stdout}")
+        print("Falling back to unbundled JavaScript files")
 
 
 def build_config_json(
@@ -265,7 +352,13 @@ def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:
     # Install Font Awesome
     install_fontawesome(run_output_dir_config)
 
+    # Install MathJax
+    install_mathjax(run_output_dir_config)
+
     # Run npm build process
     run_npm_build(run_output_dir_config)
+
+    # Bundle JavaScript files
+    bundle_javascript(run_output_dir_config)
 
     return "web assets built"

@@ -282,7 +282,7 @@ export const loadDropzoneState = () => {
         const target = dropzone.querySelector("div[role='region']");
 
         words.forEach(wordId => {
-            const wordElement = document.querySelector(`.activity-item[data-activity-item='${wordId}'], .activity-item[data-id='${wordId}']`);
+            let wordElement = document.querySelector(`.activity-item[data-activity-item='${wordId}'], .activity-item[data-id='${wordId}']`);
 
             if (!wordElement) {
                 return;
