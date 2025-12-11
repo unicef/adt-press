@@ -43,8 +43,6 @@ class TextTranscriptEvaluator(BaseEvaluator):
         # Get the most recent annotation
         latest_annotation = max(tc['annotations'], key=lambda x: x['updated_at'])
         truth = [i["result"] for i in tc["annotations"] if i['id']==latest_annotation['id']][0]
-        print("truth list=========")
-        print(truth)
         result = {
             "id": tc["id"],
             "book_title": book_title,
@@ -75,7 +73,7 @@ class TextTranscriptEvaluator(BaseEvaluator):
         tt = [i for i in truth if i["from_name"] == "page_text_all_corrected"][0]
         print(tt["value"]["text"])
         text_content = tt["value"]["text"][0]
-        gs_texts = [standardize_transcript(t) for t in text_content.split("\n\n")]
+        gs_texts = [standardize_transcript(t) for t in text_content.split(" \n\n ")]
 
         ####### Calculate metrics
         
@@ -108,31 +106,10 @@ class TextTranscriptEvaluator(BaseEvaluator):
                 llm_texts.remove(i)
                 n_matched+=1
             else:
-                # Find the best match among all llm_texts
-                best_match = None
-                best_similarity = 0.0
-                
-                for j in llm_texts:
-                    intersection = set(j).intersection(set(i))
-                    union = set(j).union(set(i))
-                    similarity_score = len(intersection) / len(union)
-                    print(f"similarity_score: {similarity_score:.3f}")
-                    
-                    if similarity_score > best_similarity:
-                        best_similarity = similarity_score
-                        best_match = j
-                
-                # Match only if best similarity is at least 50%
-                if best_similarity >= 0.5:
-                    matches.append({"expected": i, "actual": best_match})
-                    llm_texts.remove(best_match)
-                    n_matched += 1
-                else:
-                    matches.append({"expected": i, "actual": None})
-                    n_mismatched += 1
+                matches.append({"expected": i, "actual": None})
+                n_mismatched+=1
 
         # Add unmatched llm texts
-        # If we only want left join (left = label studio, right = llm, this part should be deleted)
         for i in llm_texts:
             matches.append({"expected": None, "actual": i})
             n_mismatched+=1
