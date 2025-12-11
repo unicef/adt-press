@@ -6,8 +6,8 @@ import { prepareSorting } from './modules/activities/sorting.js';
 import { prepareMatching } from './modules/activities/matching.js';
 import { prepareTrueFalse } from './modules/activities/true_false.js';
 import { validateInputs } from './modules/activities/validation.js';
-import { preparefillInBlank } from './modules/activities/fill_in_blank.js';
-import { prepareFillInTable } from './modules/activities/fill_in_table.js';
+import { preparefillInBlank } from './modules/activities/fill_in_the_blank.js';
+import { prepareFillInTable } from './modules/activities/fill_in_a_table.js';
 import { prepareOpenEnded } from './modules/activities/open_ended.js';
 import { translateText } from './modules/translations.js';
 import { nextPage } from './modules/navigation.js';
@@ -26,8 +26,8 @@ const CLASS_NAMES = {
 };
 
 const SELECTORS = {
-    FILL_IN_BLANK: 'section[data-section-type="activity_fill_in_the_blank"]',
-    FILL_IN_TABLE: 'section[data-section-type="activity_fill_in_a_table"]',
+    FILL_IN_THE_BLANK: 'section[data-section-type="activity_fill_in_the_blank"]',
+    FILL_IN_A_TABLE: 'section[data-section-type="activity_fill_in_a_table"]',
     MULTIPLE_CHOICE: 'section[data-section-type="activity_multiple_choice"]',
     TRUE_FALSE: 'section[data-section-type="activity_true_false"]',
     OPEN_ENDED: 'section[data-section-type="activity_open_ended_answer"]'
@@ -248,14 +248,14 @@ function initializeActivityHandlers() {
     // Add handlers to the object using ActivityTypes (now safe to use)
     activityResetHandlers[ActivityTypes.FILL_IN_THE_BLANK] = (activityId) => {
         resetActivityBase(activityId, {
-            sectionSelector: SELECTORS.FILL_IN_BLANK,
+            sectionSelector: SELECTORS.FILL_IN_THE_BLANK,
             inputSelector: 'input[type="text"]:not(#filter-input)'
         });
     };
 
     activityResetHandlers[ActivityTypes.FILL_IN_A_TABLE] = (activityId) => {
         resetActivityBase(activityId, {
-            sectionSelector: SELECTORS.FILL_IN_TABLE,
+            sectionSelector: SELECTORS.FILL_IN_A_TABLE,
             inputSelector: 'input[type="text"]:not(#filter-input), textarea:not(#filter-input)'
         });
     };

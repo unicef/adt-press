@@ -55,7 +55,7 @@ const activity = () => {
   if (document.getElementsByTagName("h1").length < 0) {
     localStorage.setItem("namePage", document.getElementsByTagName("h2")[0].innerText);
 } else if (document.getElementsByTagName("h1").length > 0) {
-    localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText);
+    localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 }
 
   

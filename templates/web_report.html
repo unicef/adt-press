@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Generated Web Pages{% endblock %}
 {% block head %}
-    <link rel="stylesheet" href="adt/content/tailwind_output.css">
 {% endblock %}
 {% block content %}
 
@@ -22,50 +21,168 @@
             {{ page.reasoning|e }}
             <div class="clear-both"></div>
         </div>
-            <!-- Section Metadata -->
 
         {% with section = sections[page.section_id] %}
+        {% set is_activity = section.section_type.startswith('activity_') %}
+        {% set has_answers = page.activity_answers and page.activity_answers|length > 0 %}
+        
+        <!-- Section Metadata and Activity Answers (side by side) -->
         <div class="border-t overflow-hidden">
-            <!-- Metadata Header -->
-            <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
-                Section Metadata
-            </div>
-            <!-- Metadata Content -->
-            <div class="p-3">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <!-- Background Color -->
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.background_color }}"></div>
-                        <div class="text-sm">
-                            <div class="font-medium text-gray-700">Background</div>
-                            <div class="text-gray-600">{{ section.background_color }}</div>
-                        </div>
+            {% if is_activity %}
+            <!-- Two-column layout for activities -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                
+                <!-- Section Metadata Column -->
+                <div class="lg:border-r">
+                    <!-- Metadata Header -->
+                    <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                        Section Metadata
                     </div>
-                    <!-- Text Color -->
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.text_color }}"></div>
-                        <div class="text-sm">
-                            <div class="font-medium text-gray-700">Text Color</div>
-                            <div class="text-gray-600">{{ section.text_color }}</div>
-                        </div>
-                    </div>
-                    <!-- Layout Type -->
-                    <div class="flex items-center gap-2">
-                        <div class="text-sm">
-                            <div class="font-medium text-gray-700">Layout Type</div>
-                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ section.layout_type }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Render Strategy -->
-                    <div class="flex items-center gap-2">
-                        <div class="text-sm">
-                            <div class="font-medium text-gray-700">Render Strategy</div>
-                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ page.render_strategy }}</span>
+                    <!-- Metadata Content -->
+                    <div class="p-3">
+                        <div class="grid grid-cols-1 gap-3">
+                            <!-- Section Type -->
+                            <div class="flex items-center gap-2">
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-700">Section Type</div>
+                                    <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded font-mono">{{ section.section_type }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Background Color -->
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.background_color }}"></div>
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-700">Background</div>
+                                    <div class="text-gray-600">{{ section.background_color }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Text Color -->
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.text_color }}"></div>
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-700">Text Color</div>
+                                    <div class="text-gray-600">{{ section.text_color }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Render Strategy -->
+                            <div class="flex items-center gap-2">
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-700">Render Strategy</div>
+                                    <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ page.render_strategy }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>            
+
+                <!-- Activity Answers Column -->
+                <div>
+                    <!-- Activity Answers Header -->
+                    <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                        Activity Answer Generation
+                    </div>
+                    <!-- Activity Answers Content -->
+                    <div class="p-3">
+                        <!-- Reasoning (always shown for activities) -->
+                        {% if page.activity_reasoning %}
+                        <div class="mb-3 bg-blue-50 p-2 rounded border border-blue-200">
+                            <div class="font-semibold text-blue-800 text-xs mb-1">Reasoning:</div>
+                            <div class="text-sm text-blue-900 italic">{{ page.activity_reasoning }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Answers Section -->
+                        {% if has_answers %}
+                            <div class="mb-2">
+                                <span class="font-semibold text-gray-700">Answers Generated:</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded ml-1">{{ page.activity_answers|length }} answer(s)</span>
+                            </div>
+                            <div class="bg-white rounded p-2 border border-gray-300 max-h-80 overflow-y-auto">
+                                <table class="w-full text-xs">
+                                    <thead class="sticky top-0 bg-white">
+                                        <tr class="border-b border-gray-300">
+                                            <th class="text-left py-1 px-2 font-semibold text-gray-700">Item ID</th>
+                                            <th class="text-left py-1 px-2 font-semibold text-gray-700">Answer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item_id, answer in page.activity_answers.items() %}
+                                        <tr class="border-b border-gray-100">
+                                            <td class="py-1 px-2 font-mono text-gray-600">{{ item_id }}</td>
+                                            <td class="py-1 px-2">
+                                                {% if answer %}
+                                                    <span class="text-gray-900">{{ answer }}</span>
+                                                {% else %}
+                                                    <span class="text-gray-400 italic">(empty - open-ended exercise)</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
+                                <div class="text-sm text-yellow-800">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    No answers generated for this activity.
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            {% else %}
+            <!-- Single column layout for non-activities -->
+            <div>
+                <!-- Metadata Header -->
+                <div class="bg-gray-600 text-white px-3 py-2 text-sm font-medium">
+                    Section Metadata
+                </div>
+                <!-- Metadata Content -->
+                <div class="p-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Section Type -->
+                        <div class="flex items-center gap-2">
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-700">Section Type</div>
+                                <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded font-mono">{{ section.section_type }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Background Color -->
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.background_color }}"></div>
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-700">Background</div>
+                                <div class="text-gray-600">{{ section.background_color }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Text Color -->
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 border border-gray-300 rounded" style="background-color: {{ section.text_color }}"></div>
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-700">Text Color</div>
+                                <div class="text-gray-600">{{ section.text_color }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Render Strategy -->
+                        <div class="flex items-center gap-2">
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-700">Render Strategy</div>
+                                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{{ page.render_strategy }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
         {% endwith %}
     </div>

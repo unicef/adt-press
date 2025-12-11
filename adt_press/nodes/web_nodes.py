@@ -4,9 +4,17 @@ from typing import Any
 
 from hamilton.function_modifiers import cache
 
+from adt_press.llm.web_generation_activity import generate_web_page_activity
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_template import generate_web_page_template
-from adt_press.models.config import HTMLPromptConfig, LayoutType, RenderStrategy, TemplateConfig, TemplateRenderConfig
+from adt_press.models.config import (
+    HTMLPromptConfig,
+    PromptConfig,
+    RenderStrategy,
+    SectionType,
+    TemplateConfig,
+    TemplateRenderConfig,
+)
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
@@ -22,9 +30,11 @@ def web_pages(
     plate_language_config: str,
     plate: Plate,
     default_model_config: str,
-    layout_types_config: dict[str, LayoutType],
+    section_types_config: dict[str, SectionType],
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
+    activity_prompts_config: dict[str, HTMLPromptConfig],
+    activity_answers_prompts_config: dict[str, PromptConfig],
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
@@ -52,23 +62,26 @@ def web_pages(
                 elif part_id.startswith("img_"):
                     images.append(images_by_id[part_id])
 
-            layout_type = layout_types_config.get(section.layout_type)
-            if not layout_type:
-                raise ValueError(f"Unknown layout type: {section.layout_type}")
+            # Get section type configuration
+            section_type_obj = section_types_config.get(section.section_type)
+            if not section_type_obj:
+                raise ValueError(f"Unknown section type: {section.section_type}")
 
             strategy_name = render_strategy_config
             if strategy_name == "dynamic":
-                strategy_name = layout_type.render_strategy
+                # Use section_type's render_strategy instead of layout_type's
+                strategy_name = section_type_obj.render_strategy
 
             strategy = render_strategies_config.get(strategy_name)
-            if not strategy:
-                raise ValueError(f"Unknown render strategy: {strategy_name}")
-
-            config = cached_configs.get(strategy_name)
+            specific_activity_config = activity_prompts_config.get(section.section_type)
+            cache_key = f"{strategy_name}::{section.section_type}" if specific_activity_config else strategy_name
+            config = cached_configs.get(cache_key)
             if not config:
                 if "model" in strategy.config and strategy.config["model"] == "default":
                     strategy.config["model"] = default_model_config
                 if strategy.render_type == "html":
+                    config = HTMLPromptConfig.model_validate(strategy.config)
+                elif strategy.render_type == "activity":
                     config = HTMLPromptConfig.model_validate(strategy.config)
                 elif strategy.render_type == "template":
                     config = TemplateRenderConfig.model_validate(strategy.config)
@@ -82,6 +95,21 @@ def web_pages(
                 )
             elif strategy.render_type == "template":
                 web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
+            elif strategy.render_type == "activity":
+                web_pages.append(
+                    generate_web_page_activity(
+                        strategy_name,
+                        config,
+                        config.examples,
+                        section,
+                        groups,
+                        texts,
+                        images,
+                        plate_language_config,
+                        activity_prompts_config,
+                        activity_answers_prompts_config,
+                    )
+                )
 
         return await gather_with_limit(web_pages, 300)
 
@@ -159,7 +187,14 @@ def package_adt_web(
         render_template(
             template_config,
             "webpage.html",
-            dict(content=content, webpage=webpage, section=section, language=plate_language_config, webpage_number=webpage_index + 1),
+            dict(
+                content=content,
+                webpage=webpage,
+                section=section,
+                language=plate_language_config,
+                webpage_number=webpage_index + 1,
+                activity_answers=webpage.activity_answers,  # Add this
+            ),
             output_name=f"adt/{webpage.section_id}.html",
         )
 

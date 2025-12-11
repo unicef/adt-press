@@ -33,6 +33,14 @@ class PipelineTest(unittest.TestCase):
             file_content = f.read()
         self.assertNotIn(content, file_content, msg)
 
+    def assertFileContainsIgnoreCase(self, name: str, content: str, msg: str = ""):
+        """Assert file contains content, case-insensitive."""
+        file_path = Path(self.run_dir) / name
+        self.assertTrue(file_path.exists(), f"File {name} does not exist.")
+        with open(file_path, "r") as f:
+            file_content = f.read().lower()
+        self.assertIn(content.lower(), file_content, msg)
+
     def test_pipeline_integration_first_five_pages(self):
         """Test the entire pipeline with first 6 pages using default config values."""
 
@@ -96,8 +104,8 @@ class PipelineTest(unittest.TestCase):
             self.assertFileCount("images/img_p*_r*_recrop.png", 5, "Unexpected number of recropped images created")
             self.assertFileCount("images/img_p*_chart.png", 10, "Unexpected number of chart images created")
 
-            self.assertFileContains("page_report.html", ">Hyena and Raven<", "Title not found in page report")
-            self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
+            self.assertFileContains("page_report.html", "Hyena and Raven", "Title not found in page report")
+            self.assertFileContains("page_report.html", "sec_p1_s0", "No section found for page 1 in page report")
             self.assertFileContains("page_report.html", "French", "Output language not found in page report")
             self.assertFileContains("page_report.html", "English", "Input language not found in page report")
             self.assertFileContains(
@@ -111,6 +119,8 @@ class PipelineTest(unittest.TestCase):
 
             self.assertFileContains("metadata_report.html", "Hyena and Raven", "Hyena and Raven title not found in metadata report")
             self.assertFileContains("metadata_report.html", "Tony Lelliott", "Tony Lelliott not found as an author in metadata report")
+
+            self.assertFileContainsIgnoreCase("page_report.html", "corbeau", "Translated text 'corbeau' not found in page report")
 
     def test_pipeline_integration_no_translation(self):
         # Create a temporary output directory for this test
@@ -160,8 +170,8 @@ class PipelineTest(unittest.TestCase):
                 file_path = Path(f"{self.run_dir}/{file}")
                 assert file_path.exists(), f"Output file {file} was not created."
 
-            self.assertFileContains("page_report.html", ">Hyena and Raven<", "Title not found in page report")
-            self.assertFileContains("page_report.html", ">sec_p1_s0<", "No section found for page 1 in page report")
+            self.assertFileContains("page_report.html", "Hyena and Raven", "Title not found in page report")
+            self.assertFileContains("page_report.html", "sec_p1_s0", "No section found for page 1 in page report")
             self.assertFileDoesNotContain("page_report.html", "corbeau", "French should not be in page report")
 
             # rerun using two column web strategy

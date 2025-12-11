@@ -23,7 +23,7 @@ const initializeAudio = () => {
 if (document.getElementsByTagName("h1").length < 0) {
     localStorage.setItem("namePage", document.getElementsByTagName("h2")[0].innerText);
 } else if (document.getElementsByTagName("h1").length > 0) {
-    localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText);
+    localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 }
 
 // Inside the enhanceKeyboardAccessibility function
@@ -323,8 +323,8 @@ export const checkTrueFalse = () => {
          // Guardar en localStorage
          localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
      
-        localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
-        console.log(document.getElementsByTagName("h1")[0].innerText);
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
+        console.log(document.querySelector("h1")?.innerText ?? "unknown_page");
 
         executeMail(ActivityTypes.TRUE_FALSE);
 
