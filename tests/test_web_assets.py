@@ -215,3 +215,205 @@ class TestRunNpmBuild:
                 # All subprocess calls should capture output
                 for call_item in mock_run.call_args_list:
                     assert call_item[1]["capture_output"] is True
+
+
+class TestInstallMathJax:
+    """Test installing MathJax."""
+
+    def test_install_mathjax_success(self):
+        """Test successful MathJax installation."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mock_result = MagicMock(returncode=0, stdout="", stderr="")
+
+            with patch("subprocess.run", return_value=mock_result) as mock_run:
+                with patch("shutil.rmtree"):
+                    with patch("os.makedirs"):
+                        with patch("os.path.exists", return_value=True):
+                            with patch("shutil.copytree"):
+                                from adt_press.utils.web_assets import install_mathjax
+
+                                install_mathjax(tmpdir)
+
+                # Should run npm install for mathjax@3
+                mock_run.assert_called_once()
+                cmd = mock_run.call_args[0][0]
+                assert cmd[0] == "npm"
+                assert cmd[1] == "install"
+                assert "mathjax@3" in cmd[2]
+                assert mock_run.call_args[1]["capture_output"] is True
+
+    def test_install_mathjax_fallback(self):
+        """Test fallback to local assets when npm fails."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+
+            def run_side_effect(*args, **kwargs):
+                raise subprocess.CalledProcessError(1, "npm", "Network error")
+
+            with patch("subprocess.run", side_effect=run_side_effect):
+                with patch("shutil.rmtree"):
+                    with patch("os.makedirs"):
+                        with patch("os.path.exists", return_value=True):
+                            with patch("shutil.copytree") as mock_copytree:
+                                from adt_press.utils.web_assets import install_mathjax
+
+                                # Should not raise, should fallback
+                                install_mathjax(tmpdir)
+
+                                # Should attempt to copy from local assets
+                                assert mock_copytree.called
+
+
+class TestBundleJavaScript:
+    """Test JavaScript bundling."""
+
+    def test_bundle_javascript_success(self):
+        """Test successful JavaScript bundling."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mock_result = MagicMock(returncode=0, stdout="", stderr="")
+
+            with patch("subprocess.run", return_value=mock_result) as mock_run:
+                with patch("os.path.abspath", side_effect=lambda x: f"/abs{x}"):
+                    from adt_press.utils.web_assets import bundle_javascript
+
+                    bundle_javascript(tmpdir)
+
+                # Should install esbuild then bundle
+                assert mock_run.call_count == 2
+
+                # First call: npm install esbuild
+                npm_call = mock_run.call_args_list[0]
+                assert npm_call[0][0][0] == "npm"
+                assert npm_call[0][0][1] == "install"
+                assert "esbuild" in npm_call[0][0][2]
+
+                # Second call: esbuild bundling
+                esbuild_call = mock_run.call_args_list[1]
+                assert "esbuild" in esbuild_call[0][0]
+                assert "--bundle" in esbuild_call[0][0]
+                assert "--minify" in esbuild_call[0][0]
+                assert "--sourcemap" in esbuild_call[0][0]
+
+    def test_bundle_javascript_failure_graceful(self):
+        """Test that bundling failure is handled gracefully."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+
+            def run_side_effect(*args, **kwargs):
+                # npm install succeeds, esbuild fails
+                if "npm" in args[0][0]:
+                    return MagicMock(returncode=0, stdout="", stderr="")
+                raise subprocess.CalledProcessError(1, "esbuild", stderr="Parse error")
+
+            with patch("subprocess.run", side_effect=run_side_effect):
+                with patch("os.path.abspath", side_effect=lambda x: f"/abs{x}"):
+                    from adt_press.utils.web_assets import bundle_javascript
+
+                    # Should not raise, should print warning
+                    bundle_javascript(tmpdir)
+
+
+class TestBuildConfigJson:
+    """Test config.json building."""
+
+    def test_build_config_with_defaults(self):
+        """Test building config with default feature flags."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mock_template_config = MagicMock()
+
+            with patch("adt_press.utils.web_assets.render_template") as mock_render:
+                with patch("os.makedirs"):
+                    from adt_press.utils.web_assets import build_config_json
+
+                    build_config_json(
+                        mock_template_config,
+                        tmpdir,
+                        book_title="Test Book",
+                        languages=["en", "es"],
+                        default_language="en",
+                        strategy_config={"speech_strategy": "openai"},
+                    )
+
+                    # Should call render_template
+                    mock_render.assert_called_once()
+
+                    # Check template context
+                    call_args = mock_render.call_args[0]
+                    context = call_args[2]
+                    assert context["book_title"] == "Test Book"
+                    assert context["languages"] == ["en", "es"]
+                    assert context["default_language"] == "en"
+                    assert "features" in context
+                    assert context["features"]["readAloud"] is True
+
+    def test_build_config_with_feature_overrides(self):
+        """Test building config with feature overrides."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mock_template_config = MagicMock()
+
+            with patch("adt_press.utils.web_assets.render_template") as mock_render:
+                with patch("os.makedirs"):
+                    from adt_press.utils.web_assets import build_config_json
+
+                    build_config_json(
+                        mock_template_config,
+                        tmpdir,
+                        book_title="Test",
+                        languages=["en"],
+                        default_language="en",
+                        strategy_config={},
+                        feature_overrides={"notepad": True, "highlight": True},
+                    )
+
+                    # Check overrides were applied
+                    context = mock_render.call_args[0][2]
+                    assert context["features"]["notepad"] is True
+                    assert context["features"]["highlight"] is True
+
+
+class TestBuildWebAssets:
+    """Test main build_web_assets orchestrator."""
+
+    def test_build_web_assets_calls_all_functions(self):
+        """Test that build_web_assets calls all sub-functions."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch("adt_press.utils.web_assets.copy_web_assets") as mock_copy:
+                with patch("adt_press.utils.web_assets.copy_build_files") as mock_build_files:
+                    with patch("adt_press.utils.web_assets.copy_interface_translations") as mock_translations:
+                        with patch("adt_press.utils.web_assets.install_dictionaries") as mock_dict:
+                            with patch("adt_press.utils.web_assets.install_fontawesome") as mock_fa:
+                                with patch("adt_press.utils.web_assets.install_mathjax") as mock_mj:
+                                    with patch("adt_press.utils.web_assets.run_npm_build") as mock_npm:
+                                        with patch("adt_press.utils.web_assets.bundle_javascript") as mock_bundle:
+                                            from adt_press.utils.web_assets import build_web_assets
+
+                                            result = build_web_assets(tmpdir, ["en", "es"])
+
+                                            # All functions should be called
+                                            mock_copy.assert_called_once()
+                                            mock_build_files.assert_called_once()
+                                            mock_translations.assert_called_once_with(tmpdir, ["en", "es"])
+                                            mock_dict.assert_called_once_with(tmpdir, ["en", "es"])
+                                            mock_fa.assert_called_once()
+                                            mock_mj.assert_called_once()
+                                            mock_npm.assert_called_once()
+                                            mock_bundle.assert_called_once()
+
+                                            assert result == "web assets built"
+
+    def test_build_web_assets_without_languages(self):
+        """Test build_web_assets when no languages provided."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch("adt_press.utils.web_assets.copy_web_assets"):
+                with patch("adt_press.utils.web_assets.copy_build_files"):
+                    with patch("adt_press.utils.web_assets.copy_interface_translations") as mock_translations:
+                        with patch("adt_press.utils.web_assets.install_dictionaries") as mock_dict:
+                            with patch("adt_press.utils.web_assets.install_fontawesome"):
+                                with patch("adt_press.utils.web_assets.install_mathjax"):
+                                    with patch("adt_press.utils.web_assets.run_npm_build"):
+                                        with patch("adt_press.utils.web_assets.bundle_javascript"):
+                                            from adt_press.utils.web_assets import build_web_assets
+
+                                            build_web_assets(tmpdir, [])
+
+                                            # Should not call language-specific functions
+                                            mock_translations.assert_not_called()
+                                            mock_dict.assert_not_called()
