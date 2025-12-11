@@ -443,9 +443,12 @@ export const prepareActivity = () => {
     const resetButton = document.getElementById("reset-button");
 
     if (activitySections.length === 0) {
-        if (submitButton) submitButton.style.display = "none";
-        if (resetButton) resetButton.style.display = "none";
+        if (submitButton) submitButton.classList.add("hidden");
+        if (resetButton) resetButton.classList.add("hidden");
         return;
+    } else {
+        if (submitButton) submitButton.classList.remove("hidden");
+        if (resetButton) resetButton.classList.remove("hidden");
     }
 
     if (!submitButton) {

@@ -25,6 +25,7 @@ LANGUAGE: {{ language }}.
 11. RETURN ONLY AN HTML FRAGMENT. DO NOT OUTPUT `<!DOCTYPE>`, `<html>`, `<head>`, OR `<body>` TAGS.
 12. RESPOND WITH VALID HTML MARKUP ONLY. DO NOT INCLUDE COMMENTS, EXPLANATIONS, OR TEXT OUTSIDE OF HTML TAGS.
 13. **IF YOU NEED TO PROVIDE ANY REASONING OR EXPLANATION, IT MUST BE IN ENGLISH** (even if the content language is different).
+14. DO NOT include <script> or <link> tags for Tailwind CSS or any other external resources. Assume Tailwind CSS is already loaded in the parent document.
 
 IMPORTANT NOTES FOR IMAGE TAGS:
 1. Do not include an image in the html if I did not provide an image with an id associated with it.
