@@ -3,7 +3,6 @@ import shutil
 from typing import Any
 
 import structlog
-
 from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation_activity import generate_web_page_activity
@@ -45,7 +44,6 @@ def web_pages(
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
     quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
-    quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
 
     cached_configs: dict[str, Any] = {}
 

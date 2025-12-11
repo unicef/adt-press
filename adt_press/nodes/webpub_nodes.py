@@ -3,7 +3,6 @@ import shutil
 from datetime import datetime
 
 import structlog
-
 from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig

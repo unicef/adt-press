@@ -1,5 +1,3 @@
-import enum
-
 from pydantic import BaseModel, model_validator
 
 from adt_press.models.config import SectionType
