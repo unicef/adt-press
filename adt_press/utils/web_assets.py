@@ -270,6 +270,7 @@ def bundle_javascript(run_output_dir_config: str) -> None:
             capture_output=True,
             text=True,
         )
+        cleanup_unbundled_js(run_output_dir_config)
 
     except subprocess.CalledProcessError as e:
         print(f"Warning: Could not bundle JavaScript: {e}")
@@ -277,6 +278,39 @@ def bundle_javascript(run_output_dir_config: str) -> None:
         if e.stdout:
             print(f"Standard output: {e.stdout}")
         print("Falling back to unbundled JavaScript files")
+
+
+def cleanup_unbundled_js(run_output_dir_config: str) -> None:
+    """Remove unbundled JavaScript files after successful bundling."""
+    adt_dir = os.path.join(run_output_dir_config, "adt")
+    assets_dir = os.path.join(adt_dir, "assets")
+
+    # Remove original base.js and activity.js
+    for js_file in ["base.js", "activity.js"]:
+        js_path = os.path.join(assets_dir, js_file)
+        if os.path.exists(js_path):
+            os.remove(js_path)
+
+    # Remove only .js files from the modules directory (keep other files like .dic)
+    modules_dir = os.path.join(assets_dir, "modules")
+    if os.path.exists(modules_dir):
+        for root, dirs, files in os.walk(modules_dir, topdown=False):
+            for file in files:
+                if file.endswith('.js'):
+                    file_path = os.path.join(root, file)
+                    os.remove(file_path)
+            
+            # Remove empty directories after removing .js files
+            for dir_name in dirs:
+                dir_path = os.path.join(root, dir_name)
+                if os.path.exists(dir_path) and not os.listdir(dir_path):
+                    os.rmdir(dir_path)
+        
+        # If modules directory is now empty, remove it
+        if not os.listdir(modules_dir):
+            os.rmdir(modules_dir)
+
+    print("✓ Cleaned up unbundled JavaScript files")
 
 
 def build_config_json(
@@ -336,7 +370,7 @@ def build_config_json(
     return absolute_path
 
 
-def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:
+def build_web_assets(run_output_dir_config: str, languages: list[str], has_math: bool = False) -> str:
     """Builds web assets by copying all files and running npm commands."""
     # Copy all web assets
     copy_web_assets(run_output_dir_config)
@@ -352,8 +386,9 @@ def build_web_assets(run_output_dir_config: str, languages: list[str]) -> str:
     # Install Font Awesome
     install_fontawesome(run_output_dir_config)
 
-    # Install MathJax
-    install_mathjax(run_output_dir_config)
+    # Install MathJax only if needed
+    if has_math:
+        install_mathjax(run_output_dir_config)
 
     # Run npm build process
     run_npm_build(run_output_dir_config)

@@ -20,7 +20,7 @@ from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
 from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.file import write_json_file
-from adt_press.utils.html import render_template, replace_images, replace_texts
+from adt_press.utils.html import contains_math_content, render_template, replace_images, replace_texts
 from adt_press.utils.image import compress_image_for_web
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
@@ -161,6 +161,7 @@ def package_adt_web(
     sections_by_id = {section.section_id: section for section in plate.sections}
 
     page_list = []
+    has_math = False
 
     for webpage_index, webpage in enumerate(web_pages):
         section = sections_by_id[webpage.section_id]
@@ -184,6 +185,13 @@ def package_adt_web(
         content = replace_images(content, images, plate_texts)
         content = replace_texts(content, plate_texts)
 
+        # Check if this specific page has math content
+        page_has_math = contains_math_content(content)
+
+        # Track if any page has math for build_web_assets
+        if page_has_math:
+            has_math = True
+
         render_template(
             template_config,
             "webpage.html",
@@ -193,7 +201,8 @@ def package_adt_web(
                 section=section,
                 language=plate_language_config,
                 webpage_number=webpage_index + 1,
-                activity_answers=webpage.activity_answers,  # Add this
+                activity_answers=webpage.activity_answers,
+                has_math=page_has_math,
             ),
             output_name=f"adt/{webpage.section_id}.html",
         )
@@ -290,6 +299,6 @@ def package_adt_web(
         output_subdir="adt",
     )
 
-    build_web_assets(run_output_dir_config, list(plate_translations.keys()))
+    build_web_assets(run_output_dir_config, list(plate_translations.keys()), has_math=has_math)
 
     return "done"
