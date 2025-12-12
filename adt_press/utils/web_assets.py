@@ -296,16 +296,16 @@ def cleanup_unbundled_js(run_output_dir_config: str) -> None:
     if os.path.exists(modules_dir):
         for root, dirs, files in os.walk(modules_dir, topdown=False):
             for file in files:
-                if file.endswith('.js'):
+                if file.endswith(".js"):
                     file_path = os.path.join(root, file)
                     os.remove(file_path)
-            
+
             # Remove empty directories after removing .js files
             for dir_name in dirs:
                 dir_path = os.path.join(root, dir_name)
                 if os.path.exists(dir_path) and not os.listdir(dir_path):
                     os.rmdir(dir_path)
-        
+
         # If modules directory is now empty, remove it
         if not os.listdir(modules_dir):
             os.rmdir(modules_dir)
