@@ -25,7 +25,6 @@ class TextType(str, enum.Enum):
     activity_title = "activity_title"
     activity_option = "activity_option"
     activity_input_placeholder_text = "activity_input_placeholder_text"
-    fill_in_the_blank = "fill_in_the_blank"
     image_associated_text = "image_associated_text"
     image_overlay = "image_overlay"
     math = "math"
