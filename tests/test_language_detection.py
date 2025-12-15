@@ -158,6 +158,38 @@ class ConfigNodesHelperTests(unittest.TestCase):
 
         self.assertEqual(result, ["en", "fr"])
 
+    def test_output_languages_config_accepts_comma_separated_string(self) -> None:
+        config = OmegaConf.create({"output_languages": "en, es"})
+        with patch.object(config_nodes, "log"):
+            result = config_nodes.output_languages_config(config, "en")
+
+        self.assertEqual(result, ["en", "es"])
+
+    def test_output_languages_config_rejects_comma_inside_list_entry(self) -> None:
+        config = OmegaConf.create({"output_languages": ["en,es"]})
+        with patch.object(config_nodes, "log"):
+            with self.assertRaises(ValueError):
+                config_nodes.output_languages_config(config, "en")
+
+    def test_output_languages_config_rejects_unknown_language(self) -> None:
+        config = OmegaConf.create({"output_languages": ["xx"]})
+        with patch.object(config_nodes, "log"):
+            with self.assertRaises(ValueError):
+                config_nodes.output_languages_config(config, "en")
+
+    def test_output_languages_config_substitutes_none_with_input_language(self) -> None:
+        config = OmegaConf.create({"output_languages": [None]})
+        with patch.object(config_nodes, "log"):
+            result = config_nodes.output_languages_config(config, "es")
+
+        self.assertEqual(result, ["es"])
+
+    def test_input_language_config_rejects_comma_separated_override(self) -> None:
+        config = OmegaConf.create({"input_language": "en,es"})
+        with patch.object(config_nodes, "log"):
+            with self.assertRaises(ValueError):
+                config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
+
 
 if __name__ == "__main__":
     unittest.main()
