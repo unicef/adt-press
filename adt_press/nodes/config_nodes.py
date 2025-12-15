@@ -91,10 +91,7 @@ def _flatten_output_languages(raw_languages: object) -> list[str | None]:
             sequence.append(raw_str)
         return sequence
 
-    raise TypeError(
-        "output_languages must be a list of language codes or a comma-separated string; "
-        f"got {type(raw_languages).__name__}"
-    )
+    raise TypeError(f"output_languages must be a list of language codes or a comma-separated string; got {type(raw_languages).__name__}")
 
 
 def _coerce_output_language(language_value: str | None, input_language_code: str) -> str:
