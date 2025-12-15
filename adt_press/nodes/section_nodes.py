@@ -3,10 +3,11 @@ from hamilton.function_modifiers import config
 from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
-from adt_press.models.config import PromptConfig, SectionType
+from adt_press.llm.section_quiz import generate_quiz
+from adt_press.models.config import PromptConfig, QuizPromptConfig, SectionType
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
-from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionQuiz
 from adt_press.models.text import PageText, PageTextGroup, PageTexts
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
@@ -69,6 +70,41 @@ def filtered_sections_by_page_id(
             reasoning=page_sections.reasoning,
         )
     return filtered_sections
+
+
+def quizzes_by_section_id(
+    plate_language_config: str,
+    pdf_pages: list[Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    pdf_text_groups_by_id: dict[str, PageTextGroup],
+    quiz_prompt_config: QuizPromptConfig,
+) -> dict[str, SectionQuiz]:
+    # noop if your config says 0 sections per quiz
+    if quiz_prompt_config.sections_per_quiz < 1:
+        return {}
+
+    async def get_quizzes():
+        tasks = []
+        sections = []
+        count = 0
+        for page in pdf_pages:
+            page_sections = filtered_sections_by_page_id[page.page_id]
+            for section in page_sections.sections:
+                if section.is_pruned:
+                    continue
+
+                count += 1
+                sections.append(section)
+
+                if count == quiz_prompt_config.sections_per_quiz:
+                    tasks.append(generate_quiz(quiz_prompt_config, sections, pdf_text_groups_by_id))
+                    sections = []
+                    count = 0
+
+        return await gather_with_limit(tasks, quiz_prompt_config.rate_limit)
+
+    results = run_async_task(get_quizzes)
+    return {quiz.section_id: quiz for quiz in results}
 
 
 @config.when(explanation_strategy="llm")

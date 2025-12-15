@@ -2,10 +2,12 @@ import os
 import shutil
 from typing import Any
 
+import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation_activity import generate_web_page_activity
 from adt_press.llm.web_generation_html import generate_web_page_html
+from adt_press.llm.web_generation_quiz import generate_web_quiz
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
@@ -25,6 +27,8 @@ from adt_press.utils.image import compress_image_for_web
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
 
+log = structlog.get_logger(__name__)
+
 
 def web_pages(
     plate_language_config: str,
@@ -39,6 +43,7 @@ def web_pages(
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
+    quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
     cached_configs: dict[str, Any] = {}
 
@@ -111,6 +116,20 @@ def web_pages(
                     )
                 )
 
+            # should we insert a quiz after this section?
+            quiz = quizzes_by_section_id.get(section.section_id)
+            if quiz:
+                texts: list[PlateText] = []
+                texts.append(texts_by_id[quiz.question_id])
+                for option_id in quiz.option_ids:
+                    texts.append(texts_by_id[option_id])
+                for explanation_id in quiz.explanation_ids:
+                    texts.append(texts_by_id[explanation_id])
+
+                strategy = render_strategies_config.get("section_quiz")
+                config = TemplateRenderConfig.model_validate(strategy.config)
+                web_pages.append(generate_web_quiz("section_quiz", config, plate_language_config, quiz, texts))
+
         return await gather_with_limit(web_pages, 300)
 
     pages: list[WebPage] = run_async_task(generate_pages)
@@ -159,12 +178,32 @@ def package_adt_web(
     plate_images = {img.image_id: img for img in plate.images}
     plate_texts = {txt.text_id: txt for txt in plate.texts}
     sections_by_id = {section.section_id: section for section in plate.sections}
+    quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
 
     page_list = []
     has_math = False
+    last_known_section_number: int | None = 1
 
     for webpage_index, webpage in enumerate(web_pages):
-        section = sections_by_id[webpage.section_id]
+        section = sections_by_id.get(webpage.section_id)
+        is_quiz_page = False
+        if section is None:
+            quiz = quizzes_by_id.get(webpage.section_id)
+            if quiz:
+                is_quiz_page = True
+                section = sections_by_id.get(quiz.section_id)
+
+        if section:
+            last_known_section_number = section.page_number or last_known_section_number
+        else:
+            log.warning("webpage references unknown section; skipping metadata fields", section_id=webpage.section_id)
+
+        page_number = None
+        if not is_quiz_page:
+            if section:
+                page_number = section.page_number or last_known_section_number
+            else:
+                page_number = last_known_section_number
 
         # copy the images to the output directory
         images = {}
@@ -208,13 +247,13 @@ def package_adt_web(
         )
 
         # add to our page list
-        page_list.append(
-            dict(
-                section_id=webpage.section_id,
-                page_number=section.page_number,
-                href=f"{webpage.section_id}.html",
-            )
+        page_entry: dict[str, str | int] = dict(
+            section_id=webpage.section_id,
+            href=f"{webpage.section_id}.html",
         )
+        if page_number is not None:
+            page_entry["page_number"] = page_number
+        page_list.append(page_entry)
 
     # write our page list out
     write_json_file(os.path.join(adt_dir, "content", "pages.json"), page_list)

@@ -22,7 +22,8 @@
             <div class="clear-both"></div>
         </div>
 
-        {% with section = sections[page.section_id] %}
+        {% set section = sections.get(page.section_id) %}
+        {% if section %}
         {% set is_activity = section.section_type.startswith('activity_') %}
         {% set has_answers = page.activity_answers and page.activity_answers|length > 0 %}
         
@@ -184,7 +185,12 @@
             </div>
             {% endif %}
         </div>
-        {% endwith %}
+        {% else %}
+        <div class="border-t bg-yellow-50 p-3 text-sm text-yellow-900">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Metadata for this page is unavailable.
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

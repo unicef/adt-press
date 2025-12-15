@@ -26,6 +26,63 @@ const getPageListElement = () => document.querySelector(PAGE_LIST_SELECTOR);
 
 const getNavLinks = () => document.querySelectorAll(`${PAGE_LIST_SELECTOR} .nav__list-link`);
 
+const NAV_BUTTON_DISABLED_CLASSES = [
+  "text-gray-300",
+  "opacity-40",
+  "cursor-not-allowed",
+  "pointer-events-none",
+];
+
+const applyNavButtonState = (button, isDisabled) => {
+  if (!button) return;
+
+  if (isDisabled) {
+    button.disabled = true;
+    button.setAttribute("aria-disabled", "true");
+    button.tabIndex = -1;
+    NAV_BUTTON_DISABLED_CLASSES.forEach((cls) => button.classList.add(cls));
+  } else {
+    button.disabled = false;
+    button.removeAttribute("aria-disabled");
+    button.tabIndex = 0;
+    NAV_BUTTON_DISABLED_CLASSES.forEach((cls) => button.classList.remove(cls));
+  }
+};
+
+export const updateNavigationButtonStates = () => {
+  const navContainer = document.getElementById("back-forward-buttons");
+  if (!navContainer || navContainer.classList.contains("hidden")) {
+    return;
+  }
+
+  const backButton = document.getElementById("back-button");
+  const forwardButton = document.getElementById("forward-button");
+  if (!backButton && !forwardButton) {
+    return;
+  }
+
+  const navItems = Array.from(getNavLinks());
+  if (!navItems.length) {
+    applyNavButtonState(backButton, false);
+    applyNavButtonState(forwardButton, false);
+    return;
+  }
+
+  const currentHref = window.location.pathname.split("/").pop() || "index.html";
+  const currentIndex = navItems.findIndex(
+    (item) => item.getAttribute("href") === currentHref
+  );
+
+  if (currentIndex === -1) {
+    applyNavButtonState(backButton, false);
+    applyNavButtonState(forwardButton, false);
+    return;
+  }
+
+  applyNavButtonState(backButton, currentIndex === 0);
+  applyNavButtonState(forwardButton, currentIndex === navItems.length - 1);
+};
+
 const enhancePageList = (pages) => {
   if (!Array.isArray(pages)) {
     return [];
@@ -243,6 +300,7 @@ export const setNavigationData = ({ pages = [], toc = [] }) => {
     toc: Array.isArray(toc) ? toc : [],
   };
   renderNavigationLists();
+  updateNavigationButtonStates();
 };
 
 export const getNavigationData = () => navigationData;

@@ -132,6 +132,14 @@ class MetadataPromptConfig(PromptConfig):
     page_range: int = 3
 
 
+class QuizPromptConfig(PromptConfig):
+    """
+    Prompt config for generating quizzes from sections.
+    """
+
+    sections_per_quiz: int = 3
+
+
 class RenderPromptConfig(PromptConfig):
     """Prompt config that also includes a template used to render the final output."""
 

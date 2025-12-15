@@ -177,6 +177,16 @@ export const applyTranslations = async () => {
             document.title = state.translations[titleId];
         }
     }
+
+    if (typeof document !== 'undefined' && typeof document.dispatchEvent === 'function') {
+        document.dispatchEvent(
+            new CustomEvent('adt-language-changed', {
+                detail: {
+                    language: state.currentLanguage
+                }
+            })
+        );
+    }
 };
 
 /**
