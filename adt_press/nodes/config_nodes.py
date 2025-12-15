@@ -65,7 +65,7 @@ def _flatten_output_languages(raw_languages: object) -> list[str | None]:
         return sequence
 
     if OmegaConf.is_list(raw_languages) or isinstance(raw_languages, (list, tuple)):
-        for item in raw_languages:
+        for item in raw_languages:  # type: ignore[attr-defined]
             if item is None:
                 sequence.append(None)
                 continue

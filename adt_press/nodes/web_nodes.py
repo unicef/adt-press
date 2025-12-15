@@ -181,7 +181,7 @@ def package_adt_web(
     quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
 
     page_list = []
-    last_known_section_number = 1
+    last_known_section_number: int | None = 1
 
     for webpage_index, webpage in enumerate(web_pages):
         section = sections_by_id.get(webpage.section_id)
@@ -238,7 +238,7 @@ def package_adt_web(
         )
 
         # add to our page list
-        page_entry = dict(
+        page_entry: dict[str, str | int] = dict(
             section_id=webpage.section_id,
             href=f"{webpage.section_id}.html",
         )
