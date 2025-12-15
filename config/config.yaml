@@ -121,10 +121,6 @@ section_types:
     description: "For a sorting activity with a collection of text or images that need to be sorted into different categories. You can have more items in the list to be sorted than categories to sort into."
     render_strategy: activity
 
-  section_quiz:
-    description: "Quiz or assessment pages that include questions, multiple-choice options, and answer sections."
-    render_strategy: section_quiz
-
   other:
     description: "For any other section type that does not fit the above categories."
     render_strategy: html
