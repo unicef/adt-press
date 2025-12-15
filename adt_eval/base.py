@@ -101,11 +101,17 @@ class BaseEvaluator(ABC):
 
         # Download image
         local_image_path = Path(self.image_dir) / filename
-        with fsspec.open(
-            image_url, account_name=self.azure_storage_config.account_name, account_key=self.azure_storage_config.account_key
-        ) as f:
-            with open(local_image_path, "wb") as out:
-                out.write(f.read())
+
+        if os.path.exists(local_image_path):
+            print(f"Page image already exists, using existing version: {local_image_path}")
+        else:
+            print(f"Downloading page image from Azure: {image_url}")
+
+            with fsspec.open(
+                image_url, account_name=self.azure_storage_config.account_name, account_key=self.azure_storage_config.account_key
+            ) as f:
+                with open(local_image_path, "wb") as out:
+                    out.write(f.read())
 
         return local_image_path
 
@@ -141,7 +147,6 @@ class BaseEvaluator(ABC):
 
             # process all our cases
             results = await self.process_cases(cases)
-
             # Calculate metrics
             metrics = self.calculate_metrics(results)
             mlflow.log_metric("score", metrics["score"])
