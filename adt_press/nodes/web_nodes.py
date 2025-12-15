@@ -185,9 +185,11 @@ def package_adt_web(
 
     for webpage_index, webpage in enumerate(web_pages):
         section = sections_by_id.get(webpage.section_id)
+        is_quiz_page = False
         if section is None:
             quiz = quizzes_by_id.get(webpage.section_id)
             if quiz:
+                is_quiz_page = True
                 section = sections_by_id.get(quiz.section_id)
 
         if section:
@@ -195,7 +197,12 @@ def package_adt_web(
         else:
             log.warning("webpage references unknown section; skipping metadata fields", section_id=webpage.section_id)
 
-        page_number = section.page_number if section else last_known_section_number
+        page_number = None
+        if not is_quiz_page:
+            if section:
+                page_number = section.page_number or last_known_section_number
+            else:
+                page_number = last_known_section_number
 
         # copy the images to the output directory
         images = {}
@@ -231,13 +238,13 @@ def package_adt_web(
         )
 
         # add to our page list
-        page_list.append(
-            dict(
-                section_id=webpage.section_id,
-                page_number=page_number,
-                href=f"{webpage.section_id}.html",
-            )
+        page_entry = dict(
+            section_id=webpage.section_id,
+            href=f"{webpage.section_id}.html",
         )
+        if page_number is not None:
+            page_entry["page_number"] = page_number
+        page_list.append(page_entry)
 
     # write our page list out
     write_json_file(os.path.join(adt_dir, "content", "pages.json"), page_list)
