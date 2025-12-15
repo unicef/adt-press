@@ -310,8 +310,6 @@ def cleanup_unbundled_js(run_output_dir_config: str) -> None:
         if not os.listdir(modules_dir):
             os.rmdir(modules_dir)
 
-    print("✓ Cleaned up unbundled JavaScript files")
-
 
 def build_config_json(
     template_config: TemplateConfig,
