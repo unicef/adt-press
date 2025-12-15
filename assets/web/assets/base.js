@@ -14,7 +14,7 @@ import {
   handleInitializationError,
   showMainContent,
 } from "./modules/error_utils.js";
-import { loadMerriweatherFont } from "./modules/font_utils.js";
+import { loadAtkinsonFont } from "./modules/font_utils.js";
 import {
   initializeLanguageDropdown,
   cacheInterfaceElements,
@@ -83,6 +83,7 @@ import {
   initializeNotepad
 } from "./modules/notepad.js";
 import { prepareActivity } from "./activity.js";
+import { initializeQuizActivity } from "./modules/activities/quiz.js";
 import { initCharacterDisplay } from "./modules/character-display.js"
 import { initMatomo } from "./modules/analytics.js";
 
@@ -298,7 +299,7 @@ async function initializeCoreFunctionality() {
 
     // Set initial language (without validation since config not loaded yet)
     initializeLanguage();
-  loadMerriweatherFont();
+  loadAtkinsonFont();
     initCharacterDisplay();
 
     // Initialize components after HTML is definitely loaded
@@ -710,6 +711,7 @@ async function initializeUIComponents() {
     
     // Activities should be initialized after UI components
     if (isFeatureEnabled('activities', true)) {
+      initializeQuizActivity();
       prepareActivity();
     }
     loadToggleButtonState();

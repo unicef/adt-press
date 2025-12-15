@@ -12,6 +12,8 @@
   "syllable-label": "Sílabas",
   "multiple-choice-correct-answer": "¡Buen trabajo! Tu respuesta es correcta.",
   "multiple-choice-try-again": "Inténtalo de nuevo",
+  "selection-changed-resubmit": "Selección cambiada, vuelve a enviar tu respuesta.",
+  "quiz-shortcut-hint": "Presiona 1, 2, 3 para elegir una opción y luego Enter para enviarla.",
   "next-activity": "Siguiente actividad",
   "fill-in-the-blank-correct-answer": "¡Buen trabajo!",
   "fill-in-the-blank-try-again": "Inténtalo de nuevo",

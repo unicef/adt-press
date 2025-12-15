@@ -1,0 +1,110 @@
+{% set answers = namespace(mapping={}) %}
+{% set explanations = namespace(mapping={}) %}
+{% for option_id in quiz.option_ids %}
+    {% set _ = answers.mapping.update({option_id: loop.index0 == quiz.answer_index}) %}
+    {% if quiz.explanation_ids and loop.index0 < quiz.explanation_ids|length %}
+        {% set explanation_id = quiz.explanation_ids[loop.index0] %}
+        {% if texts[explanation_id] is defined %}
+            {% set _ = explanations.mapping.update({option_id: explanation_id}) %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+<style>
+    .activity-option.selected-option {
+        border-color: #1d4ed8;
+        border-width: 4px;
+        background-color: rgba(59, 130, 246, 0.18);
+        box-shadow: 0 14px 0 rgba(29, 78, 216, 0.35);
+        transform: translateY(-3px);
+    }
+
+    .activity-option.selected-option .option-text {
+        color: #1e3a8a;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container content mx-auto w-full min-h-screen px-8 py-8 flex items-center justify-center" id="content">
+    <section
+        id="simple-main"
+        role="activity"
+        data-section-type="activity_quiz"
+        data-id="{{ quiz.quiz_id }}"
+        data-area-id="{{ quiz.quiz_id }}"
+        data-correct-answers='{{ answers.mapping | tojson }}'
+    data-option-explanations='{{ explanations.mapping | tojson }}'
+    >
+        <div class="flex w-full flex-col items-center gap-10 px-6 py-10">
+            <div class="w-full max-w-3xl rounded-3xl p-10">
+                <header class="text-center">
+                    <p
+                        id="{{ quiz.quiz_id }}-question-label"
+                        class="text-3xl font-bold text-gray-900 tracking-tight"
+                        data-id="{{ quiz.question_id }}"
+                    >
+                        {{ texts[quiz.question_id].text }}
+                    </p>
+                </header>
+
+                <div
+                    class="mt-8 flex flex-col items-center gap-6"
+                    role="group"
+                    aria-labelledby="{{ quiz.quiz_id }}-question-label"
+                >
+                    {% for option_id in quiz.option_ids %}
+                        {% set option_number = loop.index %}
+                        {% set option_explanation_id = explanations.mapping.get(option_id) %}
+                        {% set option_explanation = texts[option_explanation_id].text if option_explanation_id and texts[option_explanation_id] is defined else '' %}
+                        <label
+                            class="activity-option w-full max-w-xl cursor-pointer rounded-2xl border-2 border-gray-900 bg-[#FFFAF5] px-8 py-6 text-center text-xl font-medium text-gray-900 shadow-[0_6px_0_0_rgba(0,0,0,0.65)] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300 hover:translate-y-[-2px] hover:shadow-[0_8px_0_0_rgba(0,0,0,0.55)]"
+                            data-activity-item="{{ option_id }}"
+                            data-explanation="{{ option_explanation | e }}"
+                            {% if option_explanation_id %}data-explanation-id="{{ option_explanation_id }}"{% endif %}
+                            tabindex="0"
+                        >
+                            <input
+                                type="radio"
+                                name="{{ quiz.quiz_id }}"
+                                value="{{ option_id }}"
+                                data-activity-item="{{ option_id }}"
+                                class="sr-only"
+                                aria-labelledby="{{ option_id }}-option-label"
+                            />
+
+                            <div class="option-letter-wrapper sr-only" data-letter-hidden="true">
+                                <span class="option-letter" data-letter-hidden="true">{{ option_number }}</span>
+                            </div>
+                            <span
+                                id="{{ option_id }}-option-label"
+                                class="option-text block text-lg md:text-2xl text-gray-900"
+                                data-id="{{ option_id }}"
+                            >
+                                {{ option_number }}) {{ texts[option_id].text }}
+                            </span>
+
+                            <div class="feedback-container hidden w-full rounded-md border border-transparent bg-transparent px-3 py-2 text-gray-700" aria-live="polite">
+                                <span aria-hidden="true" class="feedback-icon mr-2"></span>
+                                <span class="feedback-text"></span>
+                            </div>
+
+                            <span class="validation-mark hidden"></span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-10 flex flex-col items-center gap-4">
+                    <div data-submit-target class="flex flex-wrap items-center justify-center gap-4"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+<script type="application/json" id="quiz-correct-answers">
+{{ answers.mapping | tojson }}
+</script>
+<script type="application/json" id="quiz-explanations">
+{{ explanations.mapping | tojson }}
+</script>

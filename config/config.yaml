@@ -1,5 +1,5 @@
-label: "???"
-pdf_path: "???"
+label: "momo-v3"
+pdf_path: "assets/momo.pdf"
 
 input_language: null
 plate_language: "${input_language}"
@@ -136,12 +136,22 @@ render_strategies:
     config:
       render_template_path: templates/two_column_render.html
 
+  two_column_story:
+    render_type: template
+    config:
+      render_template_path: templates/two_column_template_render_story.html
+
   overlay:
     render_type: html
     config:
       model: default
       template_path: prompts/web_generation_overlay.jinja2
       max_retries: 25
+
+  section_quiz:
+    render_type: template
+    config:
+      render_template_path: templates/quiz_render.html
 
   html:
     render_type: html
@@ -222,6 +232,11 @@ prompts:
   section_explanation:
     model: default
     template_path: prompts/section_explanation.jinja2
+
+  section_quiz:
+    model: default
+    template_path: prompts/section_quiz.jinja2
+    sections_per_quiz: 3
    
   text_translation:
     model: default
