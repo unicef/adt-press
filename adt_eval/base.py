@@ -63,7 +63,7 @@ class BaseEvaluator(ABC):
         return [case for case in cases if case.get("annotations")]
 
     @abstractmethod
-    async def process_case(self, step: int, test_case: Dict[str, Any]) -> Dict[str, Any]:
+    async def process_case(self, step: int, test_case: Dict[str, Any], use_cache) -> Dict[str, Any]:
         """Process a single test case."""
         pass
 
@@ -74,11 +74,12 @@ class BaseEvaluator(ABC):
         tasks = []
         limit = self.global_config["eval"]["limit"]
         rate_limit = self.global_config["eval"]["rate_limit"]
+        use_cache = self.global_config["eval"]["use_cache"]
 
         for i, case in enumerate(cases):
             if i >= limit:
                 break
-            tasks.append(self.process_case(i, case))
+            tasks.append(self.process_case(i, case, use_cache))
 
         # Use adt_press sync utility for rate limiting
         results = [r for r in await sync.gather_with_limit(tasks, rate_limit) if r]

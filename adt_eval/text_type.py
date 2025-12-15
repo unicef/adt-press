@@ -13,11 +13,15 @@ from typing import Any, Dict
 
 import mlflow
 import os
+import json
+import pandas as pd
+from soupsieve import match
 
 from adt_eval.base import BaseEvaluator
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.pdf import Page
 from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
+from adt_press.models.text import *
 
 
 class TextTypeEvaluator(BaseEvaluator):
@@ -25,8 +29,26 @@ class TextTypeEvaluator(BaseEvaluator):
 
     def __init__(self, global_config: Dict[str, Any], task_config: Dict[str, Any], output_dir: Path):
         super().__init__(global_config, task_config, output_dir)
+    
+    def build_page_texts_from_log(self, fpath: Path) -> PageTexts:
+                '''Build PageTexts object from logged JSON file, as an alternative to LLM call.'''
+                with open(fpath, "r", encoding="utf8") as f:
+                    page_texts = json.load(f)
+                    output = page_texts['output']
 
-    async def process_case(self, step: int, tc: Dict[str, Any]) -> Dict[str, Any]:
+                page_text_groups = []
+                for g in output['groups']: 
+                    page_texts = []
+                    for t in g['texts']:
+                        page_text = PageText(text_id=t['text_id'], text=t['text'], text_type=t['text_type'])
+                        page_texts.append(page_text) 
+                    page_text_group = PageTextGroup(group_id = g['group_id'], group_type = g['group_type'], texts=page_texts)
+                    page_text_groups.append(page_text_group)
+                page_texts = PageTexts(page_id=output['page_id'], groups=page_text_groups, reasoning=output['reasoning'])
+
+                return page_texts
+
+    async def process_case(self, step: int, tc: Dict[str, Any], use_cache: bool) -> Dict[str, Any]:
         """Process a single test case."""
 
         ## Get the gold standard for test case
@@ -58,7 +80,15 @@ class TextTypeEvaluator(BaseEvaluator):
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
         # Call the LLM for text type classification
-        page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
+        if (use_cache==False) or (not os.path.exists(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json")):
+            print(f"Calling LLM for case {tc['id']}.")
+            page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
+        else:
+            print(f"Skipping LLM call for case {tc['id']} and using cached results from the logs.")
+            page_texts = self.build_page_texts_from_log(Path(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json"))
+
+            
+
         result["page_texts"] = page_texts.model_dump()
 
         ## Index LLM candidate results by text content
@@ -129,7 +159,7 @@ class TextTypeEvaluator(BaseEvaluator):
 
         for match in matches:
             mlflow.log_table(match, f"results/{step}.json")
-        
+
         # Calculate score
         correct_matches = sum(1 for m in matches if m["expected"] == m["actual"])
         score = correct_matches / len(matches) if matches else 1.0
