@@ -385,7 +385,7 @@ class TestBuildWebAssets:
                                         with patch("adt_press.utils.web_assets.bundle_javascript") as mock_bundle:
                                             from adt_press.utils.web_assets import build_web_assets
 
-                                            result = build_web_assets(tmpdir, ["en", "es"])
+                                            result = build_web_assets(tmpdir, ["en", "es"], has_math=True)
 
                                             # All functions should be called
                                             mock_copy.assert_called_once()
