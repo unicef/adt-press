@@ -19,6 +19,7 @@ import { updateResetButtonVisibility } from '../activity.js';
  */
 export const ActivityTypes = Object.freeze({
     MULTIPLE_CHOICE: "activity_multiple_choice",
+    QUIZ: "activity_quiz",
     FILL_IN_THE_BLANK: "activity_fill_in_the_blank",
     SORTING: "activity_sorting",
     OPEN_ENDED_ANSWER: "activity_open_ended_answer",
@@ -97,7 +98,10 @@ export const updateSubmitButtonAndToast = (
     const submitButton = document.getElementById("submit-button");
     const resetButton = document.getElementById("reset-button");
     const toast = document.getElementById("toast");
-
+    const isMultipleChoiceLike =
+        activityType === ActivityTypes.MULTIPLE_CHOICE || activityType === ActivityTypes.QUIZ;
+    const shouldShowToast = !isMultipleChoiceLike;
+    
     // Default options
     const defaultOptions = {
         message: '', // Custom message to override default
@@ -139,10 +143,11 @@ export const updateSubmitButtonAndToast = (
             .split(".")[0];
 
         trackActivityCompletion(activityId, activityType);
-
-        submitButton.textContent = buttonText;
-
-        if (toast) {
+        
+    submitButton.textContent = buttonText;
+    submitButton.dataset.submitState = (buttonText === translateText("next-activity")) ? 'next' : 'submit';
+        
+                if (shouldShowToast && toast) {
             // Determine message and emoji based on options or defaults
             const message = mergedOptions.message ||
                 ((activityType === ActivityTypes.OPEN_ENDED_ANSWER ||
@@ -174,18 +179,33 @@ export const updateSubmitButtonAndToast = (
         }
 
         // Set timeout to hide toast
-        setTimeout(() => {
+        if (shouldShowToast) {
+            setTimeout(() => {
+                toast?.classList.add("hidden");
+            }, mergedOptions.timeout || 6000);
+        } else {
             toast?.classList.add("hidden");
-        }, mergedOptions.timeout || 6000);
+        }
     } else {
-        // Handle incorrect submission with enhanced options
-        handleIncorrectSubmission(
-            submitButton,
-            toast,
-            activityType,
-            unfilledCount,
-            mergedOptions
-        );
+        if (shouldShowToast) {
+            // Handle incorrect submission with enhanced options
+            handleIncorrectSubmission(
+                submitButton, 
+                toast, 
+                activityType, 
+                unfilledCount, 
+                mergedOptions
+            );
+        } else {
+            handleIncorrectSubmission(
+                submitButton,
+                toast,
+                activityType,
+                unfilledCount,
+                mergedOptions
+            );
+            toast?.classList.add("hidden");
+        }
     }
 };
 
@@ -222,18 +242,27 @@ export const checkCurrentActivityCompletion = (isCorrect) => {
  * @private
  */
 const handleIncorrectSubmission = (submitButton, toast, activityType, unfilledCount, options = {}) => {
-    if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
+    const isMultipleChoiceLike = activityType === ActivityTypes.MULTIPLE_CHOICE || activityType === ActivityTypes.QUIZ;
+    
+    if (isMultipleChoiceLike) {
         submitButton.textContent = translateText("retry");
         submitButton.setAttribute("aria-label", translateText("retry"));
+        submitButton.dataset.submitState = 'retry';
         state.retryHandler = retryActivity;
         submitButton.addEventListener("click", state.retryHandler);
     } else {
         submitButton.textContent = translateText("submit-text");
         submitButton.setAttribute("aria-label", translateText("submit-text"));
+        submitButton.dataset.submitState = 'submit';
         // Make sure we're adding the current validateHandler
         if (state.validateHandler) {
             submitButton.addEventListener("click", state.validateHandler);
         }
+    }
+
+    if (isMultipleChoiceLike) {
+        toast?.classList.add("hidden");
+        return;
     }
 
     updateToastForIncorrectSubmission(toast, activityType, unfilledCount, options);
@@ -624,6 +653,7 @@ const resetButtonState = () => {
         submitButton.removeEventListener("click", state.retryHandler);
         submitButton.removeEventListener("click", state.validateHandler);
         submitButton.addEventListener("click", state.validateHandler);
+        submitButton.dataset.submitState = 'submit';
     }
 };
 

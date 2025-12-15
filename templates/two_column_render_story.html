@@ -1,0 +1,87 @@
+{% set container_bg = section.background_color if section.background_color else '#fef6ed' %}
+{% set content_color = section.text_color if section.text_color else '#2d2a26' %}
+{% set totals = namespace(text_length=0, images=[], texts=[]) %}
+{% for pid in section.part_ids %}
+    {% if texts[pid] %}
+        {% set totals.text_length = totals.text_length + texts[pid].text|length %}
+        {% set totals.texts = totals.texts + [pid] %}
+    {% endif %}
+    {% if images[pid] %}
+        {% set totals.images = totals.images + [pid] %}
+    {% endif %}
+{% endfor %}
+{% set has_images = totals.images|length > 0 %}
+{% set has_text = totals.texts|length > 0 %}
+{% set text_size_class = 'text-2xl md:text-[28px] leading-relaxed tracking-tight' if totals.text_length > 500 else 'text-[32px] md:text-[36px] leading-relaxed tracking-tight' %}
+
+<div
+    id="content"
+    class="container content mx-auto flex min-h-screen w-full items-center justify-center px-6 py-12"
+    data-background-color="{{ container_bg | default('#fef6ed') }}"
+>
+    <section
+        id="simple-main"
+        role="article"
+        data-section-type="{{ section.section_type.name }}"
+        data-id="{{ section.section_id }}"
+        {% if section.explanation_id %}data-eli5-id="{{ section.explanation_id }}"{% endif %}
+        class="w-full"
+        data-text-color="{{ content_color | default('#2d2a26') }}"
+    >
+    <div class="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 rounded-[32px] bg-white/70 px-6 py-10 lg:flex-row lg:items-stretch lg:px-10 lg:py-16">
+            {% if has_images %}
+                <div class="flex w-full max-w-xl flex-shrink-0 items-center justify-center">
+                    {% if totals.images|length == 1 %}
+                        {% set img_id = totals.images[0] %}
+                        <img
+                            data-id="{{ img_id }}"
+                            class="h-auto w-full rounded-[28px] object-cover shadow-lg"
+                            style="max-height: 29rem;"
+                        >
+                    {% else %}
+                        <div class="grid w-full gap-6 sm:grid-cols-{{ totals.images|length >= 2 and 2 or 1 }}">
+                            {% for img_id in totals.images %}
+                                <img
+                                    data-id="{{ img_id }}"
+                                    class="h-auto w-full rounded-[24px] object-cover shadow-md"
+                                    style="max-height: 26rem;"
+                                >
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if has_text %}
+                <div class="flex w-full flex-col justify-center">
+                    <div class="space-y-6 text-center lg:text-left">
+                        {% for text_id in totals.texts %}
+                            <p class="{{ text_size_class }} font-medium" data-id="{{ text_id }}">{{ texts[text_id].text }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+    (function () {
+        const container = document.getElementById('content');
+        const section = container?.querySelector('#simple-main');
+
+        if (container) {
+            const bg = container.getAttribute('data-background-color');
+            if (bg) {
+                container.style.backgroundColor = bg;
+            }
+        }
+
+        if (section) {
+            const textColor = section.getAttribute('data-text-color');
+            if (textColor) {
+                section.style.color = textColor;
+            }
+        }
+    })();
+</script>

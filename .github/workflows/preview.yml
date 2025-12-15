@@ -67,7 +67,7 @@ jobs:
     environment: preview
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
-    steps:          
+    steps:
       - name: Download preview artifact
         uses: actions/download-artifact@v4
         with:

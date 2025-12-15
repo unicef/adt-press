@@ -5,6 +5,7 @@ from pydub import AudioSegment
 
 from adt_press.models.config import SpeechPromptConfig
 from adt_press.models.speech import SpeechFile
+from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import LANGUAGE_MAP
 
@@ -12,10 +13,14 @@ from adt_press.utils.languages import LANGUAGE_MAP
 async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, language_code: str, text_id: str, text: str) -> SpeechFile:
     language = LANGUAGE_MAP[language_code]
 
+    sanitized_text = strip_emojis(text)
+    if not sanitized_text.strip():
+        sanitized_text = text
+
     context = dict(
         language_code=language_code,
         language=language,
-        text=text,
+        text=sanitized_text,
         examples=config.examples,
     )
 
@@ -29,10 +34,11 @@ async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, 
     raw_speech_path = os.path.join(speech_dir, f"{speech_id}_raw.mp3")
     speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
 
+    # feed the sanitized string to TTS to avoid emoji artifacts in playback
     response = await litellm.aspeech(
         model=config.model,
         voice=config.voice,
-        input=text,
+        input=sanitized_text,
         instructions=prompt,
         response_format="mp3",
     )

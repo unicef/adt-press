@@ -63,17 +63,29 @@ export const initializeActivityAudioElements = () => {
  * Plays a sound effect for activities.
  * @param {string} soundKey - The key of the sound to play.
  */
-export const playActivitySound = async (soundKey) => {
-    if (!activityAudio?.[soundKey]) {
-        return;
+export const playActivitySound = (soundKey) => {
+    if (!activityAudio || !activityAudio[soundKey]) {
+        initializeActivityAudioElements();
+    }
+
+    const soundEffect = activityAudio?.[soundKey];
+    if (!soundEffect) {
+        console.log(`Sound ${soundKey} not available`);
+        return null;
     }
 
     try {
-        activityAudio[soundKey].currentTime = 0;
-        await activityAudio[soundKey].play();
+        soundEffect.pause();
+        soundEffect.currentTime = 0;
+        soundEffect.play().catch((err) => {
+            console.log(`Error playing ${soundKey} sound:`, err);
+        });
     } catch (err) {
         console.warn(`Error playing ${soundKey} sound:`, err);
+        return null;
     }
+
+    return soundEffect;
 };
 
 /**

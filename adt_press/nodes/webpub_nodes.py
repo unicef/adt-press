@@ -2,14 +2,16 @@ import os
 import shutil
 from datetime import datetime
 
+import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
 from adt_press.utils.file import write_json_file
-from adt_press.utils.string import page_number_for_section_id
 from adt_press.utils.web_assets import build_config_json
+
+log = structlog.get_logger(__name__)
 
 
 @cache(behavior="recompute")
@@ -82,9 +84,24 @@ def package_webpub(
         "resources": resources,
     }
 
+    sections_by_id = {section.section_id: section for section in plate.sections}
+    quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
+
+    def section_number_for_page(webpage: WebPage) -> int:
+        section = sections_by_id.get(webpage.section_id)
+        if section and section.page_number is not None:
+            return section.page_number
+        quiz = quizzes_by_id.get(webpage.section_id)
+        if quiz:
+            parent_section = sections_by_id.get(quiz.section_id)
+            if parent_section and parent_section.page_number is not None:
+                return parent_section.page_number
+        log.warning("webpage references unknown section; defaulting page number", section_id=webpage.section_id)
+        return 0
+
     # populate our reading order from our web pages
     for webpage in web_pages:
-        page_number = page_number_for_section_id(webpage.section_id)
+        page_number = section_number_for_page(webpage)
         title = f"{page_number}"
         if len(webpage.text_ids):
             title += f" - {plate_translations[default_language].get(webpage.text_ids[0], '')}"

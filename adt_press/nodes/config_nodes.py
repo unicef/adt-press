@@ -13,6 +13,7 @@ from adt_press.models.config import (
     MetadataPromptConfig,
     PageRangeConfig,
     PromptConfig,
+    QuizPromptConfig,
     RenderPromptConfig,
     RenderStrategy,
     SectionType,
@@ -22,6 +23,7 @@ from adt_press.models.text import PageTexts
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
+from adt_press.utils.languages import CUSTOM_LANGUAGE_MAP, LANGUAGE_MAP
 from adt_press.utils.sync import run_async_task
 
 log = structlog.get_logger(__name__)
@@ -43,10 +45,70 @@ def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
 
+SUPPORTED_LANGUAGE_CODES = set(LANGUAGE_MAP.keys()) | set(CUSTOM_LANGUAGE_MAP.keys())
+
+
 def _clean_language_override(language_value: str | None) -> str | None:
     if language_value is None:
         return None
     return str(language_value).strip().lower()
+
+
+def _validate_language_code(language_code: str, *, field_name: str) -> None:
+    if language_code not in SUPPORTED_LANGUAGE_CODES:
+        raise ValueError(f"{field_name} unsupported language code: {language_code!r}")
+
+
+def _flatten_output_languages(raw_languages: object) -> list[str | None]:
+    sequence: list[str | None] = []
+    if raw_languages is None:
+        return sequence
+
+    if OmegaConf.is_list(raw_languages) or isinstance(raw_languages, (list, tuple)):
+        for item in raw_languages:  # type: ignore[attr-defined]
+            if item is None:
+                sequence.append(None)
+                continue
+            entry = str(item)
+            if "," in entry:
+                raise ValueError(
+                    f"output_languages contains a comma-separated entry {entry!r} inside a list. "
+                    "Use a scalar string like 'en,es' or a list like ['en','es']."
+                )
+            sequence.append(entry)
+        return sequence
+
+    if isinstance(raw_languages, str):
+        raw_str = raw_languages.strip()
+        if raw_str in ("", "???"):
+            return sequence
+        if "," in raw_str:
+            parts = [part.strip() for part in raw_str.split(",")]
+            if any(not part for part in parts):
+                raise ValueError(f"output_languages contains an empty language code in {raw_languages!r}")
+            sequence.extend(parts)
+        else:
+            sequence.append(raw_str)
+        return sequence
+
+    raise TypeError(f"output_languages must be a list of language codes or a comma-separated string; got {type(raw_languages).__name__}")
+
+
+def _coerce_output_language(language_value: str | None, input_language_code: str) -> str:
+    if language_value is None:
+        if not input_language_code:
+            raise ValueError(
+                "output_languages contained a null entry, but input_language could not be determined. "
+                "Specify input_language or explicit output_languages."
+            )
+        return input_language_code
+
+    cleaned = _clean_language_override(language_value)
+    if not cleaned:
+        raise ValueError(f"output_languages contains an empty language code: {language_value!r}")
+    if cleaned not in SUPPORTED_LANGUAGE_CODES:
+        raise ValueError(f"output_languages unsupported language code: {cleaned!r}")
+    return cleaned
 
 
 def pdf_text_sample(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
@@ -77,6 +139,11 @@ def input_language_config(
     override_value = OmegaConf.select(config, "input_language", default=None)
     override = _clean_language_override(override_value)
     if override:
+        if "," in override:
+            raise ValueError(
+                f"input_language must be a single language code like 'en'; got {override!r}. Use output_languages for multiple languages."
+            )
+        _validate_language_code(override, field_name="input_language")
         return override
 
     if not pdf_text_sample.strip():
@@ -103,25 +170,15 @@ def plate_language_config(config: DictConfig, input_language_config: str) -> str
 
 def output_languages_config(config: DictConfig, input_language_config: str) -> list[str]:
     raw_languages = OmegaConf.select(config, "output_languages", default=None)
-    sequence: list[str | None] = []
-    if raw_languages is not None:
-        container = OmegaConf.to_container(raw_languages, resolve=True)
-        if isinstance(container, list):
-            for item in container:
-                sequence.append(str(item) if item is not None else None)
-        else:
-            raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
+    sequence = _flatten_output_languages(raw_languages)
     cleaned_languages: list[str] = []
-
-    if sequence:
-        for language in sequence:
-            cleaned = _clean_language_override(language)
-            if cleaned:
-                cleaned_languages.append(cleaned)
-            else:
-                raise RuntimeError("output languages config must be a list; please specify `output_languages` configuration parameter")
+    for language in sequence:
+        cleaned = _coerce_output_language(language, input_language_config)
+        if cleaned not in cleaned_languages:
+            cleaned_languages.append(cleaned)
 
     if not cleaned_languages:
+        _validate_language_code(input_language_config, field_name="input_language")
         cleaned_languages = [input_language_config]
         log.info("output languages defaulted to input language", languages=cleaned_languages)
 
@@ -230,6 +287,11 @@ def metadata_extraction_prompt_config(config: DictConfig) -> MetadataPromptConfi
 @cache(behavior="recompute")
 def page_sectioning_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["page_sectioning"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def quiz_prompt_config(config: DictConfig) -> QuizPromptConfig:
+    return QuizPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["section_quiz"], config["default_model"]))
 
 
 @cache(behavior="recompute")
