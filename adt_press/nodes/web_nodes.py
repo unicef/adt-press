@@ -182,6 +182,7 @@ def package_adt_web(
 
     page_list = []
     has_math = False
+    has_open_ended = False
     last_known_section_number: int | None = 1
 
     for webpage_index, webpage in enumerate(web_pages):
@@ -195,6 +196,8 @@ def package_adt_web(
 
         if section:
             last_known_section_number = section.page_number or last_known_section_number
+            if section.section_type == "activity_open_ended_answer":
+                has_open_ended = True
         else:
             log.warning("webpage references unknown section; skipping metadata fields", section_id=webpage.section_id)
 
@@ -338,6 +341,6 @@ def package_adt_web(
         output_subdir="adt",
     )
 
-    build_web_assets(run_output_dir_config, list(plate_translations.keys()), has_math=has_math)
+    build_web_assets(run_output_dir_config, list(plate_translations.keys()), has_math=has_math, has_open_ended=has_open_ended)
 
     return "done"

@@ -368,7 +368,7 @@ def build_config_json(
     return absolute_path
 
 
-def build_web_assets(run_output_dir_config: str, languages: list[str], has_math: bool = False) -> str:
+def build_web_assets(run_output_dir_config: str, languages: list[str], has_math: bool = False, has_open_ended: bool = False) -> str:
     """Builds web assets by copying all files and running npm commands."""
     # Copy all web assets
     copy_web_assets(run_output_dir_config)
@@ -379,7 +379,8 @@ def build_web_assets(run_output_dir_config: str, languages: list[str], has_math:
     # Copy only required language translations
     if languages:
         copy_interface_translations(run_output_dir_config, languages)
-        install_dictionaries(run_output_dir_config, languages)
+        if has_open_ended:
+            install_dictionaries(run_output_dir_config, languages)
 
     # Install Font Awesome
     install_fontawesome(run_output_dir_config)
