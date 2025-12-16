@@ -15,7 +15,6 @@ import mlflow
 import os
 import json
 import pandas as pd
-from soupsieve import match
 
 from adt_eval.base import BaseEvaluator
 from adt_press.llm.text_extraction import get_page_text
