@@ -26,7 +26,6 @@ eval:
       prompt: ${prompts.text_extraction}
       report_template_path: templates/eval/text_transcript_report.html
 
-
   # Whether to use cached log files instead of calling the LLM (useful for debugging)
   use_cache: False
 
