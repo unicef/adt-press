@@ -10,7 +10,6 @@ from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
 
 
-@cache(behavior="recompute")
 def _write_package_json(work_dir: Path) -> None:
     pkg = work_dir / "package.json"
 
@@ -172,7 +171,6 @@ main();
     return {"error": "results file not found"}
 
 
-@cache(behavior="recompute")
 def adt_aria_at_results(run_output_dir_config: str, package_adt_web: str) -> dict[str, Any]:
     """Run lightweight ARIA-AT-inspired checks against generated ADT pages.
 
@@ -354,7 +352,6 @@ main();
     return {"error": "results file not found"}
 
 
-@cache(behavior="recompute")
 def adt_aria_at_report(template_config: TemplateConfig, adt_aria_at_results: dict[str, Any]) -> str:
     files = list(adt_aria_at_results.get("files", [])) if isinstance(adt_aria_at_results, dict) else []
     return render_template(
@@ -364,7 +361,6 @@ def adt_aria_at_report(template_config: TemplateConfig, adt_aria_at_results: dic
     )
 
 
-@cache(behavior="recompute")
 def adt_a11y_report(template_config: TemplateConfig, adt_a11y_results: dict[str, Any]) -> str:
     """Render a simple HTML report summarizing screen reader phrases per page."""
 
