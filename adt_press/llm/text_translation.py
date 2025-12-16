@@ -1,7 +1,7 @@
 from banks import Prompt
 from pydantic import ValidationInfo, field_validator
 
-from adt_press.llm import get_instructor_client
+from adt_press.llm import format_model_name, get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.text import OutputText
 from adt_press.utils.encoding import CleanTextBaseModel
@@ -71,7 +71,7 @@ async def get_text_translation(
     }
 
     response: TranslationResponse = await client.chat.completions.create(
-        model=config.model,
+        model=format_model_name(config.model),
         response_model=TranslationResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,

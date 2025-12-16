@@ -6,10 +6,13 @@ from hamilton.function_modifiers import config as when_config
 from omegaconf import DictConfig, OmegaConf
 from pydantic import BaseModel
 
+from adt_press.llm import set_provider
 from adt_press.llm.language_detection import detect_input_language
+from adt_press.llm.providers import create_provider
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
+    LLMProviderSettings,
     MetadataPromptConfig,
     PageRangeConfig,
     PromptConfig,
@@ -29,6 +32,23 @@ log = structlog.get_logger(__name__)
 
 def config() -> DictConfig:  # pragma: no cover
     assert False, "This function should not be called directly. Use the config from the pipeline instead."
+
+
+def llm_provider_settings_config(config: DictConfig) -> LLMProviderSettings:
+    """Extract and validate LLM provider settings from config."""
+    provider_config = config.get("llm_provider", {})
+    settings = LLMProviderSettings(**provider_config)
+
+    # Initialize the global provider
+    provider = create_provider(
+        provider_type=settings.provider,
+        api_key=settings.api_key,
+        base_url=settings.base_url,
+    )
+    set_provider(provider)
+
+    log.info("initialized llm provider", provider=settings.provider)
+    return settings
 
 
 def template_config(run_output_dir_config: str) -> TemplateConfig:

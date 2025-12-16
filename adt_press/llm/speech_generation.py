@@ -3,6 +3,7 @@ import os
 import litellm
 from pydub import AudioSegment
 
+from adt_press.llm import format_model_name
 from adt_press.models.config import SpeechPromptConfig
 from adt_press.models.speech import SpeechFile
 from adt_press.utils.html import render_template_to_string
@@ -30,7 +31,7 @@ async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, 
     speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
 
     response = await litellm.aspeech(
-        model=config.model,
+        model=format_model_name(config.model),
         voice=config.voice,
         input=text,
         instructions=prompt,

@@ -1,6 +1,6 @@
 from banks import Prompt
 
-from adt_press.llm import get_instructor_client
+from adt_press.llm import format_model_name, get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.text import EasyReadText, PageText
 from adt_press.utils.encoding import CleanTextBaseModel
@@ -25,7 +25,7 @@ async def get_text_easy_read(language_code: str, config: PromptConfig, text: Pag
     prompt = Prompt(cached_read_text_file(config.template_path))
     client = get_instructor_client()
     response: EasyReadResponse = await client.chat.completions.create(
-        model=config.model,
+        model=format_model_name(config.model),
         response_model=EasyReadResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,

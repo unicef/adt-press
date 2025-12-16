@@ -35,6 +35,15 @@ speech_strategy: none
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
+# LLM provider configuration
+# provider can be: openai, gemini, anthropic
+# api_key is optional - will use environment variable if not specified
+# base_url is optional - for custom endpoints (e.g., Azure OpenAI)
+llm_provider:
+  provider: openai
+  api_key: null
+  base_url: null
+
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
 

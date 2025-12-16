@@ -1,6 +1,6 @@
 from banks import Prompt
 
-from adt_press.llm import get_instructor_client
+from adt_press.llm import format_model_name, get_instructor_client
 from adt_press.models.config import CropPromptConfig
 from adt_press.models.image import CropCoordinates, Image
 from adt_press.models.pdf import Page
@@ -28,7 +28,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
 
     client = get_instructor_client()
     response: CropResponse = await client.chat.completions.create(
-        model=config.model,
+        model=format_model_name(config.model),
         response_model=CropResponse,
         messages=messages,
         max_retries=config.max_retries,
@@ -58,7 +58,7 @@ async def get_image_crop_coordinates(config: CropPromptConfig, page: Page, image
             recrop_messages = [m.model_dump(exclude_none=True) for m in recrop_prompt.chat_messages(context)]
             messages = messages + recrop_messages
             response = await client.chat.completions.create(
-                model=config.model,
+                model=format_model_name(config.model),
                 response_model=CropResponse,
                 messages=messages,
                 max_retries=config.max_retries,

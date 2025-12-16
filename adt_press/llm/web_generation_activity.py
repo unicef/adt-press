@@ -3,7 +3,7 @@ from banks import Prompt
 from bs4 import BeautifulSoup
 from pydantic import ValidationInfo, field_validator
 
-from adt_press.llm import get_instructor_client
+from adt_press.llm import format_model_name, get_instructor_client
 from adt_press.models.config import HTMLPromptConfig, PromptConfig
 from adt_press.models.plate import PlateImage, PlateSection, PlateText
 from adt_press.models.web import RenderTextGroup, WebPage
@@ -101,7 +101,7 @@ async def generate_web_page_activity(
     messages = [m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)]
 
     response: GenerationResponse = await client.chat.completions.create(
-        model=config.model,
+        model=format_model_name(config.model),
         response_model=GenerationResponse,
         messages=messages,
         max_retries=config.max_retries,

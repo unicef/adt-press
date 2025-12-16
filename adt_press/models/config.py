@@ -74,13 +74,21 @@ class PathHashMixin(BaseModel):
         return self
 
 
+class LLMProviderSettings(BaseModel):
+    """Settings for LLM provider selection and configuration."""
+
+    provider: str = "openai"  # openai, gemini, anthropic
+    api_key: str | None = None
+    base_url: str | None = None
+
+
 class PromptConfig(PathHashMixin):
     model: str
     template_path: str
     examples: list[dict] = []
 
     rate_limit: int = 300
-    max_retries: int = 10
+    max_retries: int = 20
     timeout: int = 300
 
 
