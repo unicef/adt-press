@@ -157,8 +157,7 @@ class TextTypeEvaluator(BaseEvaluator):
         # Log to MLflow
         mlflow.log_dict(page.model_dump(), f"inputs/{step}.json")
 
-        for match in matches:
-            mlflow.log_table(match, f"results/{step}.json")
+        mlflow.log_table(pd.DataFrame(matches), f"results/{step}.json")
 
         # Calculate score
         correct_matches = sum(1 for m in matches if m["expected"] == m["actual"])
