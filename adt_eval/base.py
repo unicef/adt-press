@@ -106,8 +106,6 @@ class BaseEvaluator(ABC):
         if os.path.exists(local_image_path):
             print(f"Page image already exists, using existing version: {local_image_path}")
         else:
-            print(f"Downloading page image from Azure: {image_url}")
-
             with fsspec.open(
                 image_url, account_name=self.azure_storage_config.account_name, account_key=self.azure_storage_config.account_key
             ) as f:

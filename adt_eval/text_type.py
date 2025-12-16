@@ -81,7 +81,6 @@ class TextTypeEvaluator(BaseEvaluator):
 
         # Call the LLM for text type classification
         if (use_cache==False) or (not os.path.exists(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json")):
-            print(f"Calling LLM for case {tc['id']}.")
             page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
         else:
             print(f"Skipping LLM call for case {tc['id']} and using cached results from the logs.")
