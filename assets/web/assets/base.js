@@ -706,8 +706,11 @@ async function initializeUIComponents() {
 
     // Activities should be initialized after UI components
     if (isFeatureEnabled('activities', true)) {
-      initializeQuizActivity();
-      prepareActivity();
+      const activitySections = document.querySelectorAll('section[role="activity"]');
+      if (activitySections.length > 0) {
+        initializeQuizActivity();
+        prepareActivity();
+      }
     }
     loadToggleButtonState();
   } catch (error) {

@@ -683,13 +683,15 @@ export function handleKeyboardShortcuts(event) {
  */
 const escapeKeyPressed = () => {
   const navPopup = document.getElementById("navPopup");
+  const navToggle = document.querySelector(".nav__toggle");
   const sidebar = document.getElementById("sidebar");
-  const content = document.querySelector("body > .container");
+  const content = document.querySelector("body .container");
 
   // Check if nav is open
   if (navPopup && navPopup.getAttribute("aria-expanded") === "true") {
     // Close nav using the proper function
     setNavVisibility(false);
+    setNavToggle(false, navToggle);
   }
   // Check if sidebar is open
   else if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {

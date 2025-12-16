@@ -876,7 +876,6 @@ export const initializeQuizActivity = () => {
   const quizSection = document.querySelector(QUIZ_SECTION_SELECTOR);
 
   if (!quizSection) {
-    console.warn('activity_quiz: quiz activity section not found.');
     return;
   }
 

@@ -13,13 +13,14 @@
     "eli5": false,
     "readAloud": true,
     "autoplay": true,
-  "showNavigationControls": true,
-  "showTutorial": true,
+    "showNavigationControls": true,
+    "showTutorial": true,
     "describeImages": true,
     "notepad": false,
     "showAutoHideButton": true,
     "characterDisplay": false,
-    "highlight": false
+    "highlight": false,
+    "activities": false
   },
   "analytics": {
     "enabled": false,

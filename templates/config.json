@@ -19,7 +19,8 @@
     "notepad": {{ features['notepad'] | tojson }},
     "state": {{ features['state'] | tojson }},
     "characterDisplay": {{ features['characterDisplay'] | tojson }},
-    "highlight": {{ features['highlight'] | tojson }}
+    "highlight": {{ features['highlight'] | tojson }},
+    "activities": {{ features['activities'] | tojson }}
   },
   "analytics": {
     "enabled": false,
