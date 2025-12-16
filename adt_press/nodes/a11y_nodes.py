@@ -285,7 +285,7 @@ async function analyze(filePath) {
     };
   }
 
-  // Run axe for WCAG 2.x A/AA/AAA rules.
+  // Run axe for WCAG 2.x A/AA rules.
   const axeModule = await import('axe-core');
   const axeSource = axeModule.source || axeModule.default?.source;
   // Initialize axe inside this JSDOM window to avoid stale globals across pages.
@@ -301,7 +301,7 @@ async function analyze(filePath) {
     axeResults = await axe.run(dom.window.document, {
       runOnly: {
         type: 'tag',
-        values: ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa', 'best-practice', 'cat.color', 'cat.semantics', 'cat.time-and-media', 'cat.tables', 'cat.keyboard', 'cat.sensory-and-visual-cues', 'cat.forms', 'cat.text-alternatives'],
+        values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice', 'cat.color', 'cat.semantics', 'cat.time-and-media', 'cat.tables', 'cat.keyboard', 'cat.sensory-and-visual-cues', 'cat.forms', 'cat.text-alternatives'],
       },
     });
   } catch (error) {
