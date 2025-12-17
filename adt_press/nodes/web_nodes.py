@@ -230,9 +230,7 @@ def package_adt_web(
         # Check if this specific page has math content
         page_has_math = contains_math_content(content)
 
-        # Track if any page has math for build_web_assets
-        if page_has_math:
-            has_math = True
+        has_math = has_math or page_has_math
 
         render_template(
             template_config,
