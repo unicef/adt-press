@@ -25,14 +25,14 @@ class TextTypeEvaluator(BaseEvaluator):
 
     def __init__(self, global_config: Dict[str, Any], task_config: Dict[str, Any], output_dir: Path):
         super().__init__(global_config, task_config, output_dir)
-        
+
         # Build text_types_config from global config
         self.text_types_config = {}
         for name, text_type in global_config.get("text_types", {}).items():
             params = dict(text_type)
             params["name"] = name
             self.text_types_config[name] = TextType.model_validate(params)
-        
+
         # Build text_group_types_config from global config
         self.text_group_types_config = {}
         for name, text_group_type in global_config.get("text_group_types", {}).items():

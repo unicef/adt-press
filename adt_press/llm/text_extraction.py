@@ -1,7 +1,9 @@
 from banks import Prompt
 
 from adt_press.llm import get_instructor_client
-from adt_press.models.config import PromptConfig, TextGroupType as TextGroupTypeConfig, TextType as TextTypeConfig
+from adt_press.models.config import PromptConfig
+from adt_press.models.config import TextGroupType as TextGroupTypeConfig
+from adt_press.models.config import TextType as TextTypeConfig
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.utils.encoding import CleanTextBaseModel
