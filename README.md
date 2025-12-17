@@ -16,7 +16,7 @@
 | adt\_press/llm/page\_sectioning.py          |       43 |        0 |    100% |           |
 | adt\_press/llm/section\_explanations.py     |       17 |        6 |     65% |     21-42 |
 | adt\_press/llm/section\_glossary.py         |       15 |        6 |     60% |     17-36 |
-| adt\_press/llm/section\_quiz.py             |       51 |        6 |     88% |22, 29, 31, 36, 38, 40 |
+| adt\_press/llm/section\_quiz.py             |       51 |        7 |     86% |22, 29, 31, 36, 38, 40, 42 |
 | adt\_press/llm/speech\_generation.py        |       27 |       18 |     33% |     14-53 |
 | adt\_press/llm/text\_easy\_read.py          |       15 |        6 |     60% |     17-35 |
 | adt\_press/llm/text\_extraction.py          |       18 |        0 |    100% |           |
@@ -33,7 +33,7 @@
 | adt\_press/models/plate.py                  |        9 |        0 |    100% |           |
 | adt\_press/models/section.py                |       23 |        0 |    100% |           |
 | adt\_press/models/speech.py                 |        2 |        0 |    100% |           |
-| adt\_press/models/text.py                   |       36 |        0 |    100% |           |
+| adt\_press/models/text.py                   |       35 |        0 |    100% |           |
 | adt\_press/models/web.py                    |       13 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | adt\_press/nodes/config\_nodes.py           |      263 |       34 |     87% |59, 65, 84, 88, 91, 94, 100, 108, 124, 129, 181-183, 205, 224, 238, 324, 331-348, 362-380, 397, 402, 407, 412 |
@@ -73,7 +73,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-| **TOTAL**                                   | **3828** |  **680** | **82%** |           |
+| **TOTAL**                                   | **3827** |  **681** | **82%** |           |
 
 
 ## Setup coverage badge
