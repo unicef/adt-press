@@ -84,6 +84,7 @@ export function createZoomUI() {
 }
 
 // Create reset button
+/*
 function createResetButton() {
   // Remove existing reset button if it exists
   const existing = document.getElementById('simple-zoom-reset');
@@ -123,7 +124,7 @@ function createResetButton() {
 
   // Add to container
   container.appendChild(resetButton);
-}
+} */
 
 // Initialize on page load
 export function initSimpleZoom() {

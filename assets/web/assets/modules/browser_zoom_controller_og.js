@@ -48,7 +48,6 @@ class BrowserZoomController {
 
     // Save original body content
     const bodyContent = document.body.innerHTML;
-    const bodyStyles = window.getComputedStyle(document.body);
 
     // Create container
     const container = document.createElement('div');
