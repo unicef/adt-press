@@ -5,20 +5,30 @@ from unittest.mock import patch
 
 from omegaconf import DictConfig, OmegaConf
 
-from adt_press.llm.language_detection import LanguageDetectionResponse, detect_input_language
+from adt_press.llm.language_detection import (
+    LanguageDetectionResponse,
+    detect_input_language,
+)
 from adt_press.models.config import PromptConfig
 from adt_press.nodes import config_nodes
 
 
 class InputLanguageConfigTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
+        self.prompt_config = PromptConfig(
+            model="gpt-5", template_path="prompts/language_detection.jinja2"
+        )
         self.sample_pdf_texts = "Bonjour tout le monde"
 
     def test_input_language_config_respects_manual_override(self) -> None:
         config = DictConfig({"input_language": "ES"})
-        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log"):
-            result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
+        with (
+            patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock,
+            patch.object(config_nodes, "log"),
+        ):
+            result = config_nodes.input_language_config(
+                config, self.prompt_config, self.sample_pdf_texts
+            )
 
         self.assertEqual(result, "es")
         run_async_mock.assert_not_called()
@@ -29,23 +39,34 @@ class InputLanguageConfigTests(unittest.TestCase):
         with (
             patch(
                 "adt_press.nodes.config_nodes.run_async_task",
-                side_effect=lambda fn: SimpleNamespace(language_code="fr", confidence=0.42),
+                side_effect=lambda fn: SimpleNamespace(
+                    language_code="fr", confidence=0.42
+                ),
             ) as run_async_mock,
             patch.object(config_nodes, "log") as log_mock,
         ):
-            result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
+            result = config_nodes.input_language_config(
+                config, self.prompt_config, self.sample_pdf_texts
+            )
 
         self.assertEqual(result, "fr")
         run_async_mock.assert_called_once()
-        log_mock.info.assert_called_once_with("input language detected automatically", language="fr", confidence=0.42)
+        log_mock.info.assert_called_once_with(
+            "input language detected automatically", language="fr", confidence=0.42
+        )
 
     def test_input_language_config_defaults_to_english_when_no_text(self) -> None:
         empty_texts: str = ""
         config = DictConfig({"input_language": None})
 
-        with patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock, patch.object(config_nodes, "log"):
+        with (
+            patch("adt_press.nodes.config_nodes.run_async_task") as run_async_mock,
+            patch.object(config_nodes, "log"),
+        ):
             with self.assertRaises(ValueError):
-                config_nodes.input_language_config(config, self.prompt_config, empty_texts)
+                config_nodes.input_language_config(
+                    config, self.prompt_config, empty_texts
+                )
 
         run_async_mock.assert_not_called()
 
@@ -55,15 +76,21 @@ class InputLanguageConfigTests(unittest.TestCase):
         with (
             patch(
                 "adt_press.nodes.config_nodes.run_async_task",
-                side_effect=lambda fn: SimpleNamespace(language_code="de", confidence=0.7),
+                side_effect=lambda fn: SimpleNamespace(
+                    language_code="de", confidence=0.7
+                ),
             ) as run_async_mock,
             patch.object(config_nodes, "log") as log_mock,
         ):
-            result = config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
+            result = config_nodes.input_language_config(
+                config, self.prompt_config, self.sample_pdf_texts
+            )
 
         self.assertEqual(result, "de")
         run_async_mock.assert_called_once()
-        log_mock.info.assert_called_once_with("input language detected automatically", language="de", confidence=0.7)
+        log_mock.info.assert_called_once_with(
+            "input language detected automatically", language="de", confidence=0.7
+        )
 
 
 class FakeCompletions:
@@ -88,14 +115,29 @@ class FakeClient:
 
 class LanguageDetectionLLMTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
+        self.prompt_config = PromptConfig(
+            model="gpt-5", template_path="prompts/language_detection.jinja2"
+        )
 
     def test_detect_input_language_success(self) -> None:
-        response = LanguageDetectionResponse(language_code="ES", reasoning="accented words", confidence=0.9)
+        response = LanguageDetectionResponse(
+            language_code="ES", reasoning="accented words", confidence=0.9
+        )
         fake_client = FakeClient(lambda: response)
 
-        with patch("adt_press.llm.language_detection.get_instructor_client", return_value=fake_client):
-            result = asyncio.run(detect_input_language("Hola mundo", self.prompt_config))
+        with (
+            patch(
+                "adt_press.llm.language_detection.get_instructor_client",
+                return_value=fake_client,
+            ),
+            patch(
+                "adt_press.llm.language_detection.format_model_name",
+                return_value="gpt-5",
+            ),
+        ):
+            result = asyncio.run(
+                detect_input_language("Hola mundo", self.prompt_config)
+            )
 
         self.assertEqual(result.language_code, "es")
         self.assertGreater(result.confidence, 0)
@@ -109,7 +151,10 @@ class LanguageDetectionLLMTests(unittest.TestCase):
 
         fake_client = FakeClient(responder)
 
-        with patch("adt_press.llm.language_detection.get_instructor_client", return_value=fake_client):
+        with patch(
+            "adt_press.llm.language_detection.get_instructor_client",
+            return_value=fake_client,
+        ):
             with self.assertRaises(ValueError):
                 asyncio.run(detect_input_language("N/A", self.prompt_config))
 
@@ -121,7 +166,9 @@ class LanguageDetectionLLMTests(unittest.TestCase):
 class ConfigNodesHelperTests(unittest.TestCase):
     def setUp(self) -> None:
         self.sample_pdf_texts = "Bonjour le monde"
-        self.prompt_config = PromptConfig(model="gpt-5", template_path="prompts/language_detection.jinja2")
+        self.prompt_config = PromptConfig(
+            model="gpt-5", template_path="prompts/language_detection.jinja2"
+        )
 
     def test_clean_language_override_normalizes_and_filters(self) -> None:
         self.assertIsNone(config_nodes._clean_language_override(None))
@@ -131,11 +178,16 @@ class ConfigNodesHelperTests(unittest.TestCase):
         config = DictConfig({"input_language": None})
 
         with (
-            patch("adt_press.nodes.config_nodes.run_async_task", side_effect=RuntimeError("boom")),
+            patch(
+                "adt_press.nodes.config_nodes.run_async_task",
+                side_effect=RuntimeError("boom"),
+            ),
             patch.object(config_nodes, "log"),
         ):
             with self.assertRaises(ValueError):
-                config_nodes.input_language_config(config, self.prompt_config, self.sample_pdf_texts)
+                config_nodes.input_language_config(
+                    config, self.prompt_config, self.sample_pdf_texts
+                )
 
     def test_plate_language_config_override(self) -> None:
         config = OmegaConf.create({"plate_language": "FR"})
