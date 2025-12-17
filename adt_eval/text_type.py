@@ -12,12 +12,11 @@ from pathlib import Path
 from typing import Any, Dict
 
 import mlflow
-import os
 
 from adt_eval.base import BaseEvaluator
+from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.pdf import Page
-from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
 
 
 class TextTypeEvaluator(BaseEvaluator):
@@ -39,9 +38,9 @@ class TextTypeEvaluator(BaseEvaluator):
         page_image_path = self.download_azure_image(page_image_url, f"text_extraction_page_{tc['id']}.png")
 
         # Get the most recent annotation
-        latest_annotation = max(tc['annotations'], key=lambda x: x['updated_at'])
-        truth = [i["result"] for i in tc["annotations"] if i['id']==latest_annotation['id']][0]
-    
+        latest_annotation = max(tc["annotations"], key=lambda x: x["updated_at"])
+        truth = [i["result"] for i in tc["annotations"] if i["id"] == latest_annotation["id"]][0]
+
         result = {
             "id": tc["id"],
             "book_title": book_title,
@@ -114,32 +113,22 @@ class TextTypeEvaluator(BaseEvaluator):
                 }
             )
 
-        # Add unmatched actual results
-        #for normalized_content, actual_type in actual_type_by_text.items():
-        #    matches.append(
-        #        {
-        #            "text": normalized_content,
-        #            "expected": None,
-        #            "actual": actual_type,
-        #        }
-        #    )
-
         # Log to MLflow
         mlflow.log_dict(page.model_dump(), f"inputs/{step}.json")
 
         for match in matches:
             mlflow.log_table(match, f"results/{step}.json")
-        
+
         # Calculate score
         correct_matches = sum(1 for m in matches if m["expected"] == m["actual"])
         score = correct_matches / len(matches) if matches else 1.0
 
         result.update(
             {
-                "score": score,                 # Fraction of correct text type matches
-                "score_count": len(matches),    # Number of text type matches attempted
-                "step": step,                   # Test case number
-                "matches": matches,             # List of text type match attempts
+                "score": score,  # Fraction of correct text type matches
+                "score_count": len(matches),  # Number of text type matches attempted
+                "step": step,  # Test case number
+                "matches": matches,  # List of text type match attempts
             }
         )
 

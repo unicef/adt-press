@@ -12,7 +12,6 @@ class TextGroupType(str, enum.Enum):
 
 
 class TextType(str, enum.Enum):
-   
     # Simplified 4
     book_title = "book_title"
     book_subtitle = "book_subtitle"
@@ -34,7 +33,7 @@ class TextType(str, enum.Enum):
     page_number = "page_number"
     other = "other"
 
-    
+
 class EasyReadText(BaseModel):
     easy_read_id: str
     text_id: str
