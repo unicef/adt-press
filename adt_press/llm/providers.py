@@ -168,11 +168,43 @@ class AnthropicProvider(LLMProvider):
         return model
 
 
+class LMStudioProvider(LLMProvider):
+    """LM Studio local server provider implementation."""
+
+    def _setup_provider(self) -> None:
+        """Setup LM Studio-specific configuration."""
+        # API key is optional for LM Studio - defaults to empty string
+        if self.config.api_key:
+            os.environ["LM_STUDIO_API_KEY"] = self.config.api_key
+        elif not os.getenv("LM_STUDIO_API_KEY"):
+            # Set empty default if not provided
+            os.environ["LM_STUDIO_API_KEY"] = ""
+
+        # Base URL is required for LM Studio - defaults to localhost:1234
+        if self.config.base_url:
+            os.environ["LM_STUDIO_API_BASE"] = self.config.base_url
+        elif not os.getenv("LM_STUDIO_API_BASE"):
+            # Set default local server URL
+            os.environ["LM_STUDIO_API_BASE"] = "http://localhost:1234"
+
+    def format_model_name(self, model: str) -> str:
+        """
+        Format model name for LM Studio.
+
+        LiteLLM requires LM Studio models to be prefixed with "lm_studio/"
+        Examples: "lm_studio/llama-3-8b-instruct", "lm_studio/mistral-7b"
+        """
+        if not model.startswith("lm_studio/"):
+            return f"lm_studio/{model}"
+        return model
+
+
 # Provider registry mapping provider types to their implementations
 PROVIDER_REGISTRY: dict[str, type[LLMProvider]] = {
     "openai": OpenAIProvider,
     "gemini": GeminiProvider,
     "anthropic": AnthropicProvider,
+    "lm_studio": LMStudioProvider,
 }
 
 
