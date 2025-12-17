@@ -17,31 +17,29 @@ const matomoConfig = {
 export const initMatomo = (config = {}) => {
   // Merge default config with provided options
   const finalConfig = { ...matomoConfig, ...config };
-  
+
   // Add Matomo tracking code
   window._paq = window._paq || [];
-  
+
   // Track this page view
   window._paq.push(['trackPageView']);
-  
+
   // Enable link tracking
   window._paq.push(['enableLinkTracking']);
-  
+
   // Set up the tracker
   window._paq.push(['setTrackerUrl', finalConfig.trackerUrl]);
   window._paq.push(['setSiteId', finalConfig.siteId]);
-  
+
   // Add the script to the page
   const script = document.createElement('script');
   script.type = 'text/javascript';
   script.async = true;
   script.defer = true;
   script.src = finalConfig.srcUrl;
-  
+
   // Insert script at the end of the head element
   document.head.appendChild(script);
-  
-  console.log('Matomo Analytics initialized');
 };
 
 /**

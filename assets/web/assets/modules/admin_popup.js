@@ -25,7 +25,7 @@ const createPopupElement = () => {
             z-index: 9999;
             display: none;
         `;
-        
+
         popup.innerHTML = `
             <div style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -39,9 +39,9 @@ const createPopupElement = () => {
                 <!-- State controls will be inserted here -->
             </div>
         `;
-        
+
         document.body.appendChild(popup);
-        
+
         const overlay = document.createElement('div');
         overlay.id = 'admin-popup-overlay';
         overlay.style.cssText = `
@@ -52,10 +52,10 @@ const createPopupElement = () => {
             display: none;
         `;
         document.body.appendChild(overlay);
-        
+
         document.getElementById('close-admin-popup').addEventListener('click', toggleAdminPopup);
         overlay.addEventListener('click', toggleAdminPopup);
-        
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && adminPopupVisible) {
                 toggleAdminPopup();
@@ -76,11 +76,11 @@ const setupKeyboardShortcut = () => {
 export const toggleAdminPopup = () => {
     const popup = document.getElementById('admin-popup');
     const overlay = document.getElementById('admin-popup-overlay');
-    
+
     if (!popup || !overlay) return;
-    
+
     adminPopupVisible = !adminPopupVisible;
-    
+
     if (adminPopupVisible) {
         popup.style.display = 'block';
         overlay.style.display = 'block';
@@ -117,11 +117,11 @@ const updateStateDisplay = () => {
             align-items: center;
             background: white;
         `;
-        
+
         const formattedKey = key
             .replace(/([A-Z])/g, ' $1')
             .replace(/^./, str => str.toUpperCase());
-        
+
         if (type === 'boolean') {
             row.innerHTML = `
                 <span style="font-size: 14px; color: #374151;">${formattedKey}</span>
@@ -155,9 +155,9 @@ const updateStateDisplay = () => {
                 </div>
             `;
         }
-        
+
         container.appendChild(row);
-        
+
         // Add event listeners
         if (type === 'boolean') {
             const input = row.querySelector(`input[data-key="${key}"]`);
@@ -166,7 +166,7 @@ const updateStateDisplay = () => {
             const input = row.querySelector(`input[data-key="${key}"]`);
             const decrement = row.querySelector('.decrement');
             const increment = row.querySelector('.increment');
-            
+
             input.addEventListener('change', handleStateChange);
             decrement.addEventListener('click', () => adjustNumberValue(input, -0.1));
             increment.addEventListener('click', () => adjustNumberValue(input, 0.1));
@@ -181,7 +181,7 @@ const handleStateChange = (event) => {
 
     if (type === 'boolean') {
         value = event.target.checked;
-        
+
         // Update toggle appearance immediately
         const toggleSpan = event.target.nextElementSibling;
         toggleSpan.style.backgroundColor = value ? '#2563eb' : '#e5e7eb';
@@ -208,5 +208,5 @@ const adjustNumberValue = (input, delta) => {
     const newValue = Math.round((currentValue + delta) * 10) / 10;
     input.value = newValue;
     input.dispatchEvent(new Event('change'));
-};               
-                            
+};
+

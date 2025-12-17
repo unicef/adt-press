@@ -398,8 +398,6 @@ export const setNavState = (state) => {
   // Navigation-specific behaviors
   const currentPath = window.location.pathname.split("/").pop() || "index.html";
   handleActiveLink(state, currentPath, navLinks, navList);
-
-  console.log("setNavState - Nav is:", state ? "open" : "closed");
 };
 
 /**
@@ -464,8 +462,6 @@ export const toggleNav = (newState = null) => {
   // Additional navigation-specific operations
   handleActiveLink(!isNavOpen, currentPath, navLinks, navList);
 
-  // Log state for debugging
-  console.log("toggleNav - Nav is now:", !isNavOpen ? "open" : "closed");
 };
 
 /**
@@ -516,20 +512,14 @@ const handleActiveLink = (isNavOpen, currentPath, navLinks, navList) => {
  */
 export const nextPage = () => {
   const currentHref = window.location.href.split("/").pop() || "index.html";
-  console.log("Current page:", currentHref); // Debug log
 
   // Get all nav links in order
   const navItems = Array.from(document.querySelectorAll(".nav__list-link"));
-  console.log(
-    "Available nav items:",
-    navItems.map((item) => item.getAttribute("href"))
-  ); // Debug log
 
   // Find current page index
   const currentIndex = navItems.findIndex(
     (item) => item.getAttribute("href") === currentHref
   );
-  console.log("Current index:", currentIndex); // Debug log
 
   if (currentIndex >= 0 && currentIndex < navItems.length - 1) {
     const navList = getPageListElement();
@@ -555,7 +545,6 @@ export const nextPage = () => {
     const nextPage = navItems[currentIndex + 1].getAttribute("href");
     const nextPageId = nextPage.split('/').pop();
     trackNavigation(currentHref, nextPageId);
-    console.log("Navigating to:", nextPage); // Debug log
 
     setTimeout(() => {
       window.location.href = nextPage;
@@ -604,15 +593,8 @@ export const previousPage = () => {
  * @param {KeyboardEvent} event - The keyboard event.
  */
 export function handleKeyboardShortcuts(event) {
-  console.log("handleKeyboardShortcuts called with key:", event.key);
 
   const activeElement = document.activeElement;
-  console.log(
-    "Active element:",
-    activeElement.tagName,
-    "ID:",
-    activeElement.id
-  );
 
   // More specific check for text input elements
   const isInTextBox =
@@ -626,14 +608,11 @@ export function handleKeyboardShortcuts(event) {
   const hasModifiers =
     event.ctrlKey || event.metaKey || (event.altKey && !event.shiftKey);
 
-  console.log("isInTextBox:", isInTextBox, "hasModifiers:", hasModifiers);
-
   // Exit if in text input (but not checkbox/radio) or if unwanted modifier keys are pressed
   if (
     (isInTextBox && !activeElement.id.startsWith("toggle-")) ||
     hasModifiers
   ) {
-    console.log("Exiting early due to text input or modifiers");
     return;
   }
 
@@ -642,18 +621,8 @@ export function handleKeyboardShortcuts(event) {
   const easyReadMode = getCookie("easyReadMode") === "true";
   const eli5Mode = getCookie("eli5Mode") === "true";
 
-  console.log(
-    "Current modes - readAloud:",
-    readAloudMode,
-    "easyRead:",
-    easyReadMode,
-    "eli5:",
-    eli5Mode
-  );
-
   // Handle navigation keys with null checks
   if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-    console.log(`${event.key} pressed - handling navigation`);
     event.preventDefault();
 
     // Check if navigation is possible before proceeding
@@ -670,22 +639,18 @@ export function handleKeyboardShortcuts(event) {
 
   switch (event.key) {
     case "x":
-      console.log("X key pressed - toggling nav");
       event.preventDefault();
       toggleNav();
       break;
     case "a":
-      console.log("A key pressed - toggling sidebar");
       event.preventDefault();
       toggleSidebar();
       break;
     case "z":
-      console.log("Z key pressed - cycling language");
       event.preventDefault();
       cycleLanguage();
       break;
     case "Escape":
-      console.log("Escape key pressed - closing nav");
       event.preventDefault();
       escapeKeyPressed();
       break;
@@ -693,23 +658,17 @@ export function handleKeyboardShortcuts(event) {
 
   // Handle Alt+Shift shortcuts separately
   if (event.altKey && event.shiftKey) {
-    console.log("Alt+Shift modifier detected");
-    console.log("Key pressed:", event.key, "Key code:", event.code);
-
     //const key = event.key.toLowerCase();
     switch (event.code) {
       case "KeyX":
-        console.log("Alt+Shift+X pressed - toggling nav");
         event.preventDefault();
         toggleNav();
         break;
       case "KeyA":
-        console.log("Alt+Shift+A pressed - toggling sidebar");
         event.preventDefault();
         toggleSidebar();
         break;
       case "KeyZ":
-        console.log("Alt+Shift+Z pressed - cycling language");
         event.preventDefault();
         cycleLanguage();
         break;
@@ -724,13 +683,15 @@ export function handleKeyboardShortcuts(event) {
  */
 const escapeKeyPressed = () => {
   const navPopup = document.getElementById("navPopup");
+  const navToggle = document.querySelector(".nav__toggle");
   const sidebar = document.getElementById("sidebar");
-  const content = document.querySelector("body > .container");
+  const content = document.querySelector("body .container");
 
   // Check if nav is open
   if (navPopup && navPopup.getAttribute("aria-expanded") === "true") {
     // Close nav using the proper function
     setNavVisibility(false);
+    setNavToggle(false, navToggle);
   }
   // Check if sidebar is open
   else if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
@@ -758,7 +719,7 @@ export const setupClickOutsideHandler = () => {
     const isNavOpen = navPopup && navPopup.getAttribute("aria-expanded") === "true";
 
     // Check if sidebar is open
-  const isSidebarOpen = sidebar && sidebar.getAttribute('aria-expanded') === 'true';
+    const isSidebarOpen = sidebar && sidebar.getAttribute('aria-expanded') === 'true';
 
     // If neither menu is open, no action needed
     if (!isNavOpen && !isSidebarOpen) {

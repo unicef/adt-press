@@ -9,7 +9,7 @@ const inappropriateWords = [
   'fuck', 'shit', 'ass', 'damn', 'bitch', 'bastard', 'cunt', 'dick', 'penis', 'vagina',
   // Spanish words  
   'mierda', 'puta', 'pene', 'pija', 'boludez', 'puto', 'boludo', 'boluda', 'joder', 'carajo', 'coño', 'pendejo', 'culero', 'verga', 'polla',
-  'chinga', 'follar', 'marica', 'maricon', 'pinche', 'cabron', 'cabrón', 'culo', 'gilipollas', 'qué cabrón', 'la concha de tu madre', 'coño', 'carajo', 'puta madre', 'pelotudo' 
+  'chinga', 'follar', 'marica', 'maricon', 'pinche', 'cabron', 'cabrón', 'culo', 'gilipollas', 'qué cabrón', 'la concha de tu madre', 'coño', 'carajo', 'puta madre', 'pelotudo'
 ];
 
 /**
@@ -19,10 +19,10 @@ const inappropriateWords = [
  */
 export const containsProfanity = (text) => {
   if (!text || typeof text !== 'string') return false;
-  
+
   // Convert to lowercase for case-insensitive matching
   const lowerText = text.toLowerCase();
-  
+
   // Check if any of the inappropriate words appear in the text
   return inappropriateWords.some(word => {
     // Check for whole words by looking for word boundaries
@@ -38,13 +38,13 @@ export const containsProfanity = (text) => {
  */
 export const cleanText = (text) => {
   if (!text || typeof text !== 'string') return text;
-  
+
   let cleanedText = text;
-  
+
   inappropriateWords.forEach(word => {
     const regex = new RegExp(`\\b${word}\\b`, 'gi');
     cleanedText = cleanedText.replace(regex, '*'.repeat(word.length));
   });
-  
+
   return cleanedText;
 };

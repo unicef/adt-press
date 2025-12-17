@@ -305,3 +305,16 @@ def validate_generated_html_data_ids(
         raise ValueError("Generated HTML must include at least one element with a data-id attribute.")
 
     return html_content
+
+
+def contains_math_content(html: str) -> bool:
+    """Check if HTML contains MathJax delimiters or math tags."""
+    math_indicators = [
+        r"\$",  # LaTeX inline: $...$
+        r"\$$",  # LaTeX display: $$...$$
+        r"\\\(",  # LaTeX inline: \(...\)
+        r"\\\[",  # LaTeX display: \[...\]
+        "<math",  # MathML tags
+        "\\begin{",  # LaTeX environments
+    ]
+    return any(indicator in html for indicator in math_indicators)

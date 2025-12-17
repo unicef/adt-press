@@ -19,8 +19,6 @@ import TextValidator from './textvalidator.js';
  * @returns {void}
  */
 export const validateInputs = (activityType) => {
-    console.log("Validating activity type:", activityType);
-
     try {
         switch (activityType) {
             case ActivityTypes.MULTIPLE_CHOICE:
@@ -78,7 +76,6 @@ const setupOpenEndedInputListeners = () => {
 
 const handleOpenEndedInputChange = (event) => {
     const input = event.target;
-    console.log('Validation.js: Input change detected, clearing feedback');
     clearInputValidationFeedback(input);
 };
 
@@ -97,7 +94,6 @@ const validateOpenEndedAnswer = async () => {
     }
 
     const textInputs = activitySection.querySelectorAll('input[type="text"]:not(#filter-input), textarea:not(#filter-input)');
-    console.log(`Found ${textInputs.length} inputs to validate in activity section`);
 
     // First, clear any existing feedback to avoid duplication
     textInputs.forEach(input => {
@@ -113,44 +109,44 @@ const validateOpenEndedAnswer = async () => {
 
     playActivityFeedback(allValid);
     const activityId = location.pathname
-    .substring(location.pathname.lastIndexOf("/") + 1)
-    .split(".")[0];
+        .substring(location.pathname.lastIndexOf("/") + 1)
+        .split(".")[0];
     let key = activityId + "-intentos";
     let intentCount = localStorage.getItem(key);
     if (intentCount === null) {
-            localStorage.setItem(key, "0");
-            intentCount = 0;
-        } else {
-            intentCount = parseInt(intentCount, 10);
-        }
+        localStorage.setItem(key, "0");
+        intentCount = 0;
+    } else {
+        intentCount = parseInt(intentCount, 10);
+    }
 
-        intentCount++;
-        localStorage.setItem(key, intentCount.toString()); 
+    intentCount++;
+    localStorage.setItem(key, intentCount.toString());
 
     if (allValid) {
         const activityId = location.pathname
-        .substring(location.pathname.lastIndexOf("/") + 1)
-        .split(".")[0];
+            .substring(location.pathname.lastIndexOf("/") + 1)
+            .split(".")[0];
 
-         // Recuperar el arreglo de actividades completadas del localStorage
-         const storedActivities = localStorage.getItem("completedActivities");
-         let completedActivities = storedActivities ? JSON.parse(storedActivities) : []; 
-     
-         const namePage = localStorage.getItem("namePage");
-         const timeDone = new Date().toLocaleString("es-ES");
-         const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
-     
-         // Remover cualquier entrada anterior con el mismo activityId
-         completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
-     
-         // Agregar la nueva entrada actualizada
-         completedActivities.push(newActivityId);
-     
-         // Guardar en localStorage
-         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
-     
-         
-         localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
+        // Recuperar el arreglo de actividades completadas del localStorage
+        const storedActivities = localStorage.getItem("completedActivities");
+        let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
+
+        const namePage = localStorage.getItem("namePage");
+        const timeDone = new Date().toLocaleString("es-ES");
+        const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
+
+        // Remover cualquier entrada anterior con el mismo activityId
+        completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
+
+        // Agregar la nueva entrada actualizada
+        completedActivities.push(newActivityId);
+
+        // Guardar en localStorage
+        localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
+
+
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 
         executeMail(ActivityTypes.OPEN_ENDED_ANSWER);
     }
@@ -171,10 +167,10 @@ const countUnfilledTextInputs = (inputs) => {
     // Process each input directly
     Array.from(inputs).forEach((input) => {
         const isFilled = input.value.trim() !== "";
-        
+
         // Apply regular validation feedback to all inputs
         provideFeedback(input, isFilled);
-        
+
         if (!isFilled) {
             unfilledCount++;
             if (!firstUnfilledInput) {
@@ -261,28 +257,18 @@ export const checkForGibberish = async (inputs) => {
     const textValidator = window.globalTextValidator || new TextValidator();
 
     if (!window.globalTextValidator) {
-        // Only log and wait if we're creating a new instance
-        console.log('Using new TextValidator instance - dictionary may not be fully loaded');
-        console.log('Ensuring TextValidator is fully initialized before validation...');
         await textValidator.ensureInitialized();
-        console.log('TextValidator initialization complete, dictionary size:', 
-            textValidator.spanishWords ? textValidator.spanishWords.size : 0);
-    } else {
-        console.log('Using pre-initialized TextValidator with dictionary size:', 
-            textValidator.spanishWords ? textValidator.spanishWords.size : 0);
     }
 
     // Convert NodeList to Array to use async/await properly
     const inputsArray = Array.from(inputs);
-    
+
     // Process each input
     for (const input of inputsArray) {
         const text = input.value.trim();
         if (text.length > 0) {
             try {
                 const containsExplicitContent = containsProfanity(text);
-                console.log(text);
-                console.log("containsExplicitContent", containsExplicitContent);
 
                 if (containsExplicitContent) {
                     hasProfanity = true;
@@ -296,18 +282,15 @@ export const checkForGibberish = async (inputs) => {
                     // Skip gibberish validation for inputs with do-not-validate class
                     const skipGibberishValidation = input.classList.contains("do-not-validate");
                     if (skipGibberishValidation) {
-                        console.log("Skipping gibberish validation for", text, "due to do-not-validate class");
                         continue;
                     }
                     // Use our pre-initialized validator instance
-                    console.log("Checking if text is valid:", text);
                     const isValidText = await textValidator.isValidText(text);
-                    console.log("Text validation result for", text, ":", isValidText);
-                    
+
                     if (!isValidText) {
                         hasGibberish = true;
                         provideFeedbackForGibberish(input);
-    
+
                         if (!firstGibberishInput) {
                             firstGibberishInput = input;
                         }
@@ -317,8 +300,7 @@ export const checkForGibberish = async (inputs) => {
                 console.error("Error validating text:", error);
                 // On error, fall back to the original isLikelySpanish as a backup
                 const isSpanish = isLikelySpanish(text);
-                console.log("Fallback validation for", text, ":", isSpanish);
-                
+
                 if (!isSpanish) {
                     hasGibberish = true;
                     provideFeedbackForGibberish(input);
@@ -358,7 +340,7 @@ const provideFeedbackForProfanity = (input) => {
 
     // First, clear any existing validation icons
     clearInputValidationFeedback(input);
-    
+
     // Create feedback element
     const feedback = createFeedbackElement();
     feedback.classList.add("text-red-600");
@@ -376,7 +358,7 @@ const provideFeedbackForProfanity = (input) => {
         "border-orange-500", "focus:border-orange-500", "focus:ring-orange-200"
     );
     input.classList.add("border-red-500", "focus:border-red-500", "focus:ring-red-200", "focus:ring");
-    
+
     // Add ARIA attributes for accessibility
     input.setAttribute("aria-invalid", "true");
     input.setAttribute("aria-label", `${input.value} - ${translateText("validation-inappropriate-language") || "Inappropriate language"}`);
@@ -384,53 +366,53 @@ const provideFeedbackForProfanity = (input) => {
 
     // Ensure input has proper padding if we're going to add an icon
     input.style.paddingRight = '30px';
-    
+
     // // Remove any existing feedback icons for this input
     // const existingIcons = document.querySelectorAll(`.feedback-icon-for-${input.id || 'profanity'}`);
     // existingIcons.forEach(icon => icon.remove());
-    
+
     // Create an icon element for visual feedback
     const iconElement = document.createElement("div");
     // Use both ID and data-activity-item for more reliable cleanup
     const dataAriaId = input.getAttribute('data-aria-id') || '';
     const dataActivityItem = input.getAttribute('data-activity-item') || '';
     iconElement.className = `feedback-icon-for-${dataAriaId || input.id || dataActivityItem || 'profanity'}`;
-    
+
     iconElement.style.position = "absolute";
     iconElement.style.pointerEvents = "none";
     iconElement.style.zIndex = "10";
-    
+
     // Add the warning icon
     const icon = document.createElement("i");
     icon.className = "fas fa-exclamation-circle text-red-600 feedback-icon";
     icon.setAttribute("aria-hidden", "true");
     iconElement.appendChild(icon);
-    
+
     // Position the icon element
     const rect = input.getBoundingClientRect();
     const parentRect = input.parentNode.getBoundingClientRect();
-    
+
     // Calculate position relative to the parent
     const top = rect.top - parentRect.top + (rect.height - 24) / 2;
     const right = parentRect.right - rect.right + 10;
-    
+
     // Set the position
     iconElement.style.top = `${top}px`;
     iconElement.style.right = `${right}px`;
-    
+
     // Make sure parent has position relative or absolute
     const parentPosition = window.getComputedStyle(input.parentNode).position;
     if (parentPosition === 'static') {
         input.parentNode.style.position = 'relative';
     }
-    
+
     // Add the icon after the input
     input.parentNode.insertBefore(iconElement, input.nextSibling);
 
     // Add text feedback after the parent div containing the input
     const textParent = findAppropriateParentForFeedback(input);
     textParent.appendChild(feedback);
-    
+
     //appendFeedback(input, feedback);
     setupAriaAttributes(input, feedback);
 };
@@ -439,51 +421,51 @@ const provideFeedbackForProfanity = (input) => {
 export const findAppropriateParentForFeedback = (input) => {
     // Start with the direct parent
     let parent = input.parentNode;
-    
+
     // In 17_0_adt.html, the structure is typically:
     // <div class="bg-blue-50 p-4 rounded-lg flex items-center">
     //   <img ...>
     //   <textarea ...></textarea>
     // </div>
-    
+
     // Check if we're in a flex container
     const isFlexContainer = window.getComputedStyle(parent).display === 'flex';
 
     // Special case for grid layouts like in 16_2_adt.html
     const isGridContainer = window.getComputedStyle(parent).display === 'grid';
-    
+
     if (isFlexContainer || isGridContainer) {
         // Instead of creating a wrapper inside the flex container,
         // look for the parent of the flex container to place feedback after it
         const containerParent = parent.parentNode;
-        
+
         // Create a feedback container that will be placed AFTER the flex container
         const feedbackContainer = document.createElement('div');
         feedbackContainer.className = 'feedback-container w-full mt-2';
         feedbackContainer.style.marginTop = '0.5rem';
-        
+
         // Insert the feedback container after the container
         if (containerParent.lastChild === parent) {
             containerParent.appendChild(feedbackContainer);
         } else {
             containerParent.insertBefore(feedbackContainer, parent.nextSibling);
         }
-        
+
         return feedbackContainer;
     }
-     
+
     // Special case for textareas in 16_2_adt.html that aren't in flex containers
     // but still need feedback positioned afterward
     if (input.tagName.toLowerCase() === 'textarea') {
         // Create a wrapper div if one doesn't exist
         const wrapper = document.createElement('div');
         wrapper.className = 'feedback-container w-full';
-        
+
         // Insert the wrapper after the textarea
         parent.insertBefore(wrapper, input.nextSibling);
         return wrapper;
     }
-    
+
     // If not in a special container, just return the parent
     return parent;
 };
@@ -509,53 +491,53 @@ const provideFeedbackForGibberish = (input) => {
         "border-red-500", "focus:border-red-500", "focus:ring-red-200"
     );
     input.classList.add("border-orange-500", "focus:border-orange-500", "focus:ring-orange-200", "focus:ring");
-    
+
     // Add ARIA attributes for accessibility
     input.setAttribute("aria-invalid", "true");
     input.setAttribute("aria-label", `${input.value} - ${translateText("validation-check-spelling") || "Check your spelling"}`);
     input.setAttribute("data-has-gibberish-feedback", "true"); // Mark this input as having gibberish feedback
-    
+
     // Ensure input has proper padding if we're going to add an icon
     input.style.paddingRight = '30px';
-    
+
     // // Remove any existing feedback icons for this input
     // const existingIcons = document.querySelectorAll(`.feedback-icon-for-${input.id || 'gibberish'}`);
     // existingIcons.forEach(icon => icon.remove());
-    
+
     // Create an icon element for visual feedback
     const iconElement = document.createElement("div");
-     // Use data-aria-id as primary identifier
+    // Use data-aria-id as primary identifier
     const dataAriaId = input.getAttribute('data-aria-id') || '';
     iconElement.className = `feedback-icon-for-${dataAriaId || input.id || 'gibberish'}`;
-    
+
     iconElement.style.position = "absolute";
     iconElement.style.pointerEvents = "none";
     iconElement.style.zIndex = "10";
-    
+
     // Add the warning icon
     const icon = document.createElement("i");
     icon.className = "fas fa-question-circle text-orange-500 feedback-icon";
     icon.setAttribute("aria-hidden", "true");
     iconElement.appendChild(icon);
-    
+
     // Position the icon element
     const rect = input.getBoundingClientRect();
     const parentRect = input.parentNode.getBoundingClientRect();
-    
+
     // Calculate position relative to the parent
     const top = rect.top - parentRect.top + (rect.height - 24) / 2;
     const right = parentRect.right - rect.right + 10;
-    
+
     // Set the position
     iconElement.style.top = `${top}px`;
     iconElement.style.right = `${right}px`;
-    
+
     // Make sure parent has position relative or absolute
     const parentPosition = window.getComputedStyle(input.parentNode).position;
     if (parentPosition === 'static') {
         input.parentNode.style.position = 'relative';
     }
-    
+
     // Add the icon after the input
     input.parentNode.insertBefore(iconElement, input.nextSibling);
 
@@ -582,7 +564,7 @@ const provideFeedback = (input, isValid) => {
         // Direct application if utils not available
         applyFeedbackToInput(input, isValid);
     }
-    
+
     //const feedback = createFeedbackElement();
 
     // if (isValid) {
@@ -605,32 +587,32 @@ const provideFeedback = (input, isValid) => {
 const applyFeedbackToInput = (input, isValid) => {
     // Ensure element has padding to accommodate the icon
     input.style.paddingRight = '30px';
-    
+
     // Remove any existing feedback icons first
     const existingIconClass = `.feedback-icon-for-${input.id || 'feedback'}`;
     const existingIcon = document.querySelector(existingIconClass);
     if (existingIcon) existingIcon.remove();
-    
+
     // Create an icon element
     const iconElement = document.createElement("div");
     // Use data-aria-id as primary identifier
     const dataAriaId = input.getAttribute('data-aria-id') || '';
     iconElement.className = `feedback-icon-for-${dataAriaId || input.id || 'feedback'}`;
-    
+
     // Position the icon absolutely within the input's coordinate space
     iconElement.style.position = "absolute";
     iconElement.style.pointerEvents = "none";
     iconElement.style.zIndex = "10";
-    
+
     // Add the Font Awesome icon
     const icon = document.createElement("i");
-    icon.className = isValid ? 
-        "fas fa-check-circle text-green-600 feedback-icon" : 
+    icon.className = isValid ?
+        "fas fa-check-circle text-green-600 feedback-icon" :
         "fas fa-times-circle text-red-600 feedback-icon";
     icon.setAttribute("aria-hidden", "true");
-    
+
     iconElement.appendChild(icon);
-    
+
     // Add appropriate ARIA attributes for accessibility
     if (isValid) {
         input.setAttribute("aria-invalid", "false");
@@ -647,25 +629,25 @@ const applyFeedbackToInput = (input, isValid) => {
         input.classList.remove("border-green-500", "focus:border-green-500", "focus:ring-green-200");
         input.classList.add("border-red-500", "focus:border-red-500", "focus:ring-red-200", "focus:ring");
     }
-    
+
     // Position the icon element absolutely related to the input
     const rect = input.getBoundingClientRect();
     const parentRect = input.parentNode.getBoundingClientRect();
-    
+
     // Calculate position relative to the parent
     const top = rect.top - parentRect.top + (rect.height - 24) / 2; // Center icon vertically (24px is approx icon height)
     const right = parentRect.right - rect.right + 10;
-    
+
     // Set the position
     iconElement.style.top = `${top}px`;
     iconElement.style.right = `${right}px`;
-    
+
     // Make sure parent has position relative or absolute
     const parentPosition = window.getComputedStyle(input.parentNode).position;
     if (parentPosition === 'static') {
         input.parentNode.style.position = 'relative';
     }
-    
+
     // Add the icon after the input (as a sibling)
     input.parentNode.insertBefore(iconElement, input.nextSibling);
 }
@@ -719,9 +701,6 @@ const appendFeedback = (input, feedback) => {
     const container = input.parentElement;
     const existingFeedback = container.querySelector(".feedback");
 
-    console.log(existingFeedback);
-
-
     if (existingFeedback && container) {
         try {
             container.removeChild(existingFeedback);
@@ -729,7 +708,7 @@ const appendFeedback = (input, feedback) => {
             console.warn("Could not remove feedback node:", e);
         }
     }
-    
+
     container.appendChild(feedback);
 };
 

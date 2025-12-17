@@ -114,7 +114,7 @@ export const showWelcome = () => {
     // Close the welcome popup
     tutorialOverlay.remove();
     localStorage.setItem(TUTORIAL_SEEN_KEY, 'true'); // Mark tutorial as seen
-    
+
     // Announce to screen readers that the tutorial is closed, but remind about shortcuts
     announceToScreenReader(
       translateText("tutorial-closed-announcement")
@@ -135,7 +135,7 @@ export const showWelcome = () => {
 
     // Show tutorial steps
     showTutorial();
-    
+
     // Announce first step with reminder of shortcuts
     announceToScreenReader(translateText("tutorial-starting-announcement"));
   });
@@ -313,17 +313,16 @@ const showStep = (index) => {
   // Add arrow
   if (step.arrow) {
     const arrow = document.createElement('div');
-    arrow.className = `absolute w-0 h-0 border-solid ${
-      step.arrow === 'left'
+    arrow.className = `absolute w-0 h-0 border-solid ${step.arrow === 'left'
         ? 'border-y-[10px] border-r-[15px] border-y-transparent border-r-white left-[-15px] top-[90%] -translate-y-1/2'
         : step.arrow === 'right'
-        ? 'border-y-[10px] border-l-[15px] border-y-transparent border-l-white right-[-15px] top-[6%] -translate-y-1/2'
-        : step.arrow === 'top'
-        ? 'border-x-[10px] border-b-[15px] border-x-transparent border-b-white top-[-15px] left-1/2 -translate-x-1/2'
-        : step.arrow === 'bottom'
-        ? 'border-x-[10px] border-t-[15px] border-x-transparent border-t-white bottom-[-15px] left-1/2 -translate-x-1/2'
-        : ''
-    }`;
+          ? 'border-y-[10px] border-l-[15px] border-y-transparent border-l-white right-[-15px] top-[6%] -translate-y-1/2'
+          : step.arrow === 'top'
+            ? 'border-x-[10px] border-b-[15px] border-x-transparent border-b-white top-[-15px] left-1/2 -translate-x-1/2'
+            : step.arrow === 'bottom'
+              ? 'border-x-[10px] border-t-[15px] border-x-transparent border-t-white bottom-[-15px] left-1/2 -translate-x-1/2'
+              : ''
+      }`;
     arrow.setAttribute('aria-hidden', 'true'); // Hide from screen readers as it's decorative
     tutorialPopup.appendChild(arrow);
   }
@@ -383,13 +382,13 @@ const showStep = (index) => {
   // Announce to screen readers that a new step is shown
   const newIndex = index + 1; // Adjust for 1-based index
   const stepContent = translateText("tutorial-step-" + newIndex + "-content-announcement");
-announceToScreenReader(
+  announceToScreenReader(
     translateText("tutorial-step-announcement", {
-      currentStep: newIndex, 
+      currentStep: newIndex,
       totalSteps: tutorialSteps.length,
       stepContent: stepContent
     })
-);
+  );
 }
 
 /**
@@ -527,7 +526,7 @@ const completeTutorial = () => {
     // First try to find h1, then content div as fallback
     const h1Element = document.querySelector('h1');
     const contentElement = document.getElementById('content');
-    
+
     if (h1Element) {
       h1Element.setAttribute('tabindex', '-1');
       h1Element.focus();
@@ -538,7 +537,7 @@ const completeTutorial = () => {
 
     // Announce that tutorial is closed
     announceToScreenReader(translateText("tutorial-completed-announcement"));
-  }, 300);  
+  }, 300);
 }
 
 /**

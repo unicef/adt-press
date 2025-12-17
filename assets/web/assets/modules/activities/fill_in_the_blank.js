@@ -25,14 +25,14 @@ const setupInputListeners = (inputs) => {
 export const handleInputChange = (event) => {
     const input = event.target;
     const dataActivityItem = input.getAttribute("data-activity-item");
-    
+
     // Clear any existing validation feedback when the user makes changes
     clearInputValidationFeedback(input);
 
     // Validate the current input
     validateInput(input);
     saveInputState(input);
-    
+
     // Check if this input is part of an interchangeable pair
     if (window.interchangeablePairs && window.interchangeablePairs[dataActivityItem]) {
         // Revalidate all linked inputs in the interchangeable pair
@@ -55,8 +55,6 @@ export const handleInputChange = (event) => {
 
 // Add a new function to clear validation feedback
 export const clearInputValidationFeedback = (input) => {
-    console.log('Clearing feedback for input:', input.getAttribute('data-aria-id') || input.id || 'unknown');
-    
     // Get the data-activity-item attribute to find related feedback elements
     const dataActivityItem = input.getAttribute("data-activity-item");
     const dataAriaId = input.getAttribute("data-aria-id");
@@ -78,12 +76,11 @@ export const clearInputValidationFeedback = (input) => {
         icons.forEach(icon => {
             // Only remove if this icon is associated with this input
             if (icon && icon.parentNode === input.parentNode) {
-                console.log('Removing icon with selector:', selector);
                 icon.remove();
             }
         });
     });
-    
+
     // Also look for feedback containers that might be siblings of the flex container
     const parent = input.parentNode;
     if (parent) {
@@ -94,20 +91,18 @@ export const clearInputValidationFeedback = (input) => {
             if (flexParent) {
                 const feedbackContainers = flexParent.querySelectorAll('.feedback-container');
                 feedbackContainers.forEach(container => {
-                    console.log('Removing feedback container');
                     container.remove();
                 });
             }
         }
-        
+
         // Also remove any feedback elements inside the parent
         const feedbackElements = parent.querySelectorAll('.feedback');
         feedbackElements.forEach(el => {
-            console.log('Removing feedback element');
             el.remove();
         });
     }
-    
+
     // Reset input styling
     input.classList.remove(
         "border-green-500", "focus:border-green-500", "focus:ring-green-200",
@@ -115,12 +110,12 @@ export const clearInputValidationFeedback = (input) => {
         "border-orange-500", "focus:border-orange-500", "focus:ring-orange-200",
         "focus:ring"
     );
-    
+
     // Reset ARIA attributes and data attributes
     input.removeAttribute("aria-invalid");
     input.removeAttribute("data-has-profanity-feedback");
     input.removeAttribute("data-has-gibberish-feedback");
-    
+
     // Preserve enhanced accessibility aria-label with options list, but remove validation text
     const originalLabel = input.getAttribute("aria-label") || "";
     if (originalLabel.includes(" - ")) {
@@ -135,7 +130,7 @@ export const clearInputValidationFeedback = (input) => {
             input.setAttribute("aria-label", parts[0]);
         }
     }
-    
+
     // Remove the right padding we added for the icon
     input.style.paddingRight = '';
 }
@@ -168,7 +163,6 @@ const validateAllInputs = (inputs) => {
     let unfilledCount = 0;
     inputs.forEach((input) => {
         const validation = validateSingleInput(input);
-        console.log(validation)
         if (!validation.isCorrect) {
             allCorrect = false;
 
@@ -196,17 +190,17 @@ const validateSingleInput = (input) => {
     if (correctAnswer && correctAnswer.includes('|')) {
         // Multiple correct answers separated by |
         const acceptableAnswers = correctAnswer.split('|');
-        isCorrect = isFilled && acceptableAnswers.some(answer => 
+        isCorrect = isFilled && acceptableAnswers.some(answer =>
             inputValue === answer.trim().toLowerCase());
     } else if (window.interchangeablePairs && window.interchangeablePairs[dataActivityItem]) {
         // This is part of an interchangeable pair
         const alternateItems = window.interchangeablePairs[dataActivityItem];
         const alternateAnswers = alternateItems.map(item => correctAnswers[item]);
-        
+
         // Check against correct answer or any alternate answers
-        isCorrect = (isFilled && correctAnswer && inputValue === correctAnswer.toLowerCase()) || 
-                    alternateAnswers.some(alt => alt && inputValue === alt.toLowerCase());
-                    
+        isCorrect = (isFilled && correctAnswer && inputValue === correctAnswer.toLowerCase()) ||
+            alternateAnswers.some(alt => alt && inputValue === alt.toLowerCase());
+
         // Check for duplicates if this field is valid
         if (isCorrect && alternateItems.length > 0) {
             // Get the paired fields
@@ -228,7 +222,7 @@ const validateSingleInput = (input) => {
         }
     } else {
         // Regular validation with a single correct answer
-        isCorrect = isFilled && 
+        isCorrect = isFilled &&
             correctAnswer &&
             correctAnswer.toLowerCase() === inputValue;
     }
@@ -264,42 +258,42 @@ const handleValidationResult = (validationResult) => {
     }
 
     const activityId = location.pathname
-    .substring(location.pathname.lastIndexOf("/") + 1)
-    .split(".")[0];
+        .substring(location.pathname.lastIndexOf("/") + 1)
+        .split(".")[0];
     let key = activityId + "-intentos";
     let intentCount = localStorage.getItem(key);
     if (intentCount === null) {
-            localStorage.setItem(key, "0");
-            intentCount = 0;
-        } else {
-            intentCount = parseInt(intentCount, 10);
-        }
+        localStorage.setItem(key, "0");
+        intentCount = 0;
+    } else {
+        intentCount = parseInt(intentCount, 10);
+    }
 
-        intentCount++;
-        localStorage.setItem(key, intentCount.toString());
-        
+    intentCount++;
+    localStorage.setItem(key, intentCount.toString());
+
     playActivitySound(allCorrect ? 'success' : 'error');
 
     if (allCorrect) {
-    
+
         // Recuperar el arreglo de actividades completadas del localStorage
         const storedActivities = localStorage.getItem("completedActivities");
-        let completedActivities = storedActivities ? JSON.parse(storedActivities) : []; 
-    
+        let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
+
         const namePage = localStorage.getItem("namePage");
         const timeDone = new Date().toLocaleString("es-ES");
         const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
-    
+
         // Remover cualquier entrada anterior con el mismo activityId
         completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
-    
+
         // Agregar la nueva entrada actualizada
         completedActivities.push(newActivityId);
-    
+
         // Guardar en localStorage
         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
-    
-        
+
+
         localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page")
         executeMail(ActivityTypes.FILL_IN_THE_BLANK);
     }
@@ -316,27 +310,27 @@ export const validateInput = (input) => {
     const value = input.value.trim().toLowerCase();
     const dataActivityItem = input.getAttribute("data-activity-item");
     const correctAnswer = correctAnswers[dataActivityItem];
-    
+
     // Remove any existing duplicate feedback first
     const existingFeedback = input.parentNode.querySelector(".feedback");
     if (existingFeedback && existingFeedback.textContent === "Palabra duplicada") {
         input.parentNode.removeChild(existingFeedback);
     }
-    
+
     let isValid = false;
     let hasDuplicate = false;
-    
+
     // Check if this is an interchangeable pair input
     if (window.interchangeablePairs && window.interchangeablePairs[dataActivityItem]) {
         // Get the alternate items and their correct answers
         const alternateItems = window.interchangeablePairs[dataActivityItem];
         const alternateAnswers = alternateItems.map(item => correctAnswers[item]);
-        
+
         // First check if the value matches any valid answer for this input
-        isValid = (value !== "" && 
-                  (value === correctAnswer.toLowerCase() || 
-                   alternateAnswers.some(alt => value === alt.toLowerCase())));
-        
+        isValid = (value !== "" &&
+            (value === correctAnswer.toLowerCase() ||
+                alternateAnswers.some(alt => value === alt.toLowerCase())));
+
         // Then check for duplicates (the same answer used in multiple fields)
         if (isValid && value !== "") {
             for (const alternateItem of alternateItems) {
@@ -345,11 +339,11 @@ export const validateInput = (input) => {
                     // Found duplicate, mark as invalid
                     isValid = false;
                     hasDuplicate = true;
-                    
+
                     // Show error message for duplicate
                     const feedback = document.createElement("span");
-                    feedback.classList.add("feedback", "ml-2", "px-2", "py-1", "rounded-full", 
-                                          "text-sm", "font-medium", "bg-red-100", "text-red-800");
+                    feedback.classList.add("feedback", "ml-2", "px-2", "py-1", "rounded-full",
+                        "text-sm", "font-medium", "bg-red-100", "text-red-800");
                     feedback.textContent = "Palabra duplicada";
                     input.parentNode.appendChild(feedback);
                     break;
@@ -359,7 +353,7 @@ export const validateInput = (input) => {
     } else if (correctAnswer && correctAnswer.includes('|')) {
         // Handle pipe-separated multiple correct answers
         const acceptableAnswers = correctAnswer.split('|');
-        isValid = value !== "" && acceptableAnswers.some(answer => 
+        isValid = value !== "" && acceptableAnswers.some(answer =>
             value === answer.trim().toLowerCase());
     } else {
         // Regular validation for non-interchangeable inputs
@@ -370,20 +364,20 @@ export const validateInput = (input) => {
 
     // Only update style if we didn't find a duplicate (which would have already set the style)
     updateInputValidationStyle(input, isValid);
-    
+
     return { isValid, hasDuplicate };
 };
 
 const updateInputValidationStyle = (input, isValid) => {
     input.classList.remove('border-red-500', 'border-green-500');
-    
+
     const trimmedValue = input.value.trim();
     if (trimmedValue !== "") {
         input.classList.add(isValid ? 'border-green-500' : 'border-red-500');
-        
+
         // Get previous validation state
         const wasValid = input.dataset.wasValid === 'true';
-        
+
         // Only play sounds if:
         // 1. The valid state changed to valid (for success sound)
         // 2. The valid state changed to invalid or was already invalid (for error sound)
@@ -392,7 +386,7 @@ const updateInputValidationStyle = (input, isValid) => {
         } else if (!isValid) {
             playActivitySound('validate_error');
         }
-        
+
         // Store current validation state for next time
         input.dataset.wasValid = isValid.toString();
     }

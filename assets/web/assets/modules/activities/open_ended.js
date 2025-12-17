@@ -15,11 +15,8 @@ export const prepareOpenEnded = (section) => {
 
 async function initializeDictionary() {
     // Initialize the TextValidator dictionary early
-    console.log('Pre-initializing TextValidator dictionary...');
     const textValidator = new TextValidator();
     await textValidator.ensureInitialized();
-    console.log('TextValidator dictionary pre-initialized with',
-        textValidator.spanishWords ? textValidator.spanishWords.size : 0, 'words');
 
     // Store the validator in a global property so it can be accessed elsewhere
     window.globalTextValidator = textValidator;
@@ -41,7 +38,6 @@ const setupInputListeners = (inputs) => {
 
 const handleInputChange = (event) => {
     const input = event.target;
-    console.log('Open-ended input change detected, clearing feedback');
 
     // Clear validation feedback when input changes
     clearInputValidationFeedback(input);

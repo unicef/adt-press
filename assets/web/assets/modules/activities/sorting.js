@@ -54,11 +54,11 @@ const activity = () => {
   const localStorageKey = `${activityId}_${activity}`;
   if (document.getElementsByTagName("h1").length < 0) {
     localStorage.setItem("namePage", document.getElementsByTagName("h2")[0].innerText);
-} else if (document.getElementsByTagName("h1").length > 0) {
+  } else if (document.getElementsByTagName("h1").length > 0) {
     localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
-}
+  }
 
-  
+
   return localStorageKey
 }
 
@@ -70,17 +70,17 @@ const getAllFocusableElements = (section) => {
   const categories = Array.from(section.querySelectorAll('section .category'));
   const submitButton = document.getElementById('submit-button');
   const resetButton = document.getElementById('reset-button');
-  
+
   // Build the complete list of focusable elements in logical tab order
   let focusableElements = [];
-  
+
   // First add available word cards
   focusableElements.push(...availableWordCards);
-  
+
   // Then add categories and placed word cards
   focusableElements.push(...categories);
   focusableElements.push(...placedWordCards);
-  
+
   // Add submit and reset buttons only if they exist
   if (submitButton) {
     focusableElements.push(submitButton);
@@ -88,7 +88,7 @@ const getAllFocusableElements = (section) => {
   if (resetButton) {
     focusableElements.push(resetButton);
   }
-  
+
   return focusableElements;
 };
 
@@ -109,11 +109,11 @@ const addWordCardListeners = (wordCard, section) => {
 
 const handleWordCardKeydown = (event, wordCard, section) => {
   // Prevent arrow keys from triggering page navigation but allow natural tab order
-  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
-      event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' ||
+    event.key === 'ArrowUp' || event.key === 'ArrowDown') {
     event.stopPropagation();
     event.preventDefault();
-    
+
     // Handle arrow navigation within word cards only when focusing word cards
     handleWordCardArrowNavigation(event.key, wordCard, section);
     return;
@@ -124,17 +124,17 @@ const handleWordCardKeydown = (event, wordCard, section) => {
     // Only prevent default and control tab order when in category navigation mode
     if (state.inCategoryNavigation) {
       event.preventDefault();
-      
+
       // Exit category navigation mode if shift+tab is pressed
       if (event.shiftKey) {
         state.inCategoryNavigation = false;
         resetSelectionState();
         return; // Let browser handle the tab navigation naturally
       }
-      
+
       // Otherwise, handle custom tab navigation within categories
       const allFocusableElements = getAllFocusableElements(section);
-      
+
       if (allFocusableElements.length > 0) {
         const currentIndex = allFocusableElements.indexOf(wordCard);
         const nextIndex = (currentIndex + 1) % allFocusableElements.length;
@@ -145,7 +145,7 @@ const handleWordCardKeydown = (event, wordCard, section) => {
     // Otherwise, let the browser handle natural tab order
     return;
   }
-  
+
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     selectWordSort(wordCard);
@@ -155,7 +155,7 @@ const handleWordCardKeydown = (event, wordCard, section) => {
 // New function to handle arrow navigation through all elements
 const handleAllElementsArrowNavigation = (key, currentElement, section) => {
   const allFocusableElements = getAllFocusableElements(section);
-  
+
   if (allFocusableElements.length <= 1) return;
 
   const currentIndex = allFocusableElements.indexOf(currentElement);
@@ -213,29 +213,29 @@ const setupCategories = (section) => {
         const categoryName = category.getAttribute('aria-label') || category.getAttribute('data-activity-category');
         const placedCards = category.querySelectorAll('.placed-word');
         const placedCount = placedCards.length;
-        
+
         let announcement = '';
-        
+
         if (placedCount === 0) {
           announcement = `Categoría: ${categoryName}. No hay palabras colocadas aquí.`;
         } else {
           // Build a list of placed card names
           const cardNames = Array.from(placedCards).map(card => card.textContent.trim());
-          
+
           announcement = `Categoría: ${categoryName}. Contiene ${placedCount} palabra${placedCount !== 1 ? 's' : ''}: ${cardNames.join(', ')}.`;
         }
-        
+
         announceToScreenReader(announcement);
       }
     });
 
     category.addEventListener('click', (e) => {
-       // Add this logic to handle placing a selected word on category click
-       if (state.currentWord) {
+      // Add this logic to handle placing a selected word on category click
+      if (state.currentWord) {
         // Prevent placing if the click target is already a placed word within the category
         if (e.target.closest('.placed-word')) {
-            e.stopPropagation();
-            return; // Don't place a new word if clicking on an existing placed one
+          e.stopPropagation();
+          return; // Don't place a new word if clicking on an existing placed one
         }
         // If a word is selected, place it in this category
         placeWord(category.getAttribute('data-activity-category'), section);
@@ -244,11 +244,11 @@ const setupCategories = (section) => {
 
     category.addEventListener('keydown', (e) => {
       // Prevent arrow keys from triggering page navigation
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
-          e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' ||
+        e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.stopPropagation();
         e.preventDefault();
-        
+
         // Handle arrow navigation within categories when in category mode
         handleCategoryArrowNavigation(e.key, category, section);
         return;
@@ -258,13 +258,13 @@ const setupCategories = (section) => {
         // Confine Tab navigation within categories only when a word is selected and in category navigation mode
         if (state.currentWord && state.inCategoryNavigation) {
           e.preventDefault();
-          
+
           // Exit category navigation mode if shift+tab is pressed
           if (e.shiftKey) {
             state.inCategoryNavigation = false;
             resetSelectionState();
             highlightBoxes(false);
-            
+
             // Find the last placed word card or first word card to focus
             const wordCards = document.querySelectorAll('section .word-card:not(.bg-gray-300):not(.placed-word)');
             if (wordCards.length > 0) {
@@ -272,12 +272,12 @@ const setupCategories = (section) => {
             }
             return;
           }
-          
+
           // Otherwise continue with category tab navigation
           const allCategories = Array.from(section.querySelectorAll('section .category'));
           if (allCategories.length > 0) {
             const currentIndex = allCategories.indexOf(category);
-            const nextIndex = (currentIndex + 1) % allCategories.length;            
+            const nextIndex = (currentIndex + 1) % allCategories.length;
             allCategories[nextIndex].focus();
           }
         } else {
@@ -286,7 +286,7 @@ const setupCategories = (section) => {
         }
         return;
       }
-      
+
       if (state.currentWord && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault();
         const categoryName = category.getAttribute('data-activity-category');
@@ -304,35 +304,35 @@ const handleArrowNavigation = (key, currentElement) => {
     ...document.querySelectorAll('.category'),                    // Category dropzones
     ...document.querySelectorAll('.placed-word')                  // Placed word cards
   ];
-  
+
   // Get the current element's position
   const rect = currentElement.getBoundingClientRect();
   const currentCenter = {
     x: rect.left + rect.width / 2,
     y: rect.top + rect.height / 2
   };
-  
+
   // Find the next element based on arrow direction
   let closestElement = null;
   let minDistance = Infinity;
-  
+
   allElements.forEach(element => {
     if (element === currentElement) return; // Skip the current element
-    
+
     const elementRect = element.getBoundingClientRect();
     const elementCenter = {
       x: elementRect.left + elementRect.width / 2,
       y: elementRect.top + elementRect.height / 2
     };
-    
+
     // Calculate distance and direction
     const deltaX = elementCenter.x - currentCenter.x;
     const deltaY = elementCenter.y - currentCenter.y;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
+
     // Check if the element is in the correct direction
     let isInDirection = false;
-    
+
     switch (key) {
       case 'ArrowLeft':
         isInDirection = deltaX < -10; // Element is to the left
@@ -347,14 +347,14 @@ const handleArrowNavigation = (key, currentElement) => {
         isInDirection = deltaY > 10;  // Element is below
         break;
     }
-    
+
     // If in the right direction and closer than current closest
     if (isInDirection && distance < minDistance) {
       minDistance = distance;
       closestElement = element;
     }
   });
-  
+
   // Focus the closest element if found
   if (closestElement) {
     closestElement.focus();
@@ -381,39 +381,39 @@ export const resetActivity = () => {
     restoreOriginalCard(wordCard);
   });
 
-    // Reset state variables
-    setState('currentWord', "");
-    if (state) state.inCategoryNavigation = false;
+  // Reset state variables
+  setState('currentWord', "");
+  if (state) state.inCategoryNavigation = false;
 
-    // Remove any visual feedback
-    const feedbackElement = document.getElementById("feedback");
-    if (feedbackElement) {
-      feedbackElement.textContent = "";
-      feedbackElement.classList.remove("text-red-500", "text-green-500");
+  // Remove any visual feedback
+  const feedbackElement = document.getElementById("feedback");
+  if (feedbackElement) {
+    feedbackElement.textContent = "";
+    feedbackElement.classList.remove("text-red-500", "text-green-500");
+  }
+
+  const toast = document.getElementById("toast");
+  if (toast) {
+    toast.textContent = "";
+    toast.classList.add("hidden");
+    toast.classList.remove("bg-red-200", "text-red-700", "bg-green-200", "text-green-700");
+  }
+
+  // Reset categories' visual state
+  highlightBoxes(false);
+
+  // Clear localStorage for this activity
+  clearSortingLocalStorage();
+
+  // Try to play reset sound if audio module is loaded
+  try {
+    if (typeof playActivitySound === 'function') {
+      playActivitySound('reset');
     }
-
-    const toast = document.getElementById("toast");
-    if (toast) {
-      toast.textContent = "";
-      toast.classList.add("hidden");
-      toast.classList.remove("bg-red-200", "text-red-700", "bg-green-200", "text-green-700");
-    }
-
-    // Reset categories' visual state
-    highlightBoxes(false);
-
-    // Clear localStorage for this activity
-    clearSortingLocalStorage();
-
-    // Try to play reset sound if audio module is loaded
-    try {
-      if (typeof playActivitySound === 'function') {
-        playActivitySound('reset');
-      }
-    } catch (error) {
-      console.warn("Could not play reset sound:", error);
-    }
-  };
+  } catch (error) {
+    console.warn("Could not play reset sound:", error);
+  }
+};
 
 // New function to clear localStorage data for sorting activities
 const clearSortingLocalStorage = () => {
@@ -421,24 +421,22 @@ const clearSortingLocalStorage = () => {
     const activityId = location.pathname
       .substring(location.pathname.lastIndexOf("/") + 1)
       .split(".")[0];
-    
+
     // Get all localStorage keys for this activity
-    const localStorageKeys = Object.keys(localStorage).filter(key => 
+    const localStorageKeys = Object.keys(localStorage).filter(key =>
       key.startsWith(`${activityId}_`)
     );
-    
+
     // Remove all matching localStorage items
     localStorageKeys.forEach(key => {
       localStorage.removeItem(key);
     });
-    
+
     // Also try to remove the activity-specific item
     const activityKey = activity();
     if (activityKey) {
       localStorage.removeItem(activityKey);
     }
-    
-    console.log(`Cleared ${localStorageKeys.length + (activityKey ? 1 : 0)} localStorage items for activity ${activityId}`);
   } catch (error) {
     console.error("Error clearing sorting localStorage:", error);
   }
@@ -494,7 +492,7 @@ export const selectWordSort = (wordCard) => {
   document.querySelectorAll("section .word-card")
     .forEach((card) => card.classList.remove("border-blue-700"));
 
-  wordCard.classList.remove("border-gray-300");  
+  wordCard.classList.remove("border-gray-300");
   wordCard.classList.add("border-blue-700", "border-2", "box-border");
 
   setState('currentWord', wordCard.getAttribute("data-activity-item"));
@@ -511,7 +509,7 @@ export const selectWordSort = (wordCard) => {
     // Enhanced announcement with more context
     let announcement = `Seleccionado: ${wordCard.textContent.trim()}. `;
     announcement += `Ahora enfocado en categoría: ${categoryName}. `;
-    
+
     // Add information about what's already in the category
     if (itemCount === 0) {
       announcement += 'Esta categoría está vacía. ';
@@ -520,9 +518,9 @@ export const selectWordSort = (wordCard) => {
       const cardNames = Array.from(placedCards).map(card => card.textContent.trim());
       announcement += `Ya contiene ${itemCount} palabra${itemCount !== 1 ? 's' : ''}: ${cardNames.join(', ')}. `;
     }
-    
+
     announcement += 'Presione Enter para colocar aquí, o use las flechas para moverse entre categorías.';
-    
+
     announceToScreenReader(announcement);
   }
   highlightBoxes(true);
@@ -542,10 +540,8 @@ const restoreOriginalCard = (wordCard) => {
 };
 
 const removeWord = (listItem) => {
-  console.log("=== Starting removeWord function ===");
 
   const placedItemId = listItem.getAttribute('data-activity-item');
-  console.log("Removing word:", placedItemId);
 
   const parentCategory = listItem.closest('[data-activity-category]');
   const categoryName = parentCategory.getAttribute('data-activity-category');
@@ -559,15 +555,9 @@ const removeWord = (listItem) => {
     localStorage.setItem('wordPlacement', JSON.stringify(savedData));
   }
 
-  console.log("\nRemoving placed card from category");
-
   let wordCard = document.querySelector(`section .word-card[data-activity-item="${placedItemId}"]`);
 
   if (wordCard) {
-    console.log("\nFound original card in bottom row:");
-    console.log("- Text:", wordCard.textContent.trim());
-    console.log("- Current classes:", wordCard.classList.toString());
-
     const newWordCard = wordCard.cloneNode(true);
     wordCard.parentNode.replaceChild(newWordCard, wordCard);
 
@@ -595,34 +585,22 @@ const removeWord = (listItem) => {
     const section = document.querySelector('section[data-section-type="activity_sorting"]');
     addWordCardListeners(newWordCard, section);
 
-    console.log("\nFinal card state:");
-    console.log("- Classes:", newWordCard.classList.toString());
-    console.log("- Draggable:", newWordCard.getAttribute('draggable'));
-    console.log("- Style:", newWordCard.style.cssText);
-    
     // Focus on the restored word card after removal
     setTimeout(() => {
       newWordCard.focus();
       announceToScreenReader(`${newWordCard.textContent.trim()} has been returned to available options.`);
     }, 100);
-    
+
     saveToLocalStorage();
     playActivitySound('reset');
   } else {
     console.error(`Could not find original card with id: ${placedItemId}`);
-    console.log("All bottom word-cards:", 
-      Array.from(document.querySelectorAll('section .word-card:not(.placed-word)'))
-        .map(card => `${card.textContent.trim()} (${card.getAttribute('data-activity-item')})`));
   }
-
-  console.log("\nRemoving placed card from category");
   listItem.remove();
-  console.log("=== removeWord function complete ===\n");
 };
 
 export const placeWord = (category) => {
   if (!state.currentWord) {
-    console.log("No word selected.");
     return;
   }
 
@@ -658,38 +636,35 @@ export const placeWord = (category) => {
 
   // Enhanced focus management after placement
   const section = document.querySelector('section[data-section-type="activity_sorting"]');
-  
+
   // Give the DOM time to update and use a more specific selector for unplaced cards
   setTimeout(() => {
     // More specific query to find genuinely available word cards
     const remainingWordCards = Array.from(document.querySelectorAll('section .word-card:not(.bg-gray-300):not(.placed-word)'))
       .filter(card => !card.closest('.category')); // Exclude cards that are inside a category container
-    
-    console.log("Remaining word cards:", remainingWordCards.length);
-    
+
     // Count how many words are now in the category
     const categoryList = listElement || categoryDiv.querySelector(".word-list");
     const wordsInCategory = categoryList ? categoryList.children.length : 0;
-    
+
     // Build the announcement message
     let announcement = '';
-    
+
     // First announce the placement
     announcement += `${currentWordText} colocado en ${categoryName}. `;
-    
+
     // Add category content information
     if (wordsInCategory === 1) {
       announcement += `Esta es la primera palabra en esta categoría. `;
     } else {
       announcement += `Hay ${wordsInCategory} palabras en esta categoría. `;
     }
-    
+
     // Check if this was the last word being placed
     if (remainingWordCards.length === 0) {
       // All words placed - focus should go directly to submit button if available
       const submitButton = document.getElementById('submit-button');
       if (submitButton) {
-        console.log("Focusing submit button");
         submitButton.focus();
         announcement += "Todas las palabras han sido colocadas. Ahora está enfocado el botón de enviar. Presione Enter para enviar sus respuestas.";
         announceToScreenReader(announcement);
@@ -701,7 +676,7 @@ export const placeWord = (category) => {
       // Still have words to place - focus on next available word card
       const nextWordCard = remainingWordCards[0];
       nextWordCard.focus();
-      
+
       // Add information about what's next
       announcement += `Ahora está enfocado en "${nextWordCard.textContent.trim()}", que es la siguiente palabra disponible.`;
       announceToScreenReader(announcement);
@@ -714,28 +689,28 @@ const addNextOptionButton = (placedWordCard, nextWordCard) => {
   // Get the category container
   const categoryContainer = placedWordCard.closest('.category');
   if (!categoryContainer) return;
-  
+
   // Check if we already have a "next option" button in this category
   const existingButton = categoryContainer.querySelector('.next-option-button');
   if (existingButton) {
     existingButton.remove(); // Remove any existing button before adding a new one
   }
-  
+
   // Remove any existing "next option" buttons from other categories
   document.querySelectorAll('.next-option-button').forEach(button => {
     button.remove();
   });
-  
+
   const nextButton = document.createElement('button');
   nextButton.className = 'sr-only focus:not-sr-only focus:absolute focus:z-50 bg-blue-600 text-white p-2 rounded next-option-button focus:ring-2 focus:ring-blue-300';
   nextButton.textContent = "Volver a la siguiente opción disponible";
   nextButton.setAttribute('aria-label', "Volver a la siguiente opción disponible");
-  
+
   nextButton.addEventListener('click', (e) => {
     e.stopPropagation(); // Prevent triggering parent events
     goToNextOption(nextWordCard);
   });
-  
+
   nextButton.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -743,7 +718,7 @@ const addNextOptionButton = (placedWordCard, nextWordCard) => {
       goToNextOption(nextWordCard);
     }
   });
-  
+
   // Add as the first element inside the category container
   //placedWordCard.parentNode.insertBefore(nextButton, placedWordCard.nextSibling);
 
@@ -755,23 +730,23 @@ const goToNextOption = (nextWordCard) => {
   document.querySelectorAll('.next-option-button').forEach(button => {
     button.remove();
   });
-  
+
   nextWordCard.focus();
   setState('currentWord', nextWordCard.getAttribute('data-activity-item'));
 };
 
 const handleWordPlacement = (wordCard, listElement) => {
   const clonedWordCard = wordCard.cloneNode(true);
-  
+
   // First append to DOM so we can find the parent category
   listElement.classList.add("flex", "flex-wrap");
   listElement.appendChild(clonedWordCard);
-  
+
   // Now setup the card with access to parent category
   setupClonedCard(clonedWordCard);
 
   disableOriginalCard(wordCard);
-  
+
   return clonedWordCard; // Return the placed card so we can add buttons to it
 };
 
@@ -803,22 +778,22 @@ const setupClonedCard = (clonedCard) => {
   clonedCard.setAttribute('tabindex', '0');
   clonedCard.setAttribute('role', 'option');
   clonedCard.setAttribute('aria-selected', 'false');
-  
+
   // Get category name for more descriptive aria-label
   const parentCategory = clonedCard.closest('.category');
   let categoryName = '';
   if (parentCategory) {
     categoryName = parentCategory.getAttribute('aria-label') || parentCategory.getAttribute('data-activity-category');
   }
-  
+
   // Enhanced aria-label with category information - strip emojis for accessibility
   const cleanWordText = stripEmojisAndCleanText(clonedCard.textContent);
   clonedCard.setAttribute('aria-label', `${cleanWordText} - colocado en la categoría: ${categoryName}. Presione Enter para quitar.`);
-  
+
   clonedCard.addEventListener("click", function () {
     removeWord(this);
   });
-  
+
   clonedCard.addEventListener("keydown", function (event) {
     // Allow natural tab navigation for placed words
     if (event.key === 'Tab') {
@@ -832,15 +807,15 @@ const setupClonedCard = (clonedCard) => {
     }
 
     // Handle arrow navigation for placed words
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
-        event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' ||
+      event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
       event.stopPropagation();
       const section = document.querySelector('section[data-section-type="activity_sorting"]');
       handleAllElementsArrowNavigation(event.key, this, section);
       return;
     }
-    
+
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       event.stopPropagation(); // Stop the event from bubbling up to the category
@@ -960,9 +935,7 @@ export function checkSorting() {
   }
 
   intentCount++;
-  localStorage.setItem(key, intentCount.toString()); 
-
-  console.log("Starting validation check...");
+  localStorage.setItem(key, intentCount.toString());
 
   const categories = document.querySelectorAll('section .category');
 
@@ -997,7 +970,6 @@ export function checkSorting() {
       const wordText = stripEmojisAndCleanText(placedWord.textContent);
 
       if (categoryType === correctCategory) {
-        console.log("✓ CORRECT placement");
         placedWord.classList.remove('bg-red-100', 'border-red-300');
         placedWord.classList.add('bg-green-100', 'border-green-300', 'border');
         mark.textContent = '✓';
@@ -1005,11 +977,10 @@ export function checkSorting() {
         correctCount++;
 
         // Enhanced aria-label for correct placement
-        placedWord.setAttribute('aria-label', 
+        placedWord.setAttribute('aria-label',
           `${wordText} - colocado correctamente en la categoría: ${categoryName}. Presione Enter para quitar.`
         );
       } else {
-        console.log("✗ INCORRECT placement");
         placedWord.classList.remove('bg-green-100', 'border-green-300');
         placedWord.classList.add('bg-red-100', 'border-red-300', 'border');
         mark.textContent = '✗';
@@ -1018,11 +989,11 @@ export function checkSorting() {
 
         // Enhanced aria-label for incorrect placement - include correct category
         const correctCategoryElement = document.querySelector(`[data-activity-category="${correctCategory}"]`);
-        const correctCategoryName = correctCategoryElement ? 
-          (correctCategoryElement.getAttribute('aria-label') || correctCategoryElement.getAttribute('data-activity-category')) : 
+        const correctCategoryName = correctCategoryElement ?
+          (correctCategoryElement.getAttribute('aria-label') || correctCategoryElement.getAttribute('data-activity-category')) :
           correctCategory;
 
-        placedWord.setAttribute('aria-label', 
+        placedWord.setAttribute('aria-label',
           `${wordText} - colocado incorrectamente en la categoría: ${categoryName}. Debería estar en: ${correctCategoryName}. Presione Enter para quitar.`
         );
       }
@@ -1104,8 +1075,8 @@ export function checkSorting() {
           announceToScreenReader(`${wordText} está correctamente colocado en ${categoryName}.`);
         } else {
           const correctCategoryElement = document.querySelector(`[data-activity-category="${correctCategory}"]`);
-          const correctCategoryName = correctCategoryElement ? 
-            (correctCategoryElement.getAttribute('aria-label') || correctCategoryElement.getAttribute('data-activity-category')) : 
+          const correctCategoryName = correctCategoryElement ?
+            (correctCategoryElement.getAttribute('aria-label') || correctCategoryElement.getAttribute('data-activity-category')) :
             correctCategory;
           announceToScreenReader(`${wordText} está incorrectamente colocado. Debería estar en ${correctCategoryName}.`);
         }
@@ -1134,21 +1105,21 @@ export function checkSorting() {
       ActivityTypes.SORTING,
       totalWords - totalPlacedWords, // unfilledCount represents unplaced words here
       {
-          message: message,
-          emoji: '🤔', 
-          toastType: 'warning',
-          timeout: 6000,
-          showCloseButton: true
+        message: message,
+        emoji: '🤔',
+        toastType: 'warning',
+        timeout: 6000,
+        showCloseButton: true
       }
     );
-    
+
     playActivitySound('error');
-    
+
     // Add this line to update reset button visibility
     if (typeof updateResetButtonVisibility === 'function') {
       updateResetButtonVisibility();
     }
-    
+
     return;
   }
 
@@ -1162,7 +1133,7 @@ export function checkSorting() {
       .split(".")[0];
     // Activity tracking code (unchanged)
     const storedActivities = localStorage.getItem("completedActivities");
-    let completedActivities = storedActivities ? JSON.parse(storedActivities) : []; 
+    let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
     const namePage = localStorage.getItem("namePage");
     const timeDone = new Date().toLocaleString("es-ES")
     const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
@@ -1188,8 +1159,8 @@ export function checkSorting() {
     }, 1000);
   }
 
-  
-  
+
+
   // Update feedback element
   feedbackElement.textContent = feedbackMessage;
   feedbackElement.classList.remove("text-red-500", "text-green-500");
@@ -1202,11 +1173,11 @@ export function checkSorting() {
     ActivityTypes.SORTING,
     0, // unfilledCount
     {
-        message: feedbackMessage, // Custom message for this activity
-        emoji: allCorrect ? '🎉' : '🤔',
-        toastType: allCorrect ? 'success' : 'error', // Type of toast
-        timeout: 6000, // Custom timeout
-        showCloseButton: true // Show close button
+      message: feedbackMessage, // Custom message for this activity
+      emoji: allCorrect ? '🎉' : '🤔',
+      toastType: allCorrect ? 'success' : 'error', // Type of toast
+      timeout: 6000, // Custom timeout
+      showCloseButton: true // Show close button
     }
   );
 }
@@ -1231,7 +1202,7 @@ const loadFromLocalStorage = () => {
   try {
     const savedDataRaw = localStorage.getItem(activity());
     if (!savedDataRaw) return;
-    
+
     let savedData = {};
     try {
       savedData = JSON.parse(savedDataRaw);
@@ -1239,13 +1210,13 @@ const loadFromLocalStorage = () => {
       console.error("Error parsing saved sorting data:", error);
       return;
     }
-    
+
     if (!savedData || Object.keys(savedData).length === 0) return;
-    
+
     Object.entries(savedData).forEach(([category, words]) => {
       const categoryDiv = document.querySelector(`div[data-activity-category="${category}"]`);
       if (!categoryDiv) return;
-      
+
       if (Array.isArray(words)) {
         words.forEach(word => {
           const wordCard = document.querySelector(`.word-card[data-activity-item="${word}"]`);
@@ -1253,10 +1224,10 @@ const loadFromLocalStorage = () => {
             // Set current word temporarily
             const previousWord = state.currentWord;
             setState('currentWord', word);
-            
+
             // Place the word silently (without sound)
             placeWordSilently(category);
-            
+
             // Restore previous word
             setState('currentWord', previousWord);
           }
@@ -1271,7 +1242,7 @@ const loadFromLocalStorage = () => {
 // Add a silent version of placeWord that doesn't play sounds
 const placeWordSilently = (category) => {
   if (!state.currentWord) return;
-  
+
   const categoryDiv = document.querySelector(
     `div[data-activity-category="${category}"]`
   );
@@ -1286,10 +1257,10 @@ const placeWordSilently = (category) => {
 
   // Place the word in the category
   const placedWordCard = handleWordPlacement(wordCard, listElement);
-  
+
   // Reset selection state
   resetSelectionState();
-  
+
   // Don't call saveToLocalStorage() here to prevent circular saves
 };
 
@@ -1298,7 +1269,7 @@ const handleWordCardArrowNavigation = (key, currentWordCard, section) => {
   // Get only available (unplaced) word cards that are not inside categories
   const availableWordCards = Array.from(section.querySelectorAll('.word-card:not(.bg-gray-300):not(.placed-word)'))
     .filter(card => !card.closest('.category')); // Exclude cards that are inside categories
-    
+
   if (availableWordCards.length <= 1) return;
 
   const currentIndex = availableWordCards.indexOf(currentWordCard);
@@ -1341,21 +1312,21 @@ const handleCategoryArrowNavigation = (key, currentCategory, section) => {
   if (allCategories[nextIndex]) {
     const nextCategory = allCategories[nextIndex];
     nextCategory.focus();
-    
+
     // If in word placement mode, provide more context about the category
     if (state.currentWord) {
       const categoryName = nextCategory.getAttribute('aria-label') || nextCategory.getAttribute('data-activity-category');
       const placedCards = nextCategory.querySelectorAll('.placed-word');
       const placedCount = placedCards.length;
-      
+
       let announcement = `Categoría: ${categoryName}. `;
-      
+
       // Add information about the selected word
       const selectedWordCard = document.querySelector(`.word-card[data-activity-item="${state.currentWord}"]`);
       const selectedWordText = selectedWordCard ? selectedWordCard.textContent.trim() : 'Palabra seleccionada';
-      
+
       announcement += `Palabra seleccionada: ${selectedWordText}. `;
-      
+
       // Add information about the category contents
       if (placedCount === 0) {
         announcement += `No hay palabras colocadas aquí. `;
@@ -1365,9 +1336,9 @@ const handleCategoryArrowNavigation = (key, currentCategory, section) => {
         const cardNames = Array.from(placedCards).map(card => card.textContent.trim());
         announcement += `${cardNames.join(', ')}. `;
       }
-      
+
       announcement += 'Presione Enter para colocar la palabra aquí.';
-      
+
       announceToScreenReader(announcement);
     }
   }
