@@ -16,9 +16,19 @@ class RenderType(str, enum.Enum):
     activity = "activity"
 
 
+class TextType(BaseModel):
+    name: str
+    description: str
+
+
+class TextGroupType(BaseModel):
+    name: str
+    description: str
+
+
 class SectionType(BaseModel):
     name: str
-    description: str = ""
+    description: str
     render_strategy: str = "html"
 
 

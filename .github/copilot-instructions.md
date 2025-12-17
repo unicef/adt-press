@@ -1,128 +1,129 @@
 # ADT Press
-ADT Press is a Python 3.13+ application that converts PDF files into Accessible Digital Textbooks (ADTs) using AI/LLM processing. The tool extracts text and images from PDFs, processes them through OpenAI's models for analysis, and generates interactive HTML-based accessible textbooks with features like text-to-speech, translations, and educational activities.
+ADT Press converts PDF files into Accessible Digital Textbooks (ADTs) using AI/LLM processing. It extracts content from PDFs, processes them through generative AI models (typically from OpenAI), and generates interactive HTML textbooks with text-to-speech, translations, and educational activities.
 
-Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
+## Quick Start
 
-## Working Effectively
+**Prerequisites**: Python 3.13+, `OPENAI_API_KEY` environment variable, system dependencies (`libcairo2-dev pkg-config python3-dev`)
 
-### Bootstrap, Build, and Test
-- Install UV package manager: `pip install uv`
-- Install system dependencies: `sudo apt update && sudo apt install -y libcairo2-dev pkg-config python3-dev`
-- Sync dependencies: `uv sync --dev` - takes 5-10 seconds. NEVER CANCEL.
-- Run linting: `uv run ruff check` - takes under 1 second.
-- Run formatting: `uv run ruff format --check` - takes under 1 second.
-- Run tests: `uv run pytest -v` - takes 30-40 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
-  - 2 tests will fail without OPENAI_API_KEY environment variable - this is expected
-  - All other tests (28+) should pass
-
-### Prerequisites
-- **CRITICAL**: Must set `OPENAI_API_KEY` environment variable with valid OpenAI API key
-- Python 3.13+ (UV automatically downloads and manages this)
-- System dependencies: libcairo2-dev, pkg-config, python3-dev
-
-### Running the Application
-- Basic usage: `uv run python adt-press.py label=mydocument pdf_path=/path/to/document.pdf`
-- Example with sample file: `uv run python adt-press.py label=test pdf_path=assets/momo.pdf`
-- Configuration override: `uv run python adt-press.py label=test pdf_path=assets/momo.pdf page_range.start=0 page_range.end=5`
-- **Processing time**: Can take 10-30+ minutes depending on PDF size and page count. NEVER CANCEL.
-
-## Validation
-
-### Manual Testing Requirements
-- Always run the bootstrap steps before testing changes
-- Test with sample PDFs: `assets/momo.pdf` or `assets/cuaderno3.pdf` 
-- **ALWAYS** run linting and tests before committing: `uv run ruff check && uv run ruff format --check && uv run pytest`
-- Test configuration changes by running with different parameters
-- Verify output generation in `output/[label]/` directory after successful processing
-
-### Build Time Expectations
-- UV sync: 5-10 seconds
-- Linting: Under 1 second  
-- Tests: 30-40 seconds (NEVER CANCEL - set 60+ second timeout)
-- Full PDF processing: 10-30+ minutes depending on size (NEVER CANCEL - set 45+ minute timeout)
-
-## Key Project Components
-
-### Python Backend (`adt_press/`)
-- `pipeline.py`: Main processing pipeline using Hamilton framework
-- `nodes/`: Hamilton nodes for PDF processing, image analysis, text extraction
-- `llm/`: LLM integration modules for OpenAI models
-- `models/`: Pydantic data models for validation
-- `utils/`: Utility functions for file handling, synchronization
-
-### Configuration (`config/`)
-- `config.yaml`: Main configuration file with model settings, prompt templates, filters
-- Supports command-line overrides: `parameter.subparam=value`
-
-### Web Frontend (`assets/web/assets/`)
-- `base.js`: Main application entry point
-- `modules/`: Modular JavaScript components (state, audio, navigation, etc.)
-- `activities/`: Educational activity types (multiple choice, sorting, etc.)
-- Supports accessibility features: text-to-speech, easy read mode, keyboard navigation
-
-### Templates and Prompts
-- `templates/`: HTML templates for output generation
-- `prompts/`: Jinja2 templates for LLM prompts
-- `assets/prompts/`: Example data for few-shot prompting
-
-## Common Commands Reference
-
-### Development Workflow
 ```bash
-# Fresh setup
+# Setup (macOS/Linux)
 pip install uv
-sudo apt install -y libcairo2-dev pkg-config python3-dev
-uv sync --dev
+uv sync --dev                    # 5-10s - NEVER CANCEL
 
-# Daily development
-uv run ruff check --fix          # Fix linting issues
-uv run ruff format              # Format code
-uv run pytest -v               # Run tests
-
-# Test processing
-export OPENAI_API_KEY=your-key-here
+# Run (10-30+ minutes depending on PDF size - NEVER CANCEL)
 uv run python adt-press.py label=test pdf_path=assets/momo.pdf
+
+# Test & Lint
+uv run pytest -v                 # 30-40s - expect 2 failures without OPENAI_API_KEY
+uv run ruff check --fix
+uv run ruff format
 ```
 
-### Repository Structure
+## Architecture: Hamilton DAG Pipeline
+
+The core is a **Hamilton dataflow pipeline** (`adt_press/pipeline.py`) where functions define nodes in a directed acyclic graph. Hamilton automatically resolves dependencies and executes nodes in order.
+
+**Key Pattern**: Functions in `adt_press/nodes/` define the DAG. Function names become node names, parameters specify dependencies on other nodes or config values:
+
+```python
+# nodes/pdf_nodes.py
+def pdf_images(pdf_pages: list[Page]) -> list[Image]:
+    # Hamilton auto-injects pdf_pages from upstream node
+    return [img for page in pdf_pages for img in page.images]
 ```
-├── adt-press.py          # Main entry point
-├── adt_press/            # Python package
-│   ├── llm/             # LLM integrations
-│   ├── nodes/           # Hamilton processing nodes
-│   ├── models/          # Data models
-│   └── utils/           # Utilities
-├── assets/              # Sample files and web frontend
-├── config/              # Configuration files
-├── prompts/             # LLM prompt templates
-├── templates/           # HTML templates
-├── tests/               # Test suite
-├── pyproject.toml       # Python project config
-└── ruff.toml           # Linting config
+
+**Conditional Execution**: Use `@config.when()` to enable/disable features via config strategies:
+
+```python
+@config.when(crop_strategy="llm")
+def cropped_images__llm(images, config):  # Runs when crop_strategy=llm
+    return crop_with_llm(images, config)
+
+@config.when(crop_strategy="none") 
+def cropped_images__none(images):         # Runs when crop_strategy=none
+    return images
 ```
+
+Config strategies control pipeline behavior: `crop_strategy`, `glossary_strategy`, `caption_strategy`, `activity_strategy`, `speech_strategy`, `easy_read_strategy`. Set to `llm` or `none` in `config/config.yaml` or via CLI (`crop_strategy=llm`).
+
+## Configuration System
+
+**Three-layer merge** (OmegaConf): `config/config.yaml` → `output/[label]/config.yaml` → CLI args
+
+```bash
+# Override any config value via CLI
+uv run python adt-press.py label=test pdf_path=assets/momo.pdf \
+  page_range.start=0 page_range.end=5 \
+  crop_strategy=llm caption_strategy=none
+```
+
+**Critical config sections**:
+- `section_types`: Defines content categories (front_cover, text_and_images, activity_matching, etc.) with descriptions LLMs use for classification
+- `render_strategies`: Maps section types to HTML generation approaches (template, html, activity)
+- `prompts`: LLM prompt configs (model, template_path, rate_limit, max_retries)
+
+When adding features, update `config/config.yaml` schema and reference config nodes in `adt_press/nodes/config_nodes.py`.
+
+## LLM Integration Patterns
+
+All LLM calls follow this structure (`adt_press/llm/*.py`):
+
+1. Define Pydantic response model inheriting `CleanTextBaseModel` (auto-cleans Unicode)
+2. Use `get_instructor_client()` for structured outputs
+3. Load prompt via `banks.Prompt` from Jinja2 templates in `prompts/`
+4. Batch async calls with `gather_with_limit()` for rate limiting
+
+```python
+# Example: adt_press/llm/image_caption.py
+from adt_press.llm import get_instructor_client
+from adt_press.utils.encoding import CleanTextBaseModel
+
+class CaptionResponse(CleanTextBaseModel):
+    caption: str
+    reasoning: str
+
+async def get_image_caption(config, page, image, language_code):
+    prompt = Prompt(cached_read_text_file(config.template_path))
+    client = get_instructor_client()
+    response = await client.chat.completions.create(
+        model=config.model,
+        response_model=CaptionResponse,
+        messages=[m.model_dump() for m in prompt.chat_messages(context)]
+    )
+    return ImageCaption(image_id=image.image_id, caption=response.caption)
+```
+
+**Rate limiting**: `gather_with_limit(tasks, rate_limit)` enforces `rate_limit` ops/minute across all LLM calls in a batch.
+
+## Adding New Features
+
+**To add a new LLM processing step**:
+
+1. Create `adt_press/llm/my_feature.py` with async function + Pydantic model
+2. Add node in `adt_press/nodes/*.py` that calls your LLM function via `gather_with_limit()`
+3. Add conditional execution with `@config.when(my_strategy="llm")` and `@config.when(my_strategy="none")`
+4. Add `my_strategy: llm` to `config/config.yaml`
+5. Add prompt config under `prompts.my_feature` in `config/config.yaml`
+6. Create Jinja2 template in `prompts/my_feature.jinja2`
+7. Import new node module in `adt_press/pipeline.py` modules list
+8. Add tests in `tests/test_my_feature.py`
+9. Add a report section template in `templates/` if needed
+
+## Web Frontend
+
+Modular JavaScript in `assets/web/assets/`: `base.js` initializes modules from `modules/` (state, audio, navigation, translations). Activity types in `modules/activities/` follow a plugin pattern with `init()` and `validate()` methods.
+
+## Testing & Quality
+
+- Tests use pytest with fixtures for config/data
+- Two tests require `OPENAI_API_KEY` (integration tests) - all others should pass
+- Test timeout: 60+ seconds (some tests process PDFs)
+- Coverage tracked via GitHub Actions
+- Ruff for linting/formatting (configured in `ruff.toml`)
 
 ## Troubleshooting
 
-### Common Issues
-- **OpenAI API errors**: Ensure `OPENAI_API_KEY` is set and valid
-- **Pycairo build errors**: Install `libcairo2-dev pkg-config python3-dev`
-- **File not found**: Use absolute paths or verify file exists
-- **Config errors**: Check parameter names match `config/config.yaml` structure
-- **Test failures**: 2 tests require OpenAI API key - others should pass
-
-### Docker Usage  
-- **Note**: Docker build may fail in environments with SSL certificate issues
-- When working: `docker build -t adt-press .` then `docker run --rm -e OPENAI_API_KEY=your-key adt-press uv run adt-press.py label=test pdf_path=/path/to/file.pdf`
-
-### Development Guidelines
-- Use Ruff for code formatting and linting (configured in `ruff.toml`)
-- Follow existing patterns in `adt_press/nodes/` for new processing steps
-- Add tests in `tests/` following pytest conventions
-- Update configuration in `config/config.yaml` for new features
-- Web frontend follows modular JavaScript pattern in `assets/web/assets/`
-
-## Performance Notes
-- Processing is I/O and API-bound - expect 10-30+ minute processing times
-- UV dependency sync is fast (5-10 seconds) 
-- Tests run quickly (30-40 seconds) except for integration tests requiring OpenAI
-- Image processing and LLM calls are the main bottlenecks in PDF processing
+- **"Model not found" errors**: Check `default_model` in config (currently `gpt-5`). Use `print_available_models=true` to list valid models.
+- **Pipeline cache issues**: Run with `clear_cache=true` to reset: `uv run python adt-press.py clear_cache=true label=test pdf_path=...`
+- **Hamilton node errors**: Check function names don't conflict. Hamilton uses function names as node IDs - duplicate names break the DAG.
+- **Config validation errors**: OmegaConf struct mode enforces schema. All CLI params must exist in `config/config.yaml`.
