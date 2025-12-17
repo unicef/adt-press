@@ -16,7 +16,7 @@
 | adt\_press/llm/page\_sectioning.py          |       43 |        0 |    100% |           |
 | adt\_press/llm/section\_explanations.py     |       17 |        6 |     65% |     21-42 |
 | adt\_press/llm/section\_glossary.py         |       15 |        6 |     60% |     17-36 |
-| adt\_press/llm/section\_quiz.py             |       51 |        7 |     86% |22, 29, 31, 36, 38, 40, 42 |
+| adt\_press/llm/section\_quiz.py             |       51 |        6 |     88% |22, 29, 31, 36, 38, 40 |
 | adt\_press/llm/speech\_generation.py        |       27 |       18 |     33% |     14-53 |
 | adt\_press/llm/text\_easy\_read.py          |       15 |        6 |     60% |     17-35 |
 | adt\_press/llm/text\_extraction.py          |       18 |        0 |    100% |           |
@@ -44,20 +44,20 @@
 | adt\_press/nodes/report\_nodes.py           |       71 |        4 |     94% |   248-252 |
 | adt\_press/nodes/section\_nodes.py          |       95 |       35 |     63% |35, 84, 94, 119-144, 166-180 |
 | adt\_press/nodes/speech\_nodes.py           |       24 |       11 |     54% |     13-26 |
-| adt\_press/nodes/web\_nodes.py              |      163 |       15 |     91% |73, 86, 88, 90, 94, 98, 103-104, 198, 205, 255-256, 303-307 |
+| adt\_press/nodes/web\_nodes.py              |      169 |       16 |     91% |73, 86, 88, 90, 94, 98, 103-104, 200-202, 209, 265-266, 313-317 |
 | adt\_press/nodes/webpub\_nodes.py           |       86 |        0 |    100% |           |
 | adt\_press/pipeline.py                      |       35 |        0 |    100% |           |
 | adt\_press/utils/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | adt\_press/utils/encoding.py                |       32 |        7 |     78% |10, 57-60, 65-68 |
 | adt\_press/utils/file.py                    |       45 |        0 |    100% |           |
-| adt\_press/utils/html.py                    |      156 |       31 |     80% |65, 87, 120-122, 179-191, 223-224, 227, 236, 274, 278, 282, 285, 290-302, 305 |
+| adt\_press/utils/html.py                    |      159 |       31 |     81% |65, 87, 120-122, 179-191, 223-224, 227, 236, 274, 278, 282, 285, 290-302, 305 |
 | adt\_press/utils/image.py                   |       94 |       36 |     62% |25-34, 41-45, 54-60, 77-80, 83, 120-136 |
 | adt\_press/utils/languages.py               |        3 |        0 |    100% |           |
 | adt\_press/utils/logging.py                 |       72 |       26 |     64% |17-24, 50, 85-87, 100-107, 115-134, 142 |
 | adt\_press/utils/pdf.py                     |       18 |        3 |     83% | 47, 52-53 |
 | adt\_press/utils/report\_assets.py          |       39 |        2 |     95% |   147-148 |
 | adt\_press/utils/sync.py                    |       14 |        0 |    100% |           |
-| adt\_press/utils/web\_assets.py             |      115 |        6 |     95% |77, 164-169 |
+| adt\_press/utils/web\_assets.py             |      174 |        9 |     95% |77, 164-169, 279, 307, 311 |
 | tests/test\_clear\_cache.py                 |       45 |        0 |    100% |           |
 | tests/test\_encoding.py                     |       39 |        1 |     97% |        64 |
 | tests/test\_html\_utils.py                  |      107 |        0 |    100% |           |
@@ -68,12 +68,12 @@
 | tests/test\_pipeline.py                     |       88 |        0 |    100% |           |
 | tests/test\_report\_assets.py               |       94 |        0 |    100% |           |
 | tests/test\_utils\_image.py                 |       20 |        0 |    100% |           |
-| tests/test\_web\_assets.py                  |      128 |        0 |    100% |           |
+| tests/test\_web\_assets.py                  |      247 |        0 |    100% |           |
 | tests/test\_web\_generation\_validator.py   |       75 |        0 |    100% |           |
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-| **TOTAL**                                   | **3827** |  **681** | **82%** |           |
+| **TOTAL**                                   | **4014** |  **684** | **83%** |           |
 
 
 ## Setup coverage badge
