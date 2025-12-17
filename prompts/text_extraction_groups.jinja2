@@ -14,28 +14,27 @@ Within each group, list all the text that it contains. Text has a "text_type" an
     - "book_title": For the title of the book. There can only be one book title for the entire book.
     - "book_subtitle": For the subtitle of the book. There can only be one subtitle for the entire book.
     - "book_author": For the author of the book.
-    - "chapter_title": For a chapter title that seems to be the title of a entirely new topic with sections within it. If nothing seems like a chapter title, this should be "NONE".
-    - "section_heading": For section headings under a chapter. If there is no section heading, this should be "NONE".
-    - "section_text": For the main body of text within the section heading.
-    - "boxed_text": For text that standalones from the regular material and is surrounded in a colored box.
-    - "hint": For hints that are provided to help the reader answer questions or solve problems.
-    - "instruction_text": For instructions that direct the reader to do something or complete an activity.
+    - "book_metadata": For metadata about the book such as edition, publisher, year, series, language, etc.
+    - "section_heading": For text that introduces a new chapter, section, subsection, or topic.
+    - "section_text": For the main body of text within the section.
+    - "instruction_text":  For instructions that direct the reader to do something or complete an activity, including hints that are provided to help the reader answer questions or solve problems.
     - "activity_number": For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections.
+    - "activity_title": For text that is the title of the activity (often following the activity number).
     - "activity_option": For text that provides options for an activity like a multiple choice or matching activity.
-    - "fill_in_the_blank": For text that includes blanks that the reader must fill in for a fill in the blank activity.
-    - "image_label": For text that definitely accompany an image to augment it as a label.
-    - "image_caption": For captions that only describe the image.
-    - "image_overlay": For text that is overlaid on an image at a specific location.
-    - "math": For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \( \) OR \[ \] OR $$.
-    - "standalone_text": For text that do not fall within a section.
-    - "page_number": For text that indicates the page number of the page.
     - "activity_input_placeholder_text": For any text that will be used as a placeholder in an input field for a fill in the blank activity. E.g. "replace the word".
+    - "fill_in_the_blank": For text that includes blanks that the reader must fill in for a fill in the blank activity.
+    - "image_associated_text": For text that accompanies or is directly associated with an image to label, explain, or contextualize it. This includes figure numbers, titles, captions, descriptions, copyright information, and credits.
+    - "image_overlay": For text that is overlaid on an image at a specific location, such as a speech bubble.
+    - "math": For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \( \) OR \[ \] OR $$.
+    - "standalone_text":  For text that does not fall within a section and/or stands alone from the regular material. It may be surrounded in a colored box.
+    - "header_text": For text that appears in the header of the page.    
     - "footer_text": For text that appears in the footer of the page.
+    - "page_number": For text that indicates the page number of the page.
     - "other": For any other text that does not fit the above categories.
 
 IMPORTANT:
   - YOU MUST EXTRACT EVERY SINGLE TEXT YOU SEE IN THE PAGE. EVERY SINGLE TEXT. DO NOT LEAVE ANY TEXT OUT.
-  - THE TEXT CAN BE IN ANY LANGUAGE, THEY MUST ALL BE EXTRACTED.
+  - THE TEXT CAN BE IN ANY LANGUAGE, IT MUST ALL BE EXTRACTED.
   - Break up the text into INDIVIDUAL LOGICAL PHRASES OR SENTENCES of text. Group texts that belong together into a single group. For example a paragraph of text should be represented as a group.
   - Each logical phrase or sentence of text MUST be a single text and type. DO NOT give an entire paragraph as a single text, instead break it up into sentences, then put them all in a group.
   - In the case of drop caps, do not extract the drop cap letter as a separate text, it should be part of the same text as the rest of the paragraph.
@@ -47,6 +46,11 @@ IMPORTANT:
   - IF A PHRASE OR SENTENCE CONTAINS MATH AND TEXT, THE MATH AND TEXT MUST BE SEPARATE ENTRIES IN THE ARRAY.
   - For math equations, extract and convert them into LaTeX format, providing only the LaTeX expression. Use commonly used special characters in your LaTeX expressions for example: \ {{ '{' }} {{ '}' }} $ % & # _ ^ ~ ` '
   - In the LaTex expressions, exclude characters like ð‘¥ð‘¥â
+  - If the page is a table of contents, the texts typically have types like "chapter_title", "section_heading", or "page_number". 
+  - For lines in a table of contents, do not extract sequences of periods or page numbers. For example, "Chapter 5..........35" can just be extracted as "Chapter 5".
+  - A text like "Lesson 1", "Lesson 2", etc. is typically a "section_heading".  
+  - A text like "Chapter 1", "Chapter 2", etc. is typically a "chapter_title".
+  - A text like "Activity 1", "Activity 2", etc. is typically an "activity_title".
 
 If there is no text on the page, return:
     {{ '{' }}
@@ -57,7 +61,10 @@ You must extract ALL text into the given structure. Please take your time and ma
 {% endchat %}
 
 {% chat role="user" %}
-The following text is extracted from the PDF with fitz (it might be empty):
+The page number is:
+{{ page.page_number }}
+
+The following text is extracted from the PDF with PyMuPDF (it might be empty):
 {{ page.text }}
 
 The following image is the page from the PDF to extract the text from.

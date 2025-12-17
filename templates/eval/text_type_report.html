@@ -6,7 +6,7 @@
     <div class="bg-white rounded border mb-6 overflow-hidden">
         <!-- Page ID header -->
         <div class="bg-gray-600 text-white px-4 py-3 font-bold text-xl flex justify-between items-center">
-            <span>Page Test {{result.step}}</span>
+            <span>Page Test {{result.step}} ({{ result.book_title }}, Page {{ result.page_number }})</span>
             <div class="flex gap-2">
                 <span class="px-3 py-1 bg-gray-700 text-white text-sm font-medium rounded-full"><a href="{{ result.label_studio_url }}" target="_blank">{{ result.id }}</a></span>
                 <span class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (result.score * 100) | round | int}}%</span>

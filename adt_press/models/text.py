@@ -12,26 +12,26 @@ class TextGroupType(str, enum.Enum):
 
 
 class TextType(str, enum.Enum):
+    # Simplified 4
     book_title = "book_title"
     book_subtitle = "book_subtitle"
     book_author = "book_author"
-    chapter_title = "chapter_title"
+    book_metadata = "book_metadata"
     section_heading = "section_heading"
     section_text = "section_text"
-    boxed_text = "boxed_text"
-    hint = "hint"
     instruction_text = "instruction_text"
     activity_number = "activity_number"
+    activity_title = "activity_title"
     activity_option = "activity_option"
     fill_in_the_blank = "fill_in_the_blank"
     activity_input_placeholder_text = "activity_input_placeholder_text"
-    image_label = "image_label"
-    image_caption = "image_caption"
+    image_associated_text = "image_associated_text"
     image_overlay = "image_overlay"
     math = "math"
     standalone_text = "standalone_text"
-    page_number = "page_number"
+    header_text = "header_text"
     footer_text = "footer_text"
+    page_number = "page_number"
     other = "other"
 
 
