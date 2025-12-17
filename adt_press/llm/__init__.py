@@ -4,7 +4,7 @@ from typing import Any
 import litellm
 import mlflow
 
-from adt_press.llm.providers import LLMProvider, create_provider
+from adt_press.llm.providers import LLMProvider
 
 # if langfuse is configured, set up callbacks for litellm
 if os.getenv("LANGFUSE_HOST"):
@@ -26,20 +26,17 @@ def get_provider() -> LLMProvider:
     """
     Get the global LLM provider instance.
 
-    The provider is configured based on environment variables or defaults to OpenAI.
-    Environment variables:
-    - LLM_PROVIDER: Provider type (openai, gemini, anthropic)
-    - OPENAI_API_KEY: For OpenAI provider
-    - GEMINI_API_KEY: For Gemini provider
-    - ANTHROPIC_API_KEY: For Anthropic provider
-    - LLM_BASE_URL: Optional custom base URL for provider
+    The provider must be initialized via set_provider() before calling this function.
+    This typically happens through the llm_provider_settings_config node in the pipeline.
+
+    Raises:
+        RuntimeError: If provider has not been initialized
     """
     global _provider
     if _provider is None:
-        provider_type = os.getenv("LLM_PROVIDER", "openai").lower()
-        _provider = create_provider(
-            provider_type=provider_type,
-            base_url=os.getenv("LLM_BASE_URL"),
+        raise RuntimeError(
+            "LLM provider not initialized. Ensure llm_provider is configured in config.yaml "
+            "and the pipeline has initialized the provider via llm_provider_settings_config node."
         )
     return _provider
 

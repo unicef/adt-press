@@ -19,9 +19,7 @@ class PipelineTest(unittest.TestCase):
         files = list(Path(self.run_dir).glob(pattern))
         self.assertEqual(len(files), expected_count, msg)
 
-    def assertFileContains(
-        self, name: str, content: str, msg: str = "", case_sensitive: bool = True
-    ):
+    def assertFileContains(self, name: str, content: str, msg: str = "", case_sensitive: bool = True):
         file_path = Path(self.run_dir) / name
         self.assertTrue(file_path.exists(), f"File {name} does not exist.")
         with open(file_path, "r") as f:
@@ -46,9 +44,7 @@ class PipelineTest(unittest.TestCase):
             file_content = f.read().lower()
         self.assertIn(content.lower(), file_content, msg)
 
-    @unittest.skipUnless(
-        HAS_API_KEY, "OPENAI_API_KEY not set - skipping integration test"
-    )
+    @unittest.skipUnless(HAS_API_KEY, "OPENAI_API_KEY not set - skipping integration test")
     def test_pipeline_integration_first_five_pages(self):
         """Test the entire pipeline with first 6 pages using default config values."""
 
@@ -101,19 +97,11 @@ class PipelineTest(unittest.TestCase):
                 file_path = Path(f"{self.run_dir}/{file}")
                 assert file_path.exists(), f"Output file {file} was not created."
 
-            self.assertFileCount(
-                "*.html", len(output_files), "Unexpected number of HTML files created"
-            )
+            self.assertFileCount("*.html", len(output_files), "Unexpected number of HTML files created")
             self.assertFileCount("run.png", 1, "Run image not created")
-            self.assertFileCount(
-                "images/page_?.png", 5, "Unexpected number of page images created"
-            )
-            self.assertFileCount(
-                "images/img_p*_v?.png", 0, "Unexpected number of vector images created"
-            )
-            self.assertFileCount(
-                "images/img_p*_r?.png", 10, "Unexpected number of raster images created"
-            )
+            self.assertFileCount("images/page_?.png", 5, "Unexpected number of page images created")
+            self.assertFileCount("images/img_p*_v?.png", 0, "Unexpected number of vector images created")
+            self.assertFileCount("images/img_p*_r?.png", 10, "Unexpected number of raster images created")
             self.assertFileCount(
                 "images/img_p*_r*_crop*.png",
                 5,
@@ -130,32 +118,22 @@ class PipelineTest(unittest.TestCase):
                 "Unexpected number of chart images created",
             )
 
-            self.assertFileContains(
-                "page_report.html", "Hyena and Raven", "Title not found in page report"
-            )
+            self.assertFileContains("page_report.html", "Hyena and Raven", "Title not found in page report")
             self.assertFileContains(
                 "page_report.html",
                 "sec_p1_s0",
                 "No section found for page 1 in page report",
             )
-            self.assertFileContains(
-                "page_report.html", "French", "Output language not found in page report"
-            )
-            self.assertFileContains(
-                "page_report.html", "English", "Input language not found in page report"
-            )
+            self.assertFileContains("page_report.html", "French", "Output language not found in page report")
+            self.assertFileContains("page_report.html", "English", "Input language not found in page report")
             self.assertFileContains(
                 "page_report.html",
                 "corbeau",
                 "Translated text not found in page report",
                 case_sensitive=False,
             )
-            self.assertFileContains(
-                "page_report.html", "Glossary", "No glossary section found in report"
-            )
-            self.assertFileContains(
-                "page_report.html", "Easy Read", "No easy read section found in report"
-            )
+            self.assertFileContains("page_report.html", "Glossary", "No glossary section found in report")
+            self.assertFileContains("page_report.html", "Easy Read", "No easy read section found in report")
 
             self.assertFileContains(
                 "metadata_report.html",
@@ -174,9 +152,7 @@ class PipelineTest(unittest.TestCase):
                 "Translated text 'corbeau' not found in page report",
             )
 
-    @unittest.skipUnless(
-        HAS_API_KEY, "OPENAI_API_KEY not set - skipping integration test"
-    )
+    @unittest.skipUnless(HAS_API_KEY, "OPENAI_API_KEY not set - skipping integration test")
     def test_pipeline_integration_no_translation(self):
         # Create a temporary output directory for this test
         with tempfile.TemporaryDirectory() as self.temp_dir:
@@ -225,17 +201,13 @@ class PipelineTest(unittest.TestCase):
                 file_path = Path(f"{self.run_dir}/{file}")
                 assert file_path.exists(), f"Output file {file} was not created."
 
-            self.assertFileContains(
-                "page_report.html", "Hyena and Raven", "Title not found in page report"
-            )
+            self.assertFileContains("page_report.html", "Hyena and Raven", "Title not found in page report")
             self.assertFileContains(
                 "page_report.html",
                 "sec_p1_s0",
                 "No section found for page 1 in page report",
             )
-            self.assertFileDoesNotContain(
-                "page_report.html", "corbeau", "French should not be in page report"
-            )
+            self.assertFileDoesNotContain("page_report.html", "corbeau", "French should not be in page report")
 
             # rerun using two column web strategy
             test_config["web_strategy"] = "two_column"

@@ -151,9 +151,15 @@ class LanguageDetectionLLMTests(unittest.TestCase):
 
         fake_client = FakeClient(responder)
 
-        with patch(
-            "adt_press.llm.language_detection.get_instructor_client",
-            return_value=fake_client,
+        with (
+            patch(
+                "adt_press.llm.language_detection.get_instructor_client",
+                return_value=fake_client,
+            ),
+            patch(
+                "adt_press.llm.language_detection.format_model_name",
+                return_value="gpt-5",
+            ),
         ):
             with self.assertRaises(ValueError):
                 asyncio.run(detect_input_language("N/A", self.prompt_config))

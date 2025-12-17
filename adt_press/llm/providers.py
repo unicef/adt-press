@@ -102,7 +102,9 @@ class OpenAIProvider(LLMProvider):
         if self.config.api_key:
             os.environ["OPENAI_API_KEY"] = self.config.api_key
         elif not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("OPENAI_API_KEY must be set either in config or environment")
+            raise ValueError(
+                "OPENAI_API_KEY must be set either in config or environment"
+            )
 
         # Set base URL if provided (for Azure OpenAI or custom endpoints)
         if self.config.base_url:
@@ -126,7 +128,9 @@ class GeminiProvider(LLMProvider):
         if self.config.api_key:
             os.environ["GEMINI_API_KEY"] = self.config.api_key
         elif not os.getenv("GEMINI_API_KEY"):
-            raise ValueError("GEMINI_API_KEY must be set either in config or environment")
+            raise ValueError(
+                "GEMINI_API_KEY must be set either in config or environment"
+            )
 
     def format_model_name(self, model: str) -> str:
         """
@@ -153,7 +157,9 @@ class AnthropicProvider(LLMProvider):
         if self.config.api_key:
             os.environ["ANTHROPIC_API_KEY"] = self.config.api_key
         elif not os.getenv("ANTHROPIC_API_KEY"):
-            raise ValueError("ANTHROPIC_API_KEY must be set either in config or environment")
+            raise ValueError(
+                "ANTHROPIC_API_KEY must be set either in config or environment"
+            )
 
     def format_model_name(self, model: str) -> str:
         """
@@ -173,19 +179,17 @@ class LMStudioProvider(LLMProvider):
 
     def _setup_provider(self) -> None:
         """Setup LM Studio-specific configuration."""
-        # API key is optional for LM Studio - defaults to empty string
-        if self.config.api_key:
-            os.environ["LM_STUDIO_API_KEY"] = self.config.api_key
-        elif not os.getenv("LM_STUDIO_API_KEY"):
-            # Set empty default if not provided
-            os.environ["LM_STUDIO_API_KEY"] = ""
+        # API key is optional for LM Studio - set if provided, otherwise use empty string
+        api_key = self.config.api_key or os.getenv("LM_STUDIO_API_KEY") or ""
+        os.environ["LM_STUDIO_API_KEY"] = api_key
 
-        # Base URL is required for LM Studio - defaults to localhost:1234
-        if self.config.base_url:
-            os.environ["LM_STUDIO_API_BASE"] = self.config.base_url
-        elif not os.getenv("LM_STUDIO_API_BASE"):
-            # Set default local server URL
-            os.environ["LM_STUDIO_API_BASE"] = "http://localhost:1234"
+        # Base URL - use provided URL, or environment variable, or default to localhost:1234
+        base_url = (
+            self.config.base_url
+            or os.getenv("LM_STUDIO_API_BASE")
+            or "http://localhost:1234"
+        )
+        os.environ["LM_STUDIO_API_BASE"] = base_url
 
     def format_model_name(self, model: str) -> str:
         """
@@ -223,7 +227,9 @@ def create_provider(provider_type: str, **config_kwargs: Any) -> LLMProvider:
         ValueError: If provider_type is not supported
     """
     if provider_type not in PROVIDER_REGISTRY:
-        raise ValueError(f"Unsupported provider: {provider_type}. Supported providers: {list(PROVIDER_REGISTRY.keys())}")
+        raise ValueError(
+            f"Unsupported provider: {provider_type}. Supported providers: {list(PROVIDER_REGISTRY.keys())}"
+        )
 
     provider_class = PROVIDER_REGISTRY[provider_type]
     config = LLMProviderConfig(provider_type=provider_type, **config_kwargs)
