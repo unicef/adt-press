@@ -34,7 +34,7 @@ def web_pages(
     plate_language_config: str,
     plate: Plate,
     default_model_config: str,
-    section_types_config: dict[str, SectionType],
+    section_types_config_filtered: dict[str, SectionType],  # ← TO THIS
     render_strategy_config: str,
     render_strategies_config: dict[str, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
@@ -68,7 +68,7 @@ def web_pages(
                     images.append(images_by_id[part_id])
 
             # Get section type configuration
-            section_type_obj = section_types_config.get(section.section_type)
+            section_type_obj = section_types_config_filtered.get(section.section_type)
             if not section_type_obj:
                 raise ValueError(f"Unknown section type: {section.section_type}")
 

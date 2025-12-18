@@ -16,6 +16,7 @@ from adt_press.models.config import (
     QuizPromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    RenderType,
     SectionType,
     SpeechPromptConfig,
     TextGroupType,
@@ -154,7 +155,11 @@ def input_language_config(
     try:
         response = run_async_task(lambda: detect_input_language(pdf_text_sample, language_detection_prompt_config))
         confidence = getattr(response, "confidence", None)
-        log.info("input language detected automatically", language=response.language_code, confidence=confidence)
+        log.info(
+            "input language detected automatically",
+            language=response.language_code,
+            confidence=confidence,
+        )
         return response.language_code
     except Exception:  # pragma: no cover - fallback path
         raise ValueError("language detection failed; please specify `input_language` configuration parameter")
@@ -404,7 +409,9 @@ def activity_answers_prompts_config__llm(config: DictConfig) -> dict[str, Prompt
 
 @cache(behavior="recompute")
 @when_config.when(activity_strategy="none")
-def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, PromptConfig]:
+def activity_answers_prompts_config__none(
+    config: DictConfig,
+) -> dict[str, PromptConfig]:
     """Return empty dict when activity answer generation is disabled."""
     return {}
 
@@ -477,3 +484,41 @@ def pruned_text_types_config(config: DictConfig) -> list[str]:
 
 def pruned_section_types_config(config: DictConfig) -> list[str]:
     return list[str](config.get("section_filters", {}).get("pruned_section_types", []))
+
+
+@cache(behavior="recompute")
+def activity_strategy_config(config: DictConfig) -> str:
+    """Get the activity generation strategy from config."""
+    return str(config.get("activity_strategy", "none"))
+
+
+def section_types_config_filtered(
+    section_types_config: dict[str, SectionType],
+    render_strategies_config: dict[str, RenderStrategy],
+    activity_strategy_config: str,
+) -> dict[str, SectionType]:
+    """Filter out section types with activity render strategy when activity_strategy is none.
+
+    This prevents configuration errors where sections are classified as activities
+    but activity generation is disabled.
+    """
+    if activity_strategy_config == "none":
+        # Filter out section types that have render_strategy: activity
+        filtered = {}
+        for section_type_name, section_type_obj in section_types_config.items():
+            render_strategy_name = section_type_obj.render_strategy
+            if render_strategy_name in render_strategies_config:
+                render_strategy_obj = render_strategies_config[render_strategy_name]
+                if render_strategy_obj.render_type == RenderType.activity:
+                    # Skip this section type as it maps to an activity
+                    log.debug(
+                        "Filtering out activity section type",
+                        section_type=section_type_name,
+                        render_strategy=render_strategy_name,
+                    )
+                    continue
+            filtered[section_type_name] = section_type_obj
+        return filtered
+    else:
+        # Return original config when activities are enabled
+        return section_types_config

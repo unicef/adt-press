@@ -17,7 +17,7 @@ def sections_by_page_id(
     processed_images_by_page: dict[str, list[ProcessedImage]],
     filtered_pdf_texts: dict[str, PageTexts],
     page_sectioning_prompt_config: PromptConfig,
-    section_types_config: dict[str, SectionType],
+    section_types_config_filtered: dict[str, SectionType],
     page_grouping_config: str,
 ) -> dict[str, PageSections]:
     page_sections = {}
@@ -36,7 +36,7 @@ def sections_by_page_id(
             else:
                 sections.append(
                     get_page_sections(
-                        page_sectioning_prompt_config, section_types_config, spread_mode, page, page_images, page_texts.groups
+                        page_sectioning_prompt_config, section_types_config_filtered, spread_mode, page, page_images, page_texts.groups
                     )
                 )
 
