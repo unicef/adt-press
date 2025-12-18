@@ -3,7 +3,7 @@
 {% block content %}
 <div class="space-y-8">
     {% for language in output_languages %}
-    {% with glossary = glossary_translations[language] %}
+    {% with glossary = glossary_translations[language.code] %}
     <div class="rounded border bg-yellow-50 overflow-hidden">
         <!-- Glossary Header -->
         <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">

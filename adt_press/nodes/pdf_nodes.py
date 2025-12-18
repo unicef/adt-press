@@ -261,21 +261,21 @@ def book_table_of_contents(book_metadata: BookMetadata) -> list[BookChapter]:
     return book_metadata.table_of_contents
 
 
-def input_language(input_language_config: str | None, book_metadata: BookMetadata) -> Language:
-    if input_language_config:
-        return Language(input_language_config)
+def input_language(input_language_config: str, book_metadata: BookMetadata) -> Language:
+    if input_language_config != "auto":
+        return Language.from_code(input_language_config)
     if book_metadata.language_code:
-        return Language(book_metadata.language_code)
+        return Language.from_code(book_metadata.language_code)
     raise ValueError("Input language could not be determined from config or book metadata, please specify input_language in config.")
 
 
-def plate_language(plate_language_config: str | None, input_language: Language) -> Language:
-    if not plate_language_config:
+def plate_language(plate_language_config: str, input_language: Language) -> Language:
+    if plate_language_config == "auto":
         return input_language
-    return Language(plate_language_config)
+    return Language.from_code(plate_language_config)
 
 
-def output_languages(output_languages_config: list[str] | None, plate_language: Language) -> list[Language]:
-    if not output_languages_config or output_languages_config == [None]:
+def output_languages(output_languages_config: list[str], plate_language: Language) -> list[Language]:
+    if output_languages_config == ["auto"]:
         return [plate_language]
-    return [Language(lang_code) for lang_code in output_languages_config]
+    return [Language.from_code(lang_code) for lang_code in output_languages_config]

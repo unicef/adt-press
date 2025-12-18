@@ -43,24 +43,24 @@ def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
 
-def input_language_config(config: DictConfig) -> str | None:
-    result = OmegaConf.select(config, "input_language", default=None)
-    return str(result) if result is not None else None
+def input_language_config(config: DictConfig) -> str:
+    result = OmegaConf.select(config, "input_language", default="auto")
+    return str(result) if result is not None else "auto"
 
 
-def plate_language_config(config: DictConfig) -> str | None:
-    result = OmegaConf.select(config, "plate_language", default=None)
-    return str(result) if result is not None else None
+def plate_language_config(config: DictConfig) -> str:
+    result = OmegaConf.select(config, "plate_language", default="auto")
+    return str(result) if result is not None else "auto"
 
 
-def output_languages_config(config: DictConfig) -> list[str] | None:
-    output_languages = OmegaConf.select(config, "output_languages", default=None)
-    if output_languages is None:
-        return None
+def output_languages_config(config: DictConfig) -> list[str]:
+    output_languages = OmegaConf.select(config, "output_languages", default=["auto"])
+
     # Convert OmegaConf types to native Python types and ensure strings
-    if OmegaConf.is_list(output_languages):
-        return [str(lang) for lang in output_languages]
-    return [str(output_languages)]
+    if not OmegaConf.is_list(output_languages) and not isinstance(output_languages, list):
+        raise ValueError("output_languages must be a list of language codes.")
+
+    return [str(lang) for lang in output_languages]
 
 
 def label_config(config: DictConfig) -> str:

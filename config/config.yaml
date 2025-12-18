@@ -1,13 +1,13 @@
 label: "???"
 pdf_path: "???"
 
-# the language of the book, null will try to auto-detect
-input_language: null
+# the language of the book, auto will try to auto-detect
+input_language: auto
 
-# the language of the plate, default will be the input language
+# the language of the plate
 plate_language: "${input_language}"
 
-# the languages to translate the final ADT into, default is the input language (no translation)
+# the languages to translate the final ADT into
 output_languages: ["${plate_language}"]
 
 output_dir: "output"

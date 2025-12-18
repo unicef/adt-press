@@ -28,7 +28,7 @@ class MetadataResponse(CleanTextBaseModel):
     @classmethod
     def validate_language_code(cls, v: str | None) -> str | None:
         if v:
-            return Language(v).code
+            return Language.from_code(v).code
 
         return None
 

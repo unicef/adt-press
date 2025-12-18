@@ -5,10 +5,12 @@ from pydantic import BaseModel
 class Language(BaseModel):
     code: str
     language_code: str
-    country_code: str
+    country_code: str = ""
     name: str
 
-    def __init__(self, code: str):
+    @classmethod
+    def from_code(cls, code: str) -> "Language":
+        """Create a Language from a language code string like 'en' or 'en-US'."""
         # Parse and validate the language code
         normalized = code.lower()
         parts = normalized.split("-")
@@ -35,8 +37,7 @@ class Language(BaseModel):
         if country_code:
             name = f"{name} ({country.name})"
 
-        # Initialize fields directly
-        super().__init__(code=normalized, language_code=lang_code, country_code=country_code, name=name)
+        return cls(code=normalized, language_code=lang_code, country_code=country_code, name=name)
 
     def __eq__(self, other):
         if not isinstance(other, Language):
