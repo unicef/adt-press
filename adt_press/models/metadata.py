@@ -13,7 +13,7 @@ class BookMetadata(BaseModel):
     title: str | None = None
     authors: list[str] = []
     publisher: str | None = None
-    language_code: str | None = None
+    language: str | None = None
     cover_page_id: str | None = None
     table_of_contents: list[BookChapter] = []
     reasoning: str

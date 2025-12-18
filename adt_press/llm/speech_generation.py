@@ -19,7 +19,7 @@ async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, 
 
     context = dict(
         language_code=language_code,
-        language=language,
+        language=language.name,
         text=sanitized_text,
         examples=config.examples,
     )

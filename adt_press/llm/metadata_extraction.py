@@ -27,7 +27,6 @@ class MetadataResponse(CleanTextBaseModel):
     @field_validator("language_code")
     @classmethod
     def validate_language_code(cls, v: str | None) -> str | None:
-        """Normalize language code to lowercase if present."""
         if v:
             return Language(v).code
 
