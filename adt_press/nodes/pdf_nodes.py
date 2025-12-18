@@ -269,7 +269,7 @@ def input_language(input_language_config: str | None, book_metadata: BookMetadat
     raise ValueError("Input language could not be determined from config or book metadata, please specify input_language in config.")
 
 
-def plate_language(plate_language_config: str, input_language: Language) -> Language:
+def plate_language(plate_language_config: str | None, input_language: Language) -> Language:
     if not plate_language_config:
         return input_language
     return Language(plate_language_config)
