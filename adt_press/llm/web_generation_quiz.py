@@ -4,23 +4,21 @@ from adt_press.models.config import TemplateRenderConfig
 from adt_press.models.plate import PlateQuiz, PlateText
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template_to_string
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 async def generate_web_quiz(
     render_strategy: str,
     config: TemplateRenderConfig,
-    language_code: str,
+    language: Language,
     quiz: PlateQuiz,
     texts: list[PlateText],
 ) -> WebPage:
-    language = LANGUAGE_MAP[language_code]
-
     content = render_template_to_string(
         config.render_template_path,
         {
             "quiz": quiz,
-            "language": language,
+            "language": language.name,
             "texts": {t.text_id: t.model_dump() for t in texts},
         },
     )

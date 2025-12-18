@@ -11,7 +11,7 @@ from adt_press.models.speech import SpeechFile
 from adt_press.models.text import EasyReadText, OutputText, PageText, PageTextGroup, PageTexts
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 from adt_press.utils.report_assets import compile_tailwind_for_reports
 
 
@@ -56,11 +56,11 @@ def report_pages(
     plate_output_texts_by_id: dict[str, OutputText],
     section_glossaries_by_id: dict[str, SectionGlossary],
     easy_reads_by_text_id: dict[str, EasyReadText],
-    input_language_config: str,
-    plate_language_config: str,
+    input_language: Language,
+    plate_language: Language,
 ) -> str:
-    input_language = LANGUAGE_MAP[input_language_config]
-    output_language = LANGUAGE_MAP[plate_language_config]
+    input_language = input_language.name
+    output_language = plate_language.name
 
     return render_template(
         template_config,
@@ -111,7 +111,7 @@ def report_config(template_config: TemplateConfig, config: DictConfig) -> str:
 @cache(behavior="recompute")
 def translation_report(
     template_config: TemplateConfig,
-    output_languages_config: list[str],
+    output_languages: list[Language],
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
     speech_files: dict[str, dict[str, SpeechFile]],
@@ -121,10 +121,9 @@ def translation_report(
         "templates/translation_report.html",
         dict(
             plate=plate,
-            output_languages=output_languages_config,
+            output_languages=output_languages,
             translations=plate_translations,
             speech_files=speech_files,
-            LANGUAGE_MAP=LANGUAGE_MAP,
         ),
     )
 
@@ -133,7 +132,7 @@ def translation_report(
 def glossary_report(
     template_config: TemplateConfig,
     plate: Plate,
-    output_languages_config: list[str],
+    output_languages: list[Language],
     plate_glossary_translations: dict[str, list[GlossaryItem]],
 ) -> str:
     return render_template(
@@ -141,9 +140,8 @@ def glossary_report(
         "templates/glossary_report.html",
         dict(
             plate=plate,
-            output_languages=output_languages_config,
+            output_languages=output_languages,
             glossary_translations=plate_glossary_translations,
-            LANGUAGE_MAP=LANGUAGE_MAP,
         ),
     )
 

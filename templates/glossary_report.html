@@ -3,13 +3,12 @@
 {% block content %}
 <div class="space-y-8">
     {% for language in output_languages %}
-    {% with language_name = LANGUAGE_MAP[language] %}
     {% with glossary = glossary_translations[language] %}
     <div class="rounded border bg-yellow-50 overflow-hidden">
         <!-- Glossary Header -->
         <div class="bg-yellow-600 text-white px-3 py-2 text-sm font-medium">
             <span class="float-right ml-2 px-2 py-1 bg-yellow-800 text-white text-xs font-semibold rounded">{{ glossary|length }} terms</span>
-            {{ language_name }} Glossary
+            {{ language.name }} Glossary
             <div class="clear-both"></div>
         </div>
         <!-- Glossary Content -->
@@ -35,7 +34,6 @@
             {% endfor %}
         </div>
     </div>
-    {% endwith %}
     {% endwith %}
     {% endfor %}
 {% endblock %}

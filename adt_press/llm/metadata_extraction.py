@@ -7,7 +7,7 @@ from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-
+from adt_press.utils.languages import Language
 
 class Chapter(CleanTextBaseModel):
     title: str
@@ -25,29 +25,12 @@ class MetadataResponse(CleanTextBaseModel):
 
     @field_validator("language_code")
     @classmethod
-    def validate_language_code(cls, value: str | None) -> str | None:
-        import pycountry
+    def validate_language_code(cls, v: str | None) -> str | None:
+        """Normalize language code to lowercase if present."""
+        if v:
+            return Language(v).code
 
-        if not value:
-            return value
-
-        normalized = value.lower()
-        parts = normalized.split("-")
-
-        # Validate language code (ISO 639-1 or ISO 639-2)
-        lang_code = parts[0]
-        lang = pycountry.languages.get(alpha_2=lang_code)
-        if not lang:
-            raise ValueError(f"Invalid language code '{lang_code}'. Must be a valid two letter ISO 639 language code.")
-
-        # If locale variant provided, validate country code
-        if len(parts) == 2:
-            country_code = parts[1].upper()
-            country = pycountry.countries.get(alpha_2=country_code)
-            if not country:
-                raise ValueError(f"Invalid country code '{country_code}' in locale '{value}'. Must be a valid ISO 3166 country code.")
-
-        return normalized
+        return None
 
 
 async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_metadata: dict[str, object]) -> BookMetadata:

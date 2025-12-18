@@ -5,7 +5,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.section import GlossaryItem, PageSection, SectionGlossary
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 class GlossaryResponse(CleanTextBaseModel):
@@ -13,13 +13,11 @@ class GlossaryResponse(CleanTextBaseModel):
     reasoning: str
 
 
-async def get_section_glossary(language_code: str, config: PromptConfig, section: PageSection, texts: list[str]) -> SectionGlossary:
-    output_language = LANGUAGE_MAP[language_code]
-
+async def get_section_glossary(language: Language, config: PromptConfig, section: PageSection, texts: list[str]) -> SectionGlossary:
     context = dict(
         section=section,
         texts=texts,
-        output_language=output_language,
+        output_language=language.name,
         examples=config.examples,
     )
 

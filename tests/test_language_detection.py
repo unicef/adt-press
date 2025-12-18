@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 from omegaconf import DictConfig, OmegaConf
 
-from adt_press.llm.language_detection import LanguageDetectionResponse, detect_input_language
 from adt_press.models.config import PromptConfig
 from adt_press.nodes import config_nodes
 

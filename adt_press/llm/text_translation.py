@@ -6,7 +6,7 @@ from adt_press.models.config import PromptConfig
 from adt_press.models.text import OutputText
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 class TextItem(CleanTextBaseModel):
@@ -44,20 +44,17 @@ class TranslationResponse(CleanTextBaseModel):
 async def get_text_translation(
     config: PromptConfig,
     texts: list[tuple[str, str, str]],  # [(text_id, text_type, text)]
-    base_language_code: str,
-    target_language_code: str,
+    base_language: Language,
+    target_language: Language,
 ) -> list[OutputText]:
     """Translate one or more texts together to maintain context."""
-    base_language = LANGUAGE_MAP[base_language_code]
-    target_language = LANGUAGE_MAP[target_language_code]
-
     # Format texts for the prompt and collect expected IDs
     texts_for_prompt = [{"text_id": text_id, "text": text} for text_id, _, text in texts]
     expected_text_ids = {text_id for text_id, _, _ in texts}
 
     context = dict(
-        base_language=base_language,
-        target_language=target_language,
+        base_language=base_language.name,
+        target_language=target_language.name,
         texts=texts_for_prompt,
         examples=config.examples,
     )

@@ -13,6 +13,7 @@ from adt_press.models.pdf import Page
 from adt_press.models.text import EasyReadText, PageText, PageTextGroup, PageTexts
 from adt_press.nodes.config_nodes import PageRangeConfig
 from adt_press.utils.file import copy_file
+from adt_press.utils.languages import Language
 from adt_press.utils.pdf import extract_pdf_to_dir
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
@@ -57,7 +58,7 @@ def pdf_texts(
 
 @config.when(easy_read_strategy="llm")
 def easy_reads_by_text_id__llm(
-    input_language_config: str,
+    input_language: Language,
     text_easy_read_prompt_config: PromptConfig,
     processed_pdf_texts: dict[str, PageTexts],
 ) -> dict[str, EasyReadText]:
@@ -66,7 +67,7 @@ def easy_reads_by_text_id__llm(
         for page_texts in processed_pdf_texts.values():
             for group in page_texts.groups:
                 for text in group.texts:
-                    tasks.append(get_text_easy_read(input_language_config, text_easy_read_prompt_config, text))
+                    tasks.append(get_text_easy_read(input_language, text_easy_read_prompt_config, text))
 
         return await gather_with_limit(tasks, text_easy_read_prompt_config.rate_limit)
 
@@ -76,7 +77,7 @@ def easy_reads_by_text_id__llm(
 
 @config.when(easy_read_strategy="none")
 def easy_reads_by_text_id__none(
-    input_language_config: str,
+    input_language: Language,
     text_easy_read_prompt_config: PromptConfig,
     processed_pdf_texts: dict[str, PageTexts],
 ) -> dict[str, EasyReadText]:
@@ -255,6 +256,22 @@ def book_metadata(
 
     return run_async_task(extract_metadata)
 
-
 def book_table_of_contents(book_metadata: BookMetadata) -> list[BookChapter]:
     return book_metadata.table_of_contents
+
+def input_language(input_language_config: str | None, book_metadata: BookMetadata) -> Language:
+    if input_language_config:
+        return Language(input_language_config)
+    if book_metadata.language_code:
+        return Language(book_metadata.language_code)
+    raise ValueError("Input language could not be determined from config or book metadata, please specify input_language in config.")
+
+def plate_language(plate_language_config: str, input_language: Language) -> Language:
+    if not plate_language_config:
+        return input_language
+    return Language(plate_language_config)
+
+def output_languages(output_languages_config: list[str] | None, plate_language: Language) -> list[Language]:
+    if not output_languages_config or output_languages_config == [None]:
+        return [plate_language]
+    return [Language(lang_code) for lang_code in output_languages_config]
