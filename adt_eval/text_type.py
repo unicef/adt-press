@@ -16,6 +16,7 @@ import mlflow
 from adt_eval.base import BaseEvaluator
 from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
 from adt_press.llm.text_extraction import get_page_text
+from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
 
 
@@ -24,6 +25,20 @@ class TextTypeEvaluator(BaseEvaluator):
 
     def __init__(self, global_config: Dict[str, Any], task_config: Dict[str, Any], output_dir: Path):
         super().__init__(global_config, task_config, output_dir)
+
+        # Build text_types_config from global config
+        self.text_types_config = {}
+        for name, text_type in global_config.get("text_types", {}).items():
+            params = dict(text_type)
+            params["name"] = name
+            self.text_types_config[name] = TextType.model_validate(params)
+
+        # Build text_group_types_config from global config
+        self.text_group_types_config = {}
+        for name, text_group_type in global_config.get("text_group_types", {}).items():
+            params = dict(text_group_type)
+            params["name"] = name
+            self.text_group_types_config[name] = TextGroupType.model_validate(params)
 
     async def process_case(self, step: int, tc: Dict[str, Any]) -> Dict[str, Any]:
         """Process a single test case."""
@@ -57,7 +72,14 @@ class TextTypeEvaluator(BaseEvaluator):
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
         # Call the LLM for text type classification
-        page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
+        page_texts = await get_page_text(
+            str(self.output_dir),
+            f"eval_{tc['id']}",
+            self.prompt_config,
+            self.text_types_config,
+            self.text_group_types_config,
+            page,
+        )
         result["page_texts"] = page_texts.model_dump()
 
         ## Index LLM candidate results by text content

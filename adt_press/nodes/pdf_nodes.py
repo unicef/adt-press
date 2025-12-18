@@ -6,7 +6,7 @@ from hamilton.function_modifiers import config
 from adt_press.llm.metadata_extraction import get_metadata
 from adt_press.llm.text_easy_read import get_text_easy_read
 from adt_press.llm.text_extraction import get_page_text
-from adt_press.models.config import MetadataPromptConfig, PromptConfig
+from adt_press.models.config import MetadataPromptConfig, PromptConfig, TextGroupType, TextType
 from adt_press.models.image import Image
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
@@ -32,11 +32,22 @@ def pdf_texts(
     run_output_dir_config: str,
     pdf_pages: list[Page],
     text_extraction_prompt_config: PromptConfig,
+    text_types_config: dict[str, TextType],
+    text_group_types_config: dict[str, TextGroupType],
 ) -> dict[str, PageTexts]:
     async def extract_text():
         text = []
         for page in pdf_pages:
-            text.append(get_page_text(run_output_dir_config, f"page_{page.page_id}", text_extraction_prompt_config, page))
+            text.append(
+                get_page_text(
+                    run_output_dir_config,
+                    f"page_{page.page_id}",
+                    text_extraction_prompt_config,
+                    text_types_config,
+                    text_group_types_config,
+                    page,
+                )
+            )
 
         return await gather_with_limit(text, text_extraction_prompt_config.rate_limit)
 

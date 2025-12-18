@@ -2,6 +2,8 @@ from banks import Prompt
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
+from adt_press.models.config import TextGroupType as TextGroupTypeConfig
+from adt_press.models.config import TextType as TextTypeConfig
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.utils.encoding import CleanTextBaseModel
@@ -25,10 +27,19 @@ class TextResponse(CleanTextBaseModel):
 
 
 @io_logger(label="text_extraction")
-async def get_page_text(output_dir: str, task_id: str, config: PromptConfig, page: Page) -> PageTexts:
+async def get_page_text(
+    output_dir: str,
+    task_id: str,
+    config: PromptConfig,
+    text_types: dict[str, TextTypeConfig],
+    text_group_types: dict[str, TextGroupTypeConfig],
+    page: Page,
+) -> PageTexts:
     context = dict(
         page=page,
         examples=config.examples,
+        text_types=text_types,
+        text_group_types=text_group_types,
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))

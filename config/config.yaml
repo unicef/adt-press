@@ -44,6 +44,83 @@ render_strategy: dynamic
 # the default render strategy used for section types when not explicitly specified
 default_render_strategy: html
 
+text_types:
+  book_title:
+    description: "For the title of the book. There can only be one book title for the entire book."
+  
+  book_subtitle:
+    description: "For the subtitle of the book. There can only be one subtitle for the entire book."
+  
+  book_author:
+    description: "For the author of the book."
+  
+  book_metadata:
+    description: "For metadata about the book such as edition, publisher, year, series, language, etc."
+  
+  section_heading:
+    description: "For text that introduces a new chapter, section, subsection, or topic."
+  
+  section_text:
+    description: "For the main body of text within the section."
+  
+  instruction_text:
+    description: "For instructions that direct the reader to do something or complete an activity, including hints that are provided to help the reader answer questions or solve problems."
+  
+  activity_number:
+    description: "For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections."
+  
+  activity_title:
+    description: "For text that is the title of the activity (often following the activity number)."
+  
+  activity_option:
+    description: "For text that provides options for an activity like a multiple choice or matching activity."
+  
+  activity_input_placeholder_text:
+    description: "For any text that will be used as a placeholder in an input field for a fill in the blank activity. E.g. 'replace the word'."
+  
+  fill_in_the_blank:
+    description: "For text that includes blanks that the reader must fill in for a fill in the blank activity."
+  
+  image_associated_text:
+    description: "For text that accompanies or is directly associated with an image to label, explain, or contextualize it. This includes figure numbers, titles, captions, descriptions, copyright information, and credits."
+  
+  image_overlay:
+    description: "For text that is overlaid on an image at a specific location, such as a speech bubble."
+  
+  math:
+    description: "For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \\( \\) OR \\[ \\] OR $$."
+  
+  standalone_text:
+    description: "For text that does not fall within a section and/or stands alone from the regular material. It may be surrounded in a colored box."
+  
+  header_text:
+    description: "For text that appears in the header of the page."
+  
+  footer_text:
+    description: "For text that appears in the footer of the page."
+  
+  page_number:
+    description: "For text that indicates the page number of the page."
+  
+  other:
+    description: "For any other text that does not fit the above categories."
+
+text_group_types:
+  heading:
+    description: "For chapter titles or section headings that stand alone on a line."
+  
+  paragraph:
+    description: "For regular paragraphs of text that are grouped together."
+  
+  stanza:
+    description: "For poetry or verse that is grouped into stanzas."
+  
+  list:
+    description: "For lists or bullet points that are grouped together."
+  
+  other:
+    description: "For any other text that does not fit the above categories."
+
 section_types:
   front_cover:
     description: "For the front cover page of the textbook that is the first page. There can only be one front cover page. IMPORTANT! Only the first page can be a front cover page."
@@ -258,69 +335,56 @@ prompts:
   activity_sorting:
     model: default
     template_path: prompts/activities/sorting.jinja2
-    max_retries: 0
     
   activity_matching:
     model: default
     template_path: prompts/activities/matching.jinja2
-    max_retries: 0
     
   activity_fill_in_a_table:
     model: default
     template_path: prompts/activities/fill_in_a_table.jinja2
-    max_retries: 0
     
   activity_true_false:
     model: default
     template_path: prompts/activities/true_false.jinja2
-    max_retries: 0
     
   activity_open_ended_answer:
     model: default
     template_path: prompts/activities/open_ended_answer.jinja2
-    max_retries: 0
     
   activity_fill_in_the_blank:
     model: default
     template_path: prompts/activities/fill_in_the_blank.jinja2
-    max_retries: 0
     
   activity_multiple_choice:
     model: default
     template_path: prompts/activities/multiple_choice.jinja2
-    max_retries: 0
 
   # Activity-specific answer generation prompts
     
   activity_sorting_answers:
     model: default
     template_path: prompts/activities/answers/sorting.jinja2
-    max_retries: 0
     
   activity_matching_answers:
     model: default
     template_path: prompts/activities/answers/matching.jinja2
-    max_retries: 0
     
   activity_true_false_answers:
     model: default
     template_path: prompts/activities/answers/true_false.jinja2
-    max_retries: 0
     
   activity_fill_in_the_blank_answers:
     model: default
     template_path: prompts/activities/answers/fill_in_the_blank.jinja2
-    max_retries: 0
     
   activity_fill_in_a_table_answers:
     model: default
     template_path: prompts/activities/answers/fill_in_a_table.jinja2
-    max_retries: 0
     
   activity_multiple_choice_answers:
     model: default
     template_path: prompts/activities/answers/multiple_choice.jinja2
-    max_retries: 0
 
   speech_generation:
     model: gpt-4o-mini-tts

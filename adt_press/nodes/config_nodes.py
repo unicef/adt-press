@@ -18,6 +18,8 @@ from adt_press.models.config import (
     RenderStrategy,
     SectionType,
     SpeechPromptConfig,
+    TextGroupType,
+    TextType,
 )
 from adt_press.models.text import PageTexts
 from adt_press.utils.config import prompt_config_with_model
@@ -223,6 +225,26 @@ def section_types_config(config: DictConfig, default_render_strategy_config: str
         if "render_strategy" not in params:
             params["render_strategy"] = default_render_strategy_config
         types[name] = SectionType.model_validate(params)
+    return types
+
+
+@cache(behavior="recompute")
+def text_types_config(config: DictConfig) -> dict[str, TextType]:
+    types = dict[str, TextType]()
+    for name, text_type in config["text_types"].items():
+        params = dict(text_type)
+        params["name"] = name
+        types[name] = TextType.model_validate(params)
+    return types
+
+
+@cache(behavior="recompute")
+def text_group_types_config(config: DictConfig) -> dict[str, TextGroupType]:
+    types = dict[str, TextGroupType]()
+    for name, text_group_type in config["text_group_types"].items():
+        params = dict(text_group_type)
+        params["name"] = name
+        types[name] = TextGroupType.model_validate(params)
     return types
 
 
