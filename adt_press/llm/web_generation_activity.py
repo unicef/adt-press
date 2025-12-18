@@ -152,7 +152,7 @@ async def generate_web_page_activity(
             section=section,
             texts=all_texts,
             content=response.content,
-            language_code=language,
+            language=language,
         )
         activity_answers = answers_result.answers
         activity_reasoning = answers_result.reasoning

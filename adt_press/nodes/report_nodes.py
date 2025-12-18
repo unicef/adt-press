@@ -59,9 +59,6 @@ def report_pages(
     input_language: Language,
     plate_language: Language,
 ) -> str:
-    input_language = input_language.name
-    output_language = plate_language.name
-
     return render_template(
         template_config,
         "templates/page_report.html",
@@ -76,8 +73,8 @@ def report_pages(
             output_texts=plate_output_texts_by_id,
             section_glossaries=section_glossaries_by_id,
             easy_reads=easy_reads_by_text_id,
-            input_language=input_language,
-            output_language=output_language,
+            input_language=input_language.name,
+            output_language=plate_language.name,
         ),
     )
 

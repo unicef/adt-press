@@ -9,6 +9,7 @@ from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
 
+
 class Chapter(CleanTextBaseModel):
     title: str
     page_number: int

@@ -84,7 +84,7 @@ async def get_text_translation(
             text_type=text_type_map[translation.text_id],
             text=translation.text,
             reasoning=response.reasoning,
-            language_code=target_language_code,
+            language_code=target_language.code,
         )
         for translation in response.translations
     ]

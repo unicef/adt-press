@@ -11,12 +11,14 @@ from adt_press.utils.languages import Language
 
 
 async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, language: Language, text_id: str, text: str) -> SpeechFile:
+    language_code = language.code
+
     sanitized_text = strip_emojis(text)
     if not sanitized_text.strip():
         sanitized_text = text
 
     context = dict(
-        language_code=language.name,
+        language_code=language_code,
         language=language,
         text=sanitized_text,
         examples=config.examples,

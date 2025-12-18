@@ -20,13 +20,9 @@ from adt_press.models.config import (
     TextGroupType,
     TextType,
 )
-from adt_press.models.metadata import BookMetadata
-from adt_press.models.text import PageTexts
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
-from adt_press.utils.languages import Language
-from adt_press.utils.sync import run_async_task
 
 log = structlog.get_logger(__name__)
 
@@ -46,16 +42,26 @@ def pdf_path_config(config: DictConfig) -> str:
 def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
-def input_language_config(
-    config: DictConfig) -> str | None:
-    return OmegaConf.select(config, "input_language", default=None)
 
-def plate_language_config(config: DictConfig) -> str:
-    return OmegaConf.select(config, "plate_language", default=None)
+def input_language_config(config: DictConfig) -> str | None:
+    result = OmegaConf.select(config, "input_language", default=None)
+    return str(result) if result is not None else None
+
+
+def plate_language_config(config: DictConfig) -> str | None:
+    result = OmegaConf.select(config, "plate_language", default=None)
+    return str(result) if result is not None else None
+
 
 def output_languages_config(config: DictConfig) -> list[str] | None:
     output_languages = OmegaConf.select(config, "output_languages", default=None)
-    return output_languages
+    if output_languages is None:
+        return None
+    # Convert OmegaConf types to native Python types and ensure strings
+    if OmegaConf.is_list(output_languages):
+        return [str(lang) for lang in output_languages]
+    return [str(output_languages)]
+
 
 def label_config(config: DictConfig) -> str:
     return str(config["label"])

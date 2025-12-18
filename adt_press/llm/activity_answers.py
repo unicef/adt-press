@@ -36,7 +36,6 @@ async def generate_activity_answers(
     content: str,
     language: Language,
 ) -> ActivityAnswer:
-    
     context = dict(
         section=dict(section_id=section.section_id, section_type=section.section_type),
         texts=[dict(text_id=t.text_id, text=t.text, text_type=t.text_type) for t in texts],

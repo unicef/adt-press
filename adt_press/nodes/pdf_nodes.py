@@ -256,8 +256,10 @@ def book_metadata(
 
     return run_async_task(extract_metadata)
 
+
 def book_table_of_contents(book_metadata: BookMetadata) -> list[BookChapter]:
     return book_metadata.table_of_contents
+
 
 def input_language(input_language_config: str | None, book_metadata: BookMetadata) -> Language:
     if input_language_config:
@@ -266,10 +268,12 @@ def input_language(input_language_config: str | None, book_metadata: BookMetadat
         return Language(book_metadata.language_code)
     raise ValueError("Input language could not be determined from config or book metadata, please specify input_language in config.")
 
+
 def plate_language(plate_language_config: str, input_language: Language) -> Language:
     if not plate_language_config:
         return input_language
     return Language(plate_language_config)
+
 
 def output_languages(output_languages_config: list[str] | None, plate_language: Language) -> list[Language]:
     if not output_languages_config or output_languages_config == [None]:
