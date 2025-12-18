@@ -27,7 +27,7 @@ easy_read_strategy: none
 caption_strategy: none
 
 # our activity generation strategy, either llm or none
-activity_strategy: none
+activity_strategy: llm
 
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
@@ -313,7 +313,7 @@ prompts:
   section_quiz:
     model: default
     template_path: prompts/section_quiz.jinja2
-    sections_per_quiz: 3
+    sections_per_quiz: 0
    
   text_translation:
     model: default

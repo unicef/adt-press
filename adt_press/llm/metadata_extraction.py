@@ -1,4 +1,5 @@
 from banks import Prompt
+from pydantic import field_validator
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import MetadataPromptConfig
@@ -17,9 +18,36 @@ class MetadataResponse(CleanTextBaseModel):
     title: str | None
     authors: list[str]
     publisher: str | None
+    language_code: str | None
     cover_page_id: str | None
     table_of_contents: list[Chapter]
     reasoning: str
+
+    @field_validator("language_code")
+    @classmethod
+    def validate_language_code(cls, value: str | None) -> str | None:
+        import pycountry
+
+        if not value:
+            return value
+
+        normalized = value.lower()
+        parts = normalized.split("-")
+
+        # Validate language code (ISO 639-1 or ISO 639-2)
+        lang_code = parts[0]
+        lang = pycountry.languages.get(alpha_2=lang_code)
+        if not lang:
+            raise ValueError(f"Invalid language code '{lang_code}'. Must be a valid two letter ISO 639 language code.")
+
+        # If locale variant provided, validate country code
+        if len(parts) == 2:
+            country_code = parts[1].upper()
+            country = pycountry.countries.get(alpha_2=country_code)
+            if not country:
+                raise ValueError(f"Invalid country code '{country_code}' in locale '{value}'. Must be a valid ISO 3166 country code.")
+
+        return normalized
 
 
 async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_metadata: dict[str, object]) -> BookMetadata:
@@ -54,6 +82,7 @@ async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_meta
         title=response.title,
         authors=response.authors,
         publisher=response.publisher,
+        language_code=response.language_code,
         cover_page_id=response.cover_page_id,
         table_of_contents=[
             BookChapter(chapter_id=f"chp_{idx}", title=chap.title, page_number=chap.page_number)
