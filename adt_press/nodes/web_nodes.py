@@ -24,6 +24,7 @@ from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.file import write_json_file
 from adt_press.utils.html import contains_math_content, render_template, replace_images, replace_texts
 from adt_press.utils.image import compress_image_for_web
+from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
 
@@ -31,7 +32,7 @@ log = structlog.get_logger(__name__)
 
 
 def web_pages(
-    plate_language_config: str,
+    plate_language: Language,
     plate: Plate,
     default_model_config: str,
     section_types_config: dict[str, SectionType],
@@ -96,10 +97,10 @@ def web_pages(
 
             if strategy.render_type == "html":
                 web_pages.append(
-                    generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language_config)
+                    generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language)
                 )
             elif strategy.render_type == "template":
-                web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language_config))
+                web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))
             elif strategy.render_type == "activity":
                 web_pages.append(
                     generate_web_page_activity(
@@ -110,7 +111,7 @@ def web_pages(
                         groups,
                         texts,
                         images,
-                        plate_language_config,
+                        plate_language,
                         activity_prompts_config,
                         activity_answers_prompts_config,
                     )
@@ -128,7 +129,7 @@ def web_pages(
 
                 strategy = render_strategies_config.get("section_quiz")
                 config = TemplateRenderConfig.model_validate(strategy.config)
-                web_pages.append(generate_web_quiz("section_quiz", config, plate_language_config, quiz, texts))
+                web_pages.append(generate_web_quiz("section_quiz", config, plate_language, quiz, texts))
 
         return await gather_with_limit(web_pages, 300)
 
@@ -151,7 +152,7 @@ def package_adt_web(
     template_config: TemplateConfig,
     run_output_dir_config: str,
     pdf_title_config: str,
-    plate_language_config: str,
+    plate_language: Language,
     plate: Plate,
     plate_translations: dict[str, dict[str, str]],
     plate_glossary_translations: dict[str, list[GlossaryItem]],
@@ -239,7 +240,7 @@ def package_adt_web(
                 content=content,
                 webpage=webpage,
                 section=section,
-                language=plate_language_config,
+                language=plate_language.code,
                 webpage_number=webpage_index + 1,
                 activity_answers=webpage.activity_answers,
                 has_math=page_has_math,

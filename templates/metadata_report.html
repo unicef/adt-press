@@ -9,59 +9,71 @@
         </div>
 
         <!-- Metadata Content -->
-        <div class="p-6 space-y-6">
+        <div class="p-6 space-y-4">
             <!-- Two Column Layout: Attributes and Cover Image -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Left Column: Attributes -->
-                <div class="space-y-6">
+                <div class="space-y-4">
                     <!-- Title Section -->
                     <div>
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Title</div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Title</div>
                         {% if metadata.title %}
-                        <div class="text-2xl font-bold text-gray-900">{{ metadata.title }}</div>
+                        <div class="text-lg font-semibold text-gray-900">{{ metadata.title }}</div>
                         {% else %}
-                        <div class="text-lg text-gray-400 italic">Not detected</div>
+                        <div class="text-sm text-gray-400 italic">Not detected</div>
                         {% endif %}
                     </div>
 
                     <!-- Author Section -->
                     <div>
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Authors</div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Authors</div>
                         {% if metadata.authors %}
-                        <div class="text-xl text-gray-900">
+                        <div class="text-gray-900">
                             {% for author in metadata.authors %}
-                            <div>{{ author }}</div>
+                            <div class="text-sm">{{ author }}</div>
                             {% endfor %}
                         </div>
                         {% else %}
-                        <div class="text-lg text-gray-400 italic">Not detected</div>
+                        <div class="text-sm text-gray-400 italic">Not detected</div>
                         {% endif %}
                     </div>
 
                     <!-- Publisher Section -->
                     <div>
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Publisher</div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Publisher</div>
                         {% if metadata.publisher %}
-                        <div class="text-xl text-gray-900">{{ metadata.publisher }}</div>
+                        <div class="text-sm text-gray-900">{{ metadata.publisher }}</div>
                         {% else %}
-                        <div class="text-lg text-gray-400 italic">Not detected</div>
+                        <div class="text-sm text-gray-400 italic">Not detected</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Language Section -->
+                    <div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Language</div>
+                        {% if metadata.language_code %}
+                        <div class="text-gray-900">
+                            <span class="font-mono bg-gray-100 px-2 py-1 rounded text-sm">{{ metadata.language_code }}</span>
+                        </div>
+                        {% else %}
+                        <div class="text-sm text-gray-400 italic">Not detected</div>
                         {% endif %}
                     </div>
 
                     <!-- Table of Contents -->
                     <div>
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Table of Contents</div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Table of Contents</div>
                         {% if metadata.table_of_contents %}
-                        <div class="space-y-2">
+                        <div class="space-y-1">
                             {% for chapter in metadata.table_of_contents %}
                             <div class="flex justify-between items-start py-1 border-b border-gray-200 last:border-b-0">
-                                <div class="text-gray-900 flex-1 pr-4">{{ chapter.title }}</div>
-                                <div class="text-gray-600 font-medium whitespace-nowrap">p. {{ chapter.page_number }}</div>
+                                <div class="text-sm text-gray-900 flex-1 pr-4">{{ chapter.title }}</div>
+                                <div class="text-sm text-gray-600 font-medium whitespace-nowrap">p. {{ chapter.page_number }}</div>
                             </div>
                             {% endfor %}
                         </div>
                         {% else %}
-                        <div class="text-lg text-gray-400 italic">Not detected</div>
+                        <div class="text-sm text-gray-400 italic">Not detected</div>
                         {% endif %}
                     </div>
                 </div>
@@ -70,7 +82,7 @@
                 <div class="flex items-start justify-center">
                     {% if metadata.cover_page_id %}
                     <div class="w-full">
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Cover Page</div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Cover Page</div>
                         <div class="bg-gray-50 rounded-lg p-4">
                             <a href="./images/{{ cover_page.page_image_path | basename }}" class="block">
                                 <img src="./images/{{ cover_page.page_image_path | basename }}" 
@@ -81,8 +93,8 @@
                     </div>
                     {% else %}
                     <div class="w-full">
-                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Cover Page</div>
-                        <div class="text-lg text-gray-400 italic">No cover image</div>
+                        <div class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Cover Page</div>
+                        <div class="text-sm text-gray-400 italic">No cover image</div>
                     </div>
                     {% endif %}
                 </div>
@@ -90,7 +102,7 @@
 
             <!-- Reasoning Section -->
             <div>
-                <div class="bg-gray-50 rounded-lg p-4">
+                <div class="bg-gray-50 rounded-lg p-3">
                     <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
                     <div class="text-sm text-gray-700 whitespace-pre-wrap">{{ metadata.reasoning }}</div>
                 </div>

@@ -6,7 +6,6 @@ from hamilton.function_modifiers import config as when_config
 from omegaconf import DictConfig, OmegaConf
 from pydantic import BaseModel
 
-from adt_press.llm.language_detection import detect_input_language
 from adt_press.models.config import (
     CropPromptConfig,
     HTMLPromptConfig,
@@ -21,12 +20,9 @@ from adt_press.models.config import (
     TextGroupType,
     TextType,
 )
-from adt_press.models.text import PageTexts
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
-from adt_press.utils.languages import CUSTOM_LANGUAGE_MAP, LANGUAGE_MAP
-from adt_press.utils.sync import run_async_task
 
 log = structlog.get_logger(__name__)
 
@@ -47,144 +43,24 @@ def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
 
-SUPPORTED_LANGUAGE_CODES = set(LANGUAGE_MAP.keys()) | set(CUSTOM_LANGUAGE_MAP.keys())
+def input_language_config(config: DictConfig) -> str:
+    result = OmegaConf.select(config, "input_language", default="auto")
+    return str(result) if result is not None else "auto"
 
 
-def _clean_language_override(language_value: str | None) -> str | None:
-    if language_value is None:
-        return None
-    return str(language_value).strip().lower()
+def plate_language_config(config: DictConfig) -> str:
+    result = OmegaConf.select(config, "plate_language", default="auto")
+    return str(result) if result is not None else "auto"
 
 
-def _validate_language_code(language_code: str, *, field_name: str) -> None:
-    if language_code not in SUPPORTED_LANGUAGE_CODES:
-        raise ValueError(f"{field_name} unsupported language code: {language_code!r}")
+def output_languages_config(config: DictConfig) -> list[str]:
+    output_languages = OmegaConf.select(config, "output_languages", default=["auto"])
 
+    # Convert OmegaConf types to native Python types and ensure strings
+    if not OmegaConf.is_list(output_languages) and not isinstance(output_languages, list):
+        raise ValueError("output_languages must be a list of language codes.")
 
-def _flatten_output_languages(raw_languages: object) -> list[str | None]:
-    sequence: list[str | None] = []
-    if raw_languages is None:
-        return sequence
-
-    if OmegaConf.is_list(raw_languages) or isinstance(raw_languages, (list, tuple)):
-        for item in raw_languages:  # type: ignore[attr-defined]
-            if item is None:
-                sequence.append(None)
-                continue
-            entry = str(item)
-            if "," in entry:
-                raise ValueError(
-                    f"output_languages contains a comma-separated entry {entry!r} inside a list. "
-                    "Use a scalar string like 'en,es' or a list like ['en','es']."
-                )
-            sequence.append(entry)
-        return sequence
-
-    if isinstance(raw_languages, str):
-        raw_str = raw_languages.strip()
-        if raw_str in ("", "???"):
-            return sequence
-        if "," in raw_str:
-            parts = [part.strip() for part in raw_str.split(",")]
-            if any(not part for part in parts):
-                raise ValueError(f"output_languages contains an empty language code in {raw_languages!r}")
-            sequence.extend(parts)
-        else:
-            sequence.append(raw_str)
-        return sequence
-
-    raise TypeError(f"output_languages must be a list of language codes or a comma-separated string; got {type(raw_languages).__name__}")
-
-
-def _coerce_output_language(language_value: str | None, input_language_code: str) -> str:
-    if language_value is None:
-        if not input_language_code:
-            raise ValueError(
-                "output_languages contained a null entry, but input_language could not be determined. "
-                "Specify input_language or explicit output_languages."
-            )
-        return input_language_code
-
-    cleaned = _clean_language_override(language_value)
-    if not cleaned:
-        raise ValueError(f"output_languages contains an empty language code: {language_value!r}")
-    if cleaned not in SUPPORTED_LANGUAGE_CODES:
-        raise ValueError(f"output_languages unsupported language code: {cleaned!r}")
-    return cleaned
-
-
-def pdf_text_sample(pdf_texts: dict[str, PageTexts], max_chars: int = 2000) -> str:
-    collected: list[str] = []
-    total_chars = 0
-
-    for page_id in sorted(pdf_texts.keys()):
-        page_texts = pdf_texts[page_id]
-        for group in page_texts.groups:
-            for text in group.texts:
-                snippet = text.text.strip()
-                if not snippet:
-                    continue
-
-                collected.append(snippet)
-                total_chars += len(snippet)
-                if total_chars >= max_chars:
-                    return "\n".join(collected)
-
-    return "\n".join(collected)
-
-
-def input_language_config(
-    config: DictConfig,
-    language_detection_prompt_config: PromptConfig,
-    pdf_text_sample: str,
-) -> str:
-    override_value = OmegaConf.select(config, "input_language", default=None)
-    override = _clean_language_override(override_value)
-    if override:
-        if "," in override:
-            raise ValueError(
-                f"input_language must be a single language code like 'en'; got {override!r}. Use output_languages for multiple languages."
-            )
-        _validate_language_code(override, field_name="input_language")
-        return override
-
-    if not pdf_text_sample.strip():
-        raise ValueError("language detection failed; pdf has no text!")
-
-    try:
-        response = run_async_task(lambda: detect_input_language(pdf_text_sample, language_detection_prompt_config))
-        confidence = getattr(response, "confidence", None)
-        log.info("input language detected automatically", language=response.language_code, confidence=confidence)
-        return response.language_code
-    except Exception:  # pragma: no cover - fallback path
-        raise ValueError("language detection failed; please specify `input_language` configuration parameter")
-
-
-def plate_language_config(config: DictConfig, input_language_config: str) -> str:
-    plate_override_value = OmegaConf.select(config, "plate_language", default=None)
-    plate_override = _clean_language_override(plate_override_value)
-    if plate_override:
-        return plate_override
-
-    log.info("plate language defaulted to input language", language=input_language_config)
-    return input_language_config
-
-
-def output_languages_config(config: DictConfig, input_language_config: str) -> list[str]:
-    raw_languages = OmegaConf.select(config, "output_languages", default=None)
-    sequence = _flatten_output_languages(raw_languages)
-    cleaned_languages: list[str] = []
-    for language in sequence:
-        cleaned = _coerce_output_language(language, input_language_config)
-        if cleaned not in cleaned_languages:
-            cleaned_languages.append(cleaned)
-
-    if not cleaned_languages:
-        _validate_language_code(input_language_config, field_name="input_language")
-        cleaned_languages = [input_language_config]
-        log.info("output languages defaulted to input language", languages=cleaned_languages)
-
-    return cleaned_languages
+    return [str(lang) for lang in output_languages]
 
 
 def label_config(config: DictConfig) -> str:
@@ -279,11 +155,6 @@ def default_model_config(config: DictConfig) -> str:
 @cache(behavior="recompute")
 def caption_prompt_config(config: DictConfig) -> PromptConfig:
     return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["caption"], config["default_model"]))
-
-
-@cache(behavior="recompute")
-def language_detection_prompt_config(config: DictConfig) -> PromptConfig:
-    return PromptConfig.model_validate(prompt_config_with_model(config["prompts"]["language_detection"], config["default_model"]))
 
 
 @cache(behavior="recompute")

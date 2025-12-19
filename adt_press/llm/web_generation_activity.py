@@ -10,7 +10,7 @@ from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.html import extract_formatted_texts, validate_generated_html_data_ids
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 class GenerationResponse(CleanTextBaseModel):
@@ -55,13 +55,11 @@ async def generate_web_page_activity(
     groups: list[RenderTextGroup],
     texts: list[PlateText],
     images: list[PlateImage],
-    language_code: str,
+    language: Language,
     activity_prompts_config: dict[str, HTMLPromptConfig],
     activity_answers_prompts_config: dict[str, PromptConfig],
     activity_rendering_enabled: bool = True,
 ) -> WebPage:
-    language = LANGUAGE_MAP[language_code]
-
     # Override config with activity-specific config if available
     section_type_key = section.section_type
     if section_type_key in activity_prompts_config:
@@ -81,7 +79,7 @@ async def generate_web_page_activity(
         groups=[g.model_dump() for g in groups],
         texts=[t.model_dump() for t in texts],
         images=[i.model_dump() for i in images],
-        language=language,
+        language=language.name,
         examples=examples,
     )
 
@@ -154,7 +152,7 @@ async def generate_web_page_activity(
             section=section,
             texts=all_texts,
             content=response.content,
-            language_code=language_code,
+            language=language,
         )
         activity_answers = answers_result.answers
         activity_reasoning = answers_result.reasoning

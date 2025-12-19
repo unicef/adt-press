@@ -7,7 +7,7 @@ from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, SectionExplanation
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 class ExplanationResponse(CleanTextBaseModel):
@@ -16,16 +16,14 @@ class ExplanationResponse(CleanTextBaseModel):
 
 
 async def get_section_explanation(
-    config: PromptConfig, page: Page, section: PageSection, texts: list[str], images: list[ProcessedImage], language_code: str
+    config: PromptConfig, page: Page, section: PageSection, texts: list[str], images: list[ProcessedImage], language: Language
 ) -> SectionExplanation:
-    language = LANGUAGE_MAP[language_code]
-
     context = dict(
         page=page,
         section=section,
         texts=texts,
         images=[img.model_dump() for img in images],
-        language=language,
+        language=language.name,
         examples=config.examples,
     )
 

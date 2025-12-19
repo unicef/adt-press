@@ -1,9 +1,14 @@
 label: "???"
 pdf_path: "???"
 
-input_language: null
+# the language of the book, auto will try to auto-detect
+input_language: auto
+
+# the language of the plate
 plate_language: "${input_language}"
-output_languages: ["${input_language}"]
+
+# the languages to translate the final ADT into
+output_languages: ["${plate_language}"]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -27,7 +32,7 @@ easy_read_strategy: none
 caption_strategy: none
 
 # our activity generation strategy, either llm or none
-activity_strategy: none
+activity_strategy: llm
 
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
@@ -284,10 +289,6 @@ prompts:
     model: default
     template_path: prompts/text_extraction_groups.jinja2
 
-  language_detection:
-    model: default
-    template_path: prompts/language_detection.jinja2
-
   meaningfulness:
     model: default
     template_path: prompts/image_meaningfulness.jinja2
@@ -313,7 +314,7 @@ prompts:
   section_quiz:
     model: default
     template_path: prompts/section_quiz.jinja2
-    sections_per_quiz: 3
+    sections_per_quiz: 0
    
   text_translation:
     model: default

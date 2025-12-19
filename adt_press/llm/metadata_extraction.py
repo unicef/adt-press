@@ -1,4 +1,5 @@
 from banks import Prompt
+from pydantic import field_validator
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import MetadataPromptConfig
@@ -6,6 +7,7 @@ from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
+from adt_press.utils.languages import Language
 
 
 class Chapter(CleanTextBaseModel):
@@ -17,9 +19,18 @@ class MetadataResponse(CleanTextBaseModel):
     title: str | None
     authors: list[str]
     publisher: str | None
+    language_code: str | None
     cover_page_id: str | None
     table_of_contents: list[Chapter]
     reasoning: str
+
+    @field_validator("language_code")
+    @classmethod
+    def validate_language_code(cls, v: str | None) -> str | None:
+        if v:
+            return Language.from_code(v).code
+
+        return None
 
 
 async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_metadata: dict[str, object]) -> BookMetadata:
@@ -54,6 +65,7 @@ async def get_metadata(config: MetadataPromptConfig, pages: list[Page], pdf_meta
         title=response.title,
         authors=response.authors,
         publisher=response.publisher,
+        language_code=response.language_code,
         cover_page_id=response.cover_page_id,
         table_of_contents=[
             BookChapter(chapter_id=f"chp_{idx}", title=chap.title, page_number=chap.page_number)

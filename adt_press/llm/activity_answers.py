@@ -10,7 +10,7 @@ from adt_press.models.plate import PlateSection, PlateText
 from adt_press.models.section import ActivityAnswer
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 class ActivityAnswersResponse(CleanTextBaseModel):
@@ -34,15 +34,13 @@ async def generate_activity_answers(
     section: PlateSection,
     texts: list[PlateText],
     content: str,
-    language_code: str,
+    language: Language,
 ) -> ActivityAnswer:
-    language = LANGUAGE_MAP[language_code]
-
     context = dict(
         section=dict(section_id=section.section_id, section_type=section.section_type),
         texts=[dict(text_id=t.text_id, text=t.text, text_type=t.text_type) for t in texts],
         activity_html=content,
-        language=language,
+        language=language.name,
         page_image_path=section.page_image_path,
         examples=[],
     )

@@ -22,12 +22,11 @@ audio::-webkit-media-controls-time-remaining-display {
 </style>
 <div class="space-y-8">
     {% for output_language in output_languages %}
-    {% with language_name = LANGUAGE_MAP[output_language] %}
-    {% with translations = translations[output_language] %}
-    {% with speech_files = speech_files[output_language] %}    
+    {% with translations = translations[output_language.code] %}
+    {% with speech_files = speech_files[output_language.code] %}    
     <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-4">
         <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-bold">{{ language_name }} ({{ output_language }})</h2>
+            <h2 class="text-xl font-bold">{{ output_language.name }} ({{ output_language.code }})</h2>
         </div>
         
         {% for text in plate.texts %}
@@ -51,7 +50,6 @@ audio::-webkit-media-controls-time-remaining-display {
         </div>
         {% endfor %}
     </div>
-    {% endwith %}
     {% endwith %}
     {% endwith %}
     {% endfor %}
