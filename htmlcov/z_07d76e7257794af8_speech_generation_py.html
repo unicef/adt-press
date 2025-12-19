@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_07d76e7257794af8_text_easy_read_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.0">coverage.py v7.13.0</a>,
-            created at 2025-12-18 16:11 +0000
+            created at 2025-12-19 15:59 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -89,11 +89,11 @@
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">speech</span> <span class="key">import</span> <span class="nam">SpeechFile</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">utils</span><span class="op">.</span><span class="nam">encoding</span> <span class="key">import</span> <span class="nam">strip_emojis</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">utils</span><span class="op">.</span><span class="nam">html</span> <span class="key">import</span> <span class="nam">render_template_to_string</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">utils</span><span class="op">.</span><span class="nam">languages</span> <span class="key">import</span> <span class="nam">LANGUAGE_MAP</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">utils</span><span class="op">.</span><span class="nam">languages</span> <span class="key">import</span> <span class="nam">Language</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">generate_speech_file</span><span class="op">(</span><span class="nam">run_output_dir</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">config</span><span class="op">:</span> <span class="nam">SpeechPromptConfig</span><span class="op">,</span> <span class="nam">language_code</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">text_id</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">text</span><span class="op">:</span> <span class="nam">str</span><span class="op">)</span> <span class="op">-></span> <span class="nam">SpeechFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="nam">language</span> <span class="op">=</span> <span class="nam">LANGUAGE_MAP</span><span class="op">[</span><span class="nam">language_code</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">generate_speech_file</span><span class="op">(</span><span class="nam">run_output_dir</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">config</span><span class="op">:</span> <span class="nam">SpeechPromptConfig</span><span class="op">,</span> <span class="nam">language</span><span class="op">:</span> <span class="nam">Language</span><span class="op">,</span> <span class="nam">text_id</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">text</span><span class="op">:</span> <span class="nam">str</span><span class="op">)</span> <span class="op">-></span> <span class="nam">SpeechFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="nam">language_code</span> <span class="op">=</span> <span class="nam">language</span><span class="op">.</span><span class="nam">code</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">    <span class="nam">sanitized_text</span> <span class="op">=</span> <span class="nam">strip_emojis</span><span class="op">(</span><span class="nam">text</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">sanitized_text</span><span class="op">.</span><span class="nam">strip</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -101,7 +101,7 @@
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">    <span class="nam">context</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis mis2 show_mis"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">        <span class="nam">language_code</span><span class="op">=</span><span class="nam">language_code</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">        <span class="nam">language</span><span class="op">=</span><span class="nam">language</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">        <span class="nam">language</span><span class="op">=</span><span class="nam">language</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis mis2 show_mis"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">        <span class="nam">text</span><span class="op">=</span><span class="nam">sanitized_text</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis mis2 show_mis"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="nam">examples</span><span class="op">=</span><span class="nam">config</span><span class="op">.</span><span class="nam">examples</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis mis2 show_mis"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -142,7 +142,7 @@
             <a class="nav" href="z_07d76e7257794af8_text_easy_read_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.0">coverage.py v7.13.0</a>,
-            created at 2025-12-18 16:11 +0000
+            created at 2025-12-19 15:59 +0000
         </p>
     </div>
 </footer>
