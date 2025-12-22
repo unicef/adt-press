@@ -492,7 +492,7 @@ def activity_strategy_config(config: DictConfig) -> str:
     return str(config.get("activity_strategy", "none"))
 
 
-def section_types_config_filtered(
+def active_section_types_config(
     section_types_config: dict[str, SectionType],
     render_strategies_config: dict[str, RenderStrategy],
     activity_strategy_config: str,
@@ -502,23 +502,16 @@ def section_types_config_filtered(
     This prevents configuration errors where sections are classified as activities
     but activity generation is disabled.
     """
-    if activity_strategy_config == "none":
-        # Filter out section types that have render_strategy: activity
-        filtered = {}
-        for section_type_name, section_type_obj in section_types_config.items():
-            render_strategy_name = section_type_obj.render_strategy
-            if render_strategy_name in render_strategies_config:
-                render_strategy_obj = render_strategies_config[render_strategy_name]
-                if render_strategy_obj.render_type == RenderType.activity:
-                    # Skip this section type as it maps to an activity
-                    log.debug(
-                        "Filtering out activity section type",
-                        section_type=section_type_name,
-                        render_strategy=render_strategy_name,
-                    )
-                    continue
-            filtered[section_type_name] = section_type_obj
-        return filtered
-    else:
-        # Return original config when activities are enabled
-        return section_types_config
+    # Build set of active render strategies
+    active_render_strategies = {
+        name
+        for name, strategy in render_strategies_config.items()
+        if activity_strategy_config == "llm" or strategy.render_type != RenderType.activity
+    }
+
+    # Filter section types to only those using active render strategies
+    return {
+        section_name: section_type
+        for section_name, section_type in section_types_config.items()
+        if section_type.render_strategy in active_render_strategies
+    }
