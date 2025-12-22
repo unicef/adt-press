@@ -8,7 +8,12 @@ from adt_press.utils.html import render_template
 
 
 def copy_interface_translations(run_output_dir_config: str, languages: list[str]) -> None:
-    """Copy only the required language interface translations to the output directory."""
+    """Copy only the required language interface translations to the output directory.
+
+    Handles both simple language codes (e.g., 'en', 'es') and language-country codes
+    (e.g., 'en-us', 'es-uy'). If a specific language-country variant doesn't exist,
+    falls back to the base language code.
+    """
     adt_dir = os.path.join(run_output_dir_config, "adt")
     interface_translations_dir = os.path.join(adt_dir, "assets", "interface_translations")
 
@@ -16,16 +21,32 @@ def copy_interface_translations(run_output_dir_config: str, languages: list[str]
     if os.path.exists(interface_translations_dir):
         shutil.rmtree(interface_translations_dir)
 
-    # Create interface_translations directory and copy only required languages
+    # Create interface_translations directory
     os.makedirs(interface_translations_dir, exist_ok=True)
     source_interface_dir = os.path.join("assets", "web", "assets", "interface_translations")
 
     for language in languages:
+        # Try the exact language code first (e.g., 'es-uy' or 'es')
         source_lang_dir = os.path.join(source_interface_dir, language)
-        target_lang_dir = os.path.join(interface_translations_dir, language)
 
         if os.path.exists(source_lang_dir):
+            # Exact match exists - copy it
+            target_lang_dir = os.path.join(interface_translations_dir, language)
             shutil.copytree(source_lang_dir, target_lang_dir, dirs_exist_ok=True)
+        elif "-" in language:
+            # Language-country code provided but exact match doesn't exist
+            # Try fallback to base language (e.g., 'en-us' -> 'en')
+            base_language = language.split("-")[0]
+            source_base_dir = os.path.join(source_interface_dir, base_language)
+
+            if os.path.exists(source_base_dir):
+                # Copy base language with the original language code as target name
+                target_lang_dir = os.path.join(interface_translations_dir, language)
+                shutil.copytree(source_base_dir, target_lang_dir, dirs_exist_ok=True)
+            else:
+                print(f"Warning: No interface translation found for '{language}' or base '{base_language}'")
+        else:
+            print(f"Warning: No interface translation found for '{language}'")
 
 
 def install_dictionaries(run_output_dir_config: str, languages: list[str]) -> None:
