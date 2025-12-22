@@ -9,6 +9,7 @@ from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary, SectionQuiz
 from adt_press.models.text import PageText, PageTextGroup, PageTexts
+from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -73,7 +74,7 @@ def filtered_sections_by_page_id(
 
 
 def quizzes_by_section_id(
-    plate_language_config: str,
+    plate_language: Language,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     pdf_text_groups_by_id: dict[str, PageTextGroup],
@@ -109,7 +110,7 @@ def quizzes_by_section_id(
 
 @config.when(explanation_strategy="llm")
 def explanations_by_section_id__llm(
-    plate_language_config: str,
+    plate_language: Language,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     processed_pdf_texts_by_id: dict[str, PageText],
@@ -131,7 +132,7 @@ def explanations_by_section_id__llm(
                     images.extend([image] if image else [])
 
                 explanations.append(
-                    get_section_explanation(section_explanation_prompt_config, page, section, texts, images, plate_language_config)
+                    get_section_explanation(section_explanation_prompt_config, page, section, texts, images, plate_language)
                 )
 
         return await gather_with_limit(explanations, section_explanation_prompt_config.rate_limit)
@@ -146,7 +147,7 @@ def explanations_by_section_id__llm(
 
 @config.when(explanation_strategy="none")
 def explanations_by_section_id__none(
-    plate_language_config: str,
+    plate_language: Language,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     processed_pdf_texts_by_id: dict[str, PageText],
@@ -158,7 +159,7 @@ def explanations_by_section_id__none(
 
 @config.when(glossary_strategy="llm")
 def section_glossaries_by_id__llm(
-    plate_language_config: str,
+    plate_language: Language,
     section_glossary_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
     pdf_text_groups_by_id: dict[str, PageTextGroup],
@@ -172,7 +173,7 @@ def section_glossaries_by_id__llm(
                     if part_id.startswith("grp_"):
                         group = pdf_text_groups_by_id[part_id]
                         texts.extend([t.text for t in group.texts])
-                tasks.append(get_section_glossary(plate_language_config, section_glossary_prompt_config, section, texts))
+                tasks.append(get_section_glossary(plate_language, section_glossary_prompt_config, section, texts))
 
         return await gather_with_limit(tasks, section_glossary_prompt_config.rate_limit)
 
@@ -182,7 +183,7 @@ def section_glossaries_by_id__llm(
 
 @config.when(glossary_strategy="none")
 def section_glossaries_by_id__none(
-    plate_language_config: str,
+    plate_language: Language,
     section_glossary_prompt_config: PromptConfig,
     filtered_sections_by_page_id: dict[str, PageSections],
     processed_pdf_texts_by_id: dict[str, PageText],

@@ -6,6 +6,7 @@ from adt_press.models.config import TemplateConfig
 from adt_press.models.epub import create_epub_file
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
+from adt_press.utils.languages import Language
 from adt_press.utils.web_assets import build_config_json
 
 
@@ -14,7 +15,7 @@ def package_epub(
     template_config: TemplateConfig,
     run_output_dir_config: str,
     pdf_title_config: str,
-    plate_language_config: str,
+    plate_language: Language,
     plate: Plate,  # This is the issue - plate object has wrong paths
     plate_translations: dict[str, dict[str, str]],
     web_pages: list[WebPage],

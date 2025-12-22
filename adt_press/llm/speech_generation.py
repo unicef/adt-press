@@ -7,11 +7,11 @@ from adt_press.models.config import SpeechPromptConfig
 from adt_press.models.speech import SpeechFile
 from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
-async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, language_code: str, text_id: str, text: str) -> SpeechFile:
-    language = LANGUAGE_MAP[language_code]
+async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, language: Language, text_id: str, text: str) -> SpeechFile:
+    language_code = language.code
 
     sanitized_text = strip_emojis(text)
     if not sanitized_text.strip():
@@ -19,7 +19,7 @@ async def generate_speech_file(run_output_dir: str, config: SpeechPromptConfig, 
 
     context = dict(
         language_code=language_code,
-        language=language,
+        language=language.name,
         text=sanitized_text,
         examples=config.examples,
     )

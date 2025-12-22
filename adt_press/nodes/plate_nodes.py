@@ -12,12 +12,13 @@ from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, 
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionQuiz
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
+from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 def generated_plate(
     pdf_title_config: str,
-    plate_language_config: str,
+    plate_language: Language,
     book_metadata: BookMetadata,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
@@ -92,7 +93,7 @@ def generated_plate(
         publisher=book_metadata.publisher,
         table_of_contents=table_of_contents,
         cover_image_id=cover_image_id,
-        language_code=plate_language_config,
+        language_code=plate_language.code,
         sections=plate_sections,
         images=images,
         groups=plate_groups,
@@ -147,20 +148,20 @@ def plate_glossary(
 
 def plate_glossary_translations(
     glossary_translation_prompt_config: PromptConfig,
-    plate_language_config: str,
-    output_languages_config: list[str],
+    plate_language: Language,
+    output_languages: list[Language],
     plate_glossary: list[GlossaryItem],
 ) -> dict[str, list[GlossaryItem]]:
     glossary_translations: dict[str, list[GlossaryItem]] = {}
 
-    def translate_glossary_to_lang(output_language: str):
+    def translate_glossary_to_lang(output_language: Language):
         async def translate_glossary():
             tasks = []
             for item in plate_glossary:
                 tasks.append(
                     get_glossary_translation(
                         glossary_translation_prompt_config,
-                        plate_language_config,
+                        plate_language,
                         output_language,
                         item,
                     )
@@ -170,12 +171,12 @@ def plate_glossary_translations(
 
         return translate_glossary
 
-    for language in output_languages_config:
-        if language == plate_language_config:
-            glossary_translations[language] = plate_glossary
+    for language in output_languages:
+        if language == plate_language:
+            glossary_translations[language.code] = plate_glossary
             continue
 
-        glossary_translations[language] = sorted(run_async_task(translate_glossary_to_lang(language)), key=lambda x: x.word)
+        glossary_translations[language.code] = sorted(run_async_task(translate_glossary_to_lang(language)), key=lambda x: x.word)
 
     return glossary_translations
 
@@ -196,8 +197,8 @@ def plate_output_texts_by_id(
     explanations_by_section_id: dict[str, SectionExplanation],
     book_table_of_contents: list[BookChapter],
     quizzes_by_section_id: dict[str, SectionQuiz],
-    input_language_config: str,
-    plate_language_config: str,
+    input_language: Language,
+    plate_language: Language,
 ) -> dict[str, OutputText]:
     # Collect all texts that need processing
     texts_to_process = list[tuple[str, str, str]]()
@@ -234,13 +235,13 @@ def plate_output_texts_by_id(
             texts_to_process.append((quiz.explanation_ids[idx], "quiz_explanation", quiz_explanation))
 
     # Handle same language case (no translation needed)
-    if input_language_config == plate_language_config:
+    if input_language.code == plate_language.code:
         return {
             text_id: OutputText(
                 text_id=text_id,
                 text_type=text_type,
                 text=text_content,
-                language_code=plate_language_config,
+                language_code=plate_language.code,
                 reasoning="",
             )
             for text_id, text_type, text_content in texts_to_process
@@ -252,8 +253,8 @@ def plate_output_texts_by_id(
             get_text_translation(
                 text_translation_prompt_config,
                 [(text_id, text_type, text_content)],
-                input_language_config,
-                plate_language_config,
+                input_language,
+                plate_language,
             )
             for text_id, text_type, text_content in texts_to_process
         ]
@@ -267,10 +268,10 @@ def plate_output_texts_by_id(
 
 def plate_translations(
     text_translation_prompt_config: PromptConfig,
-    plate_language_config: str,
+    plate_language: Language,
     plate_groups: list[PlateGroup],
     plate_texts: list[PlateText],
-    output_languages_config: list[str],
+    output_languages: list[Language],
 ) -> dict[str, dict[str, str]]:
     plate_translations: dict[str, dict[str, str]] = {}
 
@@ -287,12 +288,12 @@ def plate_translations(
 
     async def translate_texts():
         tasks = []
-        for output_language in output_languages_config:
-            if output_language == plate_language_config:
-                plate_translations[output_language] = {t.text_id: t.text for t in plate_texts}
+        for output_language in output_languages:
+            if output_language == plate_language:
+                plate_translations[output_language.code] = {t.text_id: t.text for t in plate_texts}
                 continue
 
-            plate_translations[output_language] = {}
+            plate_translations[output_language.code] = {}
 
             # Process each group together to maintain context
             for group in plate_groups:
@@ -312,7 +313,7 @@ def plate_translations(
                     get_text_translation(
                         text_translation_prompt_config,
                         group_texts,
-                        plate_language_config,
+                        plate_language,
                         output_language,
                     )
                 )
@@ -324,7 +325,7 @@ def plate_translations(
                     get_text_translation(
                         text_translation_prompt_config,
                         [(text.text_id, text.text_type, text.text)],
-                        plate_language_config,
+                        plate_language,
                         output_language,
                     )
                 )
