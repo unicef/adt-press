@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_54c8d5b9e52c9eae_webpub_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.0">coverage.py v7.13.0</a>,
-            created at 2025-12-19 15:59 +0000
+            created at 2025-12-22 16:05 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -117,7 +117,7 @@
     <p class="run run2"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">    <span class="nam">plate_language</span><span class="op">:</span> <span class="nam">Language</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">    <span class="nam">plate</span><span class="op">:</span> <span class="nam">Plate</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">    <span class="nam">default_model_config</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">    <span class="nam">section_types_config</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">SectionType</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">    <span class="nam">active_section_types_config</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">SectionType</span><span class="op">]</span><span class="op">,</span>  <span class="com"># &#8592; TO THIS</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">    <span class="nam">render_strategy_config</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">    <span class="nam">render_strategies_config</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">RenderStrategy</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">    <span class="nam">activity_prompts_config</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">HTMLPromptConfig</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -151,7 +151,7 @@
     <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">                    <span class="nam">images</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">images_by_id</span><span class="op">[</span><span class="nam">part_id</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">            <span class="com"># Get section type configuration</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">            <span class="nam">section_type_obj</span> <span class="op">=</span> <span class="nam">section_types_config</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_type</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">            <span class="nam">section_type_obj</span> <span class="op">=</span> <span class="nam">active_section_types_config</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_type</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">            <span class="key">if</span> <span class="key">not</span> <span class="nam">section_type_obj</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">Unknown section type: </span><span class="op">{</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_type</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -434,7 +434,7 @@
             <a class="nav" href="z_54c8d5b9e52c9eae_webpub_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.0">coverage.py v7.13.0</a>,
-            created at 2025-12-19 15:59 +0000
+            created at 2025-12-22 16:05 +0000
         </p>
     </div>
 </footer>
