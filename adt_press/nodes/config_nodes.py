@@ -15,6 +15,7 @@ from adt_press.models.config import (
     QuizPromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    RenderType,
     SectionType,
     SpeechPromptConfig,
     TextGroupType,
@@ -275,7 +276,9 @@ def activity_answers_prompts_config__llm(config: DictConfig) -> dict[str, Prompt
 
 @cache(behavior="recompute")
 @when_config.when(activity_strategy="none")
-def activity_answers_prompts_config__none(config: DictConfig) -> dict[str, PromptConfig]:
+def activity_answers_prompts_config__none(
+    config: DictConfig,
+) -> dict[str, PromptConfig]:
     """Return empty dict when activity answer generation is disabled."""
     return {}
 
@@ -348,3 +351,34 @@ def pruned_text_types_config(config: DictConfig) -> list[str]:
 
 def pruned_section_types_config(config: DictConfig) -> list[str]:
     return list[str](config.get("section_filters", {}).get("pruned_section_types", []))
+
+
+@cache(behavior="recompute")
+def activity_strategy_config(config: DictConfig) -> str:
+    """Get the activity generation strategy from config."""
+    return str(config.get("activity_strategy", "none"))
+
+
+def active_section_types_config(
+    section_types_config: dict[str, SectionType],
+    render_strategies_config: dict[str, RenderStrategy],
+    activity_strategy_config: str,
+) -> dict[str, SectionType]:
+    """Filter out section types with activity render strategy when activity_strategy is none.
+
+    This prevents configuration errors where sections are classified as activities
+    but activity generation is disabled.
+    """
+    # Build set of active render strategies
+    active_render_strategies = {
+        name
+        for name, strategy in render_strategies_config.items()
+        if activity_strategy_config == "llm" or strategy.render_type != RenderType.activity
+    }
+
+    # Filter section types to only those using active render strategies
+    return {
+        section_name: section_type
+        for section_name, section_type in section_types_config.items()
+        if section_type.render_strategy in active_render_strategies
+    }
