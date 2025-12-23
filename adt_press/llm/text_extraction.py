@@ -8,6 +8,7 @@ from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
+from adt_press.utils.languages import Language
 from adt_press.utils.logging import io_logger
 
 
@@ -34,9 +35,11 @@ async def get_page_text(
     text_types: dict[str, TextTypeConfig],
     text_group_types: dict[str, TextGroupTypeConfig],
     page: Page,
+    language: Language,
 ) -> PageTexts:
     context = dict(
         page=page,
+        language=language,  # Add to context
         examples=config.examples,
         text_types=text_types,
         text_group_types=text_group_types,

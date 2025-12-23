@@ -35,6 +35,7 @@ def pdf_texts(
     text_extraction_prompt_config: PromptConfig,
     text_types_config: dict[str, TextType],
     text_group_types_config: dict[str, TextGroupType],
+    input_language: Language,
 ) -> dict[str, PageTexts]:
     async def extract_text():
         text = []
@@ -47,6 +48,7 @@ def pdf_texts(
                     text_types_config,
                     text_group_types_config,
                     page,
+                    input_language,
                 )
             )
 
