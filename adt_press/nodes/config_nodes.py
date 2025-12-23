@@ -284,8 +284,10 @@ def activity_answers_prompts_config__none(
 
 
 @cache(behavior="recompute")
-def speech_prompt_config(config: DictConfig) -> PromptConfig:
-    return SpeechPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["speech_generation"], config["default_model"]))
+def speech_prompt_config(config: DictConfig) -> SpeechPromptConfig:
+    # Don't use prompt_config_with_model for speech - it has nested provider configs
+    speech_config = OmegaConf.to_container(config["prompts"]["speech_generation"], resolve=True)
+    return SpeechPromptConfig.model_validate(speech_config)
 
 
 @cache(behavior="recompute")

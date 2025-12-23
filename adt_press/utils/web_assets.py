@@ -363,7 +363,7 @@ def build_config_json(
         "describeImages": True,
         "notepad": False,
         "state": True,
-        "characterDisplay": True,
+        "characterDisplay": False,
         "highlight": False,
         "activities": strategy_config.get("activity_strategy", "none") != "none",
     }

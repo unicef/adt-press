@@ -94,11 +94,36 @@ class PromptConfig(PathHashMixin):
     timeout: int = 300
 
 
+class SpeechProviderConfig(BaseModel):
+    """Configuration for a specific TTS provider."""
+
+    model: str
+    voice: str = "auto"
+
+
 class SpeechPromptConfig(PromptConfig):
-    voice: str = "alloy"
+    """Speech generation configuration with provider support."""
+
+    provider: str = "auto"  # auto (defaults to openai), openai, or azure
+    openai: SpeechProviderConfig = Field(default_factory=lambda: SpeechProviderConfig(model="gpt-4o-mini-tts", voice="auto"))
+    azure: SpeechProviderConfig = Field(default_factory=lambda: SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"))
     format: str = "mp3"
     bit_rate: str = "64k"
     sample_rate: int = 24000
+
+    def get_active_config(self) -> tuple[str, str]:
+        """
+        Get the active model and voice based on provider setting.
+
+        Returns:
+            Tuple of (model, voice)
+        """
+        if self.provider == "auto" or self.provider == "openai":
+            return (self.openai.model, self.openai.voice)
+        elif self.provider == "azure":
+            return (self.azure.model, self.azure.voice)
+        else:
+            raise ValueError(f"Unknown speech provider: {self.provider}. Must be 'auto', 'openai', or 'azure'")
 
 
 class HTMLPromptConfig(PromptConfig):
