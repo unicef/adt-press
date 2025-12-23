@@ -32,7 +32,7 @@ easy_read_strategy: none
 caption_strategy: none
 
 # our activity generation strategy, either llm or none
-activity_strategy: llm
+activity_strategy: none
 
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
