@@ -85,6 +85,79 @@ class TestCopyInterfaceTranslations:
                 # Should only copy the existing language
                 assert mock_copy.call_count == 1
 
+    def test_copy_with_language_country_fallback(self):
+        """Test fallback from language-country to base language."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+
+            def exists_mock(path):
+                # Return False for 'en-gb', True for 'en'
+                if "en-gb" in path and "interface_translations/en-gb" in path:
+                    return False
+                if "/en/" in path or path.endswith("/en"):
+                    return True
+                return "interface_translations" in path
+
+            with patch("shutil.copytree") as mock_copy:
+                with patch("shutil.rmtree"):
+                    with patch("os.makedirs"):
+                        with patch("os.path.exists", side_effect=exists_mock):
+                            copy_interface_translations(tmpdir, ["en-gb"])
+
+                # Should copy base language (en) with target name (en-gb)
+                assert mock_copy.call_count == 1
+                call_args = mock_copy.call_args[0]
+                # Source should be 'en', target should be 'en-gb'
+                assert "/en" in call_args[0]
+                assert "en-gb" in call_args[1]
+
+    def test_copy_with_missing_language_country_and_base(self):
+        """Test warning when both language-country and base language are missing."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+
+            def exists_mock(path):
+                # Return False for both 'xx-yy' and 'xx'
+                return "interface_translations" in path and "xx" not in path
+
+            with patch("shutil.copytree") as mock_copy:
+                with patch("shutil.rmtree"):
+                    with patch("os.makedirs"):
+                        with patch("os.path.exists", side_effect=exists_mock):
+                            with patch("builtins.print") as mock_print:
+                                copy_interface_translations(tmpdir, ["xx-yy"])
+
+                # Should not copy anything
+                assert mock_copy.call_count == 0
+
+                # Should print warning about missing language and base
+                mock_print.assert_called_once()
+                warning = str(mock_print.call_args[0][0])
+                assert "xx-yy" in warning
+                assert "xx" in warning
+
+    def test_copy_with_simple_missing_language(self):
+        """Test warning when simple language code is missing."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+
+            def exists_mock(path):
+                # Return False for 'zz' language
+                return "interface_translations" in path and "zz" not in path
+
+            with patch("shutil.copytree") as mock_copy:
+                with patch("shutil.rmtree"):
+                    with patch("os.makedirs"):
+                        with patch("os.path.exists", side_effect=exists_mock):
+                            with patch("builtins.print") as mock_print:
+                                copy_interface_translations(tmpdir, ["zz"])
+
+                # Should not copy anything
+                assert mock_copy.call_count == 0
+
+                # Should print warning about missing language
+                mock_print.assert_called_once()
+                warning = str(mock_print.call_args[0][0])
+                assert "zz" in warning
+                assert "No interface translation found" in warning
+
 
 class TestInstallDictionaries:
     """Test installing dictionaries."""
