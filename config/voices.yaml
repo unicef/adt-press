@@ -1,0 +1,162 @@
+# TTS Voice Mappings for Azure and OpenAI
+# Azure voices: https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts
+
+openai_voices:
+  - alloy
+  - echo
+  - fable
+  - onyx
+  - nova
+  - shimmer
+
+azure_voices:
+  # English variants
+  en: en-US-JennyNeural
+  en-us: en-US-JennyNeural
+  en-gb: en-GB-SoniaNeural
+  en-au: en-AU-NatashaNeural
+  en-ca: en-CA-ClaraNeural
+  en-in: en-IN-NeerjaNeural
+  en-ie: en-IE-EmilyNeural
+  en-nz: en-NZ-MollyNeural
+  en-za: en-ZA-LeahNeural
+  
+  # Spanish variants
+  es: es-ES-ElviraNeural
+  es-es: es-ES-ElviraNeural
+  es-mx: es-MX-DaliaNeural
+  es-ar: es-AR-ElenaNeural
+  es-co: es-CO-SalomeNeural
+  es-cl: es-CL-CatalinaNeural
+  es-pe: es-PE-CamilaNeural
+  es-ve: es-VE-PaolaNeural
+  es-cr: es-CR-MariaNeural
+  es-cu: es-CU-BelkysNeural
+  es-do: es-DO-RamonaNeural
+  es-ec: es-EC-AndreaNeural
+  es-gt: es-GT-MartaNeural
+  es-hn: es-HN-KarlaNeural
+  es-ni: es-NI-YolandaNeural
+  es-pa: es-PA-MargaritaNeural
+  es-py: es-PY-TaniaNeural
+  es-sv: es-SV-LorenaNeural
+  es-uy: es-UY-ValentinaNeural
+  es-us: es-US-PalomaNeural
+  
+  # French variants
+  fr: fr-FR-DeniseNeural
+  fr-fr: fr-FR-DeniseNeural
+  fr-ca: fr-CA-SylvieNeural
+  fr-be: fr-BE-CharlineNeural
+  fr-ch: fr-CH-ArianeNeural
+  
+  # German variants
+  de: de-DE-KatjaNeural
+  de-de: de-DE-KatjaNeural
+  de-at: de-AT-IngridNeural
+  de-ch: de-CH-LeniNeural
+  
+  # Portuguese variants
+  pt: pt-BR-FranciscaNeural
+  pt-br: pt-BR-FranciscaNeural
+  pt-pt: pt-PT-RaquelNeural
+  
+  # Italian
+  it: it-IT-ElsaNeural
+  it-it: it-IT-ElsaNeural
+  
+  # Asian languages
+  zh: zh-CN-XiaoxiaoNeural
+  zh-cn: zh-CN-XiaoxiaoNeural
+  zh-tw: zh-TW-HsiaoChenNeural
+  zh-hk: zh-HK-HiuGaaiNeural
+  ja: ja-JP-NanamiNeural
+  ja-jp: ja-JP-NanamiNeural
+  ko: ko-KR-SunHiNeural
+  ko-kr: ko-KR-SunHiNeural
+  
+  # South Asian languages
+  hi: hi-IN-SwaraNeural
+  hi-in: hi-IN-SwaraNeural
+  bn: bn-IN-TanishaaNeural
+  bn-in: bn-IN-TanishaaNeural
+  bn-bd: bn-BD-NabanitaNeural
+  ta: ta-IN-PallaviNeural
+  ta-in: ta-IN-PallaviNeural
+  ta-lk: ta-LK-SaranyaNeural
+  te: te-IN-ShrutiNeural
+  mr: mr-IN-AarohiNeural
+  gu: gu-IN-DhwaniNeural
+  kn: kn-IN-SapnaNeural
+  ml: ml-IN-SobhanaNeural
+  pa: pa-IN-SoniaNeural
+  ur: ur-IN-GulNeural
+  si: si-LK-ThiliniNeural
+  
+  # Arabic variants
+  ar: ar-SA-ZariyahNeural
+  ar-sa: ar-SA-ZariyahNeural
+  ar-eg: ar-EG-SalmaNeural
+  ar-ae: ar-AE-FatimaNeural
+  ar-dz: ar-DZ-AminaNeural
+  ar-bh: ar-BH-LailaNeural
+  ar-iq: ar-IQ-RanaNeural
+  ar-jo: ar-JO-SanaNeural
+  ar-kw: ar-KW-NouraNeural
+  ar-lb: ar-LB-LaylaNeural
+  ar-ly: ar-LY-ImanNeural
+  ar-ma: ar-MA-MounaNeural
+  ar-om: ar-OM-AyshaNeural
+  ar-qa: ar-QA-AmalNeural
+  ar-sy: ar-SY-AmanyNeural
+  ar-tn: ar-TN-ReemNeural
+  ar-ye: ar-YE-MaryamNeural
+  
+  # Russian
+  ru: ru-RU-SvetlanaNeural
+  ru-ru: ru-RU-SvetlanaNeural
+  
+  # Other European languages
+  nl: nl-NL-ColetteNeural
+  nl-nl: nl-NL-ColetteNeural
+  nl-be: nl-BE-DenaNeural
+  pl: pl-PL-ZofiaNeural
+  pl-pl: pl-PL-ZofiaNeural
+  sv: sv-SE-SofieNeural
+  sv-se: sv-SE-SofieNeural
+  no: nb-NO-PernilleNeural
+  nb-no: nb-NO-PernilleNeural
+  da: da-DK-ChristelNeural
+  da-dk: da-DK-ChristelNeural
+  fi: fi-FI-NooraNeural
+  fi-fi: fi-FI-NooraNeural
+  cs: cs-CZ-VlastaNeural
+  hu: hu-HU-NoemiNeural
+  ro: ro-RO-AlinaNeural
+  sk: sk-SK-ViktoriaNeural
+  bg: bg-BG-KalinaNeural
+  hr: hr-HR-GabrijelaNeural
+  sr: sr-RS-SophieNeural
+  sl: sl-SI-PetraNeural
+  uk: uk-UA-PolinaNeural
+  el: el-GR-AthinaNeural
+  tr: tr-TR-EmelNeural
+  
+  # Southeast Asian languages
+  th: th-TH-PremwadeeNeural
+  vi: vi-VN-HoaiMyNeural
+  id: id-ID-GadisNeural
+  ms: ms-MY-YasminNeural
+  fil: fil-PH-BlessicaNeural
+  
+  # African languages
+  af: af-ZA-AdriNeural
+  am: am-ET-MekdesNeural
+  sw: sw-KE-ZuriNeural
+  zu: zu-ZA-ThandoNeural
+  
+  # Hebrew
+  he: he-IL-HilaNeural
+  
+  # Persian
+  fa: fa-IR-DilaraNeural

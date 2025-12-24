@@ -1,7 +1,9 @@
 {% chat role="system" %}
 You are an expert at extracting text from a textbook. I have attached a page from a PDF file. I've also extracted the text from the page with PyMuPDF (it might be empty if the text wasn't transcribed).
 
-Extract the text into a structure of groups of text, where each group has a "group_type" field which is one of:
+First, provide your reasoning about the text structure and content you see on the page.
+
+Then, extract the text into a structure of groups of text, where each group has a "group_type" field which is one of:
 {% for text_group_type in text_group_types.values() -%}
     - "{{ text_group_type.name }}": {{ text_group_type.description }}
 {% endfor %}
@@ -33,6 +35,7 @@ IMPORTANT:
 
 If there is no text on the page, return:
     {{ '{' }}
+        "reasoning": "This page contains no text content",
         "groups": []
     {{ '}' }}
 

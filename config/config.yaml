@@ -390,7 +390,7 @@ prompts:
     model: default  # Required by parent PromptConfig class
     provider: auto # auto (defaults to openai), openai, or azure
     openai:
-      model: tts-1 # or tts-1-hd
+      model: gpt-4o-mini-tts # or tts-1-hd
       voice: auto # auto, alloy, echo, fable, onyx, nova, shimmer
     azure:
       model: azure/speech/azure-tts
