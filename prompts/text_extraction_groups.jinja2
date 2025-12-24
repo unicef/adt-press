@@ -51,10 +51,10 @@ The expected language of the text is: {{ language.name }}
 The following text is extracted from the PDF with PyMuPDF (it might be empty or contain garbled characters):
 {{ page.text }}
 
-IMPORTANT: If the text above appears garbled, corrupted, or contains random ASCII characters that don't match the expected language ({{ language.name }}), IGNORE IT COMPLETELY and extract the text ONLY from the visual image below. The PyMuPDF text is only a hint - the visual image is the source of truth. Extract all text in {{ language.name }}.
+IMPORTANT: The PyMuPDF text above may contain errors, especially for non-Latin scripts like {{ language.name }}. Use it as a reference for text location and structure, but rely primarily on the visual image below for accurate character recognition. If the PyMuPDF text appears significantly corrupted (unreadable symbols, wrong script), prioritize the visual image for the actual characters while using the PyMuPDF output to identify text regions.
 
 The following image is the page from the PDF to extract the text from.
 {{ page.page_image_path | image }}
 
-Now return the extracted text from the page in {{ language.name }}.
+Extract all text from the page in {{ language.name }}, using the image as your primary source and the PyMuPDF text as a structural reference.
 {% endchat %}

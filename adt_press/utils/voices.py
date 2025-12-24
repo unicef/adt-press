@@ -14,7 +14,7 @@ log = structlog.get_logger(__name__)
 def load_voice_config() -> Dict:
     """Load voice configuration from YAML file (cached)."""
     config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config", "voices.yaml")
-    
+
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
@@ -27,7 +27,7 @@ def load_voice_config() -> Dict:
                 "en": "en-US-JennyNeural",
                 "es": "es-ES-ElviraNeural",
                 "fr": "fr-FR-DeniseNeural",
-            }
+            },
         }
 
 
@@ -46,25 +46,25 @@ def get_azure_voice_map() -> Dict[str, str]:
 def get_azure_voice(language_code: str) -> Optional[str]:
     """
     Get Azure voice for language code with fallback logic.
-    
+
     Args:
         language_code: ISO language code (e.g., "es-uy", "en", "fr-ca")
-    
+
     Returns:
         Azure voice name or None if no match found
     """
     voice_map = get_azure_voice_map()
-    
+
     # Normalize to lowercase
     normalized = language_code.lower()
-    
+
     # Try exact match first
     if normalized in voice_map:
         return voice_map[normalized]
-    
+
     # Try base language (e.g., "es" from "es-uy")
     base_lang = normalized.split("-")[0]
     if base_lang in voice_map:
         return voice_map[base_lang]
-    
+
     return None

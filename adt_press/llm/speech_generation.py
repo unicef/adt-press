@@ -1,7 +1,6 @@
 import os
 
 import litellm
-import structlog
 from pydub import AudioSegment
 
 from adt_press.models.config import SpeechPromptConfig
@@ -10,8 +9,6 @@ from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import Language
 from adt_press.utils.voices import get_azure_voice, get_openai_voices
-
-log = structlog.get_logger(__name__)
 
 
 def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
@@ -33,28 +30,10 @@ def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
         if is_azure:
             voice = get_azure_voice(language_code)
             if voice:
-                # Log if using base language fallback
-                if language_code.lower() not in [language_code.lower()]:
-                    base_lang = language_code.split("-")[0]
-                    if voice == get_azure_voice(base_lang):
-                        log.info(
-                            "azure_voice_base_language_fallback",
-                            language_code=language_code,
-                            base_language=base_lang,
-                            fallback_voice=voice,
-                            message=f"No Azure voice for '{language_code}', using base language '{base_lang}' voice",
-                        )
                 return voice
-            
+
             # Final fallback to English
-            voice = "en-US-JennyNeural"
-            log.warning(
-                "azure_voice_fallback",
-                language_code=language_code,
-                fallback_voice=voice,
-                message=f"No Azure voice mapping for language '{language_code}', using default",
-            )
-            return voice
+            return "en-US-JennyNeural"
         else:
             return "alloy"  # OpenAI default
 
@@ -63,33 +42,17 @@ def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
         # Check if it's an Azure voice format (xx-XX-NameNeural)
         if "-" in requested_voice and "Neural" in requested_voice:
             return requested_voice
-        
+
         # Requested non-Azure voice with Azure model - fall back
         voice = get_azure_voice(language_code)
-        fallback = voice if voice else "en-US-JennyNeural"
-        
-        log.warning(
-            "voice_provider_mismatch",
-            requested_voice=requested_voice,
-            model=model,
-            fallback_voice=fallback,
-            message=f"Voice '{requested_voice}' not compatible with Azure, using {fallback}",
-        )
-        return fallback
+        return voice if voice else "en-US-JennyNeural"
     else:
         # OpenAI model
         openai_voices = get_openai_voices()
         if requested_voice in openai_voices:
             return requested_voice
-        
-        # Requested Azure voice with OpenAI model - fall back
-        log.warning(
-            "voice_provider_mismatch",
-            requested_voice=requested_voice,
-            model=model,
-            fallback_voice="alloy",
-            message=f"Voice '{requested_voice}' not compatible with OpenAI TTS, using 'alloy'",
-        )
+
+        # Requested Azure voice with OpenAI model - fall back to default
         return "alloy"
 
 
@@ -100,6 +63,23 @@ async def generate_speech_file(
     text_id: str,
     text: str,
 ) -> SpeechFile:
+    """
+    Generate a speech file from text using TTS.
+
+    Args:
+        run_output_dir: Output directory for audio files
+        config: Speech generation configuration
+        language: Target language for speech
+        text_id: Unique identifier for the text
+        text: Text content to convert to speech
+
+    Returns:
+        SpeechFile metadata object
+
+    Raises:
+        FileNotFoundError: If TTS output file is not created
+        ValueError: If TTS output file is empty or invalid
+    """
     language_code = language.code
 
     sanitized_text = strip_emojis(text)
@@ -113,7 +93,7 @@ async def generate_speech_file(
         examples=config.examples,
     )
 
-    # since we are calling the speech endpoint, not completion, we don't use banks but render straight to text
+    # Render prompt template for TTS instructions
     prompt = render_template_to_string(config.template_path, context)
 
     # Get active provider config
@@ -141,46 +121,40 @@ async def generate_speech_file(
     if not model.startswith("azure/"):
         speech_kwargs["instructions"] = prompt
 
-    # feed the sanitized string to TTS to avoid emoji artifacts in playback
+    # Generate speech via TTS API
     response = await litellm.aspeech(**speech_kwargs)
-    
+
     # Write the audio response to file
     # For Azure, this returns HttpxBinaryResponseContent which needs special handling
-    if hasattr(response, 'content'):
+    if hasattr(response, "content"):
         # Response has content attribute (likely bytes)
         with open(raw_speech_path, "wb") as f:
             f.write(response.content)
-    elif hasattr(response, 'read'):
+    elif hasattr(response, "read"):
         # Response is a file-like object
         with open(raw_speech_path, "wb") as f:
             f.write(response.read())
     else:
         # Use litellm's write_to_file method as fallback
         response.write_to_file(raw_speech_path)
-    
+
     # Verify file was written successfully
     if not os.path.exists(raw_speech_path):
         raise FileNotFoundError(f"TTS output file not created: {raw_speech_path}")
-    
+
     file_size = os.path.getsize(raw_speech_path)
     if file_size == 0:
         raise ValueError(f"TTS output file is empty: {raw_speech_path}")
-    
-    log.debug("TTS file written", path=raw_speech_path, size=file_size)
 
-    # transcode to quality specified in our config
-    try:
-        raw = AudioSegment.from_mp3(raw_speech_path)
-    except Exception as e:
-        log.error("Failed to decode TTS output", path=raw_speech_path, size=file_size, error=str(e))
-        # Try to read a few bytes to debug
-        with open(raw_speech_path, "rb") as f:
-            header = f.read(16)
-            log.error("File header", header=header.hex())
-        raise
-    
+    # Transcode to quality specified in config
+    raw = AudioSegment.from_mp3(raw_speech_path)
     raw.set_frame_rate(config.sample_rate)
     raw.export(speech_path, bitrate=config.bit_rate, format=config.format, parameters=["-ac", "1"])
 
     speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
-    return SpeechFile(speech_id=speech_id, speech_path=speech_relative_path, language_code=language_code, text_id=text_id)
+    return SpeechFile(
+        speech_id=speech_id,
+        speech_path=speech_relative_path,
+        language_code=language_code,
+        text_id=text_id,
+    )
