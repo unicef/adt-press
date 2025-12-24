@@ -18,6 +18,7 @@ from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
+from adt_press.utils.languages import Language
 
 
 class TextTypeEvaluator(BaseEvaluator):
@@ -71,6 +72,10 @@ class TextTypeEvaluator(BaseEvaluator):
 
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
+        # Get input language from config
+        input_language_code = self.global_config.get("input_language", "en")
+        language = Language.from_code(input_language_code)
+
         # Call the LLM for text type classification
         page_texts = await get_page_text(
             str(self.output_dir),
@@ -79,6 +84,7 @@ class TextTypeEvaluator(BaseEvaluator):
             self.text_types_config,
             self.text_group_types_config,
             page,
+            language,
         )
         result["page_texts"] = page_texts.model_dump()
 
