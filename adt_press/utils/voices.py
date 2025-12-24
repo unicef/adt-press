@@ -2,7 +2,7 @@
 
 import os
 from functools import lru_cache
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 import structlog
 import yaml
@@ -11,13 +11,14 @@ log = structlog.get_logger(__name__)
 
 
 @lru_cache(maxsize=1)
-def load_voice_config() -> Dict:
+def load_voice_config() -> Dict[str, Any]:
     """Load voice configuration from YAML file (cached)."""
     config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config", "voices.yaml")
 
     try:
         with open(config_path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            result = yaml.safe_load(f)
+            return cast(Dict[str, Any], result)
     except FileNotFoundError:
         log.warning("voices_config_not_found", path=config_path, message="Using default voice mappings")
         # Fallback to minimal defaults
@@ -34,13 +35,15 @@ def load_voice_config() -> Dict:
 def get_openai_voices() -> List[str]:
     """Get list of available OpenAI voices."""
     config = load_voice_config()
-    return config.get("openai_voices", [])
+    voices = config.get("openai_voices", [])
+    return cast(List[str], voices)
 
 
 def get_azure_voice_map() -> Dict[str, str]:
     """Get Azure voice mapping dictionary."""
     config = load_voice_config()
-    return config.get("azure_voices", {})
+    voice_map = config.get("azure_voices", {})
+    return cast(Dict[str, str], voice_map)
 
 
 def get_azure_voice(language_code: str) -> Optional[str]:
