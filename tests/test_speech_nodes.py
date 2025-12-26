@@ -41,24 +41,36 @@ class TestSpeechFilesNodes:
                     text_id="text_1",
                     language_code="en",
                     speech_path=f"{tmpdir}/en/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
                 ),
                 SpeechFile(
                     speech_id="text_2",
                     text_id="text_2",
                     language_code="en",
                     speech_path=f"{tmpdir}/en/text_2.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
                 ),
                 SpeechFile(
                     speech_id="text_1",
                     text_id="text_1",
                     language_code="es",
                     speech_path=f"{tmpdir}/es/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
                 ),
                 SpeechFile(
                     speech_id="text_2",
                     text_id="text_2",
                     language_code="es",
                     speech_path=f"{tmpdir}/es/text_2.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
                 ),
             ]
 
@@ -142,6 +154,9 @@ class TestSpeechFilesNodes:
                 text_id="single_text",
                 language_code="en",
                 speech_path=f"{tmpdir}/en/single_text.mp3",
+                provider="openai",
+                voice="alloy",
+                model="tts-1",
             )
 
             with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
