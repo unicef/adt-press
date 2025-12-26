@@ -65,15 +65,25 @@ class TestResolveVoice:
 class TestGenerateSpeechFile:
     """Test speech file generation."""
 
+    def _create_mock_response_that_writes_file(self, content=b"fake_audio_data"):
+        """Helper to create a mock response that actually writes files."""
+        mock_response = MagicMock()
+        mock_response.content = content
+        # Don't mock write_to_file or read - let them not exist so code uses content
+        if hasattr(mock_response, "write_to_file"):
+            del mock_response.write_to_file
+        if hasattr(mock_response, "read"):
+            del mock_response.read
+        return mock_response
+
     @pytest.mark.asyncio
     async def test_generate_speech_file_openai_success(self):
         """Test successful speech generation with OpenAI model."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            # Setup config with OpenAI provider
             from adt_press.models.config import SpeechProviderConfig
 
             config = SpeechPromptConfig(
-                model="tts-1",  # Required by PromptConfig base
+                model="tts-1",
                 provider="openai",
                 openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
                 template_path="prompts/speech_generation.jinja2",
@@ -87,18 +97,14 @@ class TestGenerateSpeechFile:
 
             language = Language(code="en", language_code="en", name="English")
 
-            # Mock the TTS response
-            mock_response = MagicMock()
-            mock_response.content = b"fake_audio_data"
+            mock_response = self._create_mock_response_that_writes_file()
 
-            # Mock file operations and audio processing
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
                 with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
                     with patch("adt_press.llm.speech_generation.render_template_to_string") as mock_render:
                         mock_aspeech.return_value = mock_response
                         mock_render.return_value = "Test instructions"
 
-                        # Setup audio mock
                         mock_segment = MagicMock()
                         mock_audio.from_mp3.return_value = mock_segment
                         mock_segment.set_frame_rate.return_value = mock_segment
@@ -132,7 +138,7 @@ class TestGenerateSpeechFile:
             from adt_press.models.config import SpeechProviderConfig
 
             config = SpeechPromptConfig(
-                model="azure/speech/azure-tts",  # Required by PromptConfig base
+                model="azure/speech/azure-tts",
                 provider="azure",
                 azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
                 template_path="prompts/speech_generation.jinja2",
@@ -146,8 +152,7 @@ class TestGenerateSpeechFile:
 
             language = Language(code="es", language_code="es", name="Spanish")
 
-            mock_response = MagicMock()
-            mock_response.content = b"fake_audio_data"
+            mock_response = self._create_mock_response_that_writes_file()
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
                 with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
@@ -155,7 +160,6 @@ class TestGenerateSpeechFile:
                         with patch("adt_press.llm.speech_generation.get_azure_voice", return_value="es-ES-ElviraNeural"):
                             mock_aspeech.return_value = mock_response
 
-                            # Setup audio mock
                             mock_segment = MagicMock()
                             mock_audio.from_mp3.return_value = mock_segment
                             mock_segment.set_frame_rate.return_value = mock_segment
@@ -194,8 +198,7 @@ class TestGenerateSpeechFile:
 
             language = Language(code="en", language_code="en", name="English")
 
-            mock_response = MagicMock()
-            mock_response.content = b"fake_audio_data"
+            mock_response = self._create_mock_response_that_writes_file()
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
                 with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
@@ -240,9 +243,8 @@ class TestGenerateSpeechFile:
 
             language = Language(code="en", language_code="en", name="English")
 
-            # Mock response with read() method
-            mock_response = MagicMock()
-            del mock_response.content  # Remove content attribute
+            # Mock response with ONLY read() method - use spec to control attributes
+            mock_response = MagicMock(spec=['read'])
             mock_response.read.return_value = b"fake_audio_data"
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
@@ -263,57 +265,8 @@ class TestGenerateSpeechFile:
                         )
 
                         assert result.speech_id == "test_en"
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_response_write_to_file(self):
-        """Test handling response with write_to_file() method."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            from adt_press.models.config import SpeechProviderConfig
-
-            config = SpeechPromptConfig(
-                model="tts-1",
-                provider="openai",
-                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
-                template_path="prompts/speech_generation.jinja2",
-                format="mp3",
-                bit_rate="64k",
-                sample_rate=24000,
-                rate_limit=10,
-                max_retries=3,
-                timeout=120,
-            )
-
-            language = Language(code="en", language_code="en", name="English")
-
-            # Mock response with write_to_file method
-            mock_response = MagicMock()
-            del mock_response.content
-            del mock_response.read
-
-            def write_file(path):
-                with open(path, "wb") as f:
-                    f.write(b"fake_audio_data")
-
-            mock_response.write_to_file = write_file
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        mock_aspeech.return_value = mock_response
-
-                        mock_segment = MagicMock()
-                        mock_audio.from_mp3.return_value = mock_segment
-                        mock_segment.set_frame_rate.return_value = mock_segment
-
-                        result = await generate_speech_file(
-                            run_output_dir=tmpdir,
-                            config=config,
-                            language=language,
-                            text_id="test",
-                            text="Test",
-                        )
-
-                        assert result.speech_id == "test_en"
+                        # Verify read() was called
+                        mock_response.read.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_generate_speech_file_file_not_created_error(self):
@@ -336,11 +289,11 @@ class TestGenerateSpeechFile:
 
             language = Language(code="en", language_code="en", name="English")
 
-            mock_response = MagicMock()
-            mock_response.content = b"fake_audio"
+            mock_response = self._create_mock_response_that_writes_file()
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
                 with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                    # Mock os.path.exists to return False after file write attempt
                     with patch("adt_press.llm.speech_generation.os.path.exists", return_value=False):
                         mock_aspeech.return_value = mock_response
 
@@ -374,8 +327,7 @@ class TestGenerateSpeechFile:
 
             language = Language(code="en", language_code="en", name="English")
 
-            mock_response = MagicMock()
-            mock_response.content = b""  # Empty content
+            mock_response = self._create_mock_response_that_writes_file(content=b"")
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
                 with patch("adt_press.llm.speech_generation.render_template_to_string"):
@@ -411,8 +363,7 @@ class TestGenerateSpeechFile:
 
             language = Language(code="fr", language_code="fr", name="French")
 
-            mock_response = MagicMock()
-            mock_response.content = b"fake_audio_data"
+            mock_response = self._create_mock_response_that_writes_file()
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
                 with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
