@@ -123,6 +123,9 @@ class TestGenerateSpeechFile:
                         assert result.text_id == "test_text"
                         assert result.language_code == "en"
                         assert "audio/en/" in result.speech_path
+                        assert result.provider == "openai"
+                        assert result.voice == "alloy"
+                        assert result.model == "tts-1"
 
                         # Verify aspeech was called with correct parameters
                         call_kwargs = mock_aspeech.call_args[1]
@@ -164,7 +167,7 @@ class TestGenerateSpeechFile:
                             mock_audio.from_mp3.return_value = mock_segment
                             mock_segment.set_frame_rate.return_value = mock_segment
 
-                            await generate_speech_file(
+                            result = await generate_speech_file(
                                 run_output_dir=tmpdir,
                                 config=config,
                                 language=language,
@@ -176,6 +179,10 @@ class TestGenerateSpeechFile:
                             call_kwargs = mock_aspeech.call_args[1]
                             assert "instructions" not in call_kwargs
                             assert call_kwargs["voice"] == "es-ES-ElviraNeural"
+
+                            assert result.provider == "azure"
+                            assert result.voice == "es-ES-ElviraNeural"
+                            assert result.model == "azure/speech/azure-tts"
 
     @pytest.mark.asyncio
     async def test_generate_speech_file_strips_emojis(self):
@@ -210,7 +217,7 @@ class TestGenerateSpeechFile:
                             mock_audio.from_mp3.return_value = mock_segment
                             mock_segment.set_frame_rate.return_value = mock_segment
 
-                            await generate_speech_file(
+                            result = await generate_speech_file(
                                 run_output_dir=tmpdir,
                                 config=config,
                                 language=language,
@@ -221,6 +228,10 @@ class TestGenerateSpeechFile:
                             # Verify stripped text was used
                             call_kwargs = mock_aspeech.call_args[1]
                             assert call_kwargs["input"] == "Hello world"
+
+                            assert result.provider == "openai"
+                            assert result.voice == "alloy"
+                            assert result.model == "tts-1"
 
     @pytest.mark.asyncio
     async def test_generate_speech_file_response_read_method(self):
@@ -267,6 +278,10 @@ class TestGenerateSpeechFile:
                         assert result.speech_id == "test_en"
                         # Verify read() was called
                         mock_response.read.assert_called_once()
+
+                        assert result.provider == "openai"
+                        assert result.voice == "alloy"
+                        assert result.model == "tts-1"
 
     @pytest.mark.asyncio
     async def test_generate_speech_file_file_not_created_error(self):
@@ -386,3 +401,7 @@ class TestGenerateSpeechFile:
                         audio_dir = os.path.join(tmpdir, "audio", "fr")
                         assert os.path.exists(audio_dir)
                         assert result.language_code == "fr"
+
+                        assert result.provider == "openai"
+                        assert result.voice == "alloy"
+                        assert result.model == "tts-1"

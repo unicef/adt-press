@@ -172,4 +172,7 @@ async def generate_speech_file(
         speech_path=speech_relative_path,
         language_code=language_code,
         text_id=text_id,
+        provider=config.provider,
+        voice=resolved_voice,
+        model=model,
     )
