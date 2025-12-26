@@ -244,7 +244,7 @@ class TestGenerateSpeechFile:
             language = Language(code="en", language_code="en", name="English")
 
             # Mock response with ONLY read() method - use spec to control attributes
-            mock_response = MagicMock(spec=['read'])
+            mock_response = MagicMock(spec=["read"])
             mock_response.read.return_value = b"fake_audio_data"
 
             with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
