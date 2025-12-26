@@ -405,3 +405,240 @@ class TestGenerateSpeechFile:
                         assert result.provider == "openai"
                         assert result.voice == "alloy"
                         assert result.model == "tts-1"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_response_write_to_file_method(self):
+        """Test handling response with write_to_file() method."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Mock response with write_to_file method
+            mock_response = MagicMock(spec=["write_to_file"])
+
+            def write_file(path):
+                """Actually write a file when write_to_file is called."""
+                with open(path, "wb") as f:
+                    f.write(b"fake_audio_data")
+
+            mock_response.write_to_file = write_file
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                        mock_aspeech.return_value = mock_response
+
+                        mock_segment = MagicMock()
+                        mock_audio.from_mp3.return_value = mock_segment
+                        mock_segment.set_frame_rate.return_value = mock_segment
+
+                        result = await generate_speech_file(
+                            run_output_dir=tmpdir,
+                            config=config,
+                            language=language,
+                            text_id="test",
+                            text="Test",
+                        )
+
+                        assert result.speech_id == "test_en"
+                        assert result.provider == "openai"
+                        assert result.voice == "alloy"
+                        assert result.model == "tts-1"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_response_async_content(self):
+        """Test handling response with async content attribute."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Create an async coroutine that returns content
+            async def async_content():
+                return b"fake_audio_data"
+
+            # Mock response with content that has __await__ (is awaitable)
+            mock_response = MagicMock(spec=["content"])
+            mock_response.content = async_content()
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                        mock_aspeech.return_value = mock_response
+
+                        mock_segment = MagicMock()
+                        mock_audio.from_mp3.return_value = mock_segment
+                        mock_segment.set_frame_rate.return_value = mock_segment
+
+                        result = await generate_speech_file(
+                            run_output_dir=tmpdir,
+                            config=config,
+                            language=language,
+                            text_id="test",
+                            text="Test",
+                        )
+
+                        assert result.speech_id == "test_en"
+                        assert result.provider == "openai"
+                        assert result.voice == "alloy"
+                        assert result.model == "tts-1"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_response_iter_bytes(self):
+        """Test handling response with iter_bytes() streaming method."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Mock response with iter_bytes async generator
+            async def fake_iter_bytes():
+                """Async generator that yields audio chunks."""
+                yield b"fake_"
+                yield b"audio_"
+                yield b"data"
+
+            mock_response = MagicMock(spec=["iter_bytes"])
+            mock_response.iter_bytes = fake_iter_bytes
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                        mock_aspeech.return_value = mock_response
+
+                        mock_segment = MagicMock()
+                        mock_audio.from_mp3.return_value = mock_segment
+                        mock_segment.set_frame_rate.return_value = mock_segment
+
+                        result = await generate_speech_file(
+                            run_output_dir=tmpdir,
+                            config=config,
+                            language=language,
+                            text_id="test",
+                            text="Test",
+                        )
+
+                        assert result.speech_id == "test_en"
+                        assert result.provider == "openai"
+                        assert result.voice == "alloy"
+                        assert result.model == "tts-1"
+
+                        # Verify the chunks were written correctly
+                        raw_path = os.path.join(tmpdir, "audio", "en", "test_en_raw.mp3")
+                        with open(raw_path, "rb") as f:
+                            assert f.read() == b"fake_audio_data"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_unknown_response_type_error(self):
+        """Test error when response has unknown type (no recognized attributes)."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Mock response with NO recognized attributes
+            mock_response = MagicMock(spec=["some_unknown_method"])
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                    mock_aspeech.return_value = mock_response
+
+                    with pytest.raises(ValueError, match="Unknown response type"):
+                        await generate_speech_file(
+                            run_output_dir=tmpdir,
+                            config=config,
+                            language=language,
+                            text_id="test",
+                            text="Test",
+                        )
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_write_exception_handling(self):
+        """Test exception handling during file write."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Mock response that raises an exception when trying to write
+            mock_response = MagicMock(spec=["content"])
+            mock_response.content = property(lambda self: (_ for _ in ()).throw(IOError("Disk full")))
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                    mock_aspeech.return_value = mock_response
+
+                    with pytest.raises(ValueError, match="Failed to write TTS response to file"):
+                        await generate_speech_file(
+                            run_output_dir=tmpdir,
+                            config=config,
+                            language=language,
+                            text_id="test",
+                            text="Test",
+                        )
