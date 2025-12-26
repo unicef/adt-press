@@ -77,6 +77,18 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
   - `two_column` works best for novels and storybooks
   - `html` works best for textbooks
   - `overlay` works best for comic books
+- `speech_strategy`: Enable text-to-speech generation (default: `none`, set to `tts` to enable)
+- `prompts.speech_generation.provider`: TTS provider selection (default: `auto` uses OpenAI, also supports `azure`)
+  - `auto` or `openai`: Uses OpenAI's TTS models (requires `OPENAI_API_KEY`)
+  - `azure`: Uses Azure Speech Services (requires `AZURE_API_KEY` and `AZURE_API_BASE=https://{region}.api.cognitive.microsoft.com`)
+  - Configure voice settings in `config/config.yaml` under `prompts.speech_generation`
+
+### Text-to-Speech Examples
+
+Generate speech using OpenAI (default):
+```bash
+uv run adt-press.py label=mydoc pdf_path=assets/book.pdf speech_strategy=tts
+````
 
 ## Output
 

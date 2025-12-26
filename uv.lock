@@ -103,7 +103,7 @@ requires-dist = [
     { name = "jsonref", specifier = ">=1.1.0" },
     { name = "label-studio-sdk", specifier = ">=2.0.5" },
     { name = "langfuse", specifier = ">=2,<3" },
-    { name = "litellm", specifier = ">=1.80.8" },
+    { name = "litellm", specifier = ">=1.79.3" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "mlflow-skinny", specifier = ">=3.4.0" },
     { name = "numpy", specifier = ">=2.3.1" },

@@ -125,18 +125,33 @@ async def generate_speech_file(
     response = await litellm.aspeech(**speech_kwargs)
 
     # Write the audio response to file
-    # For Azure, this returns HttpxBinaryResponseContent which needs special handling
-    if hasattr(response, "content"):
-        # Response has content attribute (likely bytes)
-        with open(raw_speech_path, "wb") as f:
-            f.write(response.content)
-    elif hasattr(response, "read"):
-        # Response is a file-like object
-        with open(raw_speech_path, "wb") as f:
-            f.write(response.read())
-    else:
-        # Use litellm's write_to_file method as fallback
-        response.write_to_file(raw_speech_path)
+    # Different response types require different handling
+    try:
+        if hasattr(response, "write_to_file"):
+            # Use litellm's write_to_file method (most reliable, handles all types)
+            response.write_to_file(raw_speech_path)
+        elif hasattr(response, "read"):
+            # Response is a file-like object
+            with open(raw_speech_path, "wb") as f:
+                content = response.read()
+                f.write(content)
+        elif hasattr(response, "content"):
+            # Response has content attribute (likely bytes)
+            content = response.content
+            # For httpx responses, content might be a coroutine
+            if hasattr(content, "__await__"):
+                content = await content
+            with open(raw_speech_path, "wb") as f:
+                f.write(content)
+        elif hasattr(response, "iter_bytes"):
+            # Streaming response
+            with open(raw_speech_path, "wb") as f:
+                async for chunk in response.iter_bytes():
+                    f.write(chunk)
+        else:
+            raise ValueError(f"Unknown response type: {type(response)}, attributes: {dir(response)}")
+    except Exception as e:
+        raise ValueError(f"Failed to write TTS response to file: {e}, response type: {type(response)}")
 
     # Verify file was written successfully
     if not os.path.exists(raw_speech_path):
