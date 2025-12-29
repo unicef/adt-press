@@ -114,7 +114,7 @@ async def generate_speech_file(
 
         # Get provider/voice for metadata (even though we didn't use TTS)
         model, voice = config.get_active_config(language_code)
-        resolved_provider = config.get_provider_for_language(language_code)  # ADD THIS
+        resolved_provider = config.get_provider_for_language(language_code)
 
         # Return relative path consistent with normal TTS generation
         speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
@@ -123,7 +123,7 @@ async def generate_speech_file(
             speech_id=speech_id,
             speech_path=speech_relative_path,
             language_code=language_code,
-            provider=resolved_provider,  # CHANGE from config.provider
+            provider=resolved_provider,
             voice=voice,
             model=model,
         )
@@ -140,6 +140,7 @@ async def generate_speech_file(
 
     # Get active provider config
     model, voice = config.get_active_config(language_code)
+    resolved_provider = config.get_provider_for_language(language_code)
 
     # Resolve the voice based on language
     resolved_voice = resolve_voice(model, voice, language_code)
@@ -217,7 +218,7 @@ async def generate_speech_file(
         speech_path=speech_relative_path,
         language_code=language_code,
         text_id=text_id,
-        provider=resolved_provider,  # CHANGE from config.provider
+        provider=resolved_provider,
         voice=resolved_voice,
         model=model,
     )
