@@ -278,6 +278,20 @@ def plate_language(plate_language_config: str, input_language: Language) -> Lang
 
 
 def output_languages(output_languages_config: list[str], plate_language: Language) -> list[Language]:
+    # Handle special case of exactly ["auto"]
     if output_languages_config == ["auto"]:
         return [plate_language]
-    return [Language.from_code(lang_code) for lang_code in output_languages_config]
+
+    # Process each language code, replacing "auto" with plate_language
+    result = []
+    for lang_code in output_languages_config:
+        # Replace "auto" or unresolved interpolations with plate_language
+        if lang_code in ("auto", "${plate_language}", "${input_language}"):
+            if plate_language not in result:  # Avoid duplicates
+                result.append(plate_language)
+        else:
+            lang = Language.from_code(lang_code)
+            if lang not in result:  # Avoid duplicates
+                result.append(lang)
+
+    return result if result else [plate_language]
