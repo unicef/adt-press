@@ -28,7 +28,7 @@ Demos of ADTs created from the outputs of ADT Press:
 
 - Python 3.13 or higher
 - UV package manager (recommended)
-- **You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work.**
+- **You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work. If you use Azure TTS you will have to set the following environment variables as well: `AZURE_API_KEY` and `AZURE_API_BASE`.**
 
 ## Installation
 
@@ -78,10 +78,10 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
   - `html` works best for textbooks
   - `overlay` works best for comic books
 - `speech_strategy`: Enable text-to-speech generation (default: `none`, set to `tts` to enable)
-- `prompts.speech_generation.provider`: TTS provider selection (default: `auto` uses OpenAI, also supports `azure`)
+- `speech.provider`: TTS provider selection (default: `auto` uses OpenAI, also supports `azure`)
   - `auto` or `openai`: Uses OpenAI's TTS models (requires `OPENAI_API_KEY`)
   - `azure`: Uses Azure Speech Services (requires `AZURE_API_KEY` and `AZURE_API_BASE=https://{region}.api.cognitive.microsoft.com`)
-  - Configure voice settings in `config/config.yaml` under `prompts.speech_generation`
+  - Configure voice settings in `config/config.yaml` under `speech`
 
 ### Text-to-Speech Examples
 
