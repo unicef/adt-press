@@ -916,7 +916,6 @@ class TestGenerateSpeechFile:
                             assert call_kwargs["model"] == "azure/speech/azure-tts"
                             assert call_kwargs["voice"] == "es-UY-MateoNeural"
 
-
     @pytest.mark.asyncio
     async def test_generate_speech_file_silent_audio_uses_resolved_provider(self):
         """Test that silent audio generation uses resolved provider."""
