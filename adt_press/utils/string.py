@@ -11,15 +11,15 @@ def is_speakable_text(text: str, min_length: int = 3) -> bool:
     """
     Check if text contains speakable content suitable for TTS generation.
 
-    Texts that are too short and contain only punctuation/symbols often cause
-    TTS APIs (especially Azure) to return empty responses.
+    Texts that contain only punctuation/symbols often cause TTS APIs
+    (especially Azure) to return empty responses, regardless of length.
 
     Args:
         text: The text to validate
-        min_length: Minimum length threshold for short text validation (default: 3)
+        min_length: Minimum length threshold for considering text "long enough" (default: 3)
 
     Returns:
-        True if text is suitable for TTS, False if it should be skipped
+        True if text contains letters or numbers (speakable content), False otherwise
 
     Examples:
         >>> is_speakable_text("1.")
@@ -30,19 +30,19 @@ def is_speakable_text(text: str, min_length: int = 3) -> bool:
         False  # Only punctuation
         >>> is_speakable_text(".")
         False  # Only punctuation
+        >>> is_speakable_text("................................................................................")
+        False  # Only punctuation, even if long
         >>> is_speakable_text("Hello world")
-        True  # Normal text (length > min_length)
+        True  # Contains letters
+        >>> is_speakable_text("Page 42")
+        True  # Contains letters and numbers
     """
     if not text or not text.strip():
         return False
 
     stripped = text.strip()
 
-    # Text longer than min_length is generally safe to speak
-    if len(stripped) >= min_length:
-        return True
-
-    # For short texts, check if they contain any letters or numbers
+    # Check if text contains any letters or numbers, regardless of length
     # Unicode categories: L* = letters (La, Ll, Lm, Lo, Lt, Lu)
     #                     N* = numbers (Nd, Nl, No)
     has_speakable = any(unicodedata.category(c).startswith(("L", "N")) for c in stripped)

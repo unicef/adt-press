@@ -6,6 +6,10 @@ import litellm
 import mlflow
 from litellm import acompletion
 
+# Disable LiteLLM's async logging worker to avoid event loop conflicts
+# This prevents "Queue is bound to a different event loop" errors when using asyncio.run()
+litellm.disable_logging_queue = True
+
 # if langfuse is configured, set up callbacks for litellm
 if os.getenv("LANGFUSE_HOST"):
     # set callbacks

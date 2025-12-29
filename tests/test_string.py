@@ -1,161 +1,137 @@
-import unittest
+"""Tests for string utility functions."""
 
 from adt_press.utils.string import is_speakable_text, page_number_for_section_id
 
 
-class TestIsSpeakableText(unittest.TestCase):
-    """Test is_speakable_text function for TTS validation."""
+class TestPageNumberForSectionId:
+    """Test page number extraction from section IDs."""
+
+    def test_basic_section_id(self):
+        """Test extracting page number from standard section ID."""
+        assert page_number_for_section_id("sec_p5_s1") == 5
+
+    def test_double_digit_page(self):
+        """Test extracting double digit page numbers."""
+        assert page_number_for_section_id("sec_p42_s3") == 42
+
+    def test_triple_digit_page(self):
+        """Test extracting triple digit page numbers."""
+        assert page_number_for_section_id("sec_p123_s1") == 123
+
+
+class TestIsSpeakableText:
+    """Test speakable text validation."""
 
     def test_empty_string(self):
-        """Test that empty strings are not speakable."""
-        self.assertFalse(is_speakable_text(""))
-        self.assertFalse(is_speakable_text("   "))
-        self.assertFalse(is_speakable_text("\t\n"))
+        """Test that empty string is not speakable."""
+        assert is_speakable_text("") is False
 
-    def test_none_value(self):
-        """Test that None is not speakable."""
-        self.assertFalse(is_speakable_text(None))
+    def test_whitespace_only(self):
+        """Test that whitespace-only text is not speakable."""
+        assert is_speakable_text("   ") is False
+        assert is_speakable_text("\n\t") is False
+
+    def test_none_input(self):
+        """Test that None input is not speakable."""
+        assert is_speakable_text(None) is False  # type: ignore
 
     def test_punctuation_only_short(self):
         """Test that short punctuation-only text is not speakable."""
-        self.assertFalse(is_speakable_text("—"))
-        self.assertFalse(is_speakable_text("."))
-        self.assertFalse(is_speakable_text(","))
-        self.assertFalse(is_speakable_text(".."))
-        self.assertFalse(is_speakable_text("—-"))
-        self.assertFalse(is_speakable_text("()"))
-        self.assertFalse(is_speakable_text("[]"))
-        self.assertFalse(is_speakable_text("{}"))
+        assert is_speakable_text("—") is False
+        assert is_speakable_text(".") is False
+        assert is_speakable_text(",") is False
+        assert is_speakable_text("...") is False
 
-    def test_symbols_only_short(self):
-        """Test that short symbol-only text is not speakable."""
-        self.assertFalse(is_speakable_text("$"))
-        self.assertFalse(is_speakable_text("@"))
-        self.assertFalse(is_speakable_text("#"))
-        self.assertFalse(is_speakable_text("*"))
+    def test_punctuation_only_long(self):
+        """Test that long punctuation-only text is not speakable."""
+        assert is_speakable_text("." * 80) is False
+        assert is_speakable_text("—" * 50) is False
+        assert is_speakable_text(",,,,,,,,,,,,,,,,,,,,") is False
 
-    def test_numbers_short(self):
-        """Test that short text with numbers is speakable."""
-        self.assertTrue(is_speakable_text("1"))
-        self.assertTrue(is_speakable_text("1."))
-        self.assertTrue(is_speakable_text("2."))
-        self.assertTrue(is_speakable_text("10"))
-        self.assertTrue(is_speakable_text("99"))
+    def test_symbols_only(self):
+        """Test that symbol-only text is not speakable."""
+        assert is_speakable_text("$$$") is False
+        assert is_speakable_text("@#$%") is False
+        assert is_speakable_text("***") is False
 
-    def test_letters_short(self):
-        """Test that short text with letters is speakable."""
-        self.assertTrue(is_speakable_text("a"))
-        self.assertTrue(is_speakable_text("A"))
-        self.assertTrue(is_speakable_text("vi"))
-        self.assertTrue(is_speakable_text("i"))
-        self.assertTrue(is_speakable_text("II"))
+    def test_number_only(self):
+        """Test that numbers are speakable."""
+        assert is_speakable_text("1") is True
+        assert is_speakable_text("42") is True
+        assert is_speakable_text("123") is True
 
-    def test_mixed_short(self):
-        """Test that short mixed text with letters/numbers is speakable."""
-        self.assertTrue(is_speakable_text("a)"))
-        self.assertTrue(is_speakable_text("1)"))
-        self.assertTrue(is_speakable_text("A."))
-        self.assertTrue(is_speakable_text("(i)"))
-        self.assertTrue(is_speakable_text("(1)"))
+    def test_number_with_punctuation(self):
+        """Test that numbers with punctuation are speakable."""
+        assert is_speakable_text("1.") is True
+        assert is_speakable_text("2)") is True
+        assert is_speakable_text("(3)") is True
 
-    def test_unicode_letters_short(self):
-        """Test that short Unicode letter text is speakable."""
-        # Sinhala
-        self.assertTrue(is_speakable_text("අ"))
-        self.assertTrue(is_speakable_text("එ"))
-        # Arabic
-        self.assertTrue(is_speakable_text("ع"))
-        # Chinese
-        self.assertTrue(is_speakable_text("中"))
-        # Greek
-        self.assertTrue(is_speakable_text("α"))
-        self.assertTrue(is_speakable_text("β"))
+    def test_letter_only(self):
+        """Test that letters are speakable."""
+        assert is_speakable_text("a") is True
+        assert is_speakable_text("vi") is True
+        assert is_speakable_text("i") is True
 
-    def test_unicode_numbers_short(self):
-        """Test that short Unicode number text is speakable."""
-        # Arabic-Indic digits
-        self.assertTrue(is_speakable_text("١"))
-        self.assertTrue(is_speakable_text("٢"))
-        # Chinese numbers
-        self.assertTrue(is_speakable_text("一"))
+    def test_mixed_short_text(self):
+        """Test that short text with mixed content is speakable."""
+        assert is_speakable_text("a)") is True
+        assert is_speakable_text("1)") is True
+        assert is_speakable_text("(i)") is True
 
-    def test_long_text_always_speakable(self):
-        """Test that text longer than min_length is always speakable."""
-        # Even if it's all punctuation, long text is considered speakable
-        # (though it may fail at TTS API level)
-        self.assertTrue(is_speakable_text("..."))
-        self.assertTrue(is_speakable_text("----"))
-        self.assertTrue(is_speakable_text("Hello"))
-        self.assertTrue(is_speakable_text("Hello, world!"))
-        self.assertTrue(is_speakable_text("This is a test."))
+    def test_unicode_letters(self):
+        """Test that Unicode letters are recognized as speakable."""
+        assert is_speakable_text("ä") is True  # German
+        assert is_speakable_text("ñ") is True  # Spanish
+        assert is_speakable_text("ß") is True  # German
+        assert is_speakable_text("å") is True  # Nordic
+        assert is_speakable_text("ō") is True  # Latin extended
+        assert is_speakable_text("א") is True  # Hebrew
+        assert is_speakable_text("あ") is True  # Japanese Hiragana
+        assert is_speakable_text("中") is True  # Chinese
+        assert is_speakable_text("අ") is True  # Sinhala
+        assert is_speakable_text("த") is True  # Tamil
+        assert is_speakable_text("Ω") is True  # Greek
 
-    def test_whitespace_handling(self):
-        """Test that whitespace is properly stripped."""
-        self.assertTrue(is_speakable_text("  1  "))
-        self.assertTrue(is_speakable_text("\tvi\n"))
-        self.assertFalse(is_speakable_text("  .  "))
-        self.assertFalse(is_speakable_text("\t—\n"))
+    def test_unicode_numbers(self):
+        """Test that Unicode numbers are recognized as speakable."""
+        assert is_speakable_text("٣") is True  # Arabic-Indic digit 3
+        assert is_speakable_text("५") is True  # Devanagari digit 5
+        assert is_speakable_text("二") is True  # Chinese number 2
+
+    def test_long_speakable_text(self):
+        """Test that normal long text is speakable."""
+        assert is_speakable_text("Hello world") is True
+        assert is_speakable_text("This is a test sentence.") is True
+        assert is_speakable_text("Page 42 of the document") is True
+
+    def test_whitespace_trimming(self):
+        """Test that surrounding whitespace is properly handled."""
+        assert is_speakable_text("  a  ") is True
+        assert is_speakable_text("  .  ") is False
+        assert is_speakable_text("\n1\n") is True
 
     def test_custom_min_length(self):
-        """Test custom min_length parameter."""
-        # With min_length=1, single characters that are letters/numbers are always speakable
-        self.assertTrue(is_speakable_text("a", min_length=1))
-        self.assertTrue(is_speakable_text("1", min_length=1))
-
-        # With min_length=5, shorter text goes through validation
-        self.assertTrue(is_speakable_text("test", min_length=5))  # Has letters
-        self.assertFalse(is_speakable_text("...", min_length=5))  # Only punctuation
-
-        # With min_length=10, medium text is automatically speakable
-        self.assertTrue(is_speakable_text(".....", min_length=1))  # > min_length
+        """Test custom min_length parameter (note: this parameter no longer affects logic)."""
+        # With the fix, min_length doesn't change behavior - we always check for letters/numbers
+        assert is_speakable_text(".", min_length=1) is False
+        assert is_speakable_text("a", min_length=5) is True
 
     def test_real_world_examples(self):
-        """Test real-world examples from text extraction."""
-        # List markers - should be speakable
-        self.assertTrue(is_speakable_text("1."))
-        self.assertTrue(is_speakable_text("2."))
-        self.assertTrue(is_speakable_text("a)"))
-        self.assertTrue(is_speakable_text("i)"))
+        """Test real-world examples from document processing."""
+        # List markers
+        assert is_speakable_text("1.") is True
+        assert is_speakable_text("a)") is True
+        assert is_speakable_text("i.") is True
 
-        # Page numbers - should be speakable
-        self.assertTrue(is_speakable_text("vi"))
-        self.assertTrue(is_speakable_text("vii"))
-        self.assertTrue(is_speakable_text("12"))
+        # Page numbers
+        assert is_speakable_text("42") is True
+        assert is_speakable_text("Page 10") is True
 
-        # Pure punctuation - should not be speakable
-        self.assertFalse(is_speakable_text("—"))
-        self.assertFalse(is_speakable_text("–"))
-        self.assertFalse(is_speakable_text("-"))
+        # Punctuation-only (should be skipped)
+        assert is_speakable_text("—") is False
+        assert is_speakable_text("...") is False
+        assert is_speakable_text("." * 80) is False  # The failing case from error
 
-        # Normal text - should be speakable
-        self.assertTrue(is_speakable_text("Hello"))
-        self.assertTrue(is_speakable_text("Test"))
-
-        # Sinhala text - should be speakable
-        self.assertTrue(is_speakable_text("බුද්ධ"))
-        self.assertTrue(is_speakable_text("ධර්මය"))
-
-
-class TestPageNumberForSectionId(unittest.TestCase):
-    """Test page_number_for_section_id function."""
-
-    def test_basic_section_id(self):
-        """Test extracting page number from section ID."""
-        self.assertEqual(page_number_for_section_id("section_p1"), 1)
-        self.assertEqual(page_number_for_section_id("section_p2"), 2)
-        self.assertEqual(page_number_for_section_id("section_p10"), 10)
-        self.assertEqual(page_number_for_section_id("section_p99"), 99)
-
-    def test_section_id_with_suffix(self):
-        """Test section IDs with additional suffixes."""
-        self.assertEqual(page_number_for_section_id("section_p5_intro"), 5)
-        self.assertEqual(page_number_for_section_id("section_p12_conclusion"), 12)
-
-    def test_large_page_numbers(self):
-        """Test large page numbers."""
-        self.assertEqual(page_number_for_section_id("section_p100"), 100)
-        self.assertEqual(page_number_for_section_id("section_p999"), 999)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        # Mixed content
+        assert is_speakable_text("Chapter 1") is True
+        assert is_speakable_text("Figure 2.3") is True
