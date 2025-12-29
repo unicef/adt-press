@@ -867,7 +867,7 @@ class TestGenerateSpeechFile:
                             assert call_kwargs["model"] == "azure/speech/azure-tts"
                             assert call_kwargs["voice"] == "es-ES-ElviraNeural"
 
-                            assert result.provider == "openai"  # Note: Config stores default, not resolved
+                            assert result.provider == "azure"  # Note: Config stores default, not resolved
                             assert result.model == "azure/speech/azure-tts"
 
     @pytest.mark.asyncio
@@ -914,3 +914,43 @@ class TestGenerateSpeechFile:
                             call_kwargs = mock_aspeech.call_args[1]
                             assert "instructions" not in call_kwargs
                             assert call_kwargs["model"] == "azure/speech/azure-tts"
+                            assert call_kwargs["voice"] == "es-UY-MateoNeural"
+
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_silent_audio_uses_resolved_provider(self):
+        """Test that silent audio generation uses resolved provider."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="default",
+                template_path="prompts/speech_generation.jinja2",
+                provider="openai",
+                language_providers={"es": "azure"},
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+            )
+
+            language = Language(code="es", language_code="es", name="Spanish")
+
+            with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                mock_silent = MagicMock()
+                mock_audio.silent.return_value = mock_silent
+
+                # Test with punctuation-only (triggers silent audio)
+                result = await generate_speech_file(
+                    run_output_dir=tmpdir,
+                    config=config,
+                    language=language,
+                    text_id="test_dash",
+                    text="—",
+                )
+
+                # Verify resolved provider is stored (Azure for Spanish)
+                assert result.provider == "azure"
+                assert result.model == "azure/speech/azure-tts"
+                assert result.language_code == "es"
