@@ -11,8 +11,7 @@ from adt_press.utils.file import calculate_file_hash, read_text_file
 class RenderType(str, enum.Enum):
     html = "html"
     rows = "rows"
-    two_column = "two_column"
-    template = "template"
+    two_column = "template"
     activity = "activity"
 
 
@@ -104,26 +103,56 @@ class SpeechProviderConfig(BaseModel):
 class SpeechPromptConfig(PromptConfig):
     """Speech generation configuration with provider support."""
 
-    provider: str = "auto"  # auto (defaults to openai), openai, or azure
+    provider: str = "auto"  # Default provider
+    language_providers: dict[str, str] = {}  # Per-language provider overrides
     openai: SpeechProviderConfig = Field(default_factory=lambda: SpeechProviderConfig(model="gpt-4o-mini-tts", voice="auto"))
     azure: SpeechProviderConfig = Field(default_factory=lambda: SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"))
     format: str = "mp3"
     bit_rate: str = "64k"
     sample_rate: int = 24000
 
-    def get_active_config(self) -> tuple[str, str]:
+    def get_provider_for_language(self, language_code: str) -> str:
+        """
+        Get the appropriate provider for a specific language.
+
+        Args:
+            language_code: ISO language code (e.g., "en", "es", "si", "es-uy", "si-lk")
+
+        Returns:
+            Provider name ("openai" or "azure")
+        """
+        # Check exact match first (e.g., "es-uy")
+        if language_code in self.language_providers:
+            return self.language_providers[language_code]
+
+        # If no exact match, try base language code (e.g., "es" from "es-uy")
+        base_lang = language_code.split("-")[0]
+        if base_lang in self.language_providers:
+            return self.language_providers[base_lang]
+
+        # Fall back to default provider
+        if self.provider == "auto":
+            return "openai"
+        return self.provider
+
+    def get_active_config(self, language_code: str | None = None) -> tuple[str, str]:
         """
         Get the active model and voice based on provider setting.
+
+        Args:
+            language_code: Optional ISO language code for per-language provider selection
 
         Returns:
             Tuple of (model, voice)
         """
-        if self.provider == "auto" or self.provider == "openai":
+        provider = self.provider if language_code is None else self.get_provider_for_language(language_code)
+
+        if provider == "auto" or provider == "openai":
             return (self.openai.model, self.openai.voice)
-        elif self.provider == "azure":
+        elif provider == "azure":
             return (self.azure.model, self.azure.voice)
         else:
-            raise ValueError(f"Unknown speech provider: {self.provider}. Must be 'auto', 'openai', or 'azure'")
+            raise ValueError(f"Unknown speech provider: {provider}. Must be 'auto', 'openai', or 'azure'")
 
 
 class HTMLPromptConfig(PromptConfig):

@@ -51,13 +51,18 @@ default_render_strategy: html
 
 # Speech/TTS provider configuration
 speech:
-  provider: auto # auto (defaults to openai), openai, or azure
+  provider: openai  # Default provider for languages not in the map
+  language_providers:  # Override provider per language
+    es: azure  # Spanish uses Azure (better quality)
+    ta: azure  # Tamil uses Azure
+    si: azure  # Sinhala uses Azure
+    # All other languages (en, etc.) use default provider
   openai:
-    model: gpt-4o-mini-tts # or tts-1-hd
-    voice: auto # auto, alloy, echo, fable, onyx, nova, shimmer
+    model: gpt-4o-mini-tts
+    voice: auto
   azure:
     model: azure/speech/azure-tts
-    voice: auto # auto selects based on language, or specify like si-LK-SameeraNeural
+    voice: auto
   bit_rate: 64k
   sample_rate: 24000
   format: mp3

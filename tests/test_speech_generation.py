@@ -820,3 +820,97 @@ class TestGenerateSpeechFile:
                         mock_audio.silent.assert_not_called()
 
                         assert result.text_id == "test_number"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_per_language_provider_selection(self):
+        """Test that language-specific provider is used during generation."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            # Configure Spanish to use Azure
+            config = SpeechPromptConfig(
+                model="default",
+                template_path="prompts/speech_generation.jinja2",
+                provider="openai",  # Default is OpenAI
+                language_providers={"es": "azure"},  # But Spanish uses Azure
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+            )
+
+            language = Language(code="es", language_code="es", name="Spanish")
+            mock_response = self._create_mock_response_that_writes_file()
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                        with patch("adt_press.llm.speech_generation.get_azure_voice", return_value="es-ES-ElviraNeural"):
+                            mock_aspeech.return_value = mock_response
+
+                            mock_segment = MagicMock()
+                            mock_audio.from_mp3.return_value = mock_segment
+                            mock_segment.set_frame_rate.return_value = mock_segment
+
+                            result = await generate_speech_file(
+                                run_output_dir=tmpdir,
+                                config=config,
+                                language=language,
+                                text_id="test_text",
+                                text="Hola mundo",
+                            )
+
+                            # Verify Azure was used (no instructions parameter)
+                            call_kwargs = mock_aspeech.call_args[1]
+                            assert "instructions" not in call_kwargs
+                            assert call_kwargs["model"] == "azure/speech/azure-tts"
+                            assert call_kwargs["voice"] == "es-ES-ElviraNeural"
+
+                            assert result.provider == "openai"  # Note: Config stores default, not resolved
+                            assert result.model == "azure/speech/azure-tts"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_locale_code_provider_selection(self):
+        """Test that locale codes (es-uy, si-lk) match base language provider."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="default",
+                template_path="prompts/speech_generation.jinja2",
+                provider="openai",
+                language_providers={"es": "azure"},  # Spanish (all locales) uses Azure
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+            )
+
+            # Test with Uruguayan Spanish locale
+            language = Language(code="es-uy", language_code="es", country_code="UY", name="Spanish (Uruguay)")
+            mock_response = self._create_mock_response_that_writes_file()
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                        with patch("adt_press.llm.speech_generation.get_azure_voice", return_value="es-UY-MateoNeural"):
+                            mock_aspeech.return_value = mock_response
+
+                            mock_segment = MagicMock()
+                            mock_audio.from_mp3.return_value = mock_segment
+                            mock_segment.set_frame_rate.return_value = mock_segment
+
+                            await generate_speech_file(
+                                run_output_dir=tmpdir,
+                                config=config,
+                                language=language,
+                                text_id="test_text",
+                                text="Hola desde Uruguay",
+                            )
+
+                            # Should use Azure (matched via base language "es")
+                            call_kwargs = mock_aspeech.call_args[1]
+                            assert "instructions" not in call_kwargs
+                            assert call_kwargs["model"] == "azure/speech/azure-tts"

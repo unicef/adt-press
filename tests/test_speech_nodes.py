@@ -3,7 +3,7 @@
 import tempfile
 from unittest.mock import patch
 
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import PromptConfig, SpeechPromptConfig, SpeechProviderConfig
 from adt_press.models.speech import SpeechFile
 
 
@@ -174,3 +174,62 @@ class TestSpeechFilesNodes:
                     assert len(result["en"]) == 1
                     assert "single_text" in result["en"]
                     assert result["en"]["single_text"].text_id == "single_text"
+
+    def test_speech_files_with_mixed_providers(self):
+        """Test TTS generation with different providers for different languages."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Spanish uses Azure, English uses OpenAI
+            mock_config = SpeechPromptConfig(
+                model="default",
+                template_path="prompts/speech_generation.jinja2",
+                provider="openai",
+                language_providers={"es": "azure"},
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+                rate_limit=10,
+            )
+
+            plate_translations = {
+                "en": {"text_1": "Hello"},
+                "es": {"text_1": "Hola"},
+            }
+
+            # Mock files showing different providers were used
+            mock_speech_files = [
+                SpeechFile(
+                    speech_id="text_1_en",
+                    text_id="text_1",
+                    language_code="en",
+                    speech_path=f"{tmpdir}/audio/en/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+                SpeechFile(
+                    speech_id="text_1_es",
+                    text_id="text_1",
+                    language_code="es",
+                    speech_path=f"{tmpdir}/audio/es/text_1.mp3",
+                    provider="openai",  # Config default stored here
+                    voice="es-ES-ElviraNeural",
+                    model="azure/speech/azure-tts",  # But Azure model was actually used
+                ),
+            ]
+
+            with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
+                with patch("adt_press.nodes.speech_nodes.run_async_task") as mock_async:
+                    mock_async.return_value = mock_speech_files
+
+                    from adt_press.nodes.speech_nodes import speech_files__tts
+
+                    result = speech_files__tts(
+                        run_output_dir_config=tmpdir,
+                        speech_prompt_config=mock_config,
+                        plate_translations=plate_translations,
+                    )
+
+                    # Verify both languages processed
+                    assert "en" in result
+                    assert "es" in result
+                    assert result["en"]["text_1"].model == "tts-1"
+                    assert result["es"]["text_1"].model == "azure/speech/azure-tts"
