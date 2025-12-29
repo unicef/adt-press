@@ -1,4 +1,5 @@
 import os
+from typing import Any, cast
 
 import structlog
 from hamilton.function_modifiers import cache
@@ -286,8 +287,9 @@ def activity_answers_prompts_config__none(
 @cache(behavior="recompute")
 def speech_prompt_config(config: DictConfig) -> SpeechPromptConfig:
     # Merge root-level speech config with prompt config
-    prompt_config = OmegaConf.to_container(config["prompts"]["speech_generation"], resolve=True)
-    root_speech_config = OmegaConf.to_container(config["speech"], resolve=True)
+    prompt_config = cast(dict[str, Any], OmegaConf.to_container(config["prompts"]["speech_generation"], resolve=True))
+    root_speech_config = cast(dict[str, Any], OmegaConf.to_container(config["speech"], resolve=True))
+
     # Merge the two configs, with root config providing provider settings
     merged_config = {**prompt_config, **root_speech_config}
 
