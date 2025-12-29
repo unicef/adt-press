@@ -6,10 +6,31 @@ from asynciolimiter import Limiter
 T = TypeVar("T")
 
 
+def custom_exception_handler(loop, context):
+    """Custom exception handler to suppress LiteLLM logging worker errors."""
+    exception = context.get("exception")
+    if isinstance(exception, RuntimeError) and "is bound to a different event loop" in str(exception):
+        # Silently ignore this specific error from LiteLLM's logging worker
+        return
+    # For other exceptions, use default behavior
+    loop.default_exception_handler(context)
+
+
 def run_async_task(task: Callable[[], Coroutine[Any, Any, T]]) -> T:
     """
-    Run an async task in a synchronous context."""
-    return asyncio.run(task())
+    Run an async task in a synchronous context.
+
+    Sets a custom exception handler to suppress LiteLLM logging worker errors
+    that occur due to event loop lifecycle issues.
+    """
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.set_exception_handler(custom_exception_handler)
+
+    try:
+        return loop.run_until_complete(task())
+    finally:
+        loop.close()
 
 
 async def gather_with_limit(fs: List[Awaitable[Never]], rate_limit: int) -> List[T]:
