@@ -49,6 +49,19 @@ render_strategy: dynamic
 # the default render strategy used for section types when not explicitly specified
 default_render_strategy: html
 
+# Speech/TTS provider configuration
+speech:
+  provider: auto # auto (defaults to openai), openai, or azure
+  openai:
+    model: gpt-4o-mini-tts # or tts-1-hd
+    voice: auto # auto, alloy, echo, fable, onyx, nova, shimmer
+  azure:
+    model: azure/speech/azure-tts
+    voice: auto # auto selects based on language, or specify like si-LK-SameeraNeural
+  bit_rate: 64k
+  sample_rate: 24000
+  format: mp3
+
 text_types:
   book_title:
     description: "For the title of the book. There can only be one book title for the entire book."
@@ -388,14 +401,4 @@ prompts:
 
   speech_generation:
     model: default  # Required by parent PromptConfig class
-    provider: auto # auto (defaults to openai), openai, or azure
-    openai:
-      model: gpt-4o-mini-tts # or tts-1-hd
-      voice: auto # auto, alloy, echo, fable, onyx, nova, shimmer
-    azure:
-      model: azure/speech/azure-tts
-      voice: auto # auto selects based on language, or specify like si-LK-SameeraNeural
     template_path: prompts/speech_generation.jinja2
-    bit_rate: 64k
-    sample_rate: 24000
-    format: mp3

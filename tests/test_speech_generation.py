@@ -642,3 +642,181 @@ class TestGenerateSpeechFile:
                             text_id="test",
                             text="Test",
                         )
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_empty_text_error(self):
+        """Test error when text is empty or whitespace-only."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Test empty string
+            with pytest.raises(ValueError, match="Empty or whitespace-only text for TTS generation"):
+                await generate_speech_file(
+                    run_output_dir=tmpdir,
+                    config=config,
+                    language=language,
+                    text_id="test",
+                    text="",
+                )
+
+            # Test whitespace-only string
+            with pytest.raises(ValueError, match="Empty or whitespace-only text for TTS generation"):
+                await generate_speech_file(
+                    run_output_dir=tmpdir,
+                    config=config,
+                    language=language,
+                    text_id="test",
+                    text="   \n\t   ",
+                )
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_non_speakable_text_silent_audio(self):
+        """Test that non-speakable text (punctuation-only) generates silent audio."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="azure/speech/azure-tts",
+                provider="azure",
+                azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="en-US-JennyNeural"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            # Mock AudioSegment for silent audio generation
+            with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                mock_silent = MagicMock()
+                mock_audio.silent.return_value = mock_silent
+
+                # Test with em-dash (punctuation-only)
+                result = await generate_speech_file(
+                    run_output_dir=tmpdir,
+                    config=config,
+                    language=language,
+                    text_id="test_emdash",
+                    text="—",
+                )
+
+                # Verify silent audio was created
+                mock_audio.silent.assert_called_once_with(duration=50)
+                mock_silent.export.assert_called_once()
+
+                # Verify result
+                assert result.text_id == "test_emdash"
+                assert result.language_code == "en"
+                assert result.speech_id == "test_emdash_en"
+                assert result.speech_path.endswith("test_emdash_en.mp3")
+                assert result.provider == "azure"
+                assert result.model == "azure/speech/azure-tts"
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_non_speakable_text_period(self):
+        """Test that a single period generates silent audio."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="si", language_code="si", name="Sinhala")
+
+            with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                mock_silent = MagicMock()
+                mock_audio.silent.return_value = mock_silent
+
+                result = await generate_speech_file(
+                    run_output_dir=tmpdir,
+                    config=config,
+                    language=language,
+                    text_id="test_period",
+                    text=".",
+                )
+
+                # Verify silent audio was created
+                mock_audio.silent.assert_called_once_with(duration=50)
+                assert result.language_code == "si"
+                assert result.speech_id == "test_period_si"
+                assert result.speech_path.endswith("test_period_si.mp3")
+
+    @pytest.mark.asyncio
+    async def test_generate_speech_file_speakable_short_text(self):
+        """Test that short but speakable text (like '1.') goes through normal TTS."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from adt_press.models.config import SpeechProviderConfig
+
+            config = SpeechPromptConfig(
+                model="tts-1",
+                provider="openai",
+                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
+                template_path="prompts/speech_generation.jinja2",
+                format="mp3",
+                bit_rate="64k",
+                sample_rate=24000,
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
+
+            language = Language(code="en", language_code="en", name="English")
+
+            mock_response = self._create_mock_response_that_writes_file()
+
+            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
+                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
+                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
+                        mock_aspeech.return_value = mock_response
+
+                        mock_segment = MagicMock()
+                        mock_audio.from_mp3.return_value = mock_segment
+                        mock_segment.set_frame_rate.return_value = mock_segment
+
+                        # Test with "1." - should call TTS API, not generate silent audio
+                        result = await generate_speech_file(
+                            run_output_dir=tmpdir,
+                            config=config,
+                            language=language,
+                            text_id="test_number",
+                            text="1.",
+                        )
+
+                        # Verify TTS API was called (not silent audio)
+                        mock_aspeech.assert_called_once()
+                        call_kwargs = mock_aspeech.call_args[1]
+                        assert call_kwargs["input"] == "1."
+
+                        # Verify AudioSegment.silent was NOT called
+                        mock_audio.silent.assert_not_called()
+
+                        assert result.text_id == "test_number"

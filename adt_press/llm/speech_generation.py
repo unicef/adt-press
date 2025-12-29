@@ -8,6 +8,7 @@ from adt_press.models.speech import SpeechFile
 from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import Language
+from adt_press.utils.string import is_speakable_text
 from adt_press.utils.voices import get_azure_voice, get_openai_voices
 
 
@@ -86,6 +87,44 @@ async def generate_speech_file(
     if not sanitized_text.strip():
         sanitized_text = text
 
+    # Validate text before attempting TTS
+    if not sanitized_text or not sanitized_text.strip():
+        raise ValueError(
+            f"Empty or whitespace-only text for TTS generation: text_id={text_id}, "
+            f"language={language_code}, original_text='{text[:100] if text else 'EMPTY'}'"
+        )
+
+    # Skip texts that aren't suitable for TTS (e.g., punctuation-only like "—")
+    # Azure TTS often returns empty responses for such content
+    if not is_speakable_text(sanitized_text):
+        # Return a minimal silent audio file instead of failing
+        speech_dir = os.path.join(run_output_dir, "audio", language_code)
+        os.makedirs(speech_dir, exist_ok=True)
+        speech_id = f"{text_id}_{language_code}"
+        speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
+
+        # Create silent audio segment (50ms)
+        silent_audio = AudioSegment.silent(duration=50)
+        silent_audio.export(
+            speech_path,
+            format=config.format,
+            bitrate=config.bit_rate,
+            parameters=["-ar", str(config.sample_rate)],
+        )
+
+        # Get provider/voice for metadata (even though we didn't use TTS)
+        model, voice = config.get_active_config()
+
+        return SpeechFile(
+            text_id=text_id,
+            speech_id=speech_id,
+            speech_path=speech_path,
+            language_code=language_code,
+            provider=config.provider,
+            voice=voice,
+            model=model,
+        )
+
     context = dict(
         language_code=language_code,
         language=language.name,
@@ -121,7 +160,6 @@ async def generate_speech_file(
     if not model.startswith("azure/"):
         speech_kwargs["instructions"] = prompt
 
-    # Generate speech via TTS API
     response = await litellm.aspeech(**speech_kwargs)
 
     # Write the audio response to file
@@ -159,7 +197,11 @@ async def generate_speech_file(
 
     file_size = os.path.getsize(raw_speech_path)
     if file_size == 0:
-        raise ValueError(f"TTS output file is empty: {raw_speech_path}")
+        raise ValueError(
+            f"TTS output file is empty: {raw_speech_path}\n"
+            f"Text ID: {text_id}, Language: {language_code}, Model: {model}, Voice: {resolved_voice}\n"
+            f"Text length: {len(sanitized_text)}, Preview: '{sanitized_text[:200]}'"
+        )
 
     # Transcode to quality specified in config
     raw = AudioSegment.from_mp3(raw_speech_path)
