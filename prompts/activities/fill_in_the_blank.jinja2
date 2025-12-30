@@ -26,9 +26,12 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
   - `data-aria-id="aria-X-Y-Z"` (sequential numbering)
   - `data-activity-item="item-N"` (for answer extraction, sequential N)
   - `aria-label="Descriptive label in {{ language }}"`
-  - `placeholder="Hint text"` (optional)
+  - `placeholder=""` (LEAVE EMPTY - do not provide hints or answers)
   - `tabindex="0"`
 - Wrap in labeled containers with semantic colors
+- **CRITICAL: Remove any dotted lines (........), underscores (______), or visual blank indicators from the original text**
+- **NEVER include answers, hints, or example text in placeholders, values, or labels**
+- **The input field itself IS the blank - do not add visual indicators**
 
 **3. Layout Patterns**
 
@@ -40,7 +43,9 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
     <input class="w-full p-2 border border-gray-300 rounded" 
            data-aria-id="aria-1-0-0" 
            data-activity-item="item-1"
-           placeholder="Hint" />
+           placeholder=""
+           tabindex="0"
+           type="text" />
   </div>
 </div>
 ```
