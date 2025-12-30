@@ -177,7 +177,3 @@ class OutputLanguagesNodeTests(unittest.TestCase):
         result = pdf_nodes.output_languages(["${input_language}", "${plate_language}"], plate_lang)
         self.assertEqual(len(result), 1)  # Should deduplicate to single plate_language
         self.assertEqual(result[0].code, "fr")
-
-
-if __name__ == "__main__":
-    unittest.main()

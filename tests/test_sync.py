@@ -108,7 +108,7 @@ class TestRunAsyncTask:
         """Test that event loop is properly closed after task execution."""
 
         async def simple_task():
-            return "result"
+            return "result"  # pragma: no cover
 
         with patch("asyncio.new_event_loop") as mock_new_loop:
             mock_loop = MagicMock(spec=asyncio.AbstractEventLoop)
@@ -126,7 +126,7 @@ class TestRunAsyncTask:
         """Test that event loop is closed even if task raises exception."""
 
         async def failing_task():
-            raise RuntimeError("Test error")
+            raise RuntimeError("Test error")  # pragma: no cover
 
         with patch("asyncio.new_event_loop") as mock_new_loop:
             mock_loop = MagicMock(spec=asyncio.AbstractEventLoop)
