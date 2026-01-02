@@ -70,7 +70,13 @@ class NodeHook(NodeExecutionHook):
         run_id: str,
         **future_kwargs: Any,
     ):
-        log.info("node result", node=node_name, success=success, result=result, error=error)
+        log.info(
+            "node result",
+            node=node_name,
+            success=success,
+            result=(lambda s: s if len(s) <= 200 else s[:200] + "...")(str(result)),
+            error=error,
+        )
 
 
 def run_pipeline(config: DictConfig) -> None:
