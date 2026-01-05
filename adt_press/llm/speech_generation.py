@@ -29,8 +29,7 @@ def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
     # Auto mode - choose best voice for language
     if requested_voice == "auto":
         if is_azure:
-            voice = get_azure_voice(language_code)
-            return voice
+            return get_azure_voice(language_code)
         else:
             return "alloy"  # OpenAI default
     return requested_voice

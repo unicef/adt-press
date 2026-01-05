@@ -2,7 +2,7 @@
 
 import os
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, cast
 
 import yaml
 
@@ -30,7 +30,7 @@ def get_azure_voice_map() -> Dict[str, str]:
     return cast(Dict[str, str], voice_map)
 
 
-def get_azure_voice(language_code: str) -> Optional[str]:
+def get_azure_voice(language_code: str) -> str:
     """
     Get Azure voice for language code with fallback logic.
 
@@ -38,7 +38,7 @@ def get_azure_voice(language_code: str) -> Optional[str]:
         language_code: ISO language code (e.g., "es-uy", "en", "fr-ca")
 
     Returns:
-        Azure voice name or None if no match found
+        Azure voice name
     """
     voice_map = get_azure_voice_map()
 
@@ -51,7 +51,4 @@ def get_azure_voice(language_code: str) -> Optional[str]:
 
     # Try base language (e.g., "es" from "es-uy")
     base_lang = normalized.split("-")[0]
-    if base_lang in voice_map:
-        return voice_map[base_lang]
-
-    return None
+    return voice_map[base_lang]
