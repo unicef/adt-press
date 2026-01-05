@@ -4,32 +4,16 @@ import os
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, cast
 
-import structlog
 import yaml
-
-log = structlog.get_logger(__name__)
 
 
 @lru_cache(maxsize=1)
 def load_voice_config() -> Dict[str, Any]:
     """Load voice configuration from YAML file (cached)."""
     config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config", "voices.yaml")
-
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            result = yaml.safe_load(f)
-            return cast(Dict[str, Any], result)
-    except FileNotFoundError:
-        log.warning("voices_config_not_found", path=config_path, message="Using default voice mappings")
-        # Fallback to minimal defaults
-        return {
-            "openai_voices": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
-            "azure_voices": {
-                "en": "en-US-JennyNeural",
-                "es": "es-ES-ElviraNeural",
-                "fr": "fr-FR-DeniseNeural",
-            },
-        }
+    with open(config_path, "r", encoding="utf-8") as f:
+        result = yaml.safe_load(f)
+        return cast(Dict[str, Any], result)
 
 
 def get_openai_voices() -> List[str]:
