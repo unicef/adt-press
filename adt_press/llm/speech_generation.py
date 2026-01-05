@@ -9,7 +9,7 @@ from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import Language
 from adt_press.utils.string import is_speakable_text
-from adt_press.utils.voices import get_azure_voice, get_openai_voices
+from adt_press.utils.voices import get_azure_voice
 
 
 def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
@@ -30,31 +30,10 @@ def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
     if requested_voice == "auto":
         if is_azure:
             voice = get_azure_voice(language_code)
-            if voice:
-                return voice
-
-            # Final fallback to English
-            return "en-US-JennyNeural"
+            return voice
         else:
             return "alloy"  # OpenAI default
-
-    # Validate requested voice matches model
-    if is_azure:
-        # Check if it's an Azure voice format (xx-XX-NameNeural)
-        if "-" in requested_voice and "Neural" in requested_voice:
-            return requested_voice
-
-        # Requested non-Azure voice with Azure model - fall back
-        voice = get_azure_voice(language_code)
-        return voice if voice else "en-US-JennyNeural"
-    else:
-        # OpenAI model
-        openai_voices = get_openai_voices()
-        if requested_voice in openai_voices:
-            return requested_voice
-
-        # Requested Azure voice with OpenAI model - fall back to default
-        return "alloy"
+    return requested_voice
 
 
 async def generate_speech_file(
