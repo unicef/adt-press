@@ -11,7 +11,8 @@ from adt_press.utils.file import calculate_file_hash, read_text_file
 class RenderType(str, enum.Enum):
     html = "html"
     rows = "rows"
-    two_column = "template"
+    two_column = "two_column"
+    template = "template"
     activity = "activity"
 
 
