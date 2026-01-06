@@ -72,17 +72,26 @@ def filtered_sections_by_page_id(
         )
     return filtered_sections
 
-
-def quizzes_by_section_id(
+@config.when(quiz_strategy="none")
+def quizzes_by_section_id__none(
     plate_language: Language,
     pdf_pages: list[Page],
     filtered_sections_by_page_id: dict[str, PageSections],
     pdf_text_groups_by_id: dict[str, PageTextGroup],
     quiz_prompt_config: QuizPromptConfig,
 ) -> dict[str, SectionQuiz]:
-    # noop if your config says 0 sections per quiz
+    return {}
+
+@config.when(quiz_strategy="llm")
+def quizzes_by_section_id__llm(
+    plate_language: Language,
+    pdf_pages: list[Page],
+    filtered_sections_by_page_id: dict[str, PageSections],
+    pdf_text_groups_by_id: dict[str, PageTextGroup],
+    quiz_prompt_config: QuizPromptConfig,
+) -> dict[str, SectionQuiz]:
     if quiz_prompt_config.sections_per_quiz < 1:
-        return {}
+        raise ValueError("sections_per_quiz must be at least 1, use quiz_strategy 'none' to disable quizzes")
 
     async def get_quizzes():
         tasks = []
@@ -98,7 +107,7 @@ def quizzes_by_section_id(
                 sections.append(section)
 
                 if count == quiz_prompt_config.sections_per_quiz:
-                    tasks.append(generate_quiz(quiz_prompt_config, sections, pdf_text_groups_by_id))
+                    tasks.append(generate_quiz(quiz_prompt_config, plate_language, sections, pdf_text_groups_by_id))
                     sections = []
                     count = 0
 

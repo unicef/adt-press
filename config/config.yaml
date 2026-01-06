@@ -37,6 +37,9 @@ activity_strategy: none
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
 
+# our quiz strategy, either llm or none
+quiz_strategy: none
+
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
@@ -51,7 +54,7 @@ default_render_strategy: html
 
 # Speech/TTS provider configuration
 speech:
-  provider: openai  # Default provider for languages not in the map
+  provider: openai  # Default provider for languages not in the map  
   language_providers:  # Override provider per language
     es: azure  # Spanish uses Azure (better quality)
     ta: azure  # Tamil uses Azure
@@ -331,7 +334,7 @@ prompts:
   section_quiz:
     model: default
     template_path: prompts/section_quiz.jinja2
-    sections_per_quiz: 0
+    sections_per_quiz: 3
 
   text_translation:
     model: default
