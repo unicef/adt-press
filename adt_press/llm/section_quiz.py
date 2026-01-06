@@ -57,7 +57,9 @@ class QuizResponse(BaseModel):
     reasoning: str
 
 
-async def generate_quiz(config: QuizPromptConfig, language: Language, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]) -> SectionQuiz:
+async def generate_quiz(
+    config: QuizPromptConfig, language: Language, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]
+) -> SectionQuiz:
     context = dict(
         sections=sections,
         text_groups=text_groups_by_id,

@@ -72,6 +72,7 @@ def filtered_sections_by_page_id(
         )
     return filtered_sections
 
+
 @config.when(quiz_strategy="none")
 def quizzes_by_section_id__none(
     plate_language: Language,
@@ -81,6 +82,7 @@ def quizzes_by_section_id__none(
     quiz_prompt_config: QuizPromptConfig,
 ) -> dict[str, SectionQuiz]:
     return {}
+
 
 @config.when(quiz_strategy="llm")
 def quizzes_by_section_id__llm(
