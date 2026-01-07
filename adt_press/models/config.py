@@ -104,7 +104,8 @@ class SpeechProviderConfig(BaseModel):
 class SpeechPromptConfig(PromptConfig):
     """Speech generation configuration with provider support."""
 
-    default_provider: str = "openai"
+    provider: str = "dynamic"  # "dynamic" for language-based selection, or specific provider name
+    default_provider: str = "openai"  # Fallback when dynamic mode can't find a match
     providers: dict[str, SpeechProviderConfig] = Field(default_factory=dict)
     format: str = "mp3"
     bit_rate: str = "64k"
@@ -138,7 +139,11 @@ class SpeechPromptConfig(PromptConfig):
         Returns:
             Provider name (e.g., "openai", "azure", "elevenlabs", etc.)
         """
-        # Build language -> provider map from all provider configs
+        # If provider is set to a specific provider (not "dynamic"), use it
+        if self.provider != "dynamic":
+            return self.provider
+
+        # Dynamic mode: Build language -> provider map from all provider configs
         language_map = {}
         for provider_name, provider_config in self.providers.items():
             for lang in provider_config.languages:
@@ -169,7 +174,13 @@ class SpeechPromptConfig(PromptConfig):
         Raises:
             ValueError: If provider is not configured
         """
-        provider = self.default_provider if language_code is None else self.get_provider_for_language(language_code)
+        # For non-dynamic mode without language_code, use the fixed provider
+        if self.provider != "dynamic" and language_code is None:
+            provider = self.provider
+        elif language_code is not None:
+            provider = self.get_provider_for_language(language_code)
+        else:
+            provider = self.default_provider
 
         if provider not in self.providers:
             raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")

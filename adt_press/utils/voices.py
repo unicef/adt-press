@@ -1,13 +1,11 @@
 """Voice mappings for TTS providers."""
 
 import os
-from functools import lru_cache
 from typing import Any, Dict, cast
 
 import yaml
 
 
-@lru_cache(maxsize=1)
 def load_voice_config() -> Dict[str, Any]:
     """Load voice configuration from YAML file (cached)."""
     config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config", "voices.yaml")
@@ -16,7 +14,7 @@ def load_voice_config() -> Dict[str, Any]:
         return cast(Dict[str, Any], result)
 
 
-def get_provider_config(provider_name: str) -> Dict[str, Any]:
+def get_provider_config(provider_name: str) -> Dict[str, str]:
     """
     Get configuration for a specific provider.
 
@@ -24,7 +22,7 @@ def get_provider_config(provider_name: str) -> Dict[str, Any]:
         provider_name: Name of the provider (e.g., "openai", "azure", "elevenlabs")
 
     Returns:
-        Provider configuration dictionary
+        Provider configuration dictionary mapping language codes to voice names
 
     Raises:
         ValueError: If provider not found in voices.yaml
@@ -33,7 +31,7 @@ def get_provider_config(provider_name: str) -> Dict[str, Any]:
     provider_config = config.get(provider_name)
     if provider_config is None:
         raise ValueError(f"Missing '{provider_name}' configuration in voices.yaml. Available providers: {list(config.keys())}")
-    return cast(Dict[str, Any], provider_config)
+    return cast(Dict[str, str], provider_config)
 
 
 def get_default_voice(provider_name: str) -> str:
@@ -45,6 +43,9 @@ def get_default_voice(provider_name: str) -> str:
 
     Returns:
         Default voice name for the provider
+
+    Raises:
+        ValueError: If 'default' key not found in provider configuration
     """
     provider_config = get_provider_config(provider_name)
     default_voice = provider_config.get("default")
@@ -61,13 +62,11 @@ def get_voice_map(provider_name: str) -> Dict[str, str]:
         provider_name: Name of the provider (e.g., "openai", "azure")
 
     Returns:
-        Dictionary mapping language codes to voice names
+        Dictionary mapping language codes to voice names (excludes 'default' key)
     """
     provider_config = get_provider_config(provider_name)
-    voices = provider_config.get("voices")
-    if voices is None:
-        return {}
-    return cast(Dict[str, str], voices)
+    # Return all mappings except 'default'
+    return {k: v for k, v in provider_config.items() if k != "default"}
 
 
 def get_voice_for_language(provider_name: str, language_code: str) -> str:
@@ -81,19 +80,22 @@ def get_voice_for_language(provider_name: str, language_code: str) -> str:
     Returns:
         Voice name for the provider
     """
-    voice_map = get_voice_map(provider_name)
+    provider_config = get_provider_config(provider_name)
 
     # Normalize to lowercase
     normalized = language_code.lower()
 
     # Try exact match first (e.g., "es-uy")
-    if normalized in voice_map:
-        return voice_map[normalized]
+    if normalized in provider_config:
+        return provider_config[normalized]
 
     # Try base language (e.g., "es" from "es-uy")
     base_lang = normalized.split("-")[0]
-    if base_lang in voice_map:
-        return voice_map[base_lang]
+    if base_lang in provider_config:
+        return provider_config[base_lang]
 
     # Fall back to default voice
-    return get_default_voice(provider_name)
+    default_voice = provider_config.get("default")
+    if default_voice is None:
+        raise ValueError(f"Missing 'default' voice in {provider_name} configuration")
+    return cast(str, default_voice)
