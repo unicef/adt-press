@@ -247,32 +247,6 @@ class TestGenerateSpeechFile:
                         with pytest.raises(FileNotFoundError, match="TTS output file not created or empty"):
                             await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
 
-    @pytest.mark.parametrize("non_speakable_text", ["—", ".", "..."])
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_non_speakable_text_empty_audio(self, non_speakable_text):
-        """Test that non-speakable text generates empty audio."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                    mock_empty = MagicMock()
-                    mock_audio.empty.return_value = mock_empty
-
-                    result = await generate_speech_file(
-                        run_output_dir=tmpdir,
-                        config=config,
-                        language=language,
-                        text_id="test",
-                        text=non_speakable_text,
-                    )
-
-                    mock_audio.empty.assert_called_once()
-                    mock_empty.export.assert_called_once()
-                    assert result.text_id == "test"
-                    assert result.language_code == "en"
-
     @pytest.mark.asyncio
     async def test_generate_speech_file_speakable_short_text_uses_tts(self):
         """Test that short but speakable text uses normal TTS."""

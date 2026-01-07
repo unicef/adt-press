@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import litellm
 from pydub import AudioSegment
@@ -77,14 +78,12 @@ async def generate_speech_file(
 
     # Handle non-speakable text (e.g., punctuation-only like "—")
     if not is_speakable_text(sanitized_text):
-        # Create empty audio file (0ms duration) instead of failing
-        empty_audio = AudioSegment.empty()
-        empty_audio.export(
-            speech_path,
-            format=config.format,
-            bitrate=config.bit_rate,
-            parameters=["-ar", str(config.sample_rate)],
-        )
+        # Copy prebuilt empty audio file
+        empty_template = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "audio", "empty.mp3")
+        if not os.path.exists(empty_template):
+            raise FileNotFoundError(f"Empty audio template not found: {empty_template}")
+
+        shutil.copy2(empty_template, speech_path)
 
         return SpeechFile(
             text_id=text_id,
