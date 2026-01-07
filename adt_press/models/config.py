@@ -110,6 +110,8 @@ class SpeechPromptConfig(PromptConfig):
     format: str = "mp3"
     bit_rate: str = "64k"
     sample_rate: int = 24000
+    voices_path: str = "config/voices.yaml"
+    language_map: dict[str, str] = Field(default_factory=dict, exclude=True)
 
     @model_validator(mode="before")
     @classmethod
@@ -129,6 +131,15 @@ class SpeechPromptConfig(PromptConfig):
                 data["providers"] = parsed_providers
         return data
 
+    @model_validator(mode="after")
+    def build_language_map(self) -> Self:
+        """Build language -> provider map once during initialization."""
+        self.language_map = {}
+        for provider_name, provider_config in self.providers.items():
+            for lang in provider_config.languages:
+                self.language_map[lang] = provider_name
+        return self
+
     def get_provider_for_language(self, language_code: str) -> str:
         """
         Get the appropriate provider for a specific language.
@@ -143,20 +154,14 @@ class SpeechPromptConfig(PromptConfig):
         if self.provider != "dynamic":
             return self.provider
 
-        # Dynamic mode: Build language -> provider map from all provider configs
-        language_map = {}
-        for provider_name, provider_config in self.providers.items():
-            for lang in provider_config.languages:
-                language_map[lang] = provider_name
-
         # Check exact match first (e.g., "es-uy")
-        if language_code in language_map:
-            return language_map[language_code]
+        if language_code in self.language_map:
+            return self.language_map[language_code]
 
         # If no exact match, try base language code (e.g., "es" from "es-uy")
         base_lang = language_code.split("-")[0]
-        if base_lang in language_map:
-            return language_map[base_lang]
+        if base_lang in self.language_map:
+            return self.language_map[base_lang]
 
         # Fall back to default provider
         return self.default_provider

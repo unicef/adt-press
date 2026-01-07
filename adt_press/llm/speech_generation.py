@@ -10,26 +10,51 @@ from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import Language
 from adt_press.utils.string import is_speakable_text
-from adt_press.utils.voices import get_voice_for_language
 
 
-def resolve_voice(provider: str, language_code: str) -> str:
+def resolve_voice(provider: str, language_code: str, voice_maps: dict[str, dict[str, str]]) -> str:
     """
-    Resolve the appropriate voice based on provider and language.
+    Resolve the appropriate voice based on provider and language using cached voice maps.
 
     Args:
         provider: TTS provider name (e.g., "openai", "azure", "elevenlabs")
         language_code: ISO language code (e.g., "si", "en", "ta")
+        voice_maps: Cached voice configuration maps from voices.yaml
 
     Returns:
         Valid voice name for the provider
+
+    Raises:
+        ValueError: If provider not found or missing 'default' voice
     """
-    return get_voice_for_language(provider, language_code)
+    if provider not in voice_maps:
+        raise ValueError(f"Missing '{provider}' configuration in voices file. Available providers: {list(voice_maps.keys())}")
+
+    provider_config = voice_maps[provider]
+
+    # Normalize to lowercase
+    normalized = language_code.lower()
+
+    # Try exact match first (e.g., "es-uy")
+    if normalized in provider_config:
+        return provider_config[normalized]
+
+    # Try base language (e.g., "es" from "es-uy")
+    base_lang = normalized.split("-")[0]
+    if base_lang in provider_config:
+        return provider_config[base_lang]
+
+    # Fall back to default voice
+    default_voice = provider_config.get("default")
+    if default_voice is None:
+        raise ValueError(f"Missing 'default' voice in {provider} configuration")
+    return default_voice
 
 
 async def generate_speech_file(
     run_output_dir: str,
     config: SpeechPromptConfig,
+    voice_maps: dict[str, dict[str, str]],  # Add cached voice maps parameter
     language: Language,
     text_id: str,
     text: str,
@@ -40,6 +65,7 @@ async def generate_speech_file(
     Args:
         run_output_dir: Output directory for audio files
         config: Speech generation configuration
+        voice_maps: Cached voice configuration maps (from Hamilton node)
         language: Target language for speech
         text_id: Unique identifier for the text
         text: Text content to convert to speech
@@ -71,10 +97,10 @@ async def generate_speech_file(
     speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
     speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
 
-    # Get provider config and resolve voice
+    # Get provider config and resolve voice using cached voice maps
     model = config.get_active_config(language_code)
     resolved_provider = config.get_provider_for_language(language_code)
-    resolved_voice = resolve_voice(resolved_provider, language_code)  # Pass provider name instead of model
+    resolved_voice = resolve_voice(resolved_provider, language_code, voice_maps)  # Pass cached maps
 
     # Handle non-speakable text (e.g., punctuation-only like "—")
     if not is_speakable_text(sanitized_text):

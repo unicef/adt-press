@@ -10,6 +10,14 @@ from adt_press.models.speech import SpeechFile
 class TestSpeechFilesNodes:
     """Test speech file generation nodes."""
 
+    @staticmethod
+    def _create_mock_voice_maps():
+        """Create mock voice maps for testing."""
+        return {
+            "openai": {"en": "alloy", "es": "alloy", "default": "alloy"},
+            "azure": {"es": "es-ES-ElviraNeural", "default": "en-US-JennyNeural"},
+        }
+
     def test_speech_files_tts_with_multiple_languages(self):
         """Test TTS speech file generation with multiple languages and texts."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -21,6 +29,8 @@ class TestSpeechFilesNodes:
                 max_retries=3,
                 timeout=120,
             )
+
+            voice_maps = self._create_mock_voice_maps()
 
             # Sample translations with multiple languages and texts
             plate_translations = {
@@ -85,6 +95,7 @@ class TestSpeechFilesNodes:
                     result = speech_files__tts(
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
                         plate_translations=plate_translations,
                     )
 
@@ -145,6 +156,8 @@ class TestSpeechFilesNodes:
                 timeout=120,
             )
 
+            voice_maps = self._create_mock_voice_maps()
+
             plate_translations = {
                 "en": {"single_text": "Just one text"},
             }
@@ -168,6 +181,7 @@ class TestSpeechFilesNodes:
                     result = speech_files__tts(
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
                         plate_translations=plate_translations,
                     )
 
@@ -189,6 +203,8 @@ class TestSpeechFilesNodes:
                 },
                 rate_limit=10,
             )
+
+            voice_maps = self._create_mock_voice_maps()
 
             plate_translations = {
                 "en": {"text_1": "Hello"},
@@ -226,6 +242,7 @@ class TestSpeechFilesNodes:
                     result = speech_files__tts(
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
                         plate_translations=plate_translations,
                     )
 

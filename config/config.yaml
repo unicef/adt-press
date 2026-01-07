@@ -64,6 +64,7 @@ speech:
   bit_rate: 64k
   sample_rate: 24000
   format: mp3
+  voices_path: config/voices.yaml
 
 text_types:
   book_title:

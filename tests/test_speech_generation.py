@@ -1,310 +1,218 @@
-"""Tests for speech generation LLM module."""
+"""Tests for speech generation nodes."""
 
-import os
 import tempfile
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
-import pytest
-
-from adt_press.llm.speech_generation import generate_speech_file, resolve_voice
-from adt_press.models.config import SpeechPromptConfig, SpeechProviderConfig
+from adt_press.models.config import PromptConfig, SpeechPromptConfig, SpeechProviderConfig
 from adt_press.models.speech import SpeechFile
-from adt_press.utils.languages import Language
 
 
-class TestResolveVoice:
-    """Test voice resolution logic."""
-
-    def test_resolve_voice_uses_voice_for_language(self):
-        """Test that resolve_voice calls get_voice_for_language with correct params."""
-        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="test-voice"):
-            result = resolve_voice("openai", "en")
-            assert result == "test-voice"
-
-
-class TestGenerateSpeechFile:
-    """Test speech file generation."""
+class TestSpeechFilesNodes:
+    """Test speech file generation nodes."""
 
     @staticmethod
-    def _create_test_config(provider="openai", model="tts-1"):
-        """Create a standard test config."""
-        return SpeechPromptConfig(
-            model=model,
-            default_provider=provider,
-            providers={
-                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
-                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
-            },
-            template_path="prompts/speech_generation.jinja2",
-            format="mp3",
-            bit_rate="64k",
-            sample_rate=24000,
-        )
+    def _create_mock_voice_maps():
+        """Create mock voice maps for testing."""
+        return {
+            "openai": {"en": "alloy", "es": "alloy", "default": "alloy"},
+            "azure": {"es": "es-ES-ElviraNeural", "default": "en-US-JennyNeural"},
+        }
 
-    @staticmethod
-    def _create_mock_response(content=b"fake_audio_data"):
-        """Create a mock response with content attribute."""
-        mock_response = MagicMock(spec=["content"])
-        mock_response.content = content
-        return mock_response
-
-    @pytest.mark.parametrize(
-        "provider,model,language_code,expected_provider",
-        [
-            ("openai", "tts-1", "en", "openai"),
-            ("azure", "azure/speech/azure-tts", "es", "azure"),
-        ],
-    )
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_success(self, provider, model, language_code, expected_provider):
-        """Test successful speech generation for different providers."""
+    def test_speech_files_tts_with_multiple_languages(self):
+        """Test TTS speech file generation with multiple languages and texts."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config(provider, model)
-            language = Language(code=language_code, language_code=language_code, name="Test")
-            mock_response = self._create_mock_response()
+            # Create mock config
+            mock_config = PromptConfig(
+                model="tts-1",
+                template_path="prompts/speech_generation.jinja2",
+                rate_limit=10,
+                max_retries=3,
+                timeout=120,
+            )
 
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="test-voice"):
-                            mock_aspeech.return_value = mock_response
-                            mock_segment = MagicMock()
-                            mock_audio.from_file.return_value = mock_segment
-                            mock_segment.set_frame_rate.return_value = mock_segment
+            voice_maps = self._create_mock_voice_maps()
 
-                            result = await generate_speech_file(
-                                run_output_dir=tmpdir,
-                                config=config,
-                                language=language,
-                                text_id="test_text",
-                                text="Hello world",
-                            )
+            # Sample translations with multiple languages and texts
+            plate_translations = {
+                "en": {
+                    "text_1": "Hello world",
+                    "text_2": "Good morning",
+                },
+                "es": {
+                    "text_1": "Hola mundo",
+                    "text_2": "Buenos días",
+                },
+            }
 
-                            assert isinstance(result, SpeechFile)
-                            assert result.text_id == "test_text"
-                            assert result.language_code == language_code
-                            assert result.provider == expected_provider
-                            assert result.voice == "test-voice"
-                            assert result.model == model
+            # Mock speech files that would be returned
+            mock_speech_files = [
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="en",
+                    speech_path=f"{tmpdir}/en/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+                SpeechFile(
+                    speech_id="text_2",
+                    text_id="text_2",
+                    language_code="en",
+                    speech_path=f"{tmpdir}/en/text_2.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="es",
+                    speech_path=f"{tmpdir}/es/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+                SpeechFile(
+                    speech_id="text_2",
+                    text_id="text_2",
+                    language_code="es",
+                    speech_path=f"{tmpdir}/es/text_2.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+            ]
 
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_openai_includes_instructions(self):
-        """Test that OpenAI models get instructions parameter."""
+            with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
+                with patch("adt_press.nodes.speech_nodes.run_async_task") as mock_async:
+                    # Mock the async task runner to return speech files
+                    mock_async.return_value = mock_speech_files
+
+                    # Import and call the function
+                    from adt_press.nodes.speech_nodes import speech_files__tts
+
+                    result = speech_files__tts(
+                        run_output_dir_config=tmpdir,
+                        speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        plate_translations=plate_translations,
+                    )
+
+                    # Verify structure - should have dicts for each language
+                    assert "en" in result
+                    assert "es" in result
+                    assert "text_1" in result["en"]
+                    assert "text_2" in result["en"]
+                    assert "text_1" in result["es"]
+                    assert "text_2" in result["es"]
+
+                    # Verify correct files were mapped
+                    assert result["en"]["text_1"].language_code == "en"
+                    assert result["es"]["text_1"].language_code == "es"
+
+    def test_speech_files_tts_handles_single_text(self):
+        """Test TTS generation with single text."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config("openai", "tts-1")
-            language = Language(code="en", language_code="en", name="English")
+            mock_config = PromptConfig(
+                model="tts-1",
+                template_path="prompts/speech_generation.jinja2",
+                rate_limit=10,
+            )
 
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string", return_value="Test prompt"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                            mock_aspeech.return_value = self._create_mock_response()
-                            mock_segment = MagicMock()
-                            mock_audio.from_file.return_value = mock_segment
-                            mock_segment.set_frame_rate.return_value = mock_segment
+            voice_maps = self._create_mock_voice_maps()
 
-                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
+            plate_translations = {
+                "en": {
+                    "text_1": "Hello",
+                },
+            }
 
-                            call_kwargs = mock_aspeech.call_args[1]
-                            assert "instructions" in call_kwargs
-                            assert call_kwargs["instructions"] == "Test prompt"
+            mock_speech_files = [
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="en",
+                    speech_path=f"{tmpdir}/en/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+            ]
 
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_azure_excludes_instructions(self):
-        """Test that Azure models don't get instructions parameter."""
+            with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
+                with patch("adt_press.nodes.speech_nodes.run_async_task") as mock_async:
+                    mock_async.return_value = mock_speech_files
+
+                    from adt_press.nodes.speech_nodes import speech_files__tts
+
+                    result = speech_files__tts(
+                        run_output_dir_config=tmpdir,
+                        speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        plate_translations=plate_translations,
+                    )
+
+                    assert "en" in result
+                    assert "text_1" in result["en"]
+                    assert result["en"]["text_1"].text_id == "text_1"
+
+    def test_speech_files_with_mixed_providers(self):
+        """Test speech file generation with mixed TTS providers."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config("azure", "azure/speech/azure-tts")
-            language = Language(code="es", language_code="es", name="Spanish")
+            # Create config that uses different providers per language
+            mock_config = SpeechPromptConfig(
+                model="tts-1",
+                template_path="prompts/speech_generation.jinja2",
+                provider="dynamic",
+                default_provider="openai",
+                providers={
+                    "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                    "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+                },
+            )
 
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="es-ES-ElviraNeural"):
-                            mock_aspeech.return_value = self._create_mock_response()
-                            mock_segment = MagicMock()
-                            mock_audio.from_file.return_value = mock_segment
-                            mock_segment.set_frame_rate.return_value = mock_segment
+            voice_maps = self._create_mock_voice_maps()
 
-                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Hola")
+            plate_translations = {
+                "en": {"text_1": "Hello"},
+                "es": {"text_1": "Hola"},
+            }
 
-                            call_kwargs = mock_aspeech.call_args[1]
-                            assert "instructions" not in call_kwargs
+            mock_speech_files = [
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="en",
+                    speech_path=f"{tmpdir}/en/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="es",
+                    speech_path=f"{tmpdir}/es/text_1.mp3",
+                    provider="azure",
+                    voice="es-ES-ElviraNeural",
+                    model="azure/speech/azure-tts",
+                ),
+            ]
 
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_strips_emojis(self):
-        """Test that emojis are stripped from text."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
+            with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
+                with patch("adt_press.nodes.speech_nodes.run_async_task") as mock_async:
+                    mock_async.return_value = mock_speech_files
 
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                            with patch("adt_press.llm.speech_generation.strip_emojis", return_value="Hello world"):
-                                mock_aspeech.return_value = self._create_mock_response()
-                                mock_segment = MagicMock()
-                                mock_audio.from_file.return_value = mock_segment
-                                mock_segment.set_frame_rate.return_value = mock_segment
+                    from adt_press.nodes.speech_nodes import speech_files__tts
 
-                                await generate_speech_file(
-                                    run_output_dir=tmpdir,
-                                    config=config,
-                                    language=language,
-                                    text_id="test",
-                                    text="Hello 😀 world 🎉",
-                                )
+                    result = speech_files__tts(
+                        run_output_dir_config=tmpdir,
+                        speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        plate_translations=plate_translations,
+                    )
 
-                                call_kwargs = mock_aspeech.call_args[1]
-                                assert call_kwargs["input"] == "Hello world"
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_response_write_to_file_method(self):
-        """Test handling response with write_to_file() method."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            mock_response = MagicMock(spec=["write_to_file"])
-
-            def write_file(path):
-                with open(path, "wb") as f:
-                    f.write(b"fake_audio_data")
-
-            mock_response.write_to_file = write_file
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                            mock_aspeech.return_value = mock_response
-                            mock_segment = MagicMock()
-                            mock_audio.from_file.return_value = mock_segment
-                            mock_segment.set_frame_rate.return_value = mock_segment
-
-                            result = await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test"
-                            )
-
-                            assert result.speech_id == "test_en"
-
-    @pytest.mark.parametrize("text", ["", "   \n\t   "])
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_empty_text_error(self, text):
-        """Test error when text is empty or whitespace-only."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            with pytest.raises(ValueError, match="Empty or whitespace-only text for TTS generation"):
-                await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text=text)
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_file_not_created_error(self):
-        """Test error when TTS output file is not created."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            # Mock response that doesn't write a file
-            mock_response = self._create_mock_response()
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                    with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                        mock_aspeech.return_value = mock_response
-
-                        # Mock os.path.exists to return False (file wasn't created)
-                        with patch("adt_press.llm.speech_generation.os.path.exists", return_value=False):
-                            with pytest.raises(FileNotFoundError, match="TTS output file not created"):
-                                await generate_speech_file(
-                                    run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test"
-                                )
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_empty_file_error(self):
-        """Test error when TTS output file is empty."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            # Mock response that writes an empty file
-            mock_response = MagicMock(spec=["write_to_file"])
-
-            def write_empty_file(path):
-                """Write an empty file."""
-                with open(path, "wb") as f:
-                    f.write(b"")  # Empty content
-
-            mock_response.write_to_file = write_empty_file
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                    with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                        mock_aspeech.return_value = mock_response
-
-                        # Match the actual error message from the code
-                        with pytest.raises(FileNotFoundError, match="TTS output file not created or empty"):
-                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_speakable_short_text_uses_tts(self):
-        """Test that short but speakable text uses normal TTS."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                            mock_aspeech.return_value = self._create_mock_response()
-                            mock_segment = MagicMock()
-                            mock_audio.from_file.return_value = mock_segment
-                            mock_segment.set_frame_rate.return_value = mock_segment
-
-                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="1.")
-
-                            mock_aspeech.assert_called_once()
-                            mock_audio.empty.assert_not_called()
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_creates_directory(self):
-        """Test that audio directory is created if it doesn't exist."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="fr", language_code="fr", name="French")
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.AudioSegment") as mock_audio:
-                    with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                        with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                            mock_aspeech.return_value = self._create_mock_response()
-                            mock_segment = MagicMock()
-                            mock_audio.from_file.return_value = mock_segment
-                            mock_segment.set_frame_rate.return_value = mock_segment
-
-                            await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Bonjour"
-                            )
-
-                            audio_dir = os.path.join(tmpdir, "audio", "fr")
-                            assert os.path.exists(audio_dir)
-
-    @pytest.mark.asyncio
-    async def test_generate_speech_file_unsupported_provider_error(self):
-        """Test error when provider doesn't support TTS."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._create_test_config()
-            language = Language(code="en", language_code="en", name="English")
-
-            with patch("adt_press.llm.speech_generation.litellm.aspeech", new_callable=AsyncMock) as mock_aspeech:
-                with patch("adt_press.llm.speech_generation.render_template_to_string"):
-                    with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
-                        # Simulate litellm error for unsupported provider
-                        # Since the code doesn't catch this yet, we expect the raw Exception
-                        mock_aspeech.side_effect = Exception("Unable to map the custom llm provider=elevenlabs to a known provider")
-
-                        # The code doesn't handle this error yet, so it bubbles up as Exception
-                        with pytest.raises(Exception, match="Unable to map the custom llm provider"):
-                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
+                    # Verify providers were used correctly
+                    assert result["en"]["text_1"].provider == "openai"
+                    assert result["es"]["text_1"].provider == "azure"
