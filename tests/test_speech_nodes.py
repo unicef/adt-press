@@ -182,10 +182,11 @@ class TestSpeechFilesNodes:
             mock_config = SpeechPromptConfig(
                 model="default",
                 template_path="prompts/speech_generation.jinja2",
-                provider="openai",
-                language_providers={"es": "azure"},
-                openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
-                azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+                default_provider="openai",
+                providers={
+                    "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                    "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+                },
                 rate_limit=10,
             )
 

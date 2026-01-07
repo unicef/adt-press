@@ -11,8 +11,11 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={"es": "azure", "en": "openai"},
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+            },
         )
 
         assert config.get_provider_for_language("es") == "azure"
@@ -23,8 +26,11 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={"es": "azure", "si": "azure"},
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es", "si"]),
+            },
         )
 
         # Locales should match base language
@@ -37,8 +43,11 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={"es": "azure", "es-mx": "openai"},
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en", "es-mx"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+            },
         )
 
         # Base Spanish uses Azure
@@ -53,21 +62,26 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={"es": "azure"},
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+            },
         )
 
         # French not in map, should use default
         assert config.get_provider_for_language("fr") == "openai"
         assert config.get_provider_for_language("fr-fr") == "openai"
 
-    def test_get_provider_for_language_auto_fallback(self):
-        """Test 'auto' provider defaults to openai."""
+    def test_get_provider_for_language_empty_providers(self):
+        """Test empty providers dict uses default provider."""
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="auto",
-            language_providers={},
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=[]),
+            },
         )
 
         assert config.get_provider_for_language("en") == "openai"
@@ -78,8 +92,11 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="azure",
-            language_providers={"en": "openai"},
+            default_provider="azure",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=[]),
+            },
         )
 
         # English explicitly uses OpenAI
@@ -94,38 +111,38 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={"es": "azure"},
-            openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
-            azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="es-ES-ElviraNeural"),
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+            },
         )
 
         # English uses default OpenAI
-        model, voice = config.get_active_config("en")
+        model = config.get_active_config("en")
         assert model == "tts-1"
-        assert voice == "alloy"
 
         # Spanish uses Azure
-        model, voice = config.get_active_config("es")
+        model = config.get_active_config("es")
         assert model == "azure/speech/azure-tts"
-        assert voice == "es-ES-ElviraNeural"
 
     def test_get_active_config_with_locale_code(self):
         """Test get_active_config with locale codes."""
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={"es": "azure", "si": "azure"},
-            openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
-            azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es", "si"]),
+            },
         )
 
         # Locale codes should match base language
-        model, voice = config.get_active_config("es-uy")
+        model = config.get_active_config("es-uy")
         assert model == "azure/speech/azure-tts"
 
-        model, voice = config.get_active_config("si-lk")
+        model = config.get_active_config("si-lk")
         assert model == "azure/speech/azure-tts"
 
     def test_get_active_config_without_language_code(self):
@@ -133,23 +150,27 @@ class TestSpeechPromptConfigProviderSelection:
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="azure",
-            language_providers={"en": "openai"},
-            openai=SpeechProviderConfig(model="tts-1", voice="alloy"),
-            azure=SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"),
+            default_provider="azure",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=[]),
+            },
         )
 
         # Without language_code, should use default provider (azure)
-        model, voice = config.get_active_config()
+        model = config.get_active_config()
         assert model == "azure/speech/azure-tts"
 
-    def test_empty_language_providers_dict(self):
-        """Test empty language_providers dict uses default provider."""
+    def test_empty_language_list(self):
+        """Test empty languages list uses default provider."""
         config = SpeechPromptConfig(
             model="default",
             template_path="prompts/speech_generation.jinja2",
-            provider="openai",
-            language_providers={},
+            default_provider="openai",
+            providers={
+                "openai": SpeechProviderConfig(model="tts-1", languages=[]),
+                "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=[]),
+            },
         )
 
         assert config.get_provider_for_language("es") == "openai"
