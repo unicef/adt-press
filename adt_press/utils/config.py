@@ -1,8 +1,11 @@
 from enum import Enum
 from typing import Any
+from pathlib import Path
 
 from omegaconf import DictConfig, ListConfig, OmegaConf
+from slugify import slugify
 
+OmegaConf.register_new_resolver("slugify", lambda x: slugify(Path(x).stem, lowercase=True))
 
 def conf_to_object(value: DictConfig | ListConfig) -> dict[str | bytes | int | Enum | float | bool, Any] | list[Any] | str | Any | None:
     return {} if value is None else OmegaConf.to_container(value, resolve=True)

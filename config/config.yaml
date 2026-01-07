@@ -1,5 +1,5 @@
-label: "???"
 pdf_path: "???"
+label: "${slugify:${pdf_path}}"
 
 # the language of the book, auto will try to auto-detect
 input_language: auto
