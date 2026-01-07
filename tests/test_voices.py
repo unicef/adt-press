@@ -1,7 +1,8 @@
 """Tests for voice utility functions."""
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from adt_press.utils.voices import (
     get_default_voice,

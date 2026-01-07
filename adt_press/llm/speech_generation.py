@@ -135,10 +135,7 @@ async def generate_speech_file(
             with open(raw_speech_path, "wb") as f:
                 f.write(content)
     except Exception as e:
-        raise ValueError(
-            f"Failed to write TTS response to file: {e}\n"
-            f"Response type: {type(response)}, Attributes: {dir(response)}"
-        ) from e
+        raise ValueError(f"Failed to write TTS response to file: {e}\nResponse type: {type(response)}, Attributes: {dir(response)}") from e
 
     # Verify file was written successfully
     if not os.path.exists(raw_speech_path) or os.path.getsize(raw_speech_path) == 0:

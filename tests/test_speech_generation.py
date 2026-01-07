@@ -103,9 +103,7 @@ class TestGenerateSpeechFile:
                             mock_audio.from_file.return_value = mock_segment
                             mock_segment.set_frame_rate.return_value = mock_segment
 
-                            await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test"
-                            )
+                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
 
                             call_kwargs = mock_aspeech.call_args[1]
                             assert "instructions" in call_kwargs
@@ -127,9 +125,7 @@ class TestGenerateSpeechFile:
                             mock_audio.from_file.return_value = mock_segment
                             mock_segment.set_frame_rate.return_value = mock_segment
 
-                            await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Hola"
-                            )
+                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Hola")
 
                             call_kwargs = mock_aspeech.call_args[1]
                             assert "instructions" not in call_kwargs
@@ -201,9 +197,7 @@ class TestGenerateSpeechFile:
             language = Language(code="en", language_code="en", name="English")
 
             with pytest.raises(ValueError, match="Empty or whitespace-only text for TTS generation"):
-                await generate_speech_file(
-                    run_output_dir=tmpdir, config=config, language=language, text_id="test", text=text
-                )
+                await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text=text)
 
     @pytest.mark.asyncio
     async def test_generate_speech_file_file_not_created_error(self):
@@ -219,7 +213,7 @@ class TestGenerateSpeechFile:
                 with patch("adt_press.llm.speech_generation.render_template_to_string"):
                     with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
                         mock_aspeech.return_value = mock_response
-                        
+
                         # Mock os.path.exists to return False (file wasn't created)
                         with patch("adt_press.llm.speech_generation.os.path.exists", return_value=False):
                             with pytest.raises(FileNotFoundError, match="TTS output file not created"):
@@ -251,9 +245,7 @@ class TestGenerateSpeechFile:
 
                         # Match the actual error message from the code
                         with pytest.raises(FileNotFoundError, match="TTS output file not created or empty"):
-                            await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test"
-                            )
+                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
 
     @pytest.mark.parametrize("non_speakable_text", ["—", ".", "..."])
     @pytest.mark.asyncio
@@ -297,9 +289,7 @@ class TestGenerateSpeechFile:
                             mock_audio.from_file.return_value = mock_segment
                             mock_segment.set_frame_rate.return_value = mock_segment
 
-                            await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="1."
-                            )
+                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="1.")
 
                             mock_aspeech.assert_called_once()
                             mock_audio.empty.assert_not_called()
@@ -339,12 +329,8 @@ class TestGenerateSpeechFile:
                     with patch("adt_press.llm.speech_generation.get_voice_for_language", return_value="alloy"):
                         # Simulate litellm error for unsupported provider
                         # Since the code doesn't catch this yet, we expect the raw Exception
-                        mock_aspeech.side_effect = Exception(
-                            "Unable to map the custom llm provider=elevenlabs to a known provider"
-                        )
+                        mock_aspeech.side_effect = Exception("Unable to map the custom llm provider=elevenlabs to a known provider")
 
                         # The code doesn't handle this error yet, so it bubbles up as Exception
                         with pytest.raises(Exception, match="Unable to map the custom llm provider"):
-                            await generate_speech_file(
-                                run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test"
-                            )
+                            await generate_speech_file(run_output_dir=tmpdir, config=config, language=language, text_id="test", text="Test")
