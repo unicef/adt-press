@@ -1,6 +1,6 @@
 import enum
 import os
-from typing import Self
+from typing import Any, Self
 
 import yaml
 from pydantic import BaseModel, Field, model_validator
@@ -98,19 +98,35 @@ class SpeechProviderConfig(BaseModel):
     """Configuration for a specific TTS provider."""
 
     model: str
-    voice: str = "auto"
+    languages: list[str] = []  # List of language codes this provider handles
 
 
 class SpeechPromptConfig(PromptConfig):
     """Speech generation configuration with provider support."""
 
-    provider: str = "auto"  # Default provider
-    language_providers: dict[str, str] = {}  # Per-language provider overrides
-    openai: SpeechProviderConfig = Field(default_factory=lambda: SpeechProviderConfig(model="gpt-4o-mini-tts", voice="auto"))
-    azure: SpeechProviderConfig = Field(default_factory=lambda: SpeechProviderConfig(model="azure/speech/azure-tts", voice="auto"))
+    default_provider: str = "openai"
+    providers: dict[str, SpeechProviderConfig] = Field(default_factory=dict)
     format: str = "mp3"
     bit_rate: str = "64k"
     sample_rate: int = 24000
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_providers(cls, data: Any) -> Any:
+        """Convert provider dicts to SpeechProviderConfig objects."""
+        if isinstance(data, dict) and "providers" in data:
+            providers = data.get("providers", {})
+            if isinstance(providers, dict):
+                # Convert each provider dict to SpeechProviderConfig
+                parsed_providers: dict[str, SpeechProviderConfig] = {}
+                for name, config in providers.items():
+                    if isinstance(config, dict):
+                        parsed_providers[name] = SpeechProviderConfig.model_validate(config)
+                    elif isinstance(config, SpeechProviderConfig):
+                        parsed_providers[name] = config
+                data = dict(data)  # Make a copy
+                data["providers"] = parsed_providers
+        return data
 
     def get_provider_for_language(self, language_code: str) -> str:
         """
@@ -120,40 +136,45 @@ class SpeechPromptConfig(PromptConfig):
             language_code: ISO language code (e.g., "en", "es", "si", "es-uy", "si-lk")
 
         Returns:
-            Provider name ("openai" or "azure")
+            Provider name (e.g., "openai", "azure", "elevenlabs", etc.)
         """
+        # Build language -> provider map from all provider configs
+        language_map = {}
+        for provider_name, provider_config in self.providers.items():
+            for lang in provider_config.languages:
+                language_map[lang] = provider_name
+
         # Check exact match first (e.g., "es-uy")
-        if language_code in self.language_providers:
-            return self.language_providers[language_code]
+        if language_code in language_map:
+            return language_map[language_code]
 
         # If no exact match, try base language code (e.g., "es" from "es-uy")
         base_lang = language_code.split("-")[0]
-        if base_lang in self.language_providers:
-            return self.language_providers[base_lang]
+        if base_lang in language_map:
+            return language_map[base_lang]
 
         # Fall back to default provider
-        if self.provider == "auto":
-            return "openai"
-        return self.provider
+        return self.default_provider
 
-    def get_active_config(self, language_code: str | None = None) -> tuple[str, str]:
+    def get_active_config(self, language_code: str | None = None) -> str:
         """
-        Get the active model and voice based on provider setting.
+        Get the active model based on provider setting.
 
         Args:
             language_code: Optional ISO language code for per-language provider selection
 
         Returns:
-            Tuple of (model, voice)
-        """
-        provider = self.provider if language_code is None else self.get_provider_for_language(language_code)
+            Model name string
 
-        if provider == "auto" or provider == "openai":
-            return (self.openai.model, self.openai.voice)
-        elif provider == "azure":
-            return (self.azure.model, self.azure.voice)
-        else:
-            raise ValueError(f"Unknown speech provider: {provider}. Must be 'auto', 'openai', or 'azure'")
+        Raises:
+            ValueError: If provider is not configured
+        """
+        provider = self.default_provider if language_code is None else self.get_provider_for_language(language_code)
+
+        if provider not in self.providers:
+            raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
+
+        return self.providers[provider].model
 
 
 class HTMLPromptConfig(PromptConfig):
