@@ -278,6 +278,16 @@ def plate_language(plate_language_config: str, input_language: Language) -> Lang
 
 
 def output_languages(output_languages_config: list[str], plate_language: Language) -> list[Language]:
+    """
+    Convert output language codes to Language objects.
+
+    Args:
+        output_languages_config: List of language codes, may contain "auto"
+        plate_language: The plate language to use when "auto" is specified
+
+    Returns:
+        List of unique Language objects for output
+    """
     # Handle special case of exactly ["auto"]
     if output_languages_config == ["auto"]:
         return [plate_language]
@@ -285,8 +295,7 @@ def output_languages(output_languages_config: list[str], plate_language: Languag
     # Process each language code, replacing "auto" with plate_language
     result = []
     for lang_code in output_languages_config:
-        # Replace "auto" or unresolved interpolations with plate_language
-        if lang_code in ("auto", "${plate_language}", "${input_language}"):
+        if lang_code == "auto":
             if plate_language not in result:  # Avoid duplicates
                 result.append(plate_language)
         else:
