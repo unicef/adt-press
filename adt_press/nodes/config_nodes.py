@@ -2,6 +2,7 @@ import os
 from typing import Any, cast
 
 import structlog
+import yaml
 from hamilton.function_modifiers import cache
 from hamilton.function_modifiers import config as when_config
 from omegaconf import DictConfig, OmegaConf
@@ -294,6 +295,22 @@ def speech_prompt_config(config: DictConfig) -> SpeechPromptConfig:
     merged_config = {**prompt_config, **root_speech_config}
 
     return SpeechPromptConfig.model_validate(merged_config)
+
+
+@cache(behavior="recompute")
+def voice_maps_config(speech_prompt_config: SpeechPromptConfig) -> dict[str, dict[str, str]]:
+    """Load voice configuration maps from voices.yaml.
+
+    This Hamilton node caches the voice maps once during pipeline execution,
+    avoiding repeated file I/O and parsing on every TTS call.
+
+    Returns:
+        Dictionary mapping provider names to their voice configurations.
+        Example: {"openai": {"en": "alloy", "default": "alloy"}, "azure": {...}}
+    """
+    with open(speech_prompt_config.voices_path, "r", encoding="utf-8") as f:
+        voice_config = yaml.safe_load(f)
+        return cast(dict[str, dict[str, str]], voice_config)
 
 
 @cache(behavior="recompute")

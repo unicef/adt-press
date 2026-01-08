@@ -1,5 +1,5 @@
-label: "???"
 pdf_path: "???"
+label: "${label_for_path:${pdf_path}}"
 
 # the language of the book, auto will try to auto-detect
 input_language: auto
@@ -54,21 +54,20 @@ default_render_strategy: html
 
 # Speech/TTS provider configuration
 speech:
-  provider: openai  # Default provider for languages not in the map  
-  language_providers:  # Override provider per language
-    es: azure  # Spanish uses Azure (better quality)
-    ta: azure  # Tamil uses Azure
-    si: azure  # Sinhala uses Azure
-    # All other languages (en, etc.) use default provider
-  openai:
-    model: gpt-4o-mini-tts
-    voice: auto
-  azure:
-    model: azure/speech/azure-tts
-    voice: auto
+  # provider selection, either dynamic (selection based on language) or specific provider (openai, azure)
+  provider: openai
+  default_provider: openai  
+  providers:
+    openai:
+      model: gpt-4o-mini-tts
+      languages: [en]  # Languages that use OpenAI
+    azure:
+      model: azure/speech/azure-tts
+      languages: [es, ta, si]  # Languages that use Azure
   bit_rate: 64k
   sample_rate: 24000
   format: mp3
+  voices_path: config/voices.yaml
 
 text_types:
   book_title:

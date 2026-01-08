@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import litellm
 from pydub import AudioSegment
@@ -9,57 +10,51 @@ from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
 from adt_press.utils.languages import Language
 from adt_press.utils.string import is_speakable_text
-from adt_press.utils.voices import get_azure_voice, get_openai_voices
 
 
-def resolve_voice(model: str, requested_voice: str, language_code: str) -> str:
+def resolve_voice(provider: str, language_code: str, voice_maps: dict[str, dict[str, str]]) -> str:
     """
-    Resolve the appropriate voice based on model and language.
+    Resolve the appropriate voice based on provider and language using cached voice maps.
 
     Args:
-        model: TTS model (e.g., "tts-1", "azure/speech/azure-tts")
-        requested_voice: Voice from config ("auto" or specific voice name)
+        provider: TTS provider name (e.g., "openai", "azure", "elevenlabs")
         language_code: ISO language code (e.g., "si", "en", "ta")
+        voice_maps: Cached voice configuration maps from voices.yaml
 
     Returns:
-        Valid voice name for the model
+        Valid voice name for the provider
+
+    Raises:
+        ValueError: If provider not found or missing 'default' voice
     """
-    is_azure = model.startswith("azure/")
+    if provider not in voice_maps:
+        raise ValueError(f"Missing '{provider}' configuration in voices file. Available providers: {list(voice_maps.keys())}")
 
-    # Auto mode - choose best voice for language
-    if requested_voice == "auto":
-        if is_azure:
-            voice = get_azure_voice(language_code)
-            if voice:
-                return voice
+    provider_config = voice_maps[provider]
 
-            # Final fallback to English
-            return "en-US-JennyNeural"
-        else:
-            return "alloy"  # OpenAI default
+    # Normalize to lowercase
+    normalized = language_code.lower()
 
-    # Validate requested voice matches model
-    if is_azure:
-        # Check if it's an Azure voice format (xx-XX-NameNeural)
-        if "-" in requested_voice and "Neural" in requested_voice:
-            return requested_voice
+    # Try exact match first (e.g., "es-uy")
+    if normalized in provider_config:
+        return provider_config[normalized]
 
-        # Requested non-Azure voice with Azure model - fall back
-        voice = get_azure_voice(language_code)
-        return voice if voice else "en-US-JennyNeural"
-    else:
-        # OpenAI model
-        openai_voices = get_openai_voices()
-        if requested_voice in openai_voices:
-            return requested_voice
+    # Try base language (e.g., "es" from "es-uy")
+    base_lang = normalized.split("-")[0]
+    if base_lang in provider_config:
+        return provider_config[base_lang]
 
-        # Requested Azure voice with OpenAI model - fall back to default
-        return "alloy"
+    # Fall back to default voice
+    default_voice = provider_config.get("default")
+    if default_voice is None:
+        raise ValueError(f"Missing 'default' voice in {provider} configuration")
+    return default_voice
 
 
 async def generate_speech_file(
     run_output_dir: str,
     config: SpeechPromptConfig,
+    voice_maps: dict[str, dict[str, str]],  # Add cached voice maps parameter
     language: Language,
     text_id: str,
     text: str,
@@ -70,6 +65,7 @@ async def generate_speech_file(
     Args:
         run_output_dir: Output directory for audio files
         config: Speech generation configuration
+        voice_maps: Cached voice configuration maps (from Hamilton node)
         language: Target language for speech
         text_id: Unique identifier for the text
         text: Text content to convert to speech
@@ -83,81 +79,66 @@ async def generate_speech_file(
     """
     language_code = language.code
 
+    # Sanitize and validate text
     sanitized_text = strip_emojis(text)
     if not sanitized_text.strip():
         sanitized_text = text
 
-    # Validate text before attempting TTS
     if not sanitized_text or not sanitized_text.strip():
         raise ValueError(
             f"Empty or whitespace-only text for TTS generation: text_id={text_id}, "
             f"language={language_code}, original_text='{text[:100] if text else 'EMPTY'}'"
         )
 
-    # Skip texts that aren't suitable for TTS (e.g., punctuation-only like "—")
-    # Azure TTS often returns empty responses for such content
+    # Setup common paths and metadata
+    speech_id = f"{text_id}_{language_code}"
+    speech_dir = os.path.join(run_output_dir, "audio", language_code)
+    os.makedirs(speech_dir, exist_ok=True)
+    speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
+    speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
+
+    # Get provider config and resolve voice using cached voice maps
+    model = config.get_active_config(language_code)
+    resolved_provider = config.get_provider_for_language(language_code)
+    resolved_voice = resolve_voice(resolved_provider, language_code, voice_maps)  # Pass cached maps
+
+    # Handle non-speakable text (e.g., punctuation-only like "—")
     if not is_speakable_text(sanitized_text):
-        # Return a minimal silent audio file instead of failing
-        speech_dir = os.path.join(run_output_dir, "audio", language_code)
-        os.makedirs(speech_dir, exist_ok=True)
-        speech_id = f"{text_id}_{language_code}"
-        speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
+        # Copy prebuilt empty audio file
+        empty_template = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "audio", "empty.mp3")
+        if not os.path.exists(empty_template):
+            raise FileNotFoundError(f"Empty audio template not found: {empty_template}")
 
-        # Create silent audio segment (50ms)
-        silent_audio = AudioSegment.silent(duration=50)
-        silent_audio.export(
-            speech_path,
-            format=config.format,
-            bitrate=config.bit_rate,
-            parameters=["-ar", str(config.sample_rate)],
-        )
+        shutil.copy2(empty_template, speech_path)
 
-        # Get provider/voice for metadata (even though we didn't use TTS)
-        model, voice = config.get_active_config(language_code)
-        resolved_provider = config.get_provider_for_language(language_code)
-
-        # Return relative path consistent with normal TTS generation
-        speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
         return SpeechFile(
             text_id=text_id,
             speech_id=speech_id,
             speech_path=speech_relative_path,
             language_code=language_code,
             provider=resolved_provider,
-            voice=voice,
+            voice=resolved_voice,
             model=model,
         )
 
+    # Render prompt template for TTS instructions
     context = dict(
         language_code=language_code,
         language=language.name,
         text=sanitized_text,
         examples=config.examples,
     )
-
-    # Render prompt template for TTS instructions
     prompt = render_template_to_string(config.template_path, context)
 
-    # Get active provider config
-    model, voice = config.get_active_config(language_code)
-    resolved_provider = config.get_provider_for_language(language_code)
-
-    # Resolve the voice based on language
-    resolved_voice = resolve_voice(model, voice, language_code)
-
-    speech_id = f"{text_id}_{language_code}"
-    speech_dir = os.path.join(run_output_dir, "audio", language_code)
-    os.makedirs(speech_dir, exist_ok=True)
-
-    raw_speech_path = os.path.join(speech_dir, f"{speech_id}_raw.mp3")
-    speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
+    # Generate speech via TTS
+    raw_speech_path = os.path.join(speech_dir, f"{speech_id}_raw.{config.format}")
 
     # Build kwargs - Azure Speech doesn't support instructions parameter
     speech_kwargs = {
         "model": model,
         "voice": resolved_voice,
         "input": sanitized_text,
-        "response_format": "mp3",
+        "response_format": config.format,
     }
 
     # Only add instructions for OpenAI-compatible models (not Azure Speech)
@@ -167,52 +148,29 @@ async def generate_speech_file(
     response = await litellm.aspeech(**speech_kwargs)
 
     # Write the audio response to file
-    # Different response types require different handling
     try:
         if hasattr(response, "write_to_file"):
-            # Use litellm's write_to_file method (most reliable, handles all types)
+            # Preferred litellm method
             response.write_to_file(raw_speech_path)
-        elif hasattr(response, "read"):
-            # Response is a file-like object
-            with open(raw_speech_path, "wb") as f:
-                content = response.read()
-                f.write(content)
-        elif hasattr(response, "content"):
-            # Response has content attribute (likely bytes)
-            content = response.content
-            # For httpx responses, content might be a coroutine
+        else:
+            # Fallback: treat as bytes-like content
+            content = response.content if hasattr(response, "content") else response.read()
             if hasattr(content, "__await__"):
                 content = await content
             with open(raw_speech_path, "wb") as f:
                 f.write(content)
-        elif hasattr(response, "iter_bytes"):
-            # Streaming response
-            with open(raw_speech_path, "wb") as f:
-                async for chunk in response.iter_bytes():
-                    f.write(chunk)
-        else:
-            raise ValueError(f"Unknown response type: {type(response)}, attributes: {dir(response)}")
     except Exception as e:
-        raise ValueError(f"Failed to write TTS response to file: {e}, response type: {type(response)}")
+        raise ValueError(f"Failed to write TTS response to file: {e}\nResponse type: {type(response)}, Attributes: {dir(response)}") from e
 
     # Verify file was written successfully
-    if not os.path.exists(raw_speech_path):
-        raise FileNotFoundError(f"TTS output file not created: {raw_speech_path}")
-
-    file_size = os.path.getsize(raw_speech_path)
-    if file_size == 0:
-        raise ValueError(
-            f"TTS output file is empty: {raw_speech_path}\n"
-            f"Text ID: {text_id}, Language: {language_code}, Model: {model}, Voice: {resolved_voice}\n"
-            f"Text length: {len(sanitized_text)}, Preview: '{sanitized_text[:200]}'"
-        )
+    if not os.path.exists(raw_speech_path) or os.path.getsize(raw_speech_path) == 0:
+        raise FileNotFoundError(f"TTS output file not created or empty: {raw_speech_path}")
 
     # Transcode to quality specified in config
-    raw = AudioSegment.from_mp3(raw_speech_path)
+    raw = AudioSegment.from_file(raw_speech_path, format=config.format)
     raw.set_frame_rate(config.sample_rate)
     raw.export(speech_path, bitrate=config.bit_rate, format=config.format, parameters=["-ac", "1"])
 
-    speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
     return SpeechFile(
         speech_id=speech_id,
         speech_path=speech_relative_path,

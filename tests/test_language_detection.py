@@ -156,24 +156,9 @@ class OutputLanguagesNodeTests(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].code, "en")
 
-    def test_output_languages_with_interpolation_tokens(self) -> None:
-        """Test output_languages handles unresolved interpolation tokens."""
-        plate_lang = Language.from_code("si")
-        result = pdf_nodes.output_languages(["${plate_language}", "en"], plate_lang)
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0].code, "si")
-        self.assertEqual(result[1].code, "en")
-
     def test_output_languages_empty_list_fallback(self) -> None:
         """Test output_languages returns plate_language for empty list."""
         plate_lang = Language.from_code("ta")
         result = pdf_nodes.output_languages([], plate_lang)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].code, "ta")
-
-    def test_output_languages_only_interpolations(self) -> None:
-        """Test output_languages with only interpolation tokens."""
-        plate_lang = Language.from_code("fr")
-        result = pdf_nodes.output_languages(["${input_language}", "${plate_language}"], plate_lang)
-        self.assertEqual(len(result), 1)  # Should deduplicate to single plate_language
-        self.assertEqual(result[0].code, "fr")

@@ -1,15 +1,12 @@
 # TTS Voice Mappings for Azure and OpenAI
 # Azure voices: https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts
 
-openai_voices:
-  - alloy
-  - echo
-  - fable
-  - onyx
-  - nova
-  - shimmer
+openai:
+  default: alloy
+  en: alloy
 
-azure_voices:
+azure:
+  default: en-US-JennyNeural
   # English variants
   en: en-US-JennyNeural
   en-us: en-US-JennyNeural

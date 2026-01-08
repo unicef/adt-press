@@ -28,7 +28,19 @@ Demos of ADTs created from the outputs of ADT Press:
 
 - Python 3.13 or higher
 - UV package manager (recommended)
-- **You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work. If you use Azure TTS you will have to set the following environment variables as well: `AZURE_API_KEY` and `AZURE_API_BASE`.**
+
+## Environment Variables
+
+API keys are required depending on your configuration. By default, ADT Press uses OpenAI for LLM processing, which requires setting the `OPENAI_API_KEY` environment variable. If you configure Azure for the main processing or for speech generation (`speech.provider=azure`), you'll also need to set `AZURE_API_KEY` and `AZURE_API_BASE`.
+
+Example of .env file:
+```bash
+# Used by default
+OPENAI_API_KEY=your-openai-api-key
+# If using Azure
+AZURE_API_KEY=your-azure-api-key
+AZURE_API_BASE=your-azure-endpoint
+```
 
 ## Installation
 
@@ -51,7 +63,7 @@ uv sync
 Run the main script with the default configuration:
 
 ```bash
-uv run adt-press.py label=raven pdf_path=assets/raven.pdf
+uv run adt-press.py pdf_path=assets/raven.pdf
 ```
 
 ### Configuration
@@ -66,8 +78,8 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
 
 ### Key Configuration Parameters
 
-- `label`: The label for this PDF file, will be used as the subdirectory name under `output_dir`
 - `pdf_path`: Path to the PDF file to process
+- `label`: The label for this PDF file, will be used as the subdirectory name under `output_dir`. If not provided, label will be generated based on the filename portion of `pdf_path`
 - `page_range`: Range of pages to process (start and end)
 - `output_dir`: Base directory to store outputs
 - `template_dir`: Directory containing HTML templates
@@ -79,8 +91,8 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
   - `overlay` works best for comic books
 - `speech_strategy`: Enable text-to-speech generation (default: `none`, set to `tts` to enable)
 - `speech.provider`: TTS provider selection (default: `auto` uses OpenAI, also supports `azure`)
-  - `auto` or `openai`: Uses OpenAI's TTS models (requires `OPENAI_API_KEY`)
-  - `azure`: Uses Azure Speech Services (requires `AZURE_API_KEY` and `AZURE_API_BASE=https://{region}.api.cognitive.microsoft.com`)
+  - `auto` or `openai`: Uses OpenAI's TTS models
+  - `azure`: Uses Azure Speech Services
   - Configure voice settings in `config/config.yaml` under `speech`
 
 ### Text-to-Speech Examples
@@ -215,17 +227,15 @@ The folder `.devcontainer` needs to be in the root of your project, containing a
 
 ---
 
-**Environment Variable Required**
+**Environment Variables**
 
 > **Note:**  
-> You must set the environment variable `OPENAI_API_KEY` with your OpenAI API key for the application to work.
->
-> - When running the Dockerized version, you need to set the `OPENAI_API_KEY` variable every time you run the container.  
+> When running the Dockerized version, set the required environment variables when running the container.  
 >   For example:
 >   ```bash
 >   docker run --rm -e OPENAI_API_KEY=your-key-here adt-press
 >   ```
-> - When using VS Code "Reopen in Container", you can add the variable to your `.env` file or set it in the container terminal before running your scripts.
+> When using VS Code "Reopen in Container", you can add the variables to your `.env` file or set them in the container terminal before running your scripts.
 
 **License**
 
