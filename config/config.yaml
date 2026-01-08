@@ -52,7 +52,7 @@ default_render_strategy: html
 # Speech/TTS provider configuration
 speech:
   # provider selection, either dynamic (selection based on language) or specific provider (openai, azure)
-  provider: dynamic
+  provider: openai
   default_provider: openai  
   providers:
     openai:
