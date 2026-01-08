@@ -35,6 +35,7 @@ def pdf_texts(
     text_extraction_prompt_config: PromptConfig,
     text_types_config: dict[str, TextType],
     text_group_types_config: dict[str, TextGroupType],
+    input_language: Language,
 ) -> dict[str, PageTexts]:
     async def extract_text():
         text = []
@@ -47,6 +48,7 @@ def pdf_texts(
                     text_types_config,
                     text_group_types_config,
                     page,
+                    input_language,
                 )
             )
 
@@ -276,6 +278,29 @@ def plate_language(plate_language_config: str, input_language: Language) -> Lang
 
 
 def output_languages(output_languages_config: list[str], plate_language: Language) -> list[Language]:
+    """
+    Convert output language codes to Language objects.
+
+    Args:
+        output_languages_config: List of language codes, may contain "auto"
+        plate_language: The plate language to use when "auto" is specified
+
+    Returns:
+        List of unique Language objects for output
+    """
+    # Handle special case of exactly ["auto"]
     if output_languages_config == ["auto"]:
         return [plate_language]
-    return [Language.from_code(lang_code) for lang_code in output_languages_config]
+
+    # Process each language code, replacing "auto" with plate_language
+    result = []
+    for lang_code in output_languages_config:
+        if lang_code == "auto":
+            if plate_language not in result:  # Avoid duplicates
+                result.append(plate_language)
+        else:
+            lang = Language.from_code(lang_code)
+            if lang not in result:  # Avoid duplicates
+                result.append(lang)
+
+    return result if result else [plate_language]

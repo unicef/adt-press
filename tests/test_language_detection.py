@@ -141,6 +141,24 @@ class OutputLanguagesNodeTests(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].code, "es")
 
+    def test_output_languages_with_auto_in_list(self) -> None:
+        """Test output_languages handles 'auto' within a list with other languages."""
+        plate_lang = Language.from_code("es")
+        result = pdf_nodes.output_languages(["auto", "en"], plate_lang)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].code, "es")  # auto replaced with plate_language
+        self.assertEqual(result[1].code, "en")
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_output_languages_removes_duplicates(self) -> None:
+        """Test output_languages removes duplicate languages."""
+        plate_lang = Language.from_code("en")
+        result = pdf_nodes.output_languages(["en", "auto", "en"], plate_lang)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].code, "en")
+
+    def test_output_languages_empty_list_fallback(self) -> None:
+        """Test output_languages returns plate_language for empty list."""
+        plate_lang = Language.from_code("ta")
+        result = pdf_nodes.output_languages([], plate_lang)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].code, "ta")

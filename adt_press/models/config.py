@@ -1,6 +1,6 @@
 import enum
 import os
-from typing import Self
+from typing import Any, Self
 
 import yaml
 from pydantic import BaseModel, Field, model_validator
@@ -94,11 +94,103 @@ class PromptConfig(PathHashMixin):
     timeout: int = 300
 
 
+class SpeechProviderConfig(BaseModel):
+    """Configuration for a specific TTS provider."""
+
+    model: str
+    languages: list[str] = []  # List of language codes this provider handles
+
+
 class SpeechPromptConfig(PromptConfig):
-    voice: str = "alloy"
+    """Speech generation configuration with provider support."""
+
+    provider: str = "dynamic"  # "dynamic" for language-based selection, or specific provider name
+    default_provider: str = "openai"  # Fallback when dynamic mode can't find a match
+    providers: dict[str, SpeechProviderConfig] = Field(default_factory=dict)
     format: str = "mp3"
     bit_rate: str = "64k"
     sample_rate: int = 24000
+    voices_path: str = "config/voices.yaml"
+    language_map: dict[str, str] = Field(default_factory=dict, exclude=True)
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_providers(cls, data: Any) -> Any:
+        """Convert provider dicts to SpeechProviderConfig objects."""
+        if isinstance(data, dict) and "providers" in data:
+            providers = data.get("providers", {})
+            if isinstance(providers, dict):
+                # Convert each provider dict to SpeechProviderConfig
+                parsed_providers: dict[str, SpeechProviderConfig] = {}
+                for name, config in providers.items():
+                    if isinstance(config, dict):
+                        parsed_providers[name] = SpeechProviderConfig.model_validate(config)
+                    elif isinstance(config, SpeechProviderConfig):
+                        parsed_providers[name] = config
+                data = dict(data)  # Make a copy
+                data["providers"] = parsed_providers
+        return data
+
+    @model_validator(mode="after")
+    def build_language_map(self) -> Self:
+        """Build language -> provider map once during initialization."""
+        self.language_map = {}
+        for provider_name, provider_config in self.providers.items():
+            for lang in provider_config.languages:
+                self.language_map[lang] = provider_name
+        return self
+
+    def get_provider_for_language(self, language_code: str) -> str:
+        """
+        Get the appropriate provider for a specific language.
+
+        Args:
+            language_code: ISO language code (e.g., "en", "es", "si", "es-uy", "si-lk")
+
+        Returns:
+            Provider name (e.g., "openai", "azure", "elevenlabs", etc.)
+        """
+        # If provider is set to a specific provider (not "dynamic"), use it
+        if self.provider != "dynamic":
+            return self.provider
+
+        # Check exact match first (e.g., "es-uy")
+        if language_code in self.language_map:
+            return self.language_map[language_code]
+
+        # If no exact match, try base language code (e.g., "es" from "es-uy")
+        base_lang = language_code.split("-")[0]
+        if base_lang in self.language_map:
+            return self.language_map[base_lang]
+
+        # Fall back to default provider
+        return self.default_provider
+
+    def get_active_config(self, language_code: str | None = None) -> str:
+        """
+        Get the active model based on provider setting.
+
+        Args:
+            language_code: Optional ISO language code for per-language provider selection
+
+        Returns:
+            Model name string
+
+        Raises:
+            ValueError: If provider is not configured
+        """
+        # For non-dynamic mode without language_code, use the fixed provider
+        if self.provider != "dynamic" and language_code is None:
+            provider = self.provider
+        elif language_code is not None:
+            provider = self.get_provider_for_language(language_code)
+        else:
+            provider = self.default_provider
+
+        if provider not in self.providers:
+            raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
+
+        return self.providers[provider].model
 
 
 class HTMLPromptConfig(PromptConfig):

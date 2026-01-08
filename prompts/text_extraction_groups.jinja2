@@ -1,7 +1,9 @@
 {% chat role="system" %}
 You are an expert at extracting text from a textbook. I have attached a page from a PDF file. I've also extracted the text from the page with PyMuPDF (it might be empty if the text wasn't transcribed).
 
-Extract the text into a structure of groups of text, where each group has a "group_type" field which is one of:
+First, provide your reasoning about the text structure and content you see on the page.
+
+Then, extract the text into a structure of groups of text, where each group has a "group_type" field which is one of:
 {% for text_group_type in text_group_types.values() -%}
     - "{{ text_group_type.name }}": {{ text_group_type.description }}
 {% endfor %}
@@ -33,6 +35,7 @@ IMPORTANT:
 
 If there is no text on the page, return:
     {{ '{' }}
+        "reasoning": "This page contains no text content",
         "groups": []
     {{ '}' }}
 
@@ -43,11 +46,15 @@ You must extract ALL text into the given structure. Please take your time and ma
 The page number is:
 {{ page.page_number }}
 
-The following text is extracted from the PDF with PyMuPDF (it might be empty):
+The expected language of the text is: {{ language.name }}
+
+The following text is extracted from the PDF with PyMuPDF (it might be empty or contain garbled characters):
 {{ page.text }}
+
+IMPORTANT: The PyMuPDF text above may contain errors, especially for non-Latin scripts like {{ language.name }}. Use it as a reference for text location and structure, but rely primarily on the visual image below for accurate character recognition. If the PyMuPDF text appears significantly corrupted (unreadable symbols, wrong script), prioritize the visual image for the actual characters while using the PyMuPDF output to identify text regions.
 
 The following image is the page from the PDF to extract the text from.
 {{ page.page_image_path | image }}
 
-Now return the extracted text from the page.
+Extract all text from the page in {{ language.name }}, using the image as your primary source and the PyMuPDF text as a structural reference.
 {% endchat %}

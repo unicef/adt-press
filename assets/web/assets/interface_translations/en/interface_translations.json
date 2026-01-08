@@ -92,5 +92,6 @@
     "validation-inappropriate-language": "Inappropriate language",
     "validation-check-spelling": "Check your spelling",
     "validation-write-appropriate": "Please write in English and use appropriate language",
-    "validation-error": "Validation error"
+    "validation-error": "Validation error",
+    "nav-page-tab-label": "Page list"
 }

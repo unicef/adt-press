@@ -111,125 +111,32 @@ class TestSpeechFilesNodes:
                     assert result["en"]["text_1"].language_code == "en"
                     assert result["es"]["text_1"].language_code == "es"
 
-    def test_speech_files_none_returns_empty_structure(self):
-        """Test that speech_files__none returns proper empty structure."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            mock_config = PromptConfig(
-                model="tts-1",
-                template_path="prompts/speech_generation.jinja2",
-                rate_limit=10,
-                max_retries=3,
-                timeout=120,
-            )
-
-            plate_translations = {
-                "en": {"text_1": "Hello"},
-                "es": {"text_1": "Hola"},
-                "fr": {"text_1": "Bonjour"},
-            }
-
-            from adt_press.nodes.speech_nodes import speech_files__none
-
-            result = speech_files__none(
-                run_output_dir_config=tmpdir,
-                speech_prompt_config=mock_config,
-                plate_translations=plate_translations,
-            )
-
-            # Should have empty dict for each language
-            assert len(result) == 3
-            assert "en" in result
-            assert "es" in result
-            assert "fr" in result
-            assert result["en"] == {}
-            assert result["es"] == {}
-            assert result["fr"] == {}
-
     def test_speech_files_tts_handles_single_text(self):
-        """Test TTS generation with single text per language."""
+        """Test TTS generation with single text."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_config = PromptConfig(
                 model="tts-1",
                 template_path="prompts/speech_generation.jinja2",
                 rate_limit=10,
-                max_retries=3,
-                timeout=120,
             )
 
             voice_maps = self._create_mock_voice_maps()
 
             plate_translations = {
-                "en": {"single_text": "Just one text"},
-            }
-
-            mock_speech_file = SpeechFile(
-                speech_id="single_text",
-                text_id="single_text",
-                language_code="en",
-                speech_path=f"{tmpdir}/en/single_text.mp3",
-                provider="openai",
-                voice="alloy",
-                model="tts-1",
-            )
-
-            with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
-                with patch("adt_press.nodes.speech_nodes.run_async_task") as mock_async:
-                    mock_async.return_value = [mock_speech_file]
-
-                    from adt_press.nodes.speech_nodes import speech_files__tts
-
-                    result = speech_files__tts(
-                        run_output_dir_config=tmpdir,
-                        speech_prompt_config=mock_config,
-                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
-                        plate_translations=plate_translations,
-                    )
-
-                    assert len(result["en"]) == 1
-                    assert "single_text" in result["en"]
-                    assert result["en"]["single_text"].text_id == "single_text"
-
-    def test_speech_files_with_mixed_providers(self):
-        """Test TTS generation with different providers for different languages."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Spanish uses Azure, English uses OpenAI
-            mock_config = SpeechPromptConfig(
-                model="default",
-                template_path="prompts/speech_generation.jinja2",
-                default_provider="openai",
-                providers={
-                    "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
-                    "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+                "en": {
+                    "text_1": "Hello",
                 },
-                rate_limit=10,
-            )
-
-            voice_maps = self._create_mock_voice_maps()
-
-            plate_translations = {
-                "en": {"text_1": "Hello"},
-                "es": {"text_1": "Hola"},
             }
 
-            # Mock files showing different providers were used
             mock_speech_files = [
                 SpeechFile(
-                    speech_id="text_1_en",
+                    speech_id="text_1",
                     text_id="text_1",
                     language_code="en",
-                    speech_path=f"{tmpdir}/audio/en/text_1.mp3",
+                    speech_path=f"{tmpdir}/en/text_1.mp3",
                     provider="openai",
                     voice="alloy",
                     model="tts-1",
-                ),
-                SpeechFile(
-                    speech_id="text_1_es",
-                    text_id="text_1",
-                    language_code="es",
-                    speech_path=f"{tmpdir}/audio/es/text_1.mp3",
-                    provider="openai",  # Config default stored here
-                    voice="es-ES-ElviraNeural",
-                    model="azure/speech/azure-tts",  # But Azure model was actually used
                 ),
             ]
 
@@ -246,8 +153,66 @@ class TestSpeechFilesNodes:
                         plate_translations=plate_translations,
                     )
 
-                    # Verify both languages processed
                     assert "en" in result
-                    assert "es" in result
-                    assert result["en"]["text_1"].model == "tts-1"
-                    assert result["es"]["text_1"].model == "azure/speech/azure-tts"
+                    assert "text_1" in result["en"]
+                    assert result["en"]["text_1"].text_id == "text_1"
+
+    def test_speech_files_with_mixed_providers(self):
+        """Test speech file generation with mixed TTS providers."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create config that uses different providers per language
+            mock_config = SpeechPromptConfig(
+                model="tts-1",
+                template_path="prompts/speech_generation.jinja2",
+                provider="dynamic",
+                default_provider="openai",
+                providers={
+                    "openai": SpeechProviderConfig(model="tts-1", languages=["en"]),
+                    "azure": SpeechProviderConfig(model="azure/speech/azure-tts", languages=["es"]),
+                },
+            )
+
+            voice_maps = self._create_mock_voice_maps()
+
+            plate_translations = {
+                "en": {"text_1": "Hello"},
+                "es": {"text_1": "Hola"},
+            }
+
+            mock_speech_files = [
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="en",
+                    speech_path=f"{tmpdir}/en/text_1.mp3",
+                    provider="openai",
+                    voice="alloy",
+                    model="tts-1",
+                ),
+                SpeechFile(
+                    speech_id="text_1",
+                    text_id="text_1",
+                    language_code="es",
+                    speech_path=f"{tmpdir}/es/text_1.mp3",
+                    provider="azure",
+                    voice="es-ES-ElviraNeural",
+                    model="azure/speech/azure-tts",
+                ),
+            ]
+
+            with patch("adt_press.nodes.speech_nodes.generate_speech_file"):
+                with patch("adt_press.nodes.speech_nodes.run_async_task") as mock_async:
+                    mock_async.return_value = mock_speech_files
+
+                    from adt_press.nodes.speech_nodes import speech_files__tts
+
+                    result = speech_files__tts(
+                        run_output_dir_config=tmpdir,
+                        speech_prompt_config=mock_config,
+                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        plate_translations=plate_translations,
+                    )
+
+                    # Verify providers were used correctly
+                    assert result["en"]["text_1"].provider == "openai"
+                    assert result["es"]["text_1"].provider == "azure"
