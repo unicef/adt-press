@@ -95,7 +95,7 @@ async def generate_speech_file(
     resolved_provider = config.get_provider_for_language(language_code)
     provider_config = config.get_provider_config(resolved_provider)
     resolved_voice = resolve_voice(resolved_provider, language_code, voice_maps)
-    
+
     # Determine output format - check if provider overrides it via api_params
     output_format = provider_config.api_params.get("response_format", config.format)
 
@@ -148,7 +148,7 @@ async def generate_speech_file(
             )
             prompt = render_template_to_string(config.template_path, context)
             speech_kwargs["instructions"] = prompt
-    
+
     response = await litellm.aspeech(**speech_kwargs)
 
     # Write the audio response to file
@@ -162,10 +162,7 @@ async def generate_speech_file(
             with open(raw_speech_path, "wb") as f:
                 f.write(content)
     except Exception as e:
-        raise ValueError(
-            f"Failed to write TTS response to file: {e}\n"
-            f"Response type: {type(response)}, Attributes: {dir(response)}"
-        ) from e
+        raise ValueError(f"Failed to write TTS response to file: {e}\nResponse type: {type(response)}, Attributes: {dir(response)}") from e
 
     # Verify file was written successfully
     if not os.path.exists(raw_speech_path) or os.path.getsize(raw_speech_path) == 0:
