@@ -98,7 +98,8 @@ class SpeechProviderConfig(BaseModel):
     """Configuration for a specific TTS provider."""
 
     model: str
-    languages: list[str] = []  # List of language codes this provider handles
+    languages: list[str] = []
+    api_params: dict[str, Any] = Field(default_factory=dict)
 
 
 class SpeechPromptConfig(PromptConfig):
@@ -191,6 +192,24 @@ class SpeechPromptConfig(PromptConfig):
             raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
 
         return self.providers[provider].model
+
+    def get_provider_config(self, provider: str) -> SpeechProviderConfig:
+        """
+        Get the provider configuration for a specific provider.
+
+        Args:
+            provider: Provider name (e.g., "openai", "azure", "elevenlabs")
+
+        Returns:
+            SpeechProviderConfig object containing model, languages, and api_params
+
+        Raises:
+            ValueError: If provider is not configured
+        """
+        if provider not in self.providers:
+            raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
+
+        return self.providers[provider]
 
 
 class HTMLPromptConfig(PromptConfig):
