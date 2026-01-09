@@ -157,3 +157,9 @@ azure:
   
   # Persian
   fa: fa-IR-DilaraNeural
+
+gemini:
+  default: Kore
+
+elevenlabs:
+  default: Rachel

@@ -61,9 +61,26 @@ speech:
     openai:
       model: gpt-4o-mini-tts
       languages: [en]  # Languages that use OpenAI
+      api_params:
+        instructions: true
     azure:
       model: azure/speech/azure-tts
       languages: [es, ta, si]  # Languages that use Azure
+      api_params:
+        instructions: false
+    gemini:
+      model: gemini/gemini-2.5-flash-preview-tts
+      languages: []
+      api_params:
+        instructions: false
+        modalities: ["audio"]
+    elevenlabs:
+      model: elevenlabs/eleven_multilingual_v2
+      languages: []
+      api_params:
+        instructions: false
+        stability: 0.5
+        similarity_boost: 0.75
   bit_rate: 64k
   sample_rate: 24000
   format: mp3

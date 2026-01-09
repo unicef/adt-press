@@ -90,27 +90,28 @@ async def generate_speech_file(
             f"language={language_code}, original_text='{text[:100] if text else 'EMPTY'}'"
         )
 
-    # Setup common paths and metadata
-    speech_id = f"{text_id}_{language_code}"
-    speech_dir = os.path.join(run_output_dir, "audio", language_code)
-    os.makedirs(speech_dir, exist_ok=True)
-    speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
-    speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{config.format}")
-
     # Get provider config and resolve voice using cached voice maps
     model = config.get_active_config(language_code)
     resolved_provider = config.get_provider_for_language(language_code)
-    resolved_voice = resolve_voice(resolved_provider, language_code, voice_maps)  # Pass cached maps
+    provider_config = config.get_provider_config(resolved_provider)
+    resolved_voice = resolve_voice(resolved_provider, language_code, voice_maps)
+    
+    # Determine output format - check if provider overrides it via api_params
+    output_format = provider_config.api_params.get("response_format", config.format)
+
+    # Setup paths using the determined output format
+    speech_id = f"{text_id}_{language_code}"
+    speech_dir = os.path.join(run_output_dir, "audio", language_code)
+    os.makedirs(speech_dir, exist_ok=True)
+    speech_path = os.path.join(speech_dir, f"{speech_id}.{output_format}")
+    speech_relative_path = os.path.join("audio", language_code, f"{speech_id}.{output_format}")
 
     # Handle non-speakable text (e.g., punctuation-only like "—")
     if not is_speakable_text(sanitized_text):
-        # Copy prebuilt empty audio file
         empty_template = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "audio", "empty.mp3")
         if not os.path.exists(empty_template):
             raise FileNotFoundError(f"Empty audio template not found: {empty_template}")
-
         shutil.copy2(empty_template, speech_path)
-
         return SpeechFile(
             text_id=text_id,
             speech_id=speech_id,
@@ -121,55 +122,59 @@ async def generate_speech_file(
             model=model,
         )
 
-    # Render prompt template for TTS instructions
-    context = dict(
-        language_code=language_code,
-        language=language.name,
-        text=sanitized_text,
-        examples=config.examples,
-    )
-    prompt = render_template_to_string(config.template_path, context)
-
     # Generate speech via TTS
-    raw_speech_path = os.path.join(speech_dir, f"{speech_id}_raw.{config.format}")
+    raw_speech_path = os.path.join(speech_dir, f"{speech_id}_raw.{output_format}")
 
-    # Build kwargs - Azure Speech doesn't support instructions parameter
+    # Build base kwargs with default format
     speech_kwargs = {
         "model": model,
         "voice": resolved_voice,
         "input": sanitized_text,
-        "response_format": config.format,
+        "response_format": output_format,  # Use determined format, not config.format
     }
 
-    # Only add instructions for OpenAI-compatible models (not Azure Speech)
-    if not model.startswith("azure/"):
-        speech_kwargs["instructions"] = prompt
-
+    # Process provider-specific api_params
+    for key, value in provider_config.api_params.items():
+        if key != "instructions":
+            # Override or add parameter (including response_format if specified)
+            speech_kwargs[key] = value
+        elif value:
+            # Render prompt template for TTS instructions
+            context = dict(
+                language_code=language_code,
+                language=language.name,
+                text=sanitized_text,
+                examples=config.examples,
+            )
+            prompt = render_template_to_string(config.template_path, context)
+            speech_kwargs["instructions"] = prompt
+    
     response = await litellm.aspeech(**speech_kwargs)
 
     # Write the audio response to file
     try:
         if hasattr(response, "write_to_file"):
-            # Preferred litellm method
             response.write_to_file(raw_speech_path)
         else:
-            # Fallback: treat as bytes-like content
             content = response.content if hasattr(response, "content") else response.read()
             if hasattr(content, "__await__"):
                 content = await content
             with open(raw_speech_path, "wb") as f:
                 f.write(content)
     except Exception as e:
-        raise ValueError(f"Failed to write TTS response to file: {e}\nResponse type: {type(response)}, Attributes: {dir(response)}") from e
+        raise ValueError(
+            f"Failed to write TTS response to file: {e}\n"
+            f"Response type: {type(response)}, Attributes: {dir(response)}"
+        ) from e
 
     # Verify file was written successfully
     if not os.path.exists(raw_speech_path) or os.path.getsize(raw_speech_path) == 0:
         raise FileNotFoundError(f"TTS output file not created or empty: {raw_speech_path}")
 
-    # Transcode to quality specified in config
-    raw = AudioSegment.from_file(raw_speech_path, format=config.format)
+    # Transcode to quality specified in config using the determined format
+    raw = AudioSegment.from_file(raw_speech_path, format=output_format)
     raw.set_frame_rate(config.sample_rate)
-    raw.export(speech_path, bitrate=config.bit_rate, format=config.format, parameters=["-ac", "1"])
+    raw.export(speech_path, bitrate=config.bit_rate, format=output_format, parameters=["-ac", "1"])
 
     return SpeechFile(
         speech_id=speech_id,
