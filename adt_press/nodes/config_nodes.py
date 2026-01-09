@@ -349,6 +349,7 @@ def strategy_config(config: DictConfig) -> dict[str, str]:
             "easy_read_strategy": config["easy_read_strategy"],
             "activity_strategy": config["activity_strategy"],
             "speech_strategy": config["speech_strategy"],
+            "quiz_strategy": config["quiz_strategy"],
         }
     )
 

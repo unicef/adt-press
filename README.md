@@ -63,7 +63,7 @@ uv sync
 Run the main script with the default configuration:
 
 ```bash
-uv run adt-press.py label=raven pdf_path=assets/raven.pdf
+uv run adt-press.py pdf_path=assets/raven.pdf
 ```
 
 ### Configuration
@@ -78,8 +78,8 @@ uv run adt-press.py label=mydocument pdf_path=/path/to/your/document.pdf page_ra
 
 ### Key Configuration Parameters
 
-- `label`: The label for this PDF file, will be used as the subdirectory name under `output_dir`
 - `pdf_path`: Path to the PDF file to process
+- `label`: The label for this PDF file, will be used as the subdirectory name under `output_dir`. If not provided, label will be generated based on the filename portion of `pdf_path`
 - `page_range`: Range of pages to process (start and end)
 - `output_dir`: Base directory to store outputs
 - `template_dir`: Directory containing HTML templates

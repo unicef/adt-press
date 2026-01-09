@@ -8,6 +8,7 @@ from adt_press.models.config import QuizPromptConfig
 from adt_press.models.section import PageSection, SectionQuiz
 from adt_press.models.text import PageTextGroup
 from adt_press.utils.file import cached_read_text_file
+from adt_press.utils.languages import Language
 
 
 class Quiz(BaseModel):
@@ -56,11 +57,14 @@ class QuizResponse(BaseModel):
     reasoning: str
 
 
-async def generate_quiz(config: QuizPromptConfig, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]) -> SectionQuiz:
+async def generate_quiz(
+    config: QuizPromptConfig, language: Language, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]
+) -> SectionQuiz:
     context = dict(
         sections=sections,
         text_groups=text_groups_by_id,
         examples=config.examples,
+        language=language,
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
