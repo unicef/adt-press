@@ -22,4 +22,4 @@ eval:
       report_template_path: templates/eval/text_type_report.html
 
   # Whether to use cached log files instead of calling the LLM (useful for debugging)
-  use_cache: False
+  use_cached_llm_results: False

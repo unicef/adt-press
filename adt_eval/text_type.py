@@ -47,7 +47,7 @@ class TextTypeEvaluator(BaseEvaluator):
 
                 return page_texts
 
-    async def process_case(self, step: int, tc: Dict[str, Any], use_cache: bool) -> Dict[str, Any]:
+    async def process_case(self, step: int, tc: Dict[str, Any], use_cached_llm_results: bool) -> Dict[str, Any]:
         """Process a single test case."""
 
         ## Get the gold standard for test case
@@ -79,13 +79,11 @@ class TextTypeEvaluator(BaseEvaluator):
         print(f"[{tc['id']:8d}] {text[:65].replace('\n', ' '):<70s}")
 
         # Call the LLM for text type classification
-        if (use_cache==False) or (not os.path.exists(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json")):
-            page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
-        else:
+        if use_cached_llm_results and os.path.exists(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json"):
             print(f"Skipping LLM call for case {tc['id']} and using cached results from the logs.")
             page_texts = self.build_page_texts_from_log(Path(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json"))
-
-            
+        else:
+            page_texts = await get_page_text(str(self.output_dir), f"eval_{tc['id']}", self.prompt_config, page)
 
         result["page_texts"] = page_texts.model_dump()
 
