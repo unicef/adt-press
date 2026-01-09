@@ -72,13 +72,19 @@ The `pdf_extract.json` file contains:
 
 ```json
 {
-  "pdf_metadata": {
+  "extract_metadata": {
     "filename": "document.pdf",
     "total_pages": 10,
     "extracted_pages": [1, 2, 3],
     "extraction_timestamp": "2025-09-16T...",
     "start_page": 1,
-    "end_page": 3
+    "end_page": 3,
+    "spread_mode": false
+  },
+  "pdf_metadata": {
+    "format": "PDF 1.5",
+    "title": "Hyena and Raven",
+    "producer": "Prince 14.2 (www.princexml.com)"
   },
   "pages": [
     {

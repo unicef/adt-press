@@ -5,13 +5,13 @@
         <!-- Container for centered content -->
         <div class="container mx-auto relative flex items-center justify-center flex-1">
             <!-- Submit + Reset button -->
-            <div class="absolute right-0 flex flex-row-reverse gap-2 scale-90 sm:scale-100">
+            <div class="absolute right-0 flex flex-row-reverse gap-2 scale-90 sm:scale-100" id="submit-reset-container">
                 <button aria-label="Submit"
-                    class="mr-0 lg:mr-12 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hidden"
                     id="submit-button" type="button" data-id="submit-text" data-aria-id="submit-text">Submit
                 </button>
                 <button aria-label="Reset"
-                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-blue-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-blue-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hidden"
                     id="reset-button" type="button" data-aria-id="reset-text"><i class="fa fa-refresh"></i>
                 </button>
 
@@ -55,28 +55,28 @@
     class="z--1 fixed bottom-16 right-20 bg-gray-100 rounded-lg shadow-lg mb-3 py-0 px-2 flex items-center space-x-6 border border-gray-200 hidden">
     <!-- Settings Panel (hidden by default) -->
     <div class="opacity-0 h-0 pointer-events-none absolute bottom-full right-0 bg-[#083149] rounded-lg mb-2 w-32"
-        id="read-aloud-settings">
+        id="read-aloud-settings" role="menu" aria-hidden="true" inert>
         <ul class="flex flex-col items-stretch p-1">
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-0-5">
                     <span data-id="read-aloud-speed-slow">Slow</span>
                 </button>
             </li>
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-1">
                     <span data-id="read-aloud-speed-normal">Normal</span>
                 </button>
             </li>
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-1-5">
                     <span data-id="read-aloud-speed-fast">Fast</span>
                 </button>
             </li>
             <li class="w-full">
-                <button type="button"
+                <button type="button" role="menuitem"
                     class="text-white rounded text-sm py-2 px-4 w-full hover:bg-[#1a3952] hover:text-white text-left read-aloud-change-speed speed-2">
                     <span data-id="read-aloud-speed-very-fast">Very Fast</span>
                 </button>
@@ -104,8 +104,10 @@
     </button>
 
     <button type="button" id="read-aloud-speed"
-        class="text-gray-700 hover:text-gray-900 text-sm font-medium border border-gray-300 rounded px-2">
-        <span data-id="read-aloud-speed-normal">Normal</span>
+        class="text-gray-700 hover:text-gray-900 text-sm font-medium border border-gray-300 rounded px-2"
+        aria-label="Playback speed: Normal" aria-haspopup="menu" aria-expanded="false" 
+        aria-controls="read-aloud-settings" data-aria-id="read-aloud-speed-label">
+        <span data-id="read-aloud-speed-normal" aria-hidden="true">Normal</span>
     </button>
 </div>
 
@@ -177,7 +179,8 @@
 <!-- Smart Utility Sidebar -->
 <div id="keyboard-shortcuts-announcement" class="sr-only" role="status" aria-live="polite"></div>
 <aside id="sidebar" role="complementary" aria-hidden="true" inert
-    class="z-60 w-96 bg-white shadow-lg border-l border-gray-300 fixed right-0 top-0 transition-transform transform translate-x-full hidden rounded-lg min-h-0 flex flex-col">
+    class="z-60 w-96 bg-white shadow-lg border-l border-gray-300 fixed right-0 top-0 rounded-lg min-h-0 flex flex-col"
+    style="opacity:0; visibility:hidden; pointer-events:none; transition: opacity 0.3s ease;">
     <div id="sidebar-content" class="max-h-[calc(100vh-5rem)] flex-shrink-0">
         <!-- Fixed Header -->
         <div class="p-4 relative z-50">

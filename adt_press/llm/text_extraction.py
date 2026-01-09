@@ -1,12 +1,14 @@
-import instructor
 from banks import Prompt
-from litellm import acompletion
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
+from adt_press.models.config import TextGroupType as TextGroupTypeConfig
+from adt_press.models.config import TextType as TextTypeConfig
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts, TextGroupType, TextType
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
+from adt_press.utils.languages import Language
 from adt_press.utils.logging import io_logger
 
 
@@ -26,19 +28,31 @@ class TextResponse(CleanTextBaseModel):
 
 
 @io_logger(label="text_extraction")
-async def get_page_text(output_dir: str, task_id: str, config: PromptConfig, page: Page) -> PageTexts:
+async def get_page_text(
+    output_dir: str,
+    task_id: str,
+    config: PromptConfig,
+    text_types: dict[str, TextTypeConfig],
+    text_group_types: dict[str, TextGroupTypeConfig],
+    page: Page,
+    language: Language,
+) -> PageTexts:
     context = dict(
         page=page,
+        language=language,  # Add to context
         examples=config.examples,
+        text_types=text_types,
+        text_group_types=text_group_types,
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
     response: TextResponse = await client.chat.completions.create(
         model=config.model,
         response_model=TextResponse,
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
+        timeout=config.timeout,
     )
 
     return PageTexts(

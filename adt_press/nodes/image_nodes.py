@@ -14,10 +14,11 @@ from adt_press.models.image import (
     ProcessedImage,
     PrunedImage,
 )
+from adt_press.models.pdf import Page
 from adt_press.nodes.config_nodes import BlankImageFilterConfig, ImageSizeFilterConfig
 from adt_press.utils.file import write_file
 from adt_press.utils.image import crop_image, image_bytes, is_blank_image
-from adt_press.utils.pdf import Page
+from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -117,14 +118,14 @@ def filtered_images(pdf_images: list[Image], pruned_image_ids: set[str]) -> list
 
 @config.when(caption_strategy="llm")
 def image_captions_by_id__llm(
-    plate_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
+    plate_language: Language, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
 ) -> dict[str, ImageCaption]:
     async def generate_captions():
         captions = []
         for page in pdf_pages:
             for image in page.images:
                 if image.image_id not in pruned_image_ids:
-                    captions.append(get_image_caption(caption_prompt_config, page, image, plate_language_config))
+                    captions.append(get_image_caption(caption_prompt_config, page, image, plate_language))
 
         return await gather_with_limit(captions, caption_prompt_config.rate_limit)
 
@@ -133,7 +134,7 @@ def image_captions_by_id__llm(
 
 @config.when(caption_strategy="none")
 def image_captions_by_id__none(
-    plate_language_config: str, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
+    plate_language: Language, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
 ) -> dict[str, ImageCaption]:
     captions = {}
     for page in pdf_pages:

@@ -7,9 +7,9 @@
 
 import { state, setState } from './state.js';
 import { getCookie, setCookie } from './cookies.js';
-import { 
-    updatePlayPauseIcon, 
-    deactivateAudioElements, 
+import {
+    updatePlayPauseIcon,
+    deactivateAudioElements,
     initializeAudioElements,
     highlightElement,
     unhighlightElement,
@@ -63,18 +63,29 @@ export const initializeActivityAudioElements = () => {
  * Plays a sound effect for activities.
  * @param {string} soundKey - The key of the sound to play.
  */
-export const playActivitySound = async (soundKey) => {
-    if (!activityAudio?.[soundKey]) {
+export const playActivitySound = (soundKey) => {
+    if (!activityAudio || !activityAudio[soundKey]) {
+        initializeActivityAudioElements();
+    }
+
+    const soundEffect = activityAudio?.[soundKey];
+    if (!soundEffect) {
         console.log(`Sound ${soundKey} not available`);
-        return;
+        return null;
     }
 
     try {
-        activityAudio[soundKey].currentTime = 0;
-        await activityAudio[soundKey].play();
+        soundEffect.pause();
+        soundEffect.currentTime = 0;
+        soundEffect.play().catch((err) => {
+            console.log(`Error playing ${soundKey} sound:`, err);
+        });
     } catch (err) {
-        console.log(`Error playing ${soundKey} sound:`, err);
+        console.warn(`Error playing ${soundKey} sound:`, err);
+        return null;
     }
+
+    return soundEffect;
 };
 
 /**
@@ -179,10 +190,8 @@ export const stopAudio = () => {
  */
 export const togglePlayPause = () => {
     if (state.isPlaying) {
-        console.log('Pausing audio...');
         stopAudio();
     } else {
-        console.log('Resuming audio...');
         setState('isPlaying', true);
         updatePlayPauseIcon(true); // Update play button state
         playAudioSequentially();
@@ -194,7 +203,6 @@ export const togglePlayPause = () => {
  */
 export const playAudioSequentially = async () => {
     if (isProcessingAudio || !hasUserInteracted) {
-        console.log('Audio processing already in progress or waiting for user interaction');
         return;
     }
 
@@ -238,7 +246,6 @@ const processAudioQueue = async () => {
     const { currentIndex, audioElements, audioSpeed, describeImagesMode, navigationDirection } = state;
 
     if (currentIndex < 0 || currentIndex >= audioElements.length) {
-        console.log(`Audio index: ${state.currentIndex} out of bounds in elements of length ${audioElements.length}`);
         stopAudio();
         state.currentIndex = 0; // Reset index if out of bounds
         state.navigationDirection = 'forward'; // Reset navigation direction
@@ -246,10 +253,10 @@ const processAudioQueue = async () => {
     }
 
     // Clear leftover highlights first
-    unhighlightAllElements(); 
+    unhighlightAllElements();
 
     const { element, audioSrc } = audioElements[currentIndex];
-    
+
     // Check if current element is an image and should be skipped
     const isImage = element.tagName.toLowerCase() === 'img';
     if (isImage && !describeImagesMode) {
@@ -258,10 +265,10 @@ const processAudioQueue = async () => {
             // Determine which direction to navigate based on the last user action
             const direction = navigationDirection === 'backward' ? -1 : 1;
             setState('currentIndex', currentIndex + direction);
-            
+
             // We don't reset navigation direction here yet - we need to keep skipping in the same direction
             // until we find a non-image element
-            
+
             await processAudioQueue();
             return;
         } else {
@@ -269,7 +276,7 @@ const processAudioQueue = async () => {
             return;
         }
     }
-    
+
     try {
         highlightElement(element);
         await playAudioWithPromise(audioSrc, audioSpeed);
@@ -367,10 +374,10 @@ export const changeAudioSpeed = (event) => {
     const button = event.target.closest('.read-aloud-change-speed');
     const speedClass = Array.from(button.classList).find(cls => cls.startsWith('speed-'));
     const newSpeed = SPEED_MAPPING[speedClass];
-    
+
     setState('audioSpeed', newSpeed);
     setCookie('audioSpeed', newSpeed, 7);
-    
+
     updateAudioSpeed(newSpeed);
     updateSpeedDisplay(newSpeed);
     updateSpeedButtons(button);
@@ -399,9 +406,16 @@ const updateAudioSpeed = (speed) => {
 const updateSpeedDisplay = (speed) => {
     const speedClass = Object.entries(SPEED_MAPPING)
         .find(([key, value]) => value === speed)?.[0] || 'speed-1';
-    const display = document.querySelector(`[class*="${speedClass}"]`)?.innerHTML;
+    const speedButton = document.querySelector(`[class*="${speedClass}"]`);
+    const display = speedButton?.innerHTML;
+
     if (display) {
-        document.getElementById('read-aloud-speed').innerHTML = display;
+        const speedButtonElement = document.getElementById('read-aloud-speed');
+        speedButtonElement.innerHTML = display;
+
+        // Update aria-label for screen readers
+        const speedText = speedButton.textContent.trim();
+        speedButtonElement.setAttribute('aria-label', `Playback speed: ${speedText}`);
     }
 };
 
@@ -430,14 +444,14 @@ const updateSpeedButtons = (selectedButton) => {
 export const toggleReadAloud = ({ stopCalls = false } = {}) => {
     stopAudio();
     unhighlightAllElements();
-     
+
     // If turning read aloud off, remove all audio handlers
     if (state.readAloudMode) {
         deactivateAudioElements();
     } else {
         initializeAudioElements();
     }
-    
+
     const newState = !state.readAloudMode;
     setState('readAloudMode', newState);
     setCookie('readAloudMode', newState.toString(), 7);
@@ -445,7 +459,7 @@ export const toggleReadAloud = ({ stopCalls = false } = {}) => {
 
     // Track the toggle event
     trackToggleEvent('ReadAloud', newState);
-    
+
     // Toggle UI elements
     const playBar = document.getElementById("play-bar");
     const ttsOptionsContainer = document.getElementById("tts-options-container");
@@ -456,7 +470,7 @@ export const toggleReadAloud = ({ stopCalls = false } = {}) => {
     if (newState) {
         if (playBar) playBar.classList.remove("hidden");
         if (ttsQuickToggleButton) ttsQuickToggleButton.classList.remove("hidden");
-        if ((isFeatureEnabled("autoplay") ||isFeatureEnabled("describeImages")) && ttsOptionsContainer) {
+        if ((isFeatureEnabled("autoplay") || isFeatureEnabled("describeImages")) && ttsOptionsContainer) {
             ttsOptionsContainer.classList.remove("hidden");
             if (isFeatureEnabled("autoplay")) autoplayContainer?.classList.remove("hidden");
             if (isFeatureEnabled("describeImages")) describeImagesContainer?.classList.remove("hidden");
@@ -482,15 +496,15 @@ export const toggleReadAloud = ({ stopCalls = false } = {}) => {
  */
 export const initializeTtsQuickToggle = () => {
     const ttsQuickToggleButton = document.getElementById("tts-quick-toggle-button");
-    
+
     if (ttsQuickToggleButton) {
-       // Show the ttsQuickToggleButton if the function is called
+        // Show the ttsQuickToggleButton if the function is called
         ttsQuickToggleButton.classList.remove("hidden");
-        
+
         // Add click event listener
         ttsQuickToggleButton.addEventListener("click", (e) => {
             e.preventDefault();
-            
+
             // Toggle read aloud mode
             toggleReadAloud();
         });

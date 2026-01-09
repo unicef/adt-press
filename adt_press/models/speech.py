@@ -6,3 +6,6 @@ class SpeechFile(BaseModel):
     speech_path: str
     language_code: str
     text_id: str
+    provider: str
+    voice: str
+    model: str

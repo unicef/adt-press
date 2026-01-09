@@ -1,78 +1,48 @@
-LANGUAGE_MAP = {
-    "sq": "Albanian",
-    "am": "Amharic",
-    "ar": "Arabic",
-    "hy": "Armenian",
-    "bn": "Bengali",
-    "bs": "Bosnian",
-    "bg": "Bulgarian",
-    "my": "Burmese",
-    "ca": "Catalan",
-    "zh": "Chinese",
-    "hr": "Croatian",
-    "cs": "Czech",
-    "cus": "Cushitic",
-    "da": "Danish",
-    "dz": "Dzongkha",
-    "nl": "Dutch",
-    "en": "English",
-    "et": "Estonian",
-    "fi": "Finnish",
-    "fr": "French",
-    "ka": "Georgian",
-    "de": "German",
-    "el": "Greek",
-    "gu": "Gujarati",
-    "ht": "Haitian",
-    "he": "Hebrew",
-    "hi": "Hindi",
-    "hmn": "Hmong",
-    "hu": "Hungarian",
-    "is": "Icelandic",
-    "id": "Indonesian",
-    "it": "Italian",
-    "ja": "Japanese",
-    "kn": "Kannada",
-    "kk": "Kazakh",
-    "ko": "Korean",
-    "lv": "Latvian",
-    "lt": "Lithuanian",
-    "mk": "Macedonian",
-    "ml": "Malayalam",
-    "ms": "Malay",
-    "mi": "Te Reo Maori",
-    "mr": "Marathi",
-    "mn": "Mongolian",
-    "ne": "Nepali",
-    "no": "Norwegian",
-    "pa": "Punjabi",
-    "pl": "Polish",
-    "pt": "Portuguese",
-    "ro": "Romanian",
-    "ru": "Russian",
-    "sr": "Serbian",
-    "sk": "Slovak",
-    "sl": "Slovenian",
-    "so": "Somali",
-    "es": "Spanish",
-    "sw": "Swahili",
-    "sv": "Swedish",
-    "ta": "Tamil",
-    "te": "Telugu",
-    "th": "Thai",
-    "tl": "Tagalog",
-    "tr": "Turkish",
-    "uk": "Ukrainian",
-    "ur": "Urdu",
-    "vi": "Vietnamese",
-}
-
-CUSTOM_LANGUAGE_MAP = {
-    "es_uy": "Spanish (Uruguay)",
-}
+import pycountry
+from pydantic import BaseModel
 
 
-LANGUAGE_HELP = (
-    "A list of languages to process the textbook into. Supported language codes are (format is [<language>,<language_code>]):\n\n"
-    + "\t\t".join([f"[{v}:{k}]" for k, v in LANGUAGE_MAP.items()])
-)
+class Language(BaseModel):
+    code: str
+    language_code: str
+    country_code: str = ""
+    name: str
+
+    @classmethod
+    def from_code(cls, code: str) -> "Language":
+        """Create a Language from a language code string like 'en' or 'en-US'."""
+        # Parse and validate the language code
+        normalized = code.lower()
+        parts = normalized.split("-")
+
+        # Validate language code (ISO 639-1 or ISO 639-2)
+        lang_code = parts[0]
+        lang = pycountry.languages.get(alpha_2=lang_code)
+        if not lang:
+            raise ValueError(f"Invalid language code '{lang_code}'. Must be a valid two letter ISO 639 language code.")
+
+        # If locale variant provided, validate country code
+        if len(parts) == 2:
+            country_code = parts[1].upper()
+            country = pycountry.countries.get(alpha_2=country_code)
+            if not country:
+                raise ValueError(f"Invalid country code '{country_code}' in locale '{code}'. Must be a valid ISO 3166 country code.")
+        else:
+            country_code = ""
+
+        # Get language name
+        name = lang.name
+
+        # Add country name in parentheses if present
+        if country_code:
+            name = f"{name} ({country.name})"
+
+        return cls(code=normalized, language_code=lang_code, country_code=country_code, name=name)
+
+    def __eq__(self, other):
+        if not isinstance(other, Language):
+            return False
+        return self.code == other.code
+
+    def __hash__(self):
+        return hash(self.code)

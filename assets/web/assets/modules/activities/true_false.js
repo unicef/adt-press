@@ -7,13 +7,10 @@ import { executeMail } from './send-email.js';
 
 
 export const prepareTrueFalse = (section) => {
-    console.log("=== Preparing True/False Activity ===");
 
     initializeAudio();
     enhanceKeyboardAccessibility(section);
     setupRadioButtons(section);
-    
-    console.log("=== Activity Preparation Complete ===");
 };
 
 const initializeAudio = () => {
@@ -23,76 +20,76 @@ const initializeAudio = () => {
 if (document.getElementsByTagName("h1").length < 0) {
     localStorage.setItem("namePage", document.getElementsByTagName("h2")[0].innerText);
 } else if (document.getElementsByTagName("h1").length > 0) {
-    localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText);
+    localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 }
 
 // Inside the enhanceKeyboardAccessibility function
 const enhanceKeyboardAccessibility = (section) => {
     // Ensure each fieldset has the proper keyboard navigation
     const fieldsets = section.querySelectorAll('fieldset');
-    
+
     fieldsets.forEach(fieldset => {
         const radios = Array.from(fieldset.querySelectorAll('input[type="radio"]'));
         const legendText = fieldset.querySelector('legend span')?.textContent || '';
-        
+
         if (radios.length > 0) {
             // We'll enhance all radio buttons with proper key handling
             radios.forEach(radio => {
                 // First remove any existing listeners to avoid duplicates
                 const newRadio = radio.cloneNode(true);
                 radio.parentNode.replaceChild(newRadio, radio);
-                
+
                 // Now add our enhanced listeners
                 newRadio.addEventListener('keydown', (event) => {
                     // Handle Enter key for selection
                     if (event.key === 'Enter') {
                         event.preventDefault();
                         newRadio.checked = true;
-                        
+
                         // Announce the selection with question context
                         announceSelectionWithContext(newRadio, legendText);
-                        
+
                         // Trigger change event
                         const changeEvent = new Event('change', { bubbles: true });
                         newRadio.dispatchEvent(changeEvent);
                     }
-                    
+
                     // Handle arrow keys
-                    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || 
+                    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' ||
                         event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                        
+
                         event.preventDefault(); // Prevent default scroll behavior
                         event.stopPropagation(); // Prevent bubbling to page navigation
-                        
+
                         let nextIndex;
                         const currentIndex = radios.indexOf(newRadio);
-                        
+
                         // Determine which radio button to focus next
                         if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
                             nextIndex = currentIndex === 0 ? radios.length - 1 : currentIndex - 1;
                         } else {
                             nextIndex = currentIndex === radios.length - 1 ? 0 : currentIndex + 1;
                         }
-                        
+
                         // Focus and select the next radio button
                         radios[nextIndex].focus();
                         radios[nextIndex].checked = true;
-                        
+
                         // Announce the selection with question context
                         announceSelectionWithContext(radios[nextIndex], legendText);
-                        
+
                         // Trigger the change event to handle any logic tied to selection
                         const changeEvent = new Event('change', { bubbles: true });
                         radios[nextIndex].dispatchEvent(changeEvent);
                     }
                 });
-                
+
                 // Also enhance the onFocus event to announce the full context
                 newRadio.addEventListener('focus', () => {
                     // When a radio button gets focus, announce the question and current state
                     const optionText = newRadio.value === 'yes' ? 'Sí' : 'No';
                     const isChecked = newRadio.checked ? 'seleccionado' : 'no seleccionado';
-                    
+
                     // Find or create an announcement element
                     const focusAnnouncement = document.getElementById('focus-announcement') || createFocusAnnouncement();
                     focusAnnouncement.textContent = `${legendText} - Opción: ${optionText}, ${isChecked}`;
@@ -105,7 +102,7 @@ const enhanceKeyboardAccessibility = (section) => {
 // Helper function to announce selection with question context
 const announceSelectionWithContext = (radio, questionText) => {
     const optionText = radio.value === 'yes' ? 'Sí' : 'No';
-    
+
     // Find or create the announcement element
     const announcement = document.getElementById('keyboard-action-announcement') || createKeyboardActionAnnouncement();
     announcement.textContent = `${questionText} - ${optionText} seleccionado`;
@@ -135,17 +132,15 @@ const createFocusAnnouncement = () => {
 
 const setupRadioButtons = (section) => {
     const buttons = section.querySelectorAll("input[type='radio']");
-    console.log("Found radio buttons:", buttons.length);
 
     buttons.forEach((button, index) => {
-        logButtonDetails(button, index);
         restorePreviousSelection(button);
         addButtonListener(button);
-        
+
         // Ensure label and input are properly associated
         const buttonId = button.id || `tf-radio-${button.name}-${button.value}-${index}`;
         button.id = buttonId;
-        
+
         const label = button.closest('label');
         if (label) {
             label.setAttribute('for', buttonId);
@@ -172,16 +167,7 @@ const restorePreviousSelection = (button) => {
     }
 };
 
-const logButtonDetails = (button, index) => {
-    console.log(`Button ${index + 1}:`, {
-        value: button.value,
-        dataActivityItem: button.getAttribute("data-activity-item"),
-        name: button.name
-    });
-};
-
 const addButtonListener = (button) => {
-    console.log("Adding event listener to button:", button.value);
     button.addEventListener("change", () => {
         playActivitySound('drop');
 
@@ -203,8 +189,6 @@ const addButtonListener = (button) => {
             areaId: areaId
         };
 
-        console.log("Button clicked:", selectedData);
-
         // Guardar en localStorage con `activityId` y `data-area-id`
         localStorage.setItem(storageKey, JSON.stringify(selectedData));
 
@@ -215,9 +199,8 @@ const addButtonListener = (button) => {
 // Add a new function to clear feedback for a specific question
 const clearFeedbackForQuestion = (questionName) => {
     // Find all radio buttons for this question
-    console.log("Clearing feedback for question:", questionName);
     const radioButtons = document.querySelectorAll(`section input[name="${questionName}"]`);
-    
+
     radioButtons.forEach(radio => {
         // Get the label containing this radio button
         const parentLabel = radio.closest('label');
@@ -225,29 +208,27 @@ const clearFeedbackForQuestion = (questionName) => {
             console.warn("No parent label found for radio button");
             return;
         }
-        
+
         // Reset validation mark - it's inside the div, not directly under the parentLabel
         const buttonDiv = parentLabel.querySelector('div');
         if (buttonDiv) {
             const validationMark = buttonDiv.querySelector(".validation-mark");
             if (validationMark) {
-                console.log("Found validation mark, hiding it");
                 validationMark.classList.add('hidden');
                 validationMark.textContent = '';
             } else {
                 console.warn("No validation mark found in button div");
             }
-            
+
             // Reset button styling - need to remove ALL color classes
-            console.log("Resetting button div styles");
             buttonDiv.classList.remove(
-                'bg-green-500', 'bg-red-500', 
+                'bg-green-500', 'bg-red-500',
                 'text-white', 'text-green-700', 'text-red-700'
             );
-            
+
             // Restore original styling
             buttonDiv.classList.add('bg-gray-200');
-            
+
             // If this button is checked, apply the blue style
             if (radio.checked) {
                 buttonDiv.classList.add('bg-blue-500', 'text-white');
@@ -258,7 +239,7 @@ const clearFeedbackForQuestion = (questionName) => {
         } else {
             console.warn("No button div found for radio");
         }
-        
+
         // Remove any aria attributes and screen reader feedback
         parentLabel.removeAttribute('aria-invalid');
         const srFeedback = parentLabel.querySelector('.sr-validation-feedback');
@@ -266,11 +247,11 @@ const clearFeedbackForQuestion = (questionName) => {
             srFeedback.remove();
         }
     });
-    
+
     // Announce the change to screen readers
     const announcement = document.getElementById('validation-results-announcement');
     if (announcement) {
-        announcement.textContent = translateText("Selección cambiada, vuelve a enviar tu respuesta");
+        announcement.textContent = translateText('selection-changed-resubmit');
     }
 };
 
@@ -281,22 +262,22 @@ export const checkTrueFalse = () => {
 
     playAppropriateSound(validationResults.allCorrect);
     const activityId = location.pathname
-    .substring(location.pathname.lastIndexOf("/") + 1)
-    .split(".")[0];
+        .substring(location.pathname.lastIndexOf("/") + 1)
+        .split(".")[0];
     let key = activityId + "-intentos";
     let intentCount = localStorage.getItem(key);
     if (intentCount === null) {
-            localStorage.setItem(key, "0");
-            intentCount = 0;
-        } else {
-            intentCount = parseInt(intentCount, 10);
-        }
+        localStorage.setItem(key, "0");
+        intentCount = 0;
+    } else {
+        intentCount = parseInt(intentCount, 10);
+    }
 
-        intentCount++;
-        localStorage.setItem(key, intentCount.toString()); 
-    
+    intentCount++;
+    localStorage.setItem(key, intentCount.toString());
+
     // Announce results to screen readers
-    const resultsAnnouncement = document.getElementById('validation-results-announcement') || 
+    const resultsAnnouncement = document.getElementById('validation-results-announcement') ||
         createResultsAnnouncementElement();
 
     if (validationResults.allCorrect) {
@@ -306,32 +287,31 @@ export const checkTrueFalse = () => {
             .substring(location.pathname.lastIndexOf("/") + 1)
             .split(".")[0];
 
-         // Recuperar el arreglo de actividades completadas del localStorage
-         const storedActivities = localStorage.getItem("completedActivities");
-         let completedActivities = storedActivities ? JSON.parse(storedActivities) : []; 
-     
-         const namePage = localStorage.getItem("namePage");
-         const timeDone = new Date().toLocaleString("es-ES");
-         const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
-     
-         // Remover cualquier entrada anterior con el mismo activityId
-         completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
-     
-         // Agregar la nueva entrada actualizada
-         completedActivities.push(newActivityId);
-     
-         // Guardar en localStorage
-         localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
-     
-        localStorage.setItem("namePage", document.getElementsByTagName("h1")[0].innerText)
-        console.log(document.getElementsByTagName("h1")[0].innerText);
+        // Recuperar el arreglo de actividades completadas del localStorage
+        const storedActivities = localStorage.getItem("completedActivities");
+        let completedActivities = storedActivities ? JSON.parse(storedActivities) : [];
+
+        const namePage = localStorage.getItem("namePage");
+        const timeDone = new Date().toLocaleString("es-ES");
+        const newActivityId = `${activityId}-${namePage}-${intentCount}-${timeDone}`;
+
+        // Remover cualquier entrada anterior con el mismo activityId
+        completedActivities = completedActivities.filter(id => !id.startsWith(`${activityId}-`));
+
+        // Agregar la nueva entrada actualizada
+        completedActivities.push(newActivityId);
+
+        // Guardar en localStorage
+        localStorage.setItem("completedActivities", JSON.stringify(completedActivities));
+
+        localStorage.setItem("namePage", document.querySelector("h1")?.innerText ?? "unknown_page");
 
         executeMail(ActivityTypes.TRUE_FALSE);
 
     } else {
         // Count incorrect answers
         const incorrectCount = validationResults.incorrectQuestions?.length || 0;
-        
+
         if (incorrectCount > 0) {
             resultsAnnouncement.textContent = translateText("Hay " + incorrectCount + " respuestas incorrectas. Por favor, revisa tus respuestas e intenta de nuevo.");
         } else {
@@ -342,7 +322,7 @@ export const checkTrueFalse = () => {
         validationResults.allCorrect,
         translateText("next-activity"),
         ActivityTypes.TRUE_FALSE
-      );
+    );
 
 
 };
@@ -377,7 +357,6 @@ const validateAllQuestions = (allQuestions) => {
         );
 
         if (!selectedButton) {
-            console.log(`Question ${questionNum}: No selection made`);
             allCorrect = false;
             allAnswered = false;
             return;
@@ -419,19 +398,19 @@ const updateValidationDisplay = (selectedButton, isCorrect) => {
 const updateScreenReaderFeedback = (button, isCorrect) => {
     // Find the parent label or closest container
     const parentLabel = button.closest('label');
-    
+
     if (parentLabel) {
         // Add screen reader feedback
         let srFeedback = parentLabel.querySelector('.sr-validation-feedback');
-        
+
         if (!srFeedback) {
             srFeedback = document.createElement('span');
             srFeedback.className = 'sr-only sr-validation-feedback';
             parentLabel.appendChild(srFeedback);
         }
-        
-        srFeedback.textContent = isCorrect ? 
-            translateText("Esta respuesta es correcta") : 
+
+        srFeedback.textContent = isCorrect ?
+            translateText("Esta respuesta es correcta") :
             translateText("Esta respuesta es incorrecta");
     }
 };
@@ -465,7 +444,7 @@ const updateButtonStyling = (button, isCorrect) => {
     if (buttonDiv) {
         buttonDiv.classList.remove('bg-gray-200', 'bg-green-500', 'bg-red-500', 'peer-checked:bg-blue-500');
         buttonDiv.classList.add(isCorrect ? 'bg-green-500' : 'bg-red-500');
-        
+
         // Set the proper ARIA attributes
         const parentLabel = button.closest('label');
         if (parentLabel) {
@@ -482,13 +461,13 @@ export const retryTrueFalse = () => {
     clearPreviousFeedback();
     resetButtonStates();
     setState('selectedButton', null);
-    
+
     // Clear screen reader announcements
     const resultsAnnouncement = document.getElementById('validation-results-announcement');
     if (resultsAnnouncement) {
         resultsAnnouncement.textContent = '';
     }
-    
+
     // Remove SR feedback elements
     document.querySelectorAll('.sr-validation-feedback').forEach(el => el.remove());
 };
@@ -501,7 +480,7 @@ const resetButtonStates = () => {
             buttonDiv.classList.remove('bg-green-500', 'bg-red-500');
             buttonDiv.classList.add('bg-gray-200', 'peer-checked:bg-blue-500');
         }
-        
+
         // Reset ARIA attributes
         const parentLabel = button.closest('label');
         if (parentLabel) {

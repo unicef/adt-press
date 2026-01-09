@@ -22,7 +22,7 @@ import {
   createZoomControls
 } from './browser_zoom_controller.js';
 import { trackToggleEvent } from './analytics.js';
-import { toggleNav } from './navigation.js';
+import { toggleNav, getNavigationData } from './navigation.js';
 
 
 let glossaryTerms = {};
@@ -30,6 +30,40 @@ let interfaceCache = {
   interface: null,
   navigation: null,
   sidebarState: null,
+};
+let lastSidebarTrigger = null;
+
+// Constants for sidebar focus management
+const SIDEBAR_TRANSITION_MS = 300;
+const SIDEBAR_FOCUS_DELAY_MS = SIDEBAR_TRANSITION_MS + 50;
+const SIDEBAR_FOCUSABLE_SELECTOR = 'button:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), a[href]:not([tabindex="-1"]):not([aria-hidden="true"]), input:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), select:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), textarea:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"]), [tabindex]:not([tabindex="-1"]):not([aria-hidden="true"])';
+
+const focusFirstSidebarElement = () => {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+
+  // Query only visible, non-hidden focusable elements within the currently visible tab
+  const focusableElements = sidebar.querySelectorAll(SIDEBAR_FOCUSABLE_SELECTOR);
+
+  // Find first truly visible element (not in a hidden tab)
+  const firstInteractive = Array.from(focusableElements).find(el => {
+    const tabContent = el.closest('.tab-content');
+    return !tabContent || !tabContent.classList.contains('hidden');
+  });
+
+  if (firstInteractive) {
+    firstInteractive.focus({ preventScroll: true });
+  }
+};
+
+const restoreSidebarTriggerFocus = () => {
+  if (lastSidebarTrigger && document.contains(lastSidebarTrigger)) {
+    lastSidebarTrigger.focus({ preventScroll: true });
+  } else {
+    const fallbackTrigger = document.getElementById('open-sidebar');
+    fallbackTrigger?.focus({ preventScroll: true });
+  }
+  lastSidebarTrigger = null;
 };
 
 /**
@@ -59,7 +93,7 @@ export const initializeSidebar = () => {
 
   // Apply initial state
   if (!stateMode) {
-    setSidebarVisibility(isOpen);
+    setSidebarVisibility(isOpen, { manageFocus: false });
   }
 
   // Ensure proper styling
@@ -70,10 +104,6 @@ export const initializeSidebar = () => {
     "bg-white",
     "shadow-lg",
     "z-70",
-    "transform",
-    "transition-transform",
-    "duration-300",
-    "ease-in-out",
     "overflow-y-auto"
   );
   attachSidebarListeners();
@@ -130,7 +160,6 @@ export const initializeLanguageDropdown = async () => {
           throw new Error("Language dropdown not found after maximum retries");
         }
         retryCount++;
-        console.log(`Language dropdown not found, attempt ${retryCount} of ${MAX_RETRIES}`);
         await new Promise(resolve => setTimeout(resolve, 200));
         return tryInitialize();
       }
@@ -206,41 +235,27 @@ export const initializeLanguageDropdown = async () => {
  * Handles special cases for sectioned and non-sectioned pages.
  */
 export const updatePageNumber = () => {
-  const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
   const pageElement = document.getElementById('page-section-id');
-
   if (!pageElement) return;
-  state.currentPage = pageSectionMetaTag?.getAttribute('content') || '0';
 
-  // Default to page 0 if no meta tag is found
-  if (!pageSectionMetaTag) {
-    pageElement.innerHTML = '<span data-id="page"></span> 0';
-    return;
+  const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
+  const sectionMetaTag = document.querySelector('meta[name="title-id"]');
+
+  const fallbackValue = pageSectionMetaTag?.getAttribute('content') || '0';
+  state.currentPage = fallbackValue;
+
+  const sectionId = sectionMetaTag?.getAttribute('content');
+  let displayLabel = null;
+
+  if (sectionId) {
+    const navPages = getNavigationData()?.pages || [];
+    const matchingEntry = navPages.find((page) => page.section_id === sectionId);
+    if (matchingEntry?.page_label) {
+      displayLabel = matchingEntry.page_label;
+    }
   }
 
-  const pageSectionContent = pageSectionMetaTag.getAttribute('content');
-  if (!pageSectionContent) {
-    pageElement.innerHTML = '<span data-id="page"></span> 0';
-    return;
-  }
-
-  const parts = pageSectionContent.split('_').map(Number);
-  let humanReadablePage;
-
-  // Handle special case of page 0
-  if (parts[0] === 0 && (!parts[1] || parts[1] === 0)) {
-    humanReadablePage = '<span data-id="page"></span> 0';
-  }
-  // For pages with sections (format "7_0" renders as "6.1")
-  else if (parts.length === 2) {
-    humanReadablePage = `<span data-id="page"></span> ${parts[0] - 1}.${parts[1] + 1}`;
-  }
-  // For pages with no section information (format "6" renders as "5")
-  else {
-    humanReadablePage = `<span data-id="page"></span> ${parts[0] - 1}`;
-  }
-
-  pageElement.innerHTML = humanReadablePage;
+  pageElement.innerHTML = `<span data-id="page"></span> ${displayLabel || fallbackValue}`;
 };
 
 /**
@@ -252,7 +267,7 @@ export const toggleSidebar = () => {
   if (!sidebar) return;
 
   // Determine current state
-  const isCurrentlyOpen = !sidebar.classList.contains("translate-x-full");
+  const isCurrentlyOpen = sidebar.getAttribute("aria-expanded") === "true";
 
   // Toggle to opposite state
   setSidebarVisibility(!isCurrentlyOpen);
@@ -274,8 +289,9 @@ export const adjustLayout = () => {
   const mainContent = document.querySelector("body > .container");
   const submitButton = document.getElementById("submit-button");
 
-  // Determine if any panel is active (sidebar or sign language)
-  const isPanelActive = state.sideBarActive || state.signLanguageMode;
+  const isSignLanguageActive = state.signLanguageMode;
+  // Only the sign language panel should influence layout spacing.
+  const shouldShiftLayout = isSignLanguageActive;
 
   // Check if this is an activity page with submit button visible
   const isActivity = submitButton && window.getComputedStyle(submitButton).display !== 'none';
@@ -286,7 +302,7 @@ export const adjustLayout = () => {
     mainContent.classList.remove("lg:ml-0", "lg:w-[calc(100vw-450px)]", "mx-auto");
 
     // Apply appropriate classes based on current state
-    if (isPanelActive) {
+    if (shouldShiftLayout) {
       mainContent.classList.add("lg:ml-0", "lg:w-[calc(100vw-450px)]");
     } else {
       mainContent.classList.add("mx-auto");
@@ -299,7 +315,7 @@ export const adjustLayout = () => {
     submitButtonContainer.classList.remove("lg:right-0", "lg:right-[calc(425px-1rem)]");
 
     // Apply appropriate classes based on current state
-    if (isPanelActive) {
+    if (shouldShiftLayout) {
       submitButtonContainer.classList.add("lg:right-[calc(425px-1rem)]");
     } else {
       submitButtonContainer.classList.add("lg:right-0");
@@ -315,7 +331,7 @@ export const adjustLayout = () => {
     if (isActivity) {
       // On activity pages, use left-20 for all screen sizes
       navButtons.classList.add("left-20");
-    } else if (isPanelActive) {
+    } else if (shouldShiftLayout) {
       navButtons.classList.add("lg:left-[calc(50vw-212.5px)]", "left-1/2");
     } else {
       navButtons.classList.add("left-1/2");
@@ -597,7 +613,6 @@ export const toggleGlossaryMode = () => {
 export const highlightGlossaryTerms = () => {
   if (!state.glossaryMode || !glossaryTerms) return;
 
-  console.log("Starting glossary highlighting");
   // Remove any existing highlights first
   removeGlossaryHighlights();
 
@@ -887,7 +902,7 @@ export const showGlossaryDefinition = async (event) => {
     const glossaryTermsPage = document.getElementById('glossary-terms-page');
 
     // Make sure the sidebar is open
-    if (sidebar && sidebar.classList.contains('translate-x-full')) {
+    if (sidebar && sidebar.getAttribute('aria-expanded') !== 'true') {
       toggleSidebar();
 
       // Add small delay to ensure sidebar is open before proceeding
@@ -1114,7 +1129,7 @@ export const toggleStateMode = () => {
  */
 export const loadStateMode = () => {
   const stateModeCookie = getCookie("stateMode");
-  
+
   // Only apply state if the cookie has a value and the feature is enabled
   if (stateModeCookie !== "" && stateModeCookie !== null) {
     const isEnabled = stateModeCookie === "true";
@@ -1168,7 +1183,11 @@ export const initializePlayBar = () => {
  */
 export const togglePlayBarSettings = () => {
   const readAloudSettings = document.getElementById("read-aloud-settings");
-  if (readAloudSettings.classList.contains("opacity-0")) {
+  const triggerButton = document.getElementById("read-aloud-speed");
+  const isHidden = readAloudSettings.classList.contains("opacity-0");
+
+  if (isHidden) {
+    // Show settings
     readAloudSettings.classList.add(
       "opacity-100",
       "pointer-events-auto",
@@ -1179,13 +1198,29 @@ export const togglePlayBarSettings = () => {
       "pointer-events-none",
       "h-0"
     );
+    readAloudSettings.setAttribute("aria-hidden", "false");
+    readAloudSettings.removeAttribute("inert");
+    triggerButton?.setAttribute("aria-expanded", "true");
+
+    // Focus first menu item after a brief delay for transition
+    setTimeout(() => {
+      const firstMenuItem = readAloudSettings.querySelector('[role="menuitem"]');
+      firstMenuItem?.focus();
+    }, 100);
   } else {
+    // Hide settings
     readAloudSettings.classList.remove(
       "opacity-100",
       "pointer-events-auto",
       "h-auto"
     );
     readAloudSettings.classList.add("h-0", "opacity-0", "pointer-events-none");
+    readAloudSettings.setAttribute("aria-hidden", "true");
+    readAloudSettings.setAttribute("inert", "");
+    triggerButton?.setAttribute("aria-expanded", "false");
+
+    // Return focus to trigger button
+    triggerButton?.focus();
   }
 };
 
@@ -1194,7 +1229,7 @@ export const togglePlayBarSettings = () => {
  * Handles activity completion and page/section formatting.
  */
 export const formatNavigationItems = () => {
-  const navListItems = document.querySelectorAll(".nav__list-item");
+  const navListItems = document.querySelectorAll('.nav__list[data-nav-type="pages"] .nav__list-item');
 
   navListItems.forEach((item, index) => {
     const link = item.querySelector(".nav__list-link");
@@ -1205,13 +1240,15 @@ export const formatNavigationItems = () => {
       "border-b",
       "border-gray-300",
       "flex",
-      "items-center"
+      "items-center",
+      "gap-2"
     );
 
     link.classList.add(
       "flex-grow",
       "flex",
       "items-center",
+      "min-w-0",
       "w-full",
       "h-full",
       "p-2",
@@ -1221,77 +1258,57 @@ export const formatNavigationItems = () => {
       "text-gray-500"
     );
 
-    // Add border top to first element
     if (index === 0) {
       item.classList.add("border-t");
     }
 
-    // Get section and page numbers from href
     const href = link.getAttribute("href");
-    const textId = link.getAttribute("data-text-id");
-
-    // Check for both patterns - either "6_0" format or just "6" format
-    const pageSectionMatch = href.match(/(\d+)_(\d+)/);
-    const pageOnlyMatch = !pageSectionMatch && href.match(/(\d+)/);
+    const humanReadablePage =
+      link.dataset.pageDisplayLabel || link.dataset.pageLabel || link.dataset.pageNumber || link.textContent.trim() || "—";
+    const pdfPageLabel = link.dataset.pdfPage;
 
     // Handle activity items
     let itemIcon = "";
-    let itemSubtitle = "";
+    let activityStatus = "";
     if (item.classList.contains("activity")) {
       const activityId = href.split(".")[0];
       const success = JSON.parse(localStorage.getItem(`${activityId}_success`)) || false;
 
       if (success) {
         itemIcon = `<i class="${activityId} fas fa-check-square text-green-500 mt-1"></i>`;
-        itemSubtitle = "<span data-id='activity-completed'></span>";
+        activityStatus = "<span class='activity-status' data-id='activity-completed'></span>";
       } else {
         itemIcon = `<i class="${activityId} fas fa-pen-to-square mt-1 text-blue-700"></i>`;
-        itemSubtitle = "<span data-id='activity-to-do'></span>";
+        activityStatus = "<span class='activity-status' data-id='activity-to-do'></span>";
       }
     }
-    // Format the link content with section numbers
-    let humanReadablePage;
-    if (pageSectionMatch) {
-      const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
 
-      // Handle special case of page 0
-      if (pageNumber === 0 && (!sectionNumber || sectionNumber === 0)) {
-        humanReadablePage = "0";
-      }
-
-      // For pages with sections (format "7_0" renders as "6.1")
-      else if (sectionNumber !== undefined) {
-        humanReadablePage = `${pageNumber - 1}.${sectionNumber + 1}`;
-      }
-    } else if (pageOnlyMatch) {
-      // For pages with no section information (format "6" renders as "5")
-      const pageNumber = Number(pageOnlyMatch[1]);
-      humanReadablePage = pageNumber - 1;
-    } else {
-      humanReadablePage = "0";
+    const metadataSegments = [];
+    if (activityStatus) {
+      metadataSegments.push(activityStatus);
     }
 
-    // Check the textId format to ensure we're not incorrectly treating this as a sectioned page
-    // If href has no section but textId does (like "text-6-0"), we should use href as the source of truth
-    const textIdHasSection = textId && textId.match(/-\d+-\d+$/);
-    const hrefHasNoSection = !pageSectionMatch && pageOnlyMatch;
+    const metadataHtml = metadataSegments.length
+      ? `<div class='text-xs text-gray-500 flex flex-wrap items-center gap-2'>${metadataSegments.join(
+        "<span class='text-gray-300'>•</span>"
+      )}</div>`
+      : "";
 
-    if (hrefHasNoSection && textIdHasSection) {
-      // This is a page without sections being incorrectly treated as having sections
-      // Use just the page number without decimal formatting
-      humanReadablePage = Number(pageOnlyMatch[1]) - 1;
-    }
+    const pdfBadge = pdfPageLabel
+      ? `<div class='text-xs text-gray-500 whitespace-nowrap ml-4' aria-label='Print page ${pdfPageLabel}'>Print Page ${pdfPageLabel}</div>`
+      : "";
 
-    link.innerHTML =
+    const leftContent =
       "<div class='flex items-top space-x-2'>" +
       itemIcon +
       "<div>" +
-      `<div>${humanReadablePage}: <span class='inline text-gray-800' data-id='${textId}'></span></div>` +
-      "<div class='text-sm text-gray-500'>" +
-      itemSubtitle +
-      "</div>" +
+      `<div class='text-gray-800 font-medium'>${humanReadablePage}</div>` +
+      metadataHtml +
       "</div>" +
       "</div>";
+
+    link.innerHTML =
+      `<div class='flex items-center justify-between gap-2 w-full'>${leftContent}${pdfBadge}</div>`;
 
     // Highlight current page
     if (href === window.location.pathname.split("/").pop()) {
@@ -1421,87 +1438,6 @@ export const extractPageTerms = () => {
   return Array.from(termMap.values()).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 };
 
-// export const adjustPageScale = () => {
-//   const container = document.getElementById("content");
-//   if (!container) return;
-/*
-const viewportHeight = window.innerHeight;
-const pixelRatio = window.devicePixelRatio;
-
-// Calculate the scale factor based only on the height
-const scaleY = viewportHeight / container.offsetHeight;
-const scale = scaleY / pixelRatio;
-
-// Apply the scale to the container
-container.style.transform = `scale(${scale})`;
-container.style.transformOrigin = 'top left'; // Ensure scaling starts from the top-left corner*/
-//};
-
-// export const adjustPageScale = () => {
-//   // Target the html element for the most global effect
-//   const htmlElement = document.documentElement;
-
-//   // Apply a 90% scale to simulate zooming out
-//   htmlElement.style.transform = 'scale(0.9)';
-//   htmlElement.style.transformOrigin = 'top center';
-
-//   // Adjust the width to prevent horizontal scrollbar
-//   // When scaled down to 90%, we need to make the width about 111% (1/0.9)
-//   htmlElement.style.width = '111.1%';
-
-//   // Compensate for the extra space created at the bottom
-//   htmlElement.style.height = '111.1%';
-
-//   // Adjust the margin to center the content
-//   htmlElement.style.marginLeft = '-5.55%'; // Half of the extra width (11.1% / 2)
-
-//   console.log('Applied 90% zoom simulation to entire page');
-// }
-
-// export const adjustPageScale = () => {
-//   const body = document.body;
-//   const pixelRatio = window.devicePixelRatio;
-
-//   // More modern detection of Windows platform
-//   const isWindows = () => {
-//     // Try modern API first
-//     if (navigator.userAgentData && navigator.userAgentData.platform) {
-//       return navigator.userAgentData.platform === 'Windows';
-//     }
-
-//     // Fallback to user agent string checking
-//     return navigator.userAgent.indexOf('Win') !== -1;
-//   };
-
-//   // For Windows with high DPI settings, we need special handling
-//   if (pixelRatio > 1 && isWindows()) {
-
-//     const fixedScale = 0.9;
-
-//     const compensationFactor = (100 / fixedScale);
-
-//     // Rest of your scaling code
-//     document.documentElement.style.setProperty('--page-scale', 1/pixelRatio);
-//     body.style.transform = `scale(${fixedScale})`;
-//     body.style.transformOrigin = 'top left';
-//     body.style.width = `${compensationFactor}%`;
-//     body.style.height = `${compensationFactor}%`;
-
-//     console.log(`Adjusted scale to fixed 90%, scaling entire body. Device pixel ratio: ${pixelRatio}`);
-//   } else {
-//     // Reset any scaling for standard displays
-//     document.documentElement.style.removeProperty('--page-scale');
-//     body.style.transform = '';
-//     body.style.width = '';
-//     body.style.height = '';
-//   }
-// };
-
-// document.addEventListener('DOMContentLoaded', function() {
-//   // Initialize simple zoom
-//   initSimpleZoom();
-// });
-
 /**
  * Checks for Windows scaling and shows a notification if needed.
  * Also initializes the zoom controller.
@@ -1510,12 +1446,8 @@ export const checkWindowsScaling = () => {
   // Initialize the zoom controller first
   initializeZoomController();
 
-  console.log('Checking Windows scaling...', isHighDpiWindows());
-
   // Only show notification if we're on Windows with high DPI and haven't shown it before
   if (isHighDpiWindows() && localStorage.getItem('hasSeenScalingNotice') !== 'true') {
-    //if (true) {
-    console.log('High DPI Windows detected, showing notification');
 
     // Create notification container
     const notification = document.createElement('div');
@@ -1542,53 +1474,11 @@ export const checkWindowsScaling = () => {
       </div>
     `;
 
-    // <button id="apply-zoom-out" onclick="this.closest('.fixed').remove(); console.log('Zoom applied')" class="text-sm px-3 py-1 bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors">
-    //       Zoom to 75%
-    //     </button>
-    //     <button id="show-zoom-controls" class="text-sm px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded transition-colors">
-    //       Show zoom controls
-    //     </button>
-
     // Add to document
     document.body.appendChild(notification);
 
-    // const applyZoomNew = () => {
-
-    //       // Apply zoom to body
-    //       if (body) {
-    //         body.style.transform = `scale(${zoomLevel})`;
-    //         body.style.transformOrigin = 'top center';
-    //         body.style.width = `${inverseZoom * 100}%`;
-    //         body.style.minHeight = `${inverseZoom * 100}vh`;
-    //         body.style.overflowY = 'auto'; // Allow vertical scrolling
-    //         body.style.overflowX = 'hidden'; // Prevent horizontal scrolling
-    //       }
-    //     };
-
-    // // Add zoom out handler
-    // document.getElementById('apply-zoom-out').addEventListener('click', () => {
-    //   // Set zoom to compensate for 150% scaling (1/1.5 ≈ 0.67)
-    //   console.log('zooming out');
-
-    //   document.body.style.zoom = 0.75;
-    //   //setNativeZoom(0.75);
-
-    //   // Show zoom controls
-    //   createZoomControls();
-
-    //   // Close notification
-    //   notification.remove();
-    // });
-
-    // Add show controls handler
-    // document.getElementById('show-zoom-controls').addEventListener('click', () => {
-    //   createZoomControls();
-    //   notification.remove();
-    // });
-
     // Add dismiss handler
     document.getElementById('dismiss-scaling-notice').addEventListener('click', () => {
-      console.log('Dismissing scaling notice');
       // Close notification
       notification.remove();
       localStorage.setItem('hasSeenScalingNotice', 'true');
@@ -1615,14 +1505,12 @@ export const createZoomResetButton = () => {
 function removeResetZoomButton() {
   const existingButton = document.getElementById('zoom-reset-button');
   if (existingButton) {
-    console.log('Removing zoom reset button');
     existingButton.remove();
   }
 }
 
 // Add a direct zoom function to test functionality
 export const testZoom = (level) => {
-  console.log(`Testing zoom at level: ${level}`);
   return setNativeZoom(level);
 };
 
@@ -1635,7 +1523,6 @@ export const showZoomResetButton = () => {
 
 // Initial check on load - using window.onload instead of DOMContentLoaded to ensure everything is loaded
 window.addEventListener('load', () => {
-  console.log('Window loaded, checking scaling...');
   setTimeout(checkWindowsScaling, 500); // Slight delay to ensure everything is ready
 });
 
@@ -1643,19 +1530,28 @@ window.addEventListener('load', () => {
  * Shows or hides the sidebar based on provided state.
  * @param {boolean} show - Whether to show the sidebar (true) or hide it (false).
  */
-export const setSidebarVisibility = (show) => {
+export const setSidebarVisibility = (show, { manageFocus = true } = {}) => {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar) return;
 
   if (show) {
     // Show sidebar
-    sidebar.classList.remove("translate-x-full");
+    if (manageFocus) {
+      lastSidebarTrigger = document.activeElement;
+    }
+    sidebar.style.opacity = "1";
+    sidebar.style.visibility = "visible";
+    sidebar.style.pointerEvents = "auto";
     sidebar.setAttribute("aria-expanded", "true");
+    sidebar.setAttribute("aria-hidden", "false");
     sidebar.removeAttribute("inert");
   } else {
     // Hide sidebar
-    sidebar.classList.add("translate-x-full");
+    sidebar.style.opacity = "0";
+    sidebar.style.visibility = "hidden";
+    sidebar.style.pointerEvents = "none";
     sidebar.setAttribute("aria-expanded", "false");
+    sidebar.setAttribute("aria-hidden", "true");
     sidebar.setAttribute("inert", "");
   }
   // Save current state
@@ -1670,6 +1566,16 @@ export const setSidebarVisibility = (show) => {
       setNativeZoom(currentZoom);
     }, 50);
   }
+
+  if (manageFocus) {
+    if (show) {
+      // Wait for CSS transition to complete before focusing
+      setTimeout(() => focusFirstSidebarElement(), SIDEBAR_FOCUS_DELAY_MS);
+    } else {
+      // Use requestAnimationFrame for immediate focus return (no transition when closing)
+      requestAnimationFrame(() => restoreSidebarTriggerFocus());
+    }
+  }
 };
 
 /**
@@ -1678,7 +1584,7 @@ export const setSidebarVisibility = (show) => {
  */
 export const setNavVisibility = (show) => {
   const navPopup = document.getElementById("navPopup");
-  const navList = document.querySelector(".nav__list");
+  const navList = document.querySelector('.nav__list[data-nav-type="pages"]');
   if (!navPopup) return;
 
   // Always ensure transform and transition classes are present
@@ -1689,6 +1595,7 @@ export const setNavVisibility = (show) => {
     navPopup.classList.remove("-translate-x-full");
     navPopup.classList.add("left-2");
     navPopup.setAttribute("aria-expanded", "true");
+    navPopup.setAttribute("aria-hidden", "false");
     navPopup.removeAttribute("inert");
 
     // Show navList
@@ -1706,12 +1613,12 @@ export const setNavVisibility = (show) => {
     navPopup.classList.add("-translate-x-full");
     navPopup.classList.remove("left-2");
     navPopup.setAttribute("aria-expanded", "false");
+    navPopup.setAttribute("aria-hidden", "true");
     navPopup.setAttribute("inert", "");
 
     // Hide navList and save scroll position
     if (navList) {
       const scrollPosition = navList.scrollTop;
-      // navList.setAttribute("hidden", "true");
       setCookie("navScrollPosition", scrollPosition, 7);
     }
     setCookie("navState", "closed", 7);

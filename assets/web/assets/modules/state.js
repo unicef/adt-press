@@ -72,9 +72,6 @@ export const getState = (key) => state[key];
  * @returns {*} The new value of the state property.
  */
 export const setState = (key, value) => {
-    if (!(key in state)) {
-        console.warn(`Creating new state key: ${key}`);
-    }
     state[key] = value;
     return state[key];
 };

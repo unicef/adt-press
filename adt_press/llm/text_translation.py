@@ -1,13 +1,12 @@
-import instructor
 from banks import Prompt
-from litellm import acompletion
 from pydantic import ValidationInfo, field_validator
 
+from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
 from adt_press.models.text import OutputText
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
-from adt_press.utils.languages import LANGUAGE_MAP
+from adt_press.utils.languages import Language
 
 
 class TextItem(CleanTextBaseModel):
@@ -45,26 +44,23 @@ class TranslationResponse(CleanTextBaseModel):
 async def get_text_translation(
     config: PromptConfig,
     texts: list[tuple[str, str, str]],  # [(text_id, text_type, text)]
-    base_language_code: str,
-    target_language_code: str,
+    base_language: Language,
+    target_language: Language,
 ) -> list[OutputText]:
     """Translate one or more texts together to maintain context."""
-    base_language = LANGUAGE_MAP[base_language_code]
-    target_language = LANGUAGE_MAP[target_language_code]
-
     # Format texts for the prompt and collect expected IDs
     texts_for_prompt = [{"text_id": text_id, "text": text} for text_id, _, text in texts]
     expected_text_ids = {text_id for text_id, _, _ in texts}
 
     context = dict(
-        base_language=base_language,
-        target_language=target_language,
+        base_language=base_language.name,
+        target_language=target_language.name,
         texts=texts_for_prompt,
         examples=config.examples,
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
-    client = instructor.from_litellm(acompletion)
+    client = get_instructor_client()
 
     # Create validation context
     validation_context = {
@@ -77,6 +73,7 @@ async def get_text_translation(
         messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
         max_retries=config.max_retries,
         context=validation_context,
+        timeout=config.timeout,
     )
 
     # Map back to OutputText objects
@@ -87,7 +84,7 @@ async def get_text_translation(
             text_type=text_type_map[translation.text_id],
             text=translation.text,
             reasoning=response.reasoning,
-            language_code=target_language_code,
+            language_code=target_language.code,
         )
         for translation in response.translations
     ]

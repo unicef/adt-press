@@ -25,6 +25,6 @@ jobs:
 
       - name: Test dependencies inside Docker
         run: |
-          docker run --rm -e OPENAI_API_KEY adt-press uv run adt-press.py pdf_path=./assets/momo.pdf label=momo page_range.end=5
+          docker run --rm -e OPENAI_API_KEY adt-press uv run adt-press.py pdf_path=./assets/raven.pdf label=raven page_range.end=5 input_language=en
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

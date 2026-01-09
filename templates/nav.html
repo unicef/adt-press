@@ -1,14 +1,25 @@
-<nav aria-label="Content Index Menu" aria-labelledby="navPopupTitle" class="fixed w-64 sm:w-80 bg-white shadow-lg p-5 border-r border-gray-300 transform -translate-x-full transition-transform duration-300 ease-in-out z-20 hidden rounded-lg top-2 left-0 bottom-2 h-[calc(100vh-5rem)]" id="navPopup" role="navigation">
-    <div class="nav__toggle flex justify-between items-center mb-4">
-        <h3 class="text-xl font-semibold" data-id="toc-title" id="navPopupTitle">Index</h3>
-        <button aria-label="Cerrar navegación" class="nav__toggle text-gray-700 text-xl p-2" id="nav-close" type="button"><i class="fas fa-close"></i></button>
+<nav aria-label="Content Index Menu" aria-labelledby="navPopupTitle" aria-hidden="true" inert class="fixed w-64 sm:w-80 bg-white shadow-lg p-5 border-r border-gray-300 transform -translate-x-full transition-transform duration-300 ease-in-out z-20 hidden rounded-lg top-2 left-0 bottom-2 h-[calc(100vh-5rem)] flex flex-col" id="navPopup" role="navigation">
+    <div class="nav__toggle flex flex-col gap-4 mb-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-semibold" data-id="toc-title" id="navPopupTitle">Contents</h3>
+            <button aria-label="Cerrar navegación" class="nav__toggle text-gray-700 text-xl p-2" id="nav-close" type="button"><i class="fas fa-close"></i></button>
+        </div>
+        <div aria-label="Navigation tabs" class="flex rounded-md bg-gray-100 p-1" role="tablist">
+            <button aria-controls="nav-panel-toc" aria-selected="true" class="flex-1 rounded-md px-3 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600" data-nav-tab="toc" id="nav-tab-toc" role="tab" type="button">
+                <span data-id="toc-title">Table of Contents</span>
+            </button>
+            <button aria-controls="nav-panel-pages" aria-selected="false" class="flex-1 rounded-md px-3 py-2 text-sm font-semibold text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600" data-nav-tab="pages" id="nav-tab-pages" role="tab" type="button">
+                <span data-id="nav-page-tab-label">Page List</span>
+            </button>
+        </div>
         <a class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:p-4 focus:bg-white focus:border-2 focus:border-blue-600 focus:rounded" href="#content">Table of Contents</a>
     </div>
-    <ol class="nav__list overflow-y-auto h-[calc(100vh-10rem)] text-base pr-2" data-id="nav-list" id="nav__list">
-        {% for webpage in webpages %}
-        <li class="nav__list-item">
-            <a class="nav__list-link" data-text-id="{{ webpage.text_id }}" href="{{ webpage.section_id }}.html">{% if webpage.text_id %}{% with text=texts[webpage.text_id] %}{{ text.text }}{% endwith %}{% endif %}</a>
-        </li>
-        {% endfor %}
-    </ol>
+    <div class="nav__panels flex-1 min-h-0 overflow-hidden">
+        <div aria-labelledby="nav-tab-toc" class="h-full" data-nav-panel="toc" id="nav-panel-toc" role="tabpanel">
+            <ol class="nav__list overflow-y-auto h-full text-base pr-2" data-id="nav-toc-list" data-nav-type="toc" id="nav-toc-list"></ol>
+        </div>
+        <div aria-labelledby="nav-tab-pages" class="h-full hidden" data-nav-panel="pages" id="nav-panel-pages" role="tabpanel">
+            <ol class="nav__list overflow-y-auto h-full text-base pr-2" data-id="nav-page-list" data-nav-type="pages" id="nav-page-list"></ol>
+        </div>
+    </div>
 </nav>

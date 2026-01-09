@@ -18,110 +18,110 @@ const characterLastNames = {
 
 const feminineName = {
   // Feminine nouns
-  "Serpiente": true, "Jirafa": true, "Águila": true, "Ballena": true, 
+  "Serpiente": true, "Jirafa": true, "Águila": true, "Ballena": true,
   "Estrella": true, "Abeja": true, "Mariquita": true, "Mariposa": true,
   "Tortuga": true, "Medusa": true, "Cebra": true, "Sirena": true,
   // Masculine nouns
-  "Cocodrilo": false, "Panda": false, "Koala": false, "Tigre": false, 
-  "León": false, "Elefante": false, "Zorro": false, "Lobo": false, 
-  "Oso": false, "Conejo": false, "Ratón": false, "Mono": false, 
+  "Cocodrilo": false, "Panda": false, "Koala": false, "Tigre": false,
+  "León": false, "Elefante": false, "Zorro": false, "Lobo": false,
+  "Oso": false, "Conejo": false, "Ratón": false, "Mono": false,
   "Mapache": false, "Pingüino": false, "Loro": false, "Búho": false,
-  "Delfín": false, "Tiburón": false, "Pulpo": false, "Cangrejo": false, 
-  "Pez": false, "Cactus": false, "Robot": false, 
-  "Dinosaurio": false, "Extraterrestre": false, "Fantasma": false, 
+  "Delfín": false, "Tiburón": false, "Pulpo": false, "Cangrejo": false,
+  "Pez": false, "Cactus": false, "Robot": false,
+  "Dinosaurio": false, "Extraterrestre": false, "Fantasma": false,
   "Genio": false, "Muñeco de Nieve": false, "Caramelo": false, "Unicornio": false
 };
 
 const characterFirstNames = [
-    // Original reptiles
-    "Cocodrilo", "Serpiente", 
-    
-    // Mammals
-    "Panda", "Koala", "Tigre", "León", "Elefante", "Jirafa", "Zorro", 
-    "Lobo", "Oso", "Conejo", "Ratón", "Mono", "Mapache", "Cebra",
-    
-    // Birds
-    "Águila", "Flamenco", "Pingüino", "Loro", "Búho", 
-    
-    // Marine life
-    "Delfín", "Ballena", "Tiburón", "Pulpo", "Estrella", "Cangrejo", 
-    "Pez", "Tortuga", "Medusa", "Foca",
-    
-    // Small creatures
-    "Abeja", "Mariquita", "Mariposa",
-    
-    // Plants and nature
-    "Cactus",
+  // Original reptiles
+  "Cocodrilo", "Serpiente",
 
-    // Others
-    "Robot", "Dinosaurio", "Extraterrestre", "Fantasma", "Genio",
-    "Sirena", "Muñeco de Nieve", "Caramelo", "Unicornio"
+  // Mammals
+  "Panda", "Koala", "Tigre", "León", "Elefante", "Jirafa", "Zorro",
+  "Lobo", "Oso", "Conejo", "Ratón", "Mono", "Mapache", "Cebra",
+
+  // Birds
+  "Águila", "Flamenco", "Pingüino", "Loro", "Búho",
+
+  // Marine life
+  "Delfín", "Ballena", "Tiburón", "Pulpo", "Estrella", "Cangrejo",
+  "Pez", "Tortuga", "Medusa", "Foca",
+
+  // Small creatures
+  "Abeja", "Mariquita", "Mariposa",
+
+  // Plants and nature
+  "Cactus",
+
+  // Others
+  "Robot", "Dinosaurio", "Extraterrestre", "Fantasma", "Genio",
+  "Sirena", "Muñeco de Nieve", "Caramelo", "Unicornio"
 ];
 
 const characterSounds = [
-    
+
 ];
 
 // Map to associate animals with their corresponding emojis
 const animalEmojis = {
-    //Original Reptiles
-    "Cocodrilo": "🐊",
-    "Serpiente": "🐍",
-    "Rana": "🐸",
+  //Original Reptiles
+  "Cocodrilo": "🐊",
+  "Serpiente": "🐍",
+  "Rana": "🐸",
 
-    // Mammals
-    "Panda": "🐼",
-    "Koala": "🐨",
-    "Tigre": "🐯",
-    "León": "🦁",
-    "Elefante": "🐘",
-    "Jirafa": "🦒",
-    "Zorro": "🦊",
-    "Lobo": "🐺",
-    "Oso": "🐻",
-    "Conejo": "🐰",
-    "Ratón": "🐭",
-    "Mono": "🐒",
-    "Mapache": "🦝",
-    "Cebra": "🦓",
-    
-    // Birds
-    "Águila": "🦅",
-    "Flamenco": "🦩",
-    "Pingüino": "🐧",
-    "Loro": "🦜",
-    "Búho": "🦉",
+  // Mammals
+  "Panda": "🐼",
+  "Koala": "🐨",
+  "Tigre": "🐯",
+  "León": "🦁",
+  "Elefante": "🐘",
+  "Jirafa": "🦒",
+  "Zorro": "🦊",
+  "Lobo": "🐺",
+  "Oso": "🐻",
+  "Conejo": "🐰",
+  "Ratón": "🐭",
+  "Mono": "🐒",
+  "Mapache": "🦝",
+  "Cebra": "🦓",
 
-    // Marine life
-    "Delfín": "🐬",
-    "Ballena": "🐋",
-    "Tiburón": "🦈",
-    "Pulpo": "🐙",
-    "Estrella": "⭐",
-    "Cangrejo": "🦀",
-    "Pez": "🐠",
-    "Tortuga": "🐢",
-    "Medusa": "🐙",
-    "Foca": "🦭",
+  // Birds
+  "Águila": "🦅",
+  "Flamenco": "🦩",
+  "Pingüino": "🐧",
+  "Loro": "🦜",
+  "Búho": "🦉",
 
-    // Small creatures
-    "Abeja": "🐝",
-    "Mariquita": "🐞",
-    "Mariposa": "🦋",
+  // Marine life
+  "Delfín": "🐬",
+  "Ballena": "🐋",
+  "Tiburón": "🦈",
+  "Pulpo": "🐙",
+  "Estrella": "⭐",
+  "Cangrejo": "🦀",
+  "Pez": "🐠",
+  "Tortuga": "🐢",
+  "Medusa": "🐙",
+  "Foca": "🦭",
 
-    // Plants and nature
-    "Cactus": "🌵",
-    
-    // Others
-    "Robot": "🤖",
-    "Dinosaurio": "🦖",
-    "Extraterrestre": "👽",
-    "Fantasma": "👻",
-    "Genio": "🧞‍♂️",
-    "Sirena": "🧜‍♀️",
-    "Muñeco de Nieve": "⛄️",
-    "Caramelo": "🍭",
-    "Unicornio": "🦄",
+  // Small creatures
+  "Abeja": "🐝",
+  "Mariquita": "🐞",
+  "Mariposa": "🦋",
+
+  // Plants and nature
+  "Cactus": "🌵",
+
+  // Others
+  "Robot": "🤖",
+  "Dinosaurio": "🦖",
+  "Extraterrestre": "👽",
+  "Fantasma": "👻",
+  "Genio": "🧞‍♂️",
+  "Sirena": "🧜‍♀️",
+  "Muñeco de Nieve": "⛄️",
+  "Caramelo": "🍭",
+  "Unicornio": "🦄",
 };
 
 /**
@@ -133,7 +133,7 @@ export function generateStudentID() {
   // Generate a random alphanumeric ID with a timestamp prefix to ensure uniqueness
   const timestamp = Date.now().toString(36); // Convert timestamp to base36
   const randomPart = Math.random().toString(36).substring(2, 10); // 8 characters of randomness
-  
+
   //return `student-${timestamp}-${randomPart}`;
   return `${randomPart}`;
 }
@@ -144,14 +144,14 @@ export function generateStudentID() {
  */
 export function generateRandomCharacterName() {
   const randomFirstName = characterFirstNames[Math.floor(Math.random() * characterFirstNames.length)];
-  
+
   // Select from feminine or masculine last names based on the gender of the first name
   const isFeminine = feminineName[randomFirstName] === true;
   const lastNamesList = isFeminine ? characterLastNames.feminine : characterLastNames.masculine;
   const randomLastName = lastNamesList[Math.floor(Math.random() * lastNamesList.length)];
-  
+
   const emoji = animalEmojis[randomFirstName] || "🦖";
-  
+
   return {
     firstName: randomFirstName,
     lastName: randomLastName,
@@ -167,6 +167,6 @@ export function getCharacterGreeting(characterName) {
     `¡Bienvenido! Me llamo ${characterName} y te acompañaré en esta aventura.`,
     `¡Saludos! ${characterName} a tu servicio para aprender juntos.`
   ];
-  
+
   return greetings[Math.floor(Math.random() * greetings.length)];
 }

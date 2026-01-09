@@ -21,8 +21,8 @@
 │           ├── sorting.js
 │           ├── matching.js
 │           ├── true_false.js
-│           ├── fill_in_blank.js
-│           ├── fill_in_table.js
+│           ├── fill_in_the_blank.js
+│           ├── fill_in_a_table.js
 │           └── validation.js
 ```
 

@@ -1,5 +1,5 @@
 {
-    "toc-title": "Index",
+    "toc-title": "Contents",
     "sidebar-title": "Accessibility menu",
     "language-label": "Language",
     "nav-label": "Navigation menu",
@@ -17,6 +17,8 @@
     "syllable-label": "Syllables",
     "multiple-choice-correct-answer": "Great job! Your answer is correct.",
     "multiple-choice-try-again": "Try again",
+    "selection-changed-resubmit": "Selection changed. Please submit again.",
+    "quiz-shortcut-hint": "Press 1, 2, 3 to choose an option, then Enter to submit.",
     "next-activity": "Next activity",
     "success-try-next-activity": "Great job! Try the next activity!",
     "fill-in-the-blank-correct-answer": "Great job!",
@@ -90,5 +92,6 @@
     "validation-inappropriate-language": "Inappropriate language",
     "validation-check-spelling": "Check your spelling",
     "validation-write-appropriate": "Please write in English and use appropriate language",
-    "validation-error": "Validation error"
+    "validation-error": "Validation error",
+    "nav-page-tab-label": "Page list"
 }

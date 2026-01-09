@@ -1,9 +1,14 @@
-label: "???"
 pdf_path: "???"
+label: "${label_for_path:${pdf_path}}"
 
-input_language: en
-plate_language: en
-output_languages: [en]
+# the language of the book, auto will try to auto-detect
+input_language: auto
+
+# the language of the plate
+plate_language: "${input_language}"
+
+# the languages to translate the final ADT into
+output_languages: ["${plate_language}"]
 
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
@@ -12,22 +17,28 @@ clear_cache: false
 print_available_models: false
 
 # our strategy for cropping, either llm or none
-crop_strategy: llm
+crop_strategy: none
 
 # our glossary strategy, either llm or none
-glossary_strategy: llm
+glossary_strategy: none
 
 # our explanation strategy, either llm or none
-explanation_strategy: llm
+explanation_strategy: none
 
 # our easy read strategy, either llm or none
-easy_read_strategy: llm
+easy_read_strategy: none
 
 # our caption strategy, either llm or none
-caption_strategy: llm
+caption_strategy: none
+
+# our activity generation strategy, either llm or none
+activity_strategy: none
 
 # our TTS / speech strategy, either tts or none
-speech_strategy: tts
+speech_strategy: none
+
+# our quiz strategy, either llm or none
+quiz_strategy: none
 
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
@@ -35,56 +46,185 @@ custom_plate_path: ""
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
 
-# what strategy is used to render sections into web pages, dynamic will choose based on layout type 
+# what strategy is used to render sections into web pages, dynamic will choose based on section type
 render_strategy: dynamic
 
-layout_types:
-  cover_page:
-    description: "Cover page of the book, typically includes title, author, and publisher information."
+# the default render strategy used for section types when not explicitly specified
+default_render_strategy: html
+
+# Speech/TTS provider configuration
+speech:
+  # provider selection, either dynamic (selection based on language) or specific provider (openai, azure)
+  provider: openai
+  default_provider: openai  
+  providers:
+    openai:
+      model: gpt-4o-mini-tts
+      languages: [en]  # Languages that use OpenAI
+    azure:
+      model: azure/speech/azure-tts
+      languages: [es, ta, si]  # Languages that use Azure
+  bit_rate: 64k
+  sample_rate: 24000
+  format: mp3
+  voices_path: config/voices.yaml
+
+text_types:
+  book_title:
+    description: "For the title of the book. There can only be one book title for the entire book."
+
+  book_subtitle:
+    description: "For the subtitle of the book. There can only be one subtitle for the entire book."
+
+  book_author:
+    description: "For the author of the book."
+
+  book_metadata:
+    description: "For metadata about the book such as edition, publisher, year, series, language, etc."
+
+  section_heading:
+    description: "For text that introduces a new chapter, section, subsection, or topic."
+
+  section_text:
+    description: "For the main body of text within the section."
+
+  instruction_text:
+    description: "For instructions that direct the reader to do something or complete an activity, including hints that are provided to help the reader answer questions or solve problems."
+
+  activity_number:
+    description: "For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections."
+
+  activity_title:
+    description: "For text that is the title of the activity (often following the activity number)."
+
+  activity_option:
+    description: "For text that provides options for an activity like a multiple choice or matching activity."
+
+  activity_input_placeholder_text:
+    description: "For any text that will be used as a placeholder in an input field for a fill in the blank activity. E.g. 'replace the word'."
+
+  fill_in_the_blank:
+    description: "For text that includes blanks that the reader must fill in for a fill in the blank activity."
+
+  image_associated_text:
+    description: "For text that accompanies or is directly associated with an image to label, explain, or contextualize it. This includes figure numbers, titles, captions, descriptions, copyright information, and credits."
+
+  image_overlay:
+    description: "For text that is overlaid on an image at a specific location, such as a speech bubble."
+
+  math:
+    description: "For math. MATH MUST BE EXTRACTED AS LATEX. DO NOT, I REPEAT DO NOT INCLUDE ANY RENDERING CHARACTERS LIKE \\( \\) OR \\[ \\] OR $$."
+
+  standalone_text:
+    description: "For text that does not fall within a section and/or stands alone from the regular material. It may be surrounded in a colored box."
+
+  header_text:
+    description: "For text that appears in the header of the page."
+
+  footer_text:
+    description: "For text that appears in the footer of the page."
+
+  page_number:
+    description: "For text that indicates the page number of the page."
+
+  other:
+    description: "For any other text that does not fit the above categories."
+
+text_group_types:
+  heading:
+    description: "For chapter titles or section headings that stand alone on a line."
+
+  paragraph:
+    description: "For regular paragraphs of text that are grouped together."
+
+  stanza:
+    description: "For poetry or verse that is grouped into stanzas."
+
+  list:
+    description: "For lists or bullet points that are grouped together."
+
+  other:
+    description: "For any other text that does not fit the above categories."
+
+section_types:
+  front_cover:
+    description: "For the front cover page of the textbook that is the first page. There can only be one front cover page. IMPORTANT! Only the first page can be a front cover page."
     render_strategy: two_column
 
-  divider_page:
-    description: "Divider or chapter title pages that separate sections or chapters within the book."
+  inside_cover:
+    description: "For an inside cover page that can contain the title."
+    render_strategy: two_column
+
+  back_cover:
+    description: "For a back cover page that is the last page of the textbook."
+    render_strategy: two_column
+
+  separator:
+    description: "For a separator page that breaks up the text into different logical sections."
     render_strategy: single_column
 
-  novel_text_and_images:
-    description: "Novel pages with text and embedded images, including poetry. Text flows around images, or text and images would be best laid out in two column format."
-    render_strategy: two_column
-
-  novel_text_only:
-    description: "Novel pages with only text content, including poetry. Simple flowing text layout."
-    render_strategy: two_column
-
-  novel_images_only:
-    description: "Novel pages with only images, including spreads, such as illustrated novels or photo essays."
-    render_strategy: two_column
-
-  mathbook:
-    description: "Math textbook pages with equations, diagrams, and structured layouts typical of educational math content."
+  credits:
+    description: "For a credits page that lists the credits and acknowledgements of the textbook."
     render_strategy: html
 
-  storybook_text_images:
-    description: "Storybook pages with integrated text and illustrations. Often text is overlapping, however it will work in a two column format. If the overlapping is too complex like speech bubbles, the comic_overlay strategy will be used instead."
+  foreword:
+    description: "For a foreword page that can be an introduction, overview, or note from the author."
     render_strategy: two_column
 
-  storybook_images_only:
-    description: "Storybook pages with only illustrations, no text content."
+  table_of_contents:
+    description: "For a table of contents page."
+    render_strategy: html
+
+  boxed_text:
+    description: "For text that is contained in a box or callout section."
     render_strategy: two_column
 
-  comic_overlay:
-    description: "Visually rich layouts that are image focused with text overlayed positionally. For examples comics, storybooks, graphic novels features pages with speech bubbles, captions, and text overlays on images. Complex spatial relationships between text and visuals."
-    render_strategy: overlay
+  text_only:
+    description: "For a reading section with only text."
+    render_strategy: two_column
 
-  textbook_complex:
-    description: "Textbook pages with complex multi-element layouts including sidebars, callout boxes, diagrams, and non-linear reading flow."
+  text_and_single_image:
+    description: "For a section that contains text and a single image."
+    render_strategy: two_column
+
+  text_and_images:
+    description: "For a reading section with text and images."
     render_strategy: html
 
-  textbook_activity:
-    description: "Activity or workbook pages with interactive elements, fill-in-blanks, exercises, and structured activity layouts."
-    render_strategy: html
-  
+  images_only:
+    description: "For a section with only images."
+    render_strategy: two_column
+
+  activity_matching:
+    description: "For an interactive matching activity where you match items in a list to items in another list. In general, you can only match one item from the first list to one item in the second list. If you have fewer items in the second list - this is likely a 'sorting activity'."
+    render_strategy: activity
+
+  activity_fill_in_a_table:
+    description: "For an interactive table to fill in."
+    render_strategy: activity
+
+  activity_multiple_choice:
+    description: "For an interactive multiple choice activity with a question and two or more options with only one right answer. e.g. 'circle the correct answer'."
+    render_strategy: activity
+
+  activity_true_false:
+    description: "For a true or false activity with a question and either a true or false answer."
+    render_strategy: activity
+
+  activity_open_ended_answer:
+    description: "For an activity section with only open ended text response."
+    render_strategy: activity
+
+  activity_fill_in_the_blank:
+    description: "For a fill in the blank activity with one or more blanks to fill in, with a very short answer."
+    render_strategy: activity
+
+  activity_sorting:
+    description: "For a sorting activity with a collection of text or images that need to be sorted into different categories. You can have more items in the list to be sorted than categories to sort into."
+    render_strategy: activity
+
   other:
-    description: "Pages that do not fit into the other defined layout types, requiring custom handling."
+    description: "For any other section type that does not fit the above categories."
     render_strategy: html
 
 render_strategies:
@@ -98,6 +238,11 @@ render_strategies:
     config:
       render_template_path: templates/two_column_render.html
 
+  two_column_story:
+    render_type: template
+    config:
+      render_template_path: templates/two_column_template_render_story.html
+
   overlay:
     render_type: html
     config:
@@ -105,22 +250,33 @@ render_strategies:
       template_path: prompts/web_generation_overlay.jinja2
       max_retries: 25
 
+  section_quiz:
+    render_type: template
+    config:
+      render_template_path: templates/quiz_render.html
+
   html:
     render_type: html
     config:
       model: default
       template_path: prompts/web_generation_html.jinja2
       max_retries: 25
+      example_dirs: []
 
-      example_dirs:
-        - assets/prompts/adt_examples/text_only_1
-        - assets/prompts/adt_examples/text_and_images_1
-        - assets/prompts/adt_examples/text_and_images_2
-        - assets/prompts/adt_examples/text_and_images_3
+  activity:
+    render_type: activity
+    config:
+      model: default
+      template_path: prompts/activities/generic.jinja2
+      max_retries: 25
+      example_dirs: []
 
 page_range:
   start: 0
   end: 0
+
+# Page grouping mode: 'single' treats each page individually, 'spread' groups pages as spreads (cover solo, then even-odd pairs)
+page_grouping: single
 
 image_filters:
   size:
@@ -141,9 +297,13 @@ section_filters:
     - back_cover
     - credits
     - inside_cover
-   
 
 prompts:
+  metadata_extraction:
+    model: default
+    template_path: prompts/metadata_extraction.jinja2
+    page_range: 10
+
   text_extraction:
     model: default
     template_path: prompts/text_extraction_groups.jinja2
@@ -165,12 +325,16 @@ prompts:
   page_sectioning:
     model: default
     template_path: prompts/page_sectioning_by_page.jinja2
-    max_retries: 10
 
   section_explanation:
     model: default
     template_path: prompts/section_explanation.jinja2
-   
+
+  section_quiz:
+    model: default
+    template_path: prompts/section_quiz.jinja2
+    sections_per_quiz: 3
+
   text_translation:
     model: default
     template_path: prompts/text_translation.jinja2
@@ -183,18 +347,65 @@ prompts:
     model: default
     template_path: prompts/section_glossary.jinja2
 
-  section_metadata:
-    model: default
-    template_path: prompts/section_metadata.jinja2
-
   text_easy_read:
     model: default
     template_path: prompts/text_easy_read.jinja2
 
+  # Activity-specific prompts for HTML generation
+  activity_sorting:
+    model: default
+    template_path: prompts/activities/sorting.jinja2
+
+  activity_matching:
+    model: default
+    template_path: prompts/activities/matching.jinja2
+
+  activity_fill_in_a_table:
+    model: default
+    template_path: prompts/activities/fill_in_a_table.jinja2
+
+  activity_true_false:
+    model: default
+    template_path: prompts/activities/true_false.jinja2
+
+  activity_open_ended_answer:
+    model: default
+    template_path: prompts/activities/open_ended_answer.jinja2
+
+  activity_fill_in_the_blank:
+    model: default
+    template_path: prompts/activities/fill_in_the_blank.jinja2
+
+  activity_multiple_choice:
+    model: default
+    template_path: prompts/activities/multiple_choice.jinja2
+
+  # Activity-specific answer generation prompts
+
+  activity_sorting_answers:
+    model: default
+    template_path: prompts/activities/answers/sorting.jinja2
+
+  activity_matching_answers:
+    model: default
+    template_path: prompts/activities/answers/matching.jinja2
+
+  activity_true_false_answers:
+    model: default
+    template_path: prompts/activities/answers/true_false.jinja2
+
+  activity_fill_in_the_blank_answers:
+    model: default
+    template_path: prompts/activities/answers/fill_in_the_blank.jinja2
+
+  activity_fill_in_a_table_answers:
+    model: default
+    template_path: prompts/activities/answers/fill_in_a_table.jinja2
+
+  activity_multiple_choice_answers:
+    model: default
+    template_path: prompts/activities/answers/multiple_choice.jinja2
+
   speech_generation:
-    model: gpt-4o-mini-tts
+    model: default  # Required by parent PromptConfig class
     template_path: prompts/speech_generation.jinja2
-    voice: alloy
-    bit_rate: 64k
-    sample_rate: 24000
-    format: mp3

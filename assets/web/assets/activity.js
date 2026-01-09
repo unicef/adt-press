@@ -2,12 +2,13 @@ import { state, setState } from './modules/state.js';
 import { ActivityTypes } from './modules/utils.js'; // Import ActivityTypes first
 import { initializeActivityAudioElements, playActivitySound } from './modules/audio.js';
 import { prepareMultipleChoice } from './modules/activities/multiple_choice.js';
+import { prepareQuiz, resetQuizActivity } from './modules/activities/quiz.js';
 import { prepareSorting } from './modules/activities/sorting.js';
 import { prepareMatching } from './modules/activities/matching.js';
 import { prepareTrueFalse } from './modules/activities/true_false.js';
 import { validateInputs } from './modules/activities/validation.js';
-import { preparefillInBlank } from './modules/activities/fill_in_blank.js';
-import { prepareFillInTable } from './modules/activities/fill_in_table.js';
+import { preparefillInBlank } from './modules/activities/fill_in_the_blank.js';
+import { prepareFillInTable } from './modules/activities/fill_in_a_table.js';
 import { prepareOpenEnded } from './modules/activities/open_ended.js';
 import { translateText } from './modules/translations.js';
 import { nextPage } from './modules/navigation.js';
@@ -26,9 +27,10 @@ const CLASS_NAMES = {
 };
 
 const SELECTORS = {
-    FILL_IN_BLANK: 'section[data-section-type="activity_fill_in_the_blank"]',
-    FILL_IN_TABLE: 'section[data-section-type="activity_fill_in_a_table"]',
+    FILL_IN_THE_BLANK: 'section[data-section-type="activity_fill_in_the_blank"]',
+    FILL_IN_A_TABLE: 'section[data-section-type="activity_fill_in_a_table"]',
     MULTIPLE_CHOICE: 'section[data-section-type="activity_multiple_choice"]',
+    QUIZ: 'section[data-section-type="activity_quiz"]',
     TRUE_FALSE: 'section[data-section-type="activity_true_false"]',
     OPEN_ENDED: 'section[data-section-type="activity_open_ended_answer"]'
 };
@@ -49,14 +51,14 @@ const hasNonEmptyInputs = (selector) => {
 // Checks if an activity has user data based on activity type
 const activityHasUserData = (activityType) => {
     const activityId = getActivityIdFromPath();
-    
+
     // Common checks for localStorage data
-    const hasLocalStorageData = Object.keys(localStorage).some(key => 
-        key.startsWith(`${activityId}_`) && 
+    const hasLocalStorageData = Object.keys(localStorage).some(key =>
+        key.startsWith(`${activityId}_`) &&
         key !== `${activityId}_success`
     );
 
-    if (!hasLocalStorageData){
+    if (!hasLocalStorageData) {
         // Use a function lookup pattern instead of switch
         if (activityType === 'activity_open_ended_answer') {
             return hasNonEmptyInputs('section textarea, section input[type="text"]');
@@ -68,6 +70,9 @@ const activityHasUserData = (activityType) => {
             return hasNonEmptyInputs('section td input[type="text"], section td textarea');
         }
         else if (activityType === 'activity_multiple_choice') {
+            return document.querySelectorAll('section input[type="radio"]:checked').length > 0;
+        }
+        else if (activityType === 'activity_quiz') {
             return document.querySelectorAll('section input[type="radio"]:checked').length > 0;
         }
         else if (activityType === 'activity_true_false') {
@@ -91,7 +96,7 @@ const activityHasUserData = (activityType) => {
 export const checkForUserData = () => {
     const activitySection = document.querySelector('section[role="activity"]');
     if (!activitySection) return false;
-    
+
     const activityType = activitySection.dataset.sectionType;
     return activityHasUserData(activityType);
 };
@@ -101,9 +106,24 @@ export const updateResetButtonVisibility = () => {
     const resetButton = document.getElementById("reset-button");
     if (!resetButton) return;
     
+    const activitySection = document.querySelector('section[role="activity"]');
+    const activityType = activitySection?.dataset.sectionType;
+    const resetSupportedTypes = new Set([
+        ActivityTypes.OPEN_ENDED_ANSWER,
+        ActivityTypes.FILL_IN_THE_BLANK,
+        ActivityTypes.SORTING,
+        ActivityTypes.FILL_IN_A_TABLE,
+        ActivityTypes.MATCHING
+    ]);
+
+    if (!resetSupportedTypes.has(activityType)) {
+        resetButton.classList.add("hidden");
+        return;
+    }
+
     // Check if there's any user data for this activity
     const hasUserData = checkForUserData();
-    
+
     // Toggle visibility
     resetButton.classList.toggle("hidden", !hasUserData);
 };
@@ -143,6 +163,67 @@ const resetSelectionInputs = (radioButtons) => {
     });
 };
 
+const submitActivityClasses = [
+    'min-w-[180px]',
+    'px-8',
+    'py-3',
+    'rounded-2xl',
+    'text-lg',
+    'font-semibold',
+    'shadow-lg'
+];
+
+const resetActivityClasses = [
+    'px-6',
+    'py-3',
+    'rounded-2xl',
+    'text-lg',
+    'font-medium'
+];
+
+const relocateActionButtons = (section) => {
+    const target = section?.querySelector('[data-submit-target]');
+    const submitButton = document.getElementById('submit-button');
+    const resetButton = document.getElementById('reset-button');
+    const originalContainer = document.getElementById('submit-reset-container');
+
+    if (!submitButton || !originalContainer) {
+        return;
+    }
+
+    const applyActivityStyles = () => {
+        submitActivityClasses.forEach(cls => submitButton.classList.add(cls));
+        resetButton && resetActivityClasses.forEach(cls => resetButton.classList.add(cls));
+        submitButton.dataset.submitLocation = 'activity';
+    };
+
+    const removeActivityStyles = () => {
+        submitActivityClasses.forEach(cls => submitButton.classList.remove(cls));
+        resetButton && resetActivityClasses.forEach(cls => resetButton.classList.remove(cls));
+        submitButton.dataset.submitLocation = 'interface';
+    };
+
+    if (target) {
+        if (!target.contains(submitButton)) {
+            target.appendChild(submitButton);
+            if (resetButton) {
+                target.appendChild(resetButton);
+            }
+            applyActivityStyles();
+        }
+        originalContainer.classList.add('hidden');
+    } else {
+        if (!originalContainer.contains(submitButton)) {
+            originalContainer.appendChild(submitButton);
+            if (resetButton) {
+                originalContainer.appendChild(resetButton);
+            }
+        }
+        removeActivityStyles();
+        originalContainer.classList.remove('hidden');
+    }
+};
+
 // Clear localStorage for an activity
 const clearActivityLocalStorage = (activityId) => {
     Object.keys(localStorage)
@@ -157,6 +238,7 @@ const resetSubmitButton = () => {
         submitButton.textContent = translateText("submit-text");
         submitButton.setAttribute("aria-label", translateText("submit-text"));
         submitButton.removeEventListener("click", nextPage);
+        submitButton.dataset.submitState = 'submit';
 
         if (state.validateHandler) {
             submitButton.addEventListener("click", state.validateHandler);
@@ -168,20 +250,20 @@ const resetSubmitButton = () => {
 const clearAllFeedback = () => {
     // Elements to remove completely
     const elementsToRemove = [
-        ".feedback-icon", 
+        ".feedback-icon",
         "[class^='feedback-icon-for-']",
         ".mark",
         ".validation-mark",
         ".sr-only"
     ].join(", ");
-    
+
     document.querySelectorAll(elementsToRemove).forEach(el => el.remove());
-    
+
     // Elements to clear content
     document.querySelectorAll(".feedback-container").forEach(container => {
         container.innerHTML = '';
     });
-    
+
     // Clear validation styling on inputs
     document.querySelectorAll("input, textarea").forEach(input => {
         input.classList.remove(
@@ -189,11 +271,11 @@ const clearAllFeedback = () => {
             ...CLASS_NAMES.VALIDATION.ERROR,
             ...CLASS_NAMES.VALIDATION.WARNING
         );
-        
+
         ["aria-invalid", "aria-describedby", "data-has-gibberish-feedback", "data-has-profanity-feedback"]
             .forEach(attr => input.removeAttribute(attr));
     });
-    
+
     // Clear styling on activity options
     document.querySelectorAll(".activity-option span, .statement-option, .placed-word").forEach(el => {
         el.classList.remove(
@@ -203,7 +285,7 @@ const clearAllFeedback = () => {
             "border-2"
         );
     });
-    
+
     // Reset toast
     const toast = document.getElementById("toast");
     if (toast) {
@@ -215,7 +297,7 @@ const clearAllFeedback = () => {
             "bg-orange-200", "text-orange-700"
         );
     }
-    
+
     // Reset feedback element
     const feedbackElement = document.getElementById("feedback");
     if (feedbackElement) {
@@ -248,14 +330,14 @@ function initializeActivityHandlers() {
     // Add handlers to the object using ActivityTypes (now safe to use)
     activityResetHandlers[ActivityTypes.FILL_IN_THE_BLANK] = (activityId) => {
         resetActivityBase(activityId, {
-            sectionSelector: SELECTORS.FILL_IN_BLANK,
+            sectionSelector: SELECTORS.FILL_IN_THE_BLANK,
             inputSelector: 'input[type="text"]:not(#filter-input)'
         });
     };
 
     activityResetHandlers[ActivityTypes.FILL_IN_A_TABLE] = (activityId) => {
         resetActivityBase(activityId, {
-            sectionSelector: SELECTORS.FILL_IN_TABLE,
+            sectionSelector: SELECTORS.FILL_IN_A_TABLE,
             inputSelector: 'input[type="text"]:not(#filter-input), textarea:not(#filter-input)'
         });
     };
@@ -283,6 +365,10 @@ function initializeActivityHandlers() {
         });
 
         localStorage.removeItem(`${activityId}_selectedOption`);
+    };
+
+    activityResetHandlers[ActivityTypes.QUIZ] = (activityId) => {
+        resetQuizActivity(activityId);
     };
 
     activityResetHandlers[ActivityTypes.TRUE_FALSE] = (activityId) => {
@@ -339,6 +425,11 @@ function initializeActivityHandlers() {
         validate: () => validateInputs(ActivityTypes.MULTIPLE_CHOICE)
     };
 
+    activityHandlers[ActivityTypes.QUIZ] = {
+        setup: prepareQuiz,
+        validate: () => validateInputs(ActivityTypes.QUIZ)
+    };
+
     activityHandlers[ActivityTypes.FILL_IN_THE_BLANK] = {
         setup: preparefillInBlank,
         validate: () => validateInputs(ActivityTypes.FILL_IN_THE_BLANK)
@@ -374,7 +465,7 @@ function initializeActivityHandlers() {
 
 // Store the handlers in state when prepareActivity is called
 let activityResetHandlers;
-let activityHandlers; 
+let activityHandlers;
 
 // Function to handle activity reset
 const handleResetActivity = () => {
@@ -416,18 +507,20 @@ const setupActivitySection = (section, activityType, submitButton) => {
     }
 
     const handler = activityHandlers[activityType];
-    
+
     if (handler) {
         handler.setup(section);
         setState('validateHandler', handler.validate);
     } else {
         console.error("Unknown activity type:", activityType);
     }
-    
+
     if (state.validateHandler) {
         submitButton.removeEventListener("click", state.validateHandler);
         submitButton.addEventListener("click", state.validateHandler);
     }
+
+    relocateActionButtons(section);
 };
 
 // Main activity preparation function - make sure this is at the end of the file
@@ -443,9 +536,12 @@ export const prepareActivity = () => {
     const resetButton = document.getElementById("reset-button");
 
     if (activitySections.length === 0) {
-        if (submitButton) submitButton.style.display = "none";
-        if (resetButton) resetButton.style.display = "none";
+        if (submitButton) submitButton.classList.add("hidden");
+        if (resetButton) resetButton.classList.add("hidden");
         return;
+    } else {
+        if (submitButton) submitButton.classList.remove("hidden");
+        if (resetButton) resetButton.classList.remove("hidden");
     }
 
     if (!submitButton) {

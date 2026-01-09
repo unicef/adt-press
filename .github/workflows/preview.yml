@@ -52,7 +52,7 @@ jobs:
 
       - name: Run ADT Press
         run: |
-          uv run adt-press.py pdf_path=./assets/raven.pdf label=raven page_range.end=5
+          uv run adt-press.py pdf_path=./assets/raven.pdf label=raven input_language=en page_range.end=5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -67,7 +67,7 @@ jobs:
     environment: preview
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
-    steps:          
+    steps:
       - name: Download preview artifact
         uses: actions/download-artifact@v4
         with:

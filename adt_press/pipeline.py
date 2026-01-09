@@ -8,7 +8,18 @@ from hamilton import driver, registry, telemetry
 from hamilton.lifecycle import NodeExecutionHook
 from omegaconf import DictConfig
 
-from adt_press.nodes import config_nodes, image_nodes, pdf_nodes, plate_nodes, report_nodes, section_nodes, speech_nodes, web_nodes
+from adt_press.nodes import (
+    config_nodes,
+    epub_nodes,
+    image_nodes,
+    pdf_nodes,
+    plate_nodes,
+    report_nodes,
+    section_nodes,
+    speech_nodes,
+    web_nodes,
+    webpub_nodes,
+)
 
 registry.disable_autoload()
 telemetry.disable_telemetry()
@@ -25,6 +36,8 @@ modules = [
     web_nodes,
     plate_nodes,
     speech_nodes,
+    epub_nodes,
+    webpub_nodes,
 ]
 
 
@@ -57,7 +70,13 @@ class NodeHook(NodeExecutionHook):
         run_id: str,
         **future_kwargs: Any,
     ):
-        log.info("node result", node=node_name, success=success, result=result, error=error)
+        log.info(
+            "node result",
+            node=node_name,
+            success=success,
+            result=(lambda s: s if len(s) <= 200 else s[:200] + "...")(str(result)),
+            error=error,
+        )
 
 
 def run_pipeline(config: DictConfig) -> None:
@@ -88,7 +107,17 @@ def run_pipeline(config: DictConfig) -> None:
             print(f"- {model}")
 
     # Execute nodes in sequence to ensure reports are generated even if later steps fail
-    nodes_to_execute = ["report_pages", "plate_report", "glossary_report", "web_report", "report_index"]
+    nodes_to_execute = [
+        "metadata_report",
+        "report_pages",
+        "report_quizzes",
+        "plate_report",
+        "glossary_report",
+        "web_report",
+        "report_index",
+        "package_epub",
+        "package_webpub",
+    ]
 
     dr.execute(nodes_to_execute, overrides={"config": config})
 
