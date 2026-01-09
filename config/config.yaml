@@ -37,6 +37,9 @@ activity_strategy: none
 # our TTS / speech strategy, either tts or none
 speech_strategy: none
 
+# our quiz strategy, either llm or none
+quiz_strategy: none
+
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
@@ -330,7 +333,7 @@ prompts:
   section_quiz:
     model: default
     template_path: prompts/section_quiz.jinja2
-    sections_per_quiz: 0
+    sections_per_quiz: 3
 
   text_translation:
     model: default

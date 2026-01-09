@@ -365,7 +365,7 @@ def build_config_json(
         "state": True,
         "characterDisplay": False,
         "highlight": False,
-        "activities": strategy_config.get("activity_strategy", "none") != "none",
+        "activities": strategy_config.get("activity_strategy", "none") != "none" or strategy_config.get("quiz_strategy", "none") != "none",
     }
 
     if feature_overrides:
