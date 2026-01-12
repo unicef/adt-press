@@ -6,8 +6,8 @@ from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateSection
-from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.quiz import SectionQuiz
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.speech import SpeechFile
 from adt_press.models.text import EasyReadText, OutputText, PageText, PageTextGroup, PageTexts
 from adt_press.models.web import WebPage

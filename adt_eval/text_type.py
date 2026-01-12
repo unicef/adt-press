@@ -8,12 +8,12 @@ Some notes on the scoring of matches:
     - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
 """
 
+import json
+import os
 from pathlib import Path
 from typing import Any, Dict
 
 import mlflow
-import os
-import json
 import pandas as pd
 
 from adt_eval.base import BaseEvaluator
@@ -21,8 +21,8 @@ from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
+from adt_press.models.text import PageText, PageTextGroup, PageTexts
 from adt_press.utils.languages import Language
-from adt_press.models.text import PageTexts
 
 
 class TextTypeEvaluator(BaseEvaluator):
@@ -30,7 +30,7 @@ class TextTypeEvaluator(BaseEvaluator):
 
     def __init__(self, global_config: Dict[str, Any], task_config: Dict[str, Any], output_dir: Path):
         super().__init__(global_config, task_config, output_dir)
-        
+
         # Build text_types_config from global config
         self.text_types_config = {}
         for name, text_type in global_config.get("text_types", {}).items():
@@ -44,24 +44,24 @@ class TextTypeEvaluator(BaseEvaluator):
             params = dict(text_group_type)
             params["name"] = name
             self.text_group_types_config[name] = TextGroupType.model_validate(params)
-    
+
     def build_page_texts_from_log(self, fpath: Path) -> PageTexts:
-                '''Build PageTexts object from logged JSON file, as an alternative to LLM call.'''
-                with open(fpath, "r", encoding="utf8") as f:
-                    page_texts = json.load(f)
-                    output = page_texts['output']
+        """Build PageTexts object from logged JSON file, as an alternative to LLM call."""
+        with open(fpath, "r", encoding="utf8") as f:
+            page_texts = json.load(f)
+            output = page_texts["output"]
 
-                page_text_groups = []
-                for g in output['groups']: 
-                    page_texts = []
-                    for t in g['texts']:
-                        page_text = PageText(text_id=t['text_id'], text=t['text'], text_type=t['text_type'])
-                        page_texts.append(page_text) 
-                    page_text_group = PageTextGroup(group_id = g['group_id'], group_type = g['group_type'], texts=page_texts)
-                    page_text_groups.append(page_text_group)
-                page_texts = PageTexts(page_id=output['page_id'], groups=page_text_groups, reasoning=output['reasoning'])
+        page_text_groups = []
+        for g in output["groups"]:
+            page_texts = []
+            for t in g["texts"]:
+                page_text = PageText(text_id=t["text_id"], text=t["text"], text_type=t["text_type"])
+                page_texts.append(page_text)
+            page_text_group = PageTextGroup(group_id=g["group_id"], group_type=g["group_type"], texts=page_texts)
+            page_text_groups.append(page_text_group)
+        page_texts = PageTexts(page_id=output["page_id"], groups=page_text_groups, reasoning=output["reasoning"])
 
-                return page_texts
+        return page_texts
 
     async def process_case(self, step: int, tc: Dict[str, Any], use_cached_llm_results: bool) -> Dict[str, Any]:
         """Process a single test case."""
@@ -101,7 +101,9 @@ class TextTypeEvaluator(BaseEvaluator):
         # Call the LLM for text type classification
         if use_cached_llm_results and os.path.exists(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json"):
             print(f"Skipping LLM call for case {tc['id']} and using cached results from the logs.")
-            page_texts = self.build_page_texts_from_log(Path(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json"))
+            page_texts = self.build_page_texts_from_log(
+                Path(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json")
+            )
         else:
             page_texts = await get_page_text(
                 str(self.output_dir),
@@ -112,7 +114,7 @@ class TextTypeEvaluator(BaseEvaluator):
                 page,
                 language,
             )
-            
+
         result["page_texts"] = page_texts.model_dump()
 
         ## Index LLM candidate results by text content

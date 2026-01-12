@@ -2,10 +2,9 @@ from banks import Prompt
 from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import PromptConfig, TextGroupType, TextGroupTypeName, TextType, TextTypeName
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageText, PageTextGroup, PageTexts
-from adt_press.models.config import TextType, TextTypeName, TextGroupType, TextGroupTypeName
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
@@ -22,9 +21,7 @@ class Text(CleanTextBaseModel):
         if info.context:
             valid_types = info.context.get("text_types", [])
             if valid_types and v not in valid_types:
-                raise ValueError(
-                    f"Invalid text_type='{v}'. Must be one of: {', '.join(sorted(valid_types))}"
-                )
+                raise ValueError(f"Invalid text_type='{v}'. Must be one of: {', '.join(sorted(valid_types))}")
         return v
 
 
@@ -38,9 +35,7 @@ class TextGroup(CleanTextBaseModel):
         if info.context:
             valid_types = info.context.get("text_group_types", [])
             if valid_types and v not in valid_types:
-                raise ValueError(
-                    f"Invalid group_type='{v}'. Must be one of: {', '.join(sorted(valid_types))}"
-                )
+                raise ValueError(f"Invalid group_type='{v}'. Must be one of: {', '.join(sorted(valid_types))}")
         return v
 
 
@@ -69,13 +64,13 @@ async def get_page_text(
 
     prompt = Prompt(cached_read_text_file(config.template_path))
     client = get_instructor_client()
-    
+
     # Create validation context
     validation_context = {
         "text_types": list(text_types.keys()),
         "text_group_types": list(text_group_types.keys()),
     }
-    
+
     response: TextResponse = await client.chat.completions.create(
         model=config.model,
         response_model=TextResponse,

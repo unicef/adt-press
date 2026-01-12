@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from adt_press.models.ids import PageID
 from adt_press.models.image import Image
 
+
 class Page(BaseModel):
     page_id: PageID
     page_number: int

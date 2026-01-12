@@ -1,8 +1,8 @@
-import enum
-
 from pydantic import BaseModel
+
 from adt_press.models.config import TextGroupTypeName, TextTypeName
-from adt_press.models.ids import PageID, TextID, TextGroupID
+from adt_press.models.ids import PageID, TextGroupID, TextID
+
 
 class EasyReadText(BaseModel):
     easy_read_id: TextID

@@ -9,8 +9,8 @@ from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, PlateQuiz, PlateSection, PlateText
-from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.quiz import SectionQuiz
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.languages import Language

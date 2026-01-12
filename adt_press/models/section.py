@@ -1,7 +1,8 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
 
 from adt_press.models.config import SectionType
 from adt_press.models.ids import PageID, SectionID
+
 
 class PageSection(BaseModel):
     section_id: SectionID
@@ -12,7 +13,9 @@ class PageSection(BaseModel):
     background_color: str
     text_color: str
 
+
 type ExplanationID = str
+
 
 class SectionExplanation(BaseModel):
     explanation_id: ExplanationID

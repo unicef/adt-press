@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-from adt_press.models.ids import TextID, SpeechID
+from adt_press.models.ids import SpeechID, TextID
+
 
 class SpeechFile(BaseModel):
     speech_id: SpeechID

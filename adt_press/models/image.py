@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from adt_press.models.ids import PageID, ImageID
 
+from adt_press.models.ids import ImageID, PageID
 
 
 class Image(BaseModel):
