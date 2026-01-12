@@ -21,8 +21,8 @@ from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
-from adt_press.models.text import *
 from adt_press.utils.languages import Language
+from adt_press.models.text import PageTexts
 
 
 class TextTypeEvaluator(BaseEvaluator):
@@ -143,7 +143,7 @@ class TextTypeEvaluator(BaseEvaluator):
             text_type = taxonomy[0][0]
 
             # Some mild cleaning on the text content to match the Gold Standard
-            text_content = text_content.replace("\/", "/")
+            text_content = text_content.replace("\\/", "/")
             text_content = text_content.replace("\\n", "\n")
             text_content = text_content.replace("  ", " ")
             text_content = text_content.replace("\xad", "")

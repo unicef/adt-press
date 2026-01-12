@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 
+from adt_press.models.ids import ChapterID
+
 
 class BookChapter(BaseModel):
-    chapter_id: str
+    chapter_id: ChapterID
     title: str
     page_number: int
 

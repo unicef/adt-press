@@ -1,19 +1,20 @@
 from pydantic import BaseModel, Field
 
+from adt_press.models.ids import ImageID, SectionID, TextGroupID, TextID
 from adt_press.models.plate import PlateText
 
 
 class RenderTextGroup(BaseModel):
-    group_id: str
+    group_id: TextGroupID
     group_type: str
     texts: list[PlateText]
 
 
 class WebPage(BaseModel):
-    section_id: str
-    text_id: str | None = None
-    text_ids: list[str] = Field(default_factory=list)
-    image_ids: list[str] = Field(default_factory=list)
+    section_id: SectionID
+    text_id: TextID | None = None
+    text_ids: list[TextID] = Field(default_factory=list)
+    image_ids: list[ImageID] = Field(default_factory=list)
     generated_texts: list[PlateText] = Field(default_factory=list)
     content: str
     reasoning: str = ""

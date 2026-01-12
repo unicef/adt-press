@@ -4,12 +4,13 @@ from hamilton.function_modifiers import cache
 
 from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
-from adt_press.models.config import PromptConfig
+from adt_press.models.config import PromptConfig, TextTypeName
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, PlateQuiz, PlateSection, PlateText
-from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary, SectionQuiz
+from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
+from adt_press.models.quiz import SectionQuiz
 from adt_press.models.text import EasyReadText, OutputText, PageTexts
 from adt_press.utils.file import calculate_file_hash, write_text_file
 from adt_press.utils.languages import Language
@@ -201,7 +202,7 @@ def plate_output_texts_by_id(
     plate_language: Language,
 ) -> dict[str, OutputText]:
     # Collect all texts that need processing
-    texts_to_process = list[tuple[str, str, str]]()
+    texts_to_process = list[tuple[str, TextTypeName, str]]()
 
     # Page texts and easy reads
     for page_texts in processed_pdf_texts.values():
