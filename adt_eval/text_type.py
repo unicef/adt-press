@@ -126,10 +126,10 @@ class TextTypeEvaluator(BaseEvaluator):
 
                 if normalized_key not in actual_type_by_text.keys():
                     # If text does not yet appear in dictionary, insert as a 1-item list
-                    actual_type_by_text[normalized_key] = [text_item.text_type.value]
+                    actual_type_by_text[normalized_key] = [text_item.text_type]
                 else:
                     # If it exists, add to list
-                    actual_type_by_text[normalized_key].append(text_item.text_type.value)
+                    actual_type_by_text[normalized_key].append(text_item.text_type)
 
         ## Compare with gold standard annotations
         matches = []
