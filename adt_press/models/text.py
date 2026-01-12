@@ -1,69 +1,38 @@
-import enum
-
 from pydantic import BaseModel
 
-
-class TextGroupType(str, enum.Enum):
-    heading = "heading"
-    stanza = "stanza"
-    list = "list"
-    paragraph = "paragraph"
-    other = "other"
-
-
-class TextType(str, enum.Enum):
-    # Simplified 4
-    book_title = "book_title"
-    book_subtitle = "book_subtitle"
-    book_author = "book_author"
-    book_metadata = "book_metadata"
-    section_heading = "section_heading"
-    section_text = "section_text"
-    instruction_text = "instruction_text"
-    activity_number = "activity_number"
-    activity_title = "activity_title"
-    activity_option = "activity_option"
-    fill_in_the_blank = "fill_in_the_blank"
-    activity_input_placeholder_text = "activity_input_placeholder_text"
-    image_associated_text = "image_associated_text"
-    image_overlay = "image_overlay"
-    math = "math"
-    standalone_text = "standalone_text"
-    header_text = "header_text"
-    footer_text = "footer_text"
-    page_number = "page_number"
-    other = "other"
+from adt_press.models.config import TextGroupTypeName, TextTypeName
+from adt_press.models.ids import PageID, TextGroupID, TextID
 
 
 class EasyReadText(BaseModel):
-    easy_read_id: str
-    text_id: str
+    easy_read_id: TextID
+    text_id: TextID
     easy_read: str
     reasoning: str
 
 
 class PageText(BaseModel):
-    text_id: str
+    text_id: TextID
     text: str
-    text_type: TextType
+    text_type: TextTypeName
     is_pruned: bool = False
 
 
 class PageTextGroup(BaseModel):
-    group_id: str
-    group_type: TextGroupType
+    group_id: TextGroupID
+    group_type: TextGroupTypeName
     texts: list[PageText]
 
 
 class PageTexts(BaseModel):
-    page_id: str
+    page_id: PageID
     groups: list[PageTextGroup]
     reasoning: str
 
 
 class OutputText(BaseModel):
-    text_id: str
-    text_type: str
+    text_id: TextID
+    text_type: TextTypeName
     language_code: str
     text: str
     reasoning: str

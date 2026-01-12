@@ -16,13 +16,17 @@ class RenderType(str, enum.Enum):
     activity = "activity"
 
 
+type TextTypeName = str
+type TextGroupTypeName = str
+
+
 class TextType(BaseModel):
-    name: str
+    name: TextTypeName
     description: str
 
 
 class TextGroupType(BaseModel):
-    name: str
+    name: TextGroupTypeName
     description: str
 
 

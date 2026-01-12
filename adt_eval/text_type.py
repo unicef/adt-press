@@ -8,16 +8,20 @@ Some notes on the scoring of matches:
     - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
 """
 
+import json
+import os
 from pathlib import Path
 from typing import Any, Dict
 
 import mlflow
+import pandas as pd
 
 from adt_eval.base import BaseEvaluator
 from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
+from adt_press.models.text import PageText, PageTextGroup, PageTexts
 from adt_press.utils.languages import Language
 
 
@@ -41,7 +45,25 @@ class TextTypeEvaluator(BaseEvaluator):
             params["name"] = name
             self.text_group_types_config[name] = TextGroupType.model_validate(params)
 
-    async def process_case(self, step: int, tc: Dict[str, Any]) -> Dict[str, Any]:
+    def build_page_texts_from_log(self, fpath: Path) -> PageTexts:
+        """Build PageTexts object from logged JSON file, as an alternative to LLM call."""
+        with open(fpath, "r", encoding="utf8") as f:
+            page_texts = json.load(f)
+            output = page_texts["output"]
+
+        page_text_groups = []
+        for g in output["groups"]:
+            page_texts = []
+            for t in g["texts"]:
+                page_text = PageText(text_id=t["text_id"], text=t["text"], text_type=t["text_type"])
+                page_texts.append(page_text)
+            page_text_group = PageTextGroup(group_id=g["group_id"], group_type=g["group_type"], texts=page_texts)
+            page_text_groups.append(page_text_group)
+        page_texts = PageTexts(page_id=output["page_id"], groups=page_text_groups, reasoning=output["reasoning"])
+
+        return page_texts
+
+    async def process_case(self, step: int, tc: Dict[str, Any], use_cached_llm_results: bool) -> Dict[str, Any]:
         """Process a single test case."""
 
         ## Get the gold standard for test case
@@ -77,15 +99,22 @@ class TextTypeEvaluator(BaseEvaluator):
         language = Language.from_code(input_language_code)
 
         # Call the LLM for text type classification
-        page_texts = await get_page_text(
-            str(self.output_dir),
-            f"eval_{tc['id']}",
-            self.prompt_config,
-            self.text_types_config,
-            self.text_group_types_config,
-            page,
-            language,
-        )
+        if use_cached_llm_results and os.path.exists(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json"):
+            print(f"Skipping LLM call for case {tc['id']} and using cached results from the logs.")
+            page_texts = self.build_page_texts_from_log(
+                Path(f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{tc['id']}.json")
+            )
+        else:
+            page_texts = await get_page_text(
+                str(self.output_dir),
+                f"eval_{tc['id']}",
+                self.prompt_config,
+                self.text_types_config,
+                self.text_group_types_config,
+                page,
+                language,
+            )
+
         result["page_texts"] = page_texts.model_dump()
 
         ## Index LLM candidate results by text content
@@ -97,10 +126,10 @@ class TextTypeEvaluator(BaseEvaluator):
 
                 if normalized_key not in actual_type_by_text.keys():
                     # If text does not yet appear in dictionary, insert as a 1-item list
-                    actual_type_by_text[normalized_key] = [text_item.text_type.value]
+                    actual_type_by_text[normalized_key] = [text_item.text_type]
                 else:
                     # If it exists, add to list
-                    actual_type_by_text[normalized_key].append(text_item.text_type.value)
+                    actual_type_by_text[normalized_key].append(text_item.text_type)
 
         ## Compare with gold standard annotations
         matches = []
@@ -116,7 +145,7 @@ class TextTypeEvaluator(BaseEvaluator):
             text_type = taxonomy[0][0]
 
             # Some mild cleaning on the text content to match the Gold Standard
-            text_content = text_content.replace("\/", "/")
+            text_content = text_content.replace("\\/", "/")
             text_content = text_content.replace("\\n", "\n")
             text_content = text_content.replace("  ", " ")
             text_content = text_content.replace("\xad", "")
@@ -144,8 +173,7 @@ class TextTypeEvaluator(BaseEvaluator):
         # Log to MLflow
         mlflow.log_dict(page.model_dump(), f"inputs/{step}.json")
 
-        for match in matches:
-            mlflow.log_table(match, f"results/{step}.json")
+        mlflow.log_table(pd.DataFrame(matches), f"results/{step}.json")
 
         # Calculate score
         correct_matches = sum(1 for m in matches if m["expected"] == m["actual"])

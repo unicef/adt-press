@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
+from adt_press.models.ids import SpeechID, TextID
+
 
 class SpeechFile(BaseModel):
-    speech_id: str
+    speech_id: SpeechID
     speech_path: str
     language_code: str
-    text_id: str
+    text_id: TextID
     provider: str
     voice: str
     model: str

@@ -63,7 +63,7 @@ class BaseEvaluator(ABC):
         return [case for case in cases if case.get("annotations")]
 
     @abstractmethod
-    async def process_case(self, step: int, test_case: Dict[str, Any]) -> Dict[str, Any]:
+    async def process_case(self, step: int, test_case: Dict[str, Any], use_cached_llm_results) -> Dict[str, Any]:
         """Process a single test case."""
         pass
 
@@ -74,11 +74,12 @@ class BaseEvaluator(ABC):
         tasks = []
         limit = self.global_config["eval"]["limit"]
         rate_limit = self.global_config["eval"]["rate_limit"]
+        use_cached_llm_results = self.global_config["eval"]["use_cached_llm_results"]
 
         for i, case in enumerate(cases):
             if i >= limit:
                 break
-            tasks.append(self.process_case(i, case))
+            tasks.append(self.process_case(i, case, use_cached_llm_results))
 
         # Use adt_press sync utility for rate limiting
         results = [r for r in await sync.gather_with_limit(tasks, rate_limit) if r]
@@ -101,11 +102,15 @@ class BaseEvaluator(ABC):
 
         # Download image
         local_image_path = Path(self.image_dir) / filename
-        with fsspec.open(
-            image_url, account_name=self.azure_storage_config.account_name, account_key=self.azure_storage_config.account_key
-        ) as f:
-            with open(local_image_path, "wb") as out:
-                out.write(f.read())
+
+        if os.path.exists(local_image_path):
+            print(f"Page image already exists, using existing version: {local_image_path}")
+        else:
+            with fsspec.open(
+                image_url, account_name=self.azure_storage_config.account_name, account_key=self.azure_storage_config.account_key
+            ) as f:
+                with open(local_image_path, "wb") as out:
+                    out.write(f.read())
 
         return local_image_path
 
@@ -141,7 +146,6 @@ class BaseEvaluator(ABC):
 
             # process all our cases
             results = await self.process_cases(cases)
-
             # Calculate metrics
             metrics = self.calculate_metrics(results)
             mlflow.log_metric("score", metrics["score"])

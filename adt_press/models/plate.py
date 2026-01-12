@@ -1,22 +1,23 @@
 from pydantic import BaseModel
 
+from adt_press.models.ids import ImageID, TextGroupID, TextID
 from adt_press.models.section import GlossaryItem
 
 
 class PlateText(BaseModel):
-    text_id: str
+    text_id: TextID
     text_type: str
     text: str
 
 
 class PlateGroup(BaseModel):
-    group_id: str
+    group_id: TextGroupID
     group_type: str
-    text_ids: list[str]
+    text_ids: list[TextID]
 
 
 class PlateImage(BaseModel):
-    image_id: str
+    image_id: ImageID
     image_path: str
     caption_id: str
 
