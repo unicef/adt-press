@@ -206,7 +206,7 @@ def plate_output_texts_by_id(
     plate_language: Language,
 ) -> dict[OutputTextID, OutputText]:
     # Collect all texts that need processing
-    texts_to_process = list[tuple[TextID, TextTypeName, str]]()
+    texts_to_process: list[tuple[TextID, TextTypeName, str]] = []
 
     # Page texts and easy reads
     for page_texts in processed_pdf_texts.values():
