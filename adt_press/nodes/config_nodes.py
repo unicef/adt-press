@@ -133,7 +133,7 @@ def text_group_types_config(config: DictConfig) -> dict[TextGroupTypeName, TextG
 
 @cache(behavior="recompute")
 def default_render_strategy_config(config: DictConfig) -> RenderStrategyName:
-    return str(config.get("default_render_strategy", "html"))
+    return RenderStrategyName(config.get("default_render_strategy", "html"))
 
 
 @cache(behavior="recompute")

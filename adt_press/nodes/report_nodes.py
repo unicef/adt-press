@@ -10,7 +10,7 @@ from adt_press.models.plate import Plate, PlateSection
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.speech import SpeechFile
-from adt_press.models.text import EasyReadText, OutputText, Text, TextGroup, PageTextGroups
+from adt_press.models.text import EasyReadText, OutputText, PageTextGroups, Text, TextGroup
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
 from adt_press.utils.languages import Language, LanguageCode
@@ -156,7 +156,7 @@ def metadata_report(
     # Find the cover page if specified
     cover_page = None
     if book_metadata.cover_page_id:
-        cover_page = pdf_pages_by_id.get(book_metadata.cover_page_id)
+        cover_page = pdf_pages_by_id.get(PageID(book_metadata.cover_page_id))
 
     # Get the pages used for metadata extraction (first N pages)
     page_range = metadata_extraction_prompt_config.page_range
@@ -181,11 +181,11 @@ def web_report(
     plate: Plate,
     plate_sections_by_id: dict[SectionID, PlateSection],
 ) -> str:
-    sections_lookup = dict(plate_sections_by_id)
+    sections_lookup: dict[SectionID, PlateSection] = dict(plate_sections_by_id)
     for quiz in plate.quizzes:
-        parent_section = plate_sections_by_id.get(quiz.section_id)
+        parent_section = plate_sections_by_id.get(SectionID(quiz.section_id))
         if parent_section and quiz.quiz_id not in sections_lookup:
-            sections_lookup[quiz.quiz_id] = parent_section
+            sections_lookup[SectionID(quiz.quiz_id)] = parent_section
 
     return render_template(
         template_config,

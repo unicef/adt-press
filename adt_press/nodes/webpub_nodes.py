@@ -106,7 +106,7 @@ def package_webpub(
         page_number = section_number_for_page(webpage)
         title = f"{page_number}"
         if len(webpage.text_ids):
-            title += f" - {plate_translations[default_language].get(webpage.text_ids[0], '')}"
+            title += f" - {plate_translations[default_language].get(OutputTextID(webpage.text_ids[0]), '')}"
 
         page_entry = {
             "href": f"{webpage.section_id}.html",

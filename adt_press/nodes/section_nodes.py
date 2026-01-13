@@ -10,7 +10,7 @@ from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary
-from adt_press.models.text import Text, TextGroup, PageTextGroups
+from adt_press.models.text import PageTextGroups, Text, TextGroup
 from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
@@ -150,10 +150,10 @@ def explanations_by_section_id__llm(
 
         return await gather_with_limit(explanations, section_explanation_prompt_config.rate_limit)
 
-    explanations: dict[str, SectionExplanation] = {}
+    explanations: dict[SectionID, SectionExplanation] = {}
     results = run_async_task(explain_sections)
     for explanation in results:
-        explanations[explanation.section_id] = explanation
+        explanations[SectionID(explanation.section_id)] = explanation
 
     return explanations
 

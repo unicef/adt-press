@@ -33,10 +33,10 @@ def speech_files__tts(
 
         return await gather_with_limit(tts, speech_prompt_config.rate_limit)
 
-    lang_to_tts = {lang: dict[str, SpeechFile]() for lang in plate_translations.keys()}
+    lang_to_tts: dict[LanguageCode, dict[OutputTextID, SpeechFile]] = {lang: {} for lang in plate_translations.keys()}
     files = run_async_task(generate_speech_files)
     for file in files:
-        lang_to_tts[file.language_code][file.text_id] = file
+        lang_to_tts[file.language_code][OutputTextID(file.text_id)] = file
 
     return lang_to_tts
 
@@ -45,7 +45,7 @@ def speech_files__tts(
 def speech_files__none(
     run_output_dir_config: str, speech_prompt_config: PromptConfig, plate_translations: dict[LanguageCode, dict[OutputTextID, str]]
 ) -> dict[LanguageCode, dict[OutputTextID, SpeechFile]]:
-    empty_tts = dict[LanguageCode, dict[OutputTextID, SpeechFile]]()
+    empty_tts: dict[LanguageCode, dict[OutputTextID, SpeechFile]] = {}
     for language in plate_translations.keys():
-        empty_tts[language] = dict[str, SpeechFile]()
+        empty_tts[language] = {}
     return empty_tts

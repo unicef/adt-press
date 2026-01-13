@@ -23,7 +23,9 @@ from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
-def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config: ImageSizeFilterConfig) -> dict[ImageID, ImageFilterFailure]:
+def image_size_filter_failures(
+    pdf_images: list[Image], image_size_filter_config: ImageSizeFilterConfig
+) -> dict[ImageID, ImageFilterFailure]:
     failures = {}
     for img in pdf_images:
         failed = []
@@ -161,7 +163,9 @@ def image_crops__none(pdf_pages: list[Page], pruned_image_ids: set[ImageID]) -> 
 
 
 @config.when(crop_strategy="llm")
-def image_crops__llm(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[ImageID]) -> dict[ImageID, ImageCrop]:
+def image_crops__llm(
+    crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[ImageID]
+) -> dict[ImageID, ImageCrop]:
     async def generate_crop(page: Page, img: Image) -> ImageCrop:
         coord = await get_image_crop_coordinates(crop_prompt_config, page, img)
 

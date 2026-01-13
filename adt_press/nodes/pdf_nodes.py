@@ -11,7 +11,7 @@ from adt_press.models.ids import ImageID, PageID, TextGroupID, TextID
 from adt_press.models.image import Image
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
-from adt_press.models.text import EasyReadText, Text, TextGroup, PageTextGroups
+from adt_press.models.text import EasyReadText, PageTextGroups, Text, TextGroup
 from adt_press.nodes.config_nodes import PageRangeConfig
 from adt_press.utils.file import copy_file
 from adt_press.utils.languages import Language
@@ -87,7 +87,9 @@ def easy_reads_by_text_id__none(
     return {}
 
 
-def processed_pdf_texts(pruned_text_types_config: list[TextTypeName], pdf_texts: dict[PageID, PageTextGroups]) -> dict[PageID, PageTextGroups]:
+def processed_pdf_texts(
+    pruned_text_types_config: list[TextTypeName], pdf_texts: dict[PageID, PageTextGroups]
+) -> dict[PageID, PageTextGroups]:
     filtered_texts = {}
     for page_id, page_texts in pdf_texts.items():
         groups = []

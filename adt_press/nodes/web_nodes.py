@@ -19,7 +19,7 @@ from adt_press.models.config import (
     TemplateConfig,
     TemplateRenderConfig,
 )
-from adt_press.models.ids import OutputTextID
+from adt_press.models.ids import ImageID, OutputTextID
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
@@ -45,7 +45,7 @@ def web_pages(
     activity_answers_prompts_config: dict[str, PromptConfig],
 ) -> list[WebPage]:
     images_by_id = {img.image_id: img for img in plate.images}
-    texts_by_id = {txt.text_id: txt for txt in plate.texts}
+    texts_by_id: dict[OutputTextID, PlateText] = {OutputTextID(txt.text_id): txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
     quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
@@ -139,7 +139,9 @@ def web_pages(
     pages: list[WebPage] = run_async_task(generate_pages)
 
     image_urls = {
-        img.image_id: PlateImage(image_id=img.image_id, image_path=f"images/{os.path.basename(img.image_path)}", caption_id=img.image_id)
+        ImageID(img.image_id): PlateImage(
+            image_id=img.image_id, image_path=f"images/{os.path.basename(img.image_path)}", caption_id=img.image_id
+        )
         for img in plate.images
     }
 
@@ -221,7 +223,7 @@ def package_adt_web(
                 image_dir,
                 image_id,
             )
-            images[image_id] = PlateImage(
+            images[ImageID(image_id)] = PlateImage(
                 image_id=image.image_id,
                 image_path=os.path.join("images", optimized_name),
                 caption_id=image.caption_id,
@@ -272,7 +274,7 @@ def package_adt_web(
                     chapter_id=chapter.chapter_id,
                     section_id=chapter.section_id,
                     href=f"{chapter.section_id}.html",
-                    title=plate_texts[chapter.chapter_id].text,
+                    title=plate_texts[OutputTextID(chapter.chapter_id)].text,
                 )
             )
     write_json_file(os.path.join(adt_dir, "content", "toc.json"), toc)
@@ -280,7 +282,7 @@ def package_adt_web(
     # copy our cover image if it exists
     if plate.cover_image_id:
         compress_image_for_web(
-            plate_images[plate.cover_image_id].image_path,
+            plate_images[ImageID(plate.cover_image_id)].image_path,
             adt_dir,
             "cover",
         )

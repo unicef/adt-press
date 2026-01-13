@@ -5,7 +5,9 @@ from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig, TextGroupType, TextGroupTypeName, TextType, TextTypeName
 from adt_press.models.ids import TextGroupID, TextID
 from adt_press.models.pdf import Page
-from adt_press.models.text import Text as ADTText, TextGroup as ADTTextGroup, PageTextGroups
+from adt_press.models.text import PageTextGroups
+from adt_press.models.text import Text as ADTText
+from adt_press.models.text import TextGroup as ADTTextGroup
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language

@@ -67,20 +67,23 @@ def generated_plate(
                 quiz_id=quiz.quiz_id,
                 section_id=quiz.section_id,
                 question_id=quiz.question_id,
-                option_ids=quiz.option_ids,
-                explanation_ids=quiz.explanation_ids,
+                option_ids=list(quiz.option_ids),
+                explanation_ids=list(quiz.explanation_ids),
                 answer_index=quiz.answer_index,
             )
         )
 
     # build our plate texts and images from our output texts and processed images
     texts = [PlateText(text_id=t.text_id, text_type=t.text_type, text=t.text) for t in plate_output_texts_by_id.values()]
-    images = [PlateImage(image_id=i.image_id, image_path=i.crop.image_path, caption_id=i.image_id) for i in processed_images_by_id.values()]
+    images = [
+        PlateImage(image_id=ImageID(i.image_id), image_path=i.crop.image_path, caption_id=ImageID(i.image_id))
+        for i in processed_images_by_id.values()
+    ]
 
     cover_image_id = ""
     if cover_image_path:
         cover_image_id = "cover"
-        images.append(PlateImage(image_id=cover_image_id, image_path=cover_image_path, caption_id=cover_image_id))
+        images.append(PlateImage(image_id=ImageID(cover_image_id), image_path=cover_image_path, caption_id=ImageID(cover_image_id)))
 
     table_of_contents: list[PlateChapter] = []
     for chapter in book_metadata.table_of_contents:
@@ -106,7 +109,7 @@ def generated_plate(
 
 
 def plate_sections_by_id(plate: Plate) -> dict[SectionID, PlateSection]:
-    return {section.section_id: section for section in plate.sections}
+    return {SectionID(section.section_id): section for section in plate.sections}
 
 
 def plate_path(run_output_dir_config: str, generated_plate: Plate, custom_plate_path_config: str) -> str:
@@ -203,44 +206,44 @@ def plate_output_texts_by_id(
     plate_language: Language,
 ) -> dict[OutputTextID, OutputText]:
     # Collect all texts that need processing
-    texts_to_process = list[tuple[str, TextTypeName, str]]()
+    texts_to_process = list[tuple[TextID, TextTypeName, str]]()
 
     # Page texts and easy reads
     for page_texts in processed_pdf_texts.values():
         for page_group in page_texts.groups:
             for text in page_group.texts:
-                texts_to_process.append((text.text_id, text.text_type, text.text))
+                texts_to_process.append((TextID(text.text_id), text.text_type, text.text))
 
                 easy_read = easy_reads_by_text_id.get(text.text_id, None)
                 if easy_read:
-                    texts_to_process.append((easy_read.easy_read_id, text.text_type, easy_read.easy_read))
+                    texts_to_process.append((TextID(easy_read.easy_read_id), text.text_type, easy_read.easy_read))
 
     # Image captions
     for key, caption in image_captions_by_id.items():
         if caption.caption:
-            texts_to_process.append((key, "image_caption", caption.caption))
+            texts_to_process.append((TextID(key), TextTypeName("image_caption"), caption.caption))
 
     # Explanations
     for explanation in explanations_by_section_id.values():
-        texts_to_process.append((explanation.explanation_id, "explanation", explanation.explanation))
+        texts_to_process.append((TextID(explanation.explanation_id), TextTypeName("explanation"), explanation.explanation))
 
     # Chapter titles
     for chapter in book_table_of_contents:
-        texts_to_process.append((chapter.chapter_id, "chapter_title", chapter.title))
+        texts_to_process.append((TextID(chapter.chapter_id), TextTypeName("chapter_title"), chapter.title))
 
     # Quizzes
     for quiz in quizzes_by_section_id.values():
-        texts_to_process.append((quiz.question_id, "quiz_question", quiz.question))
+        texts_to_process.append((TextID(quiz.question_id), TextTypeName("quiz_question"), quiz.question))
         for idx, quiz_option in enumerate(quiz.options):
-            texts_to_process.append((quiz.option_ids[idx], "quiz_option", quiz_option))
+            texts_to_process.append((TextID(quiz.option_ids[idx]), TextTypeName("quiz_option"), quiz_option))
         for idx, quiz_explanation in enumerate(quiz.explanations):
-            texts_to_process.append((quiz.explanation_ids[idx], "quiz_explanation", quiz_explanation))
+            texts_to_process.append((TextID(quiz.explanation_ids[idx]), TextTypeName("quiz_explanation"), quiz_explanation))
 
     # Handle same language case (no translation needed)
     if input_language.code == plate_language.code:
         return {
-            text_id: OutputText(
-                text_id=text_id,
+            OutputTextID(text_id): OutputText(
+                text_id=OutputTextID(text_id),
                 text_type=text_type,
                 text=text_content,
                 language_code=plate_language.code,
@@ -265,7 +268,7 @@ def plate_output_texts_by_id(
     results = run_async_task(translate_texts)
     # Flatten results - each result is a list with one item
     texts = [text for result_list in results for text in result_list]
-    return {t.text_id: t for t in texts}
+    return {OutputTextID(t.text_id): t for t in texts}
 
 
 def plate_translations(
@@ -281,9 +284,9 @@ def plate_translations(
     plate_texts_by_id = {t.text_id: t for t in plate_texts}
 
     # Identify which text IDs are in groups
-    text_ids_in_groups = set()
+    text_ids_in_groups: set[OutputTextID] = set()
     for group in plate_groups:
-        text_ids_in_groups.update(group.text_ids)
+        text_ids_in_groups.update(OutputTextID(tid) for tid in group.text_ids)
 
     # Identify texts not in any group
     ungrouped_text_ids = set(plate_texts_by_id.keys()) - text_ids_in_groups

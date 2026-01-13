@@ -2,6 +2,7 @@ from banks import Prompt
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
+from adt_press.models.ids import ExplanationID
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, SectionExplanation
@@ -38,7 +39,7 @@ async def get_section_explanation(
     )
 
     return SectionExplanation(
-        explanation_id=f"{section.section_id}_eli5",
+        explanation_id=ExplanationID(f"{section.section_id}_eli5"),
         section_id=section.section_id,
         reasoning=response.reasoning,
         explanation=response.explanation,

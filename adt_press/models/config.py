@@ -21,6 +21,7 @@ TextGroupTypeName = NewType("TextGroupTypeName", str)
 SectionTypeName = NewType("SectionTypeName", str)
 RenderStrategyName = NewType("RenderStrategyName", str)
 
+
 class TextType(BaseModel):
     name: TextTypeName
     description: str

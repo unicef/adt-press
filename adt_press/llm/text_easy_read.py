@@ -2,6 +2,7 @@ from banks import Prompt
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
+from adt_press.models.ids import EasyReadID
 from adt_press.models.text import EasyReadText, Text
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
@@ -31,7 +32,7 @@ async def get_text_easy_read(output_language: Language, config: PromptConfig, te
     )
 
     return EasyReadText(
-        easy_read_id=f"{text.text_id}_easy_read",
+        easy_read_id=EasyReadID(f"{text.text_id}_easy_read"),
         text_id=text.text_id,
         easy_read=response.data,
         reasoning=response.reasoning,

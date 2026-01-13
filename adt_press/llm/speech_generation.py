@@ -5,6 +5,7 @@ import litellm
 from pydub import AudioSegment
 
 from adt_press.models.config import SpeechPromptConfig
+from adt_press.models.ids import SpeechID, TextID
 from adt_press.models.speech import SpeechFile
 from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
@@ -112,8 +113,8 @@ async def generate_speech_file(
         shutil.copy2(empty_template, speech_path)
 
         return SpeechFile(
-            text_id=text_id,
-            speech_id=speech_id,
+            text_id=TextID(text_id),
+            speech_id=SpeechID(speech_id),
             speech_path=speech_relative_path,
             language_code=language_code,
             provider=resolved_provider,
@@ -172,10 +173,10 @@ async def generate_speech_file(
     raw.export(speech_path, bitrate=config.bit_rate, format=config.format, parameters=["-ac", "1"])
 
     return SpeechFile(
-        speech_id=speech_id,
+        speech_id=SpeechID(speech_id),
         speech_path=speech_relative_path,
         language_code=language_code,
-        text_id=text_id,
+        text_id=TextID(text_id),
         provider=resolved_provider,
         voice=resolved_voice,
         model=model,

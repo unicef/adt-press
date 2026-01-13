@@ -21,7 +21,7 @@ from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
-from adt_press.models.text import Text, TextGroup, PageTextGroups
+from adt_press.models.text import PageTextGroups, Text, TextGroup
 from adt_press.utils.languages import Language
 
 
