@@ -6,11 +6,12 @@ from hamilton.function_modifiers import config
 from adt_press.llm.metadata_extraction import get_metadata
 from adt_press.llm.text_easy_read import get_text_easy_read
 from adt_press.llm.text_extraction import get_page_text
-from adt_press.models.config import MetadataPromptConfig, PromptConfig, TextGroupType, TextType
+from adt_press.models.config import MetadataPromptConfig, PromptConfig, TextGroupType, TextGroupTypeName, TextType, TextTypeName
+from adt_press.models.ids import ImageID, PageID, TextGroupID, TextID
 from adt_press.models.image import Image
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
-from adt_press.models.text import EasyReadText, PageText, PageTextGroup, PageTexts
+from adt_press.models.text import EasyReadText, Text, TextGroup, PageTextGroups
 from adt_press.nodes.config_nodes import PageRangeConfig
 from adt_press.utils.file import copy_file
 from adt_press.utils.languages import Language
@@ -18,7 +19,7 @@ from adt_press.utils.pdf import extract_pdf_to_dir
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
-def pdf_pages_by_id(pdf_pages: list[Page]) -> dict[str, Page]:
+def pdf_pages_by_id(pdf_pages: list[Page]) -> dict[PageID, Page]:
     return {p.page_id: p for p in pdf_pages}
 
 
@@ -33,10 +34,10 @@ def pdf_texts(
     run_output_dir_config: str,
     pdf_pages: list[Page],
     text_extraction_prompt_config: PromptConfig,
-    text_types_config: dict[str, TextType],
-    text_group_types_config: dict[str, TextGroupType],
+    text_types_config: dict[TextTypeName, TextType],
+    text_group_types_config: dict[TextGroupTypeName, TextGroupType],
     input_language: Language,
-) -> dict[str, PageTexts]:
+) -> dict[PageID, PageTextGroups]:
     async def extract_text():
         text = []
         for page in pdf_pages:
@@ -62,8 +63,8 @@ def pdf_texts(
 def easy_reads_by_text_id__llm(
     input_language: Language,
     text_easy_read_prompt_config: PromptConfig,
-    processed_pdf_texts: dict[str, PageTexts],
-) -> dict[str, EasyReadText]:
+    processed_pdf_texts: dict[str, PageTextGroups],
+) -> dict[TextID, EasyReadText]:
     async def get_easy_reads():
         tasks = []
         for page_texts in processed_pdf_texts.values():
@@ -81,18 +82,18 @@ def easy_reads_by_text_id__llm(
 def easy_reads_by_text_id__none(
     input_language: Language,
     text_easy_read_prompt_config: PromptConfig,
-    processed_pdf_texts: dict[str, PageTexts],
-) -> dict[str, EasyReadText]:
+    processed_pdf_texts: dict[PageID, PageTextGroups],
+) -> dict[TextID, EasyReadText]:
     return {}
 
 
-def processed_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str, PageTexts]) -> dict[str, PageTexts]:
+def processed_pdf_texts(pruned_text_types_config: list[TextTypeName], pdf_texts: dict[PageID, PageTextGroups]) -> dict[PageID, PageTextGroups]:
     filtered_texts = {}
     for page_id, page_texts in pdf_texts.items():
         groups = []
         for g in page_texts.groups:
             group_texts = [
-                PageText(
+                Text(
                     text_id=t.text_id,
                     text=t.text,
                     text_type=t.text_type,
@@ -101,9 +102,9 @@ def processed_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str
                 for t in g.texts
             ]
 
-            groups.append(PageTextGroup(group_id=g.group_id, group_type=g.group_type, texts=group_texts))
+            groups.append(TextGroup(group_id=g.group_id, group_type=g.group_type, texts=group_texts))
 
-        filtered_texts[page_id] = PageTexts(
+        filtered_texts[page_id] = PageTextGroups(
             page_id=page_id,
             groups=groups,
             reasoning=page_texts.reasoning,
@@ -112,16 +113,16 @@ def processed_pdf_texts(pruned_text_types_config: list[str], pdf_texts: dict[str
     return filtered_texts
 
 
-def filtered_pdf_texts(processed_pdf_texts: dict[str, PageTexts]) -> dict[str, PageTexts]:
+def filtered_pdf_texts(processed_pdf_texts: dict[PageID, PageTextGroups]) -> dict[PageID, PageTextGroups]:
     unpruned_texts = {}
     for page_id, page_texts in processed_pdf_texts.items():
         groups = []
         for g in page_texts.groups:
             group_texts = [t for t in g.texts if not t.is_pruned]
             if group_texts:
-                groups.append(PageTextGroup(group_id=g.group_id, group_type=g.group_type, texts=group_texts))
+                groups.append(TextGroup(group_id=g.group_id, group_type=g.group_type, texts=group_texts))
 
-        unpruned_texts[page_id] = PageTexts(
+        unpruned_texts[page_id] = PageTextGroups(
             page_id=page_id,
             groups=groups,
             reasoning=page_texts.reasoning,
@@ -130,7 +131,7 @@ def filtered_pdf_texts(processed_pdf_texts: dict[str, PageTexts]) -> dict[str, P
     return unpruned_texts
 
 
-def processed_pdf_texts_by_id(processed_pdf_texts: dict[str, PageTexts]) -> dict[str, PageText]:
+def processed_pdf_texts_by_id(processed_pdf_texts: dict[PageID, PageTextGroups]) -> dict[TextID, Text]:
     texts = {}
     for pt in processed_pdf_texts.values():
         for g in pt.groups:
@@ -139,7 +140,7 @@ def processed_pdf_texts_by_id(processed_pdf_texts: dict[str, PageTexts]) -> dict
     return texts
 
 
-def pdf_text_groups_by_id(processed_pdf_texts: dict[str, PageTexts]) -> dict[str, PageTextGroup]:
+def pdf_text_groups_by_id(processed_pdf_texts: dict[PageID, PageTextGroups]) -> dict[TextGroupID, TextGroup]:
     groups = {}
     for pt in processed_pdf_texts.values():
         for g in pt.groups:
@@ -190,8 +191,8 @@ def pdf_pages(run_output_dir_config: str, pdf_extraction_dir: str) -> list[Page]
         images = []
         for img_data in page_data["images"]:
             image = Image(
-                image_id=img_data["image_id"],
-                page_id=img_data["page_id"],
+                image_id=ImageID(img_data["image_id"]),
+                page_id=PageID(img_data["page_id"]),
                 index=img_data["index"],
                 image_path=copy_file(pdf_extraction_dir, images_dir, img_data["image_path"]),
                 chart_path=copy_file(pdf_extraction_dir, images_dir, img_data["chart_path"]),
@@ -203,7 +204,7 @@ def pdf_pages(run_output_dir_config: str, pdf_extraction_dir: str) -> list[Page]
 
         # Create page object with copied image path
         page = Page(
-            page_id=page_data["page_id"],
+            page_id=PageID(page_data["page_id"]),
             page_number=page_data["page_number"],
             page_image_path=copy_file(pdf_extraction_dir, images_dir, page_data["page_image_path"]),
             text=page_data["text"],

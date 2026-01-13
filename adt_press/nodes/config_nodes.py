@@ -17,11 +17,15 @@ from adt_press.models.config import (
     QuizPromptConfig,
     RenderPromptConfig,
     RenderStrategy,
+    RenderStrategyName,
     RenderType,
     SectionType,
+    SectionTypeName,
     SpeechPromptConfig,
     TextGroupType,
+    TextGroupTypeName,
     TextType,
+    TextTypeName,
 )
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
@@ -95,8 +99,8 @@ def page_grouping_config(config: DictConfig) -> str:
 
 
 @cache(behavior="recompute")
-def section_types_config(config: DictConfig, default_render_strategy_config: str) -> dict[str, SectionType]:
-    types = dict[str, SectionType]()
+def section_types_config(config: DictConfig, default_render_strategy_config: RenderStrategyName) -> dict[SectionTypeName, SectionType]:
+    types = dict[SectionTypeName, SectionType]()
     for name, section_type in config["section_types"].items():
         params = dict(section_type)
         params["name"] = name
@@ -108,8 +112,8 @@ def section_types_config(config: DictConfig, default_render_strategy_config: str
 
 
 @cache(behavior="recompute")
-def text_types_config(config: DictConfig) -> dict[str, TextType]:
-    types = dict[str, TextType]()
+def text_types_config(config: DictConfig) -> dict[TextTypeName, TextType]:
+    types = dict[TextTypeName, TextType]()
     for name, text_type in config["text_types"].items():
         params = dict(text_type)
         params["name"] = name
@@ -118,8 +122,8 @@ def text_types_config(config: DictConfig) -> dict[str, TextType]:
 
 
 @cache(behavior="recompute")
-def text_group_types_config(config: DictConfig) -> dict[str, TextGroupType]:
-    types = dict[str, TextGroupType]()
+def text_group_types_config(config: DictConfig) -> dict[TextGroupTypeName, TextGroupType]:
+    types = dict[TextGroupTypeName, TextGroupType]()
     for name, text_group_type in config["text_group_types"].items():
         params = dict(text_group_type)
         params["name"] = name
@@ -128,21 +132,21 @@ def text_group_types_config(config: DictConfig) -> dict[str, TextGroupType]:
 
 
 @cache(behavior="recompute")
-def default_render_strategy_config(config: DictConfig) -> str:
+def default_render_strategy_config(config: DictConfig) -> RenderStrategyName:
     return str(config.get("default_render_strategy", "html"))
 
 
 @cache(behavior="recompute")
-def render_strategy_config(config: DictConfig, render_strategies_config: dict[str, RenderStrategy]) -> str:
-    strategy = str(config["render_strategy"])
+def render_strategy_config(config: DictConfig, render_strategies_config: dict[RenderStrategyName, RenderStrategy]) -> RenderStrategyName:
+    strategy = RenderStrategyName(config["render_strategy"])
     if strategy != "dynamic" and strategy not in render_strategies_config:
         raise ValueError(f"Unknown render strategy: {strategy}")
     return strategy
 
 
 @cache(behavior="recompute")
-def render_strategies_config(config: DictConfig) -> dict[str, RenderStrategy]:
-    strategies = dict[str, RenderStrategy]()
+def render_strategies_config(config: DictConfig) -> dict[RenderStrategyName, RenderStrategy]:
+    strategies = dict[RenderStrategyName, RenderStrategy]()
     for name, strategy in config["render_strategies"].items():
         params = dict(strategy)
         params["name"] = name
@@ -371,12 +375,12 @@ def blank_image_filter_config(image_config: DictConfig) -> BlankImageFilterConfi
     return BlankImageFilterConfig.model_validate(image_config.get("blank", {}))
 
 
-def pruned_text_types_config(config: DictConfig) -> list[str]:
-    return list[str](config.get("text_filters", {}).get("pruned_text_types", []))
+def pruned_text_types_config(config: DictConfig) -> list[TextTypeName]:
+    return list[TextTypeName](config.get("text_filters", {}).get("pruned_text_types", []))
 
 
-def pruned_section_types_config(config: DictConfig) -> list[str]:
-    return list[str](config.get("section_filters", {}).get("pruned_section_types", []))
+def pruned_section_types_config(config: DictConfig) -> list[SectionTypeName]:
+    return list[SectionTypeName](config.get("section_filters", {}).get("pruned_section_types", []))
 
 
 @cache(behavior="recompute")
@@ -386,10 +390,10 @@ def activity_strategy_config(config: DictConfig) -> str:
 
 
 def active_section_types_config(
-    section_types_config: dict[str, SectionType],
-    render_strategies_config: dict[str, RenderStrategy],
+    section_types_config: dict[SectionTypeName, SectionType],
+    render_strategies_config: dict[RenderStrategyName, RenderStrategy],
     activity_strategy_config: str,
-) -> dict[str, SectionType]:
+) -> dict[SectionTypeName, SectionType]:
     """Filter out section types with activity render strategy when activity_strategy is none.
 
     This prevents configuration errors where sections are classified as activities

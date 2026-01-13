@@ -5,15 +5,16 @@ from hamilton.function_modifiers import cache
 from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig, TextTypeName
+from adt_press.models.ids import ImageID, OutputTextID, PageID, SectionID, TextID
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
 from adt_press.models.plate import Plate, PlateChapter, PlateGroup, PlateImage, PlateQuiz, PlateSection, PlateText
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
-from adt_press.models.text import EasyReadText, OutputText, PageTexts
+from adt_press.models.text import EasyReadText, OutputText, PageTextGroups
 from adt_press.utils.file import calculate_file_hash, write_text_file
-from adt_press.utils.languages import Language
+from adt_press.utils.languages import Language, LanguageCode
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
@@ -22,12 +23,12 @@ def generated_plate(
     plate_language: Language,
     book_metadata: BookMetadata,
     pdf_pages: list[Page],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    processed_images_by_id: dict[str, ProcessedImage],
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    processed_images_by_id: dict[ImageID, ProcessedImage],
     plate_groups: list[PlateGroup],
-    plate_output_texts_by_id: dict[str, OutputText],
-    explanations_by_section_id: dict[str, SectionExplanation],
-    quizzes_by_section_id: dict[str, SectionQuiz],
+    plate_output_texts_by_id: dict[OutputTextID, OutputText],
+    explanations_by_section_id: dict[SectionID, SectionExplanation],
+    quizzes_by_section_id: dict[SectionID, SectionQuiz],
     plate_glossary: list[GlossaryItem],
 ) -> Plate:
     plate_sections: list[PlateSection] = []
@@ -104,7 +105,7 @@ def generated_plate(
     )
 
 
-def plate_sections_by_id(plate: Plate) -> dict[str, PlateSection]:
+def plate_sections_by_id(plate: Plate) -> dict[SectionID, PlateSection]:
     return {section.section_id: section for section in plate.sections}
 
 
@@ -130,7 +131,7 @@ def plate_texts(plate: Plate) -> list[PlateText]:
 
 
 def plate_glossary(
-    filtered_sections_by_page_id: dict[str, PageSections], section_glossaries_by_id: dict[str, SectionGlossary]
+    filtered_sections_by_page_id: dict[PageID, PageSections], section_glossaries_by_id: dict[SectionID, SectionGlossary]
 ) -> list[GlossaryItem]:
     # build glossary from all section glossaries, we keep the first definition we see
     glossary_items: dict[str, GlossaryItem] = {}
@@ -152,8 +153,8 @@ def plate_glossary_translations(
     plate_language: Language,
     output_languages: list[Language],
     plate_glossary: list[GlossaryItem],
-) -> dict[str, list[GlossaryItem]]:
-    glossary_translations: dict[str, list[GlossaryItem]] = {}
+) -> dict[LanguageCode, list[GlossaryItem]]:
+    glossary_translations: dict[LanguageCode, list[GlossaryItem]] = {}
 
     def translate_glossary_to_lang(output_language: Language):
         async def translate_glossary():
@@ -182,7 +183,7 @@ def plate_glossary_translations(
     return glossary_translations
 
 
-def plate_groups(processed_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
+def plate_groups(processed_pdf_texts: dict[PageID, PageTextGroups]) -> list[PlateGroup]:
     groups = []
     for page_texts in processed_pdf_texts.values():
         for g in page_texts.groups:
@@ -192,15 +193,15 @@ def plate_groups(processed_pdf_texts: dict[str, PageTexts]) -> list[PlateGroup]:
 
 def plate_output_texts_by_id(
     text_translation_prompt_config: PromptConfig,
-    processed_pdf_texts: dict[str, PageTexts],
-    easy_reads_by_text_id: dict[str, EasyReadText],
-    image_captions_by_id: dict[str, ImageCaption],
-    explanations_by_section_id: dict[str, SectionExplanation],
+    processed_pdf_texts: dict[PageID, PageTextGroups],
+    easy_reads_by_text_id: dict[TextID, EasyReadText],
+    image_captions_by_id: dict[ImageID, ImageCaption],
+    explanations_by_section_id: dict[SectionID, SectionExplanation],
     book_table_of_contents: list[BookChapter],
-    quizzes_by_section_id: dict[str, SectionQuiz],
+    quizzes_by_section_id: dict[SectionID, SectionQuiz],
     input_language: Language,
     plate_language: Language,
-) -> dict[str, OutputText]:
+) -> dict[OutputTextID, OutputText]:
     # Collect all texts that need processing
     texts_to_process = list[tuple[str, TextTypeName, str]]()
 
@@ -273,8 +274,8 @@ def plate_translations(
     plate_groups: list[PlateGroup],
     plate_texts: list[PlateText],
     output_languages: list[Language],
-) -> dict[str, dict[str, str]]:
-    plate_translations: dict[str, dict[str, str]] = {}
+) -> dict[LanguageCode, dict[OutputTextID, str]]:
+    plate_translations: dict[LanguageCode, dict[OutputTextID, str]] = {}
 
     # Create a lookup for plate texts by ID
     plate_texts_by_id = {t.text_id: t for t in plate_texts}

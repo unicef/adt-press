@@ -2,6 +2,7 @@ from hamilton.function_modifiers import cache
 from omegaconf import DictConfig, OmegaConf
 
 from adt_press.models.config import MetadataPromptConfig, TemplateConfig
+from adt_press.models.ids import ImageID, OutputTextID, PageID, SectionID, TextGroupID, TextID
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
@@ -9,10 +10,10 @@ from adt_press.models.plate import Plate, PlateSection
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import GlossaryItem, PageSections, SectionExplanation, SectionGlossary
 from adt_press.models.speech import SpeechFile
-from adt_press.models.text import EasyReadText, OutputText, PageText, PageTextGroup, PageTexts
+from adt_press.models.text import EasyReadText, OutputText, Text, TextGroup, PageTextGroups
 from adt_press.models.web import WebPage
 from adt_press.utils.html import render_template
-from adt_press.utils.languages import Language
+from adt_press.utils.languages import Language, LanguageCode
 from adt_press.utils.report_assets import compile_tailwind_for_reports
 
 
@@ -30,8 +31,8 @@ def report_pruned_images(template_config: TemplateConfig, pruned_images: list[Pr
 def report_quizzes(
     template_config: TemplateConfig,
     pdf_pages: list[Page],
-    sections_by_page_id: dict[str, PageSections],
-    quizzes_by_section_id: dict[str, SectionQuiz],
+    sections_by_page_id: dict[PageID, PageSections],
+    quizzes_by_section_id: dict[SectionID, SectionQuiz],
 ) -> str:
     return render_template(
         template_config,
@@ -48,15 +49,15 @@ def report_quizzes(
 def report_pages(
     template_config: TemplateConfig,
     pdf_pages: list[Page],
-    processed_pdf_texts: dict[str, PageTexts],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    processed_pdf_texts_by_id: dict[str, PageText],
-    pdf_text_groups_by_id: dict[str, PageTextGroup],
-    processed_images_by_id: dict[str, ProcessedImage],
-    explanations_by_section_id: dict[str, SectionExplanation],
-    plate_output_texts_by_id: dict[str, OutputText],
-    section_glossaries_by_id: dict[str, SectionGlossary],
-    easy_reads_by_text_id: dict[str, EasyReadText],
+    processed_pdf_texts: dict[PageID, PageTextGroups],
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    processed_pdf_texts_by_id: dict[TextID, Text],
+    pdf_text_groups_by_id: dict[TextGroupID, TextGroup],
+    processed_images_by_id: dict[ImageID, ProcessedImage],
+    explanations_by_section_id: dict[SectionID, SectionExplanation],
+    plate_output_texts_by_id: dict[OutputTextID, OutputText],
+    section_glossaries_by_id: dict[SectionID, SectionGlossary],
+    easy_reads_by_text_id: dict[TextID, EasyReadText],
     input_language: Language,
     plate_language: Language,
 ) -> str:
@@ -111,8 +112,8 @@ def translation_report(
     template_config: TemplateConfig,
     output_languages: list[Language],
     plate: Plate,
-    plate_translations: dict[str, dict[str, str]],
-    speech_files: dict[str, dict[str, SpeechFile]],
+    plate_translations: dict[LanguageCode, dict[OutputTextID, str]],
+    speech_files: dict[LanguageCode, dict[OutputTextID, SpeechFile]],
 ) -> str:
     return render_template(
         template_config,
@@ -131,7 +132,7 @@ def glossary_report(
     template_config: TemplateConfig,
     plate: Plate,
     output_languages: list[Language],
-    plate_glossary_translations: dict[str, list[GlossaryItem]],
+    plate_glossary_translations: dict[LanguageCode, list[GlossaryItem]],
 ) -> str:
     return render_template(
         template_config,
@@ -149,7 +150,7 @@ def metadata_report(
     template_config: TemplateConfig,
     book_metadata: BookMetadata,
     pdf_pages: list[Page],
-    pdf_pages_by_id: dict[str, Page],
+    pdf_pages_by_id: dict[PageID, Page],
     metadata_extraction_prompt_config: MetadataPromptConfig,
 ) -> str:
     # Find the cover page if specified
@@ -178,7 +179,7 @@ def web_report(
     template_config: TemplateConfig,
     web_pages: list[WebPage],
     plate: Plate,
-    plate_sections_by_id: dict[str, PlateSection],
+    plate_sections_by_id: dict[SectionID, PlateSection],
 ) -> str:
     sections_lookup = dict(plate_sections_by_id)
     for quiz in plate.quizzes:

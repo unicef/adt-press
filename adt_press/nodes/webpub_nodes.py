@@ -6,9 +6,11 @@ import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
+from adt_press.models.ids import OutputTextID
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
 from adt_press.utils.file import write_json_file
+from adt_press.utils.languages import LanguageCode
 from adt_press.utils.web_assets import build_config_json
 
 log = structlog.get_logger(__name__)
@@ -20,7 +22,7 @@ def package_webpub(
     pdf_title_config: str,
     run_output_dir_config: str,
     plate: Plate,
-    plate_translations: dict[str, dict[str, str]],
+    plate_translations: dict[LanguageCode, dict[OutputTextID, str]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,

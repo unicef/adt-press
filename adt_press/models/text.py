@@ -11,22 +11,22 @@ class EasyReadText(BaseModel):
     reasoning: str
 
 
-class PageText(BaseModel):
+class Text(BaseModel):
     text_id: TextID
     text: str
     text_type: TextTypeName
     is_pruned: bool = False
 
 
-class PageTextGroup(BaseModel):
+class TextGroup(BaseModel):
     group_id: TextGroupID
     group_type: TextGroupTypeName
-    texts: list[PageText]
+    texts: list[Text]
 
 
-class PageTexts(BaseModel):
+class PageTextGroups(BaseModel):
     page_id: PageID
-    groups: list[PageTextGroup]
+    groups: list[TextGroup]
     reasoning: str
 
 

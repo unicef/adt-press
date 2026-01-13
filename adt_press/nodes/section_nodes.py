@@ -4,24 +4,25 @@ from adt_press.llm.page_sectioning import get_page_sections
 from adt_press.llm.section_explanations import get_section_explanation
 from adt_press.llm.section_glossary import get_section_glossary
 from adt_press.llm.section_quiz import generate_quiz
-from adt_press.models.config import PromptConfig, QuizPromptConfig, SectionType
+from adt_press.models.config import PromptConfig, QuizPromptConfig, SectionType, SectionTypeName
+from adt_press.models.ids import ImageID, PageID, SectionID, TextGroupID, TextID
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import PageSection, PageSections, SectionExplanation, SectionGlossary
-from adt_press.models.text import PageText, PageTextGroup, PageTexts
+from adt_press.models.text import Text, TextGroup, PageTextGroups
 from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 def sections_by_page_id(
     pdf_pages: list[Page],
-    processed_images_by_page: dict[str, list[ProcessedImage]],
-    filtered_pdf_texts: dict[str, PageTexts],
+    processed_images_by_page: dict[PageID, list[ProcessedImage]],
+    filtered_pdf_texts: dict[PageID, PageTextGroups],
     page_sectioning_prompt_config: PromptConfig,
-    active_section_types_config: dict[str, SectionType],
+    active_section_types_config: dict[SectionTypeName, SectionType],
     page_grouping_config: str,
-) -> dict[str, PageSections]:
+) -> dict[PageID, PageSections]:
     page_sections = {}
 
     spread_mode = page_grouping_config == "spread"
@@ -51,8 +52,8 @@ def sections_by_page_id(
 
 
 def filtered_sections_by_page_id(
-    pruned_section_types_config: list[str], sections_by_page_id: dict[str, PageSections]
-) -> dict[str, PageSections]:
+    pruned_section_types_config: list[SectionTypeName], sections_by_page_id: dict[PageID, PageSections]
+) -> dict[PageID, PageSections]:
     filtered_sections = {}
     for page_id, page_sections in sections_by_page_id.items():
         filtered_sections[page_id] = PageSections(
@@ -78,10 +79,10 @@ def filtered_sections_by_page_id(
 def quizzes_by_section_id__none(
     plate_language: Language,
     pdf_pages: list[Page],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    pdf_text_groups_by_id: dict[str, PageTextGroup],
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    pdf_text_groups_by_id: dict[TextGroupID, TextGroup],
     quiz_prompt_config: QuizPromptConfig,
-) -> dict[str, SectionQuiz]:
+) -> dict[SectionID, SectionQuiz]:
     return {}
 
 
@@ -89,10 +90,10 @@ def quizzes_by_section_id__none(
 def quizzes_by_section_id__llm(
     plate_language: Language,
     pdf_pages: list[Page],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    pdf_text_groups_by_id: dict[str, PageTextGroup],
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    pdf_text_groups_by_id: dict[TextGroupID, TextGroup],
     quiz_prompt_config: QuizPromptConfig,
-) -> dict[str, SectionQuiz]:
+) -> dict[SectionID, SectionQuiz]:
     if quiz_prompt_config.sections_per_quiz < 1:
         raise ValueError("sections_per_quiz must be at least 1, use quiz_strategy 'none' to disable quizzes")
 
@@ -124,11 +125,11 @@ def quizzes_by_section_id__llm(
 def explanations_by_section_id__llm(
     plate_language: Language,
     pdf_pages: list[Page],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    processed_pdf_texts_by_id: dict[str, PageText],
-    processed_images_by_id: dict[str, ProcessedImage],
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    processed_pdf_texts_by_id: dict[TextID, Text],
+    processed_images_by_id: dict[ImageID, ProcessedImage],
     section_explanation_prompt_config: PromptConfig,
-) -> dict[str, SectionExplanation]:
+) -> dict[SectionID, SectionExplanation]:
     async def explain_sections():
         explanations = []
         for page in pdf_pages:
@@ -161,11 +162,11 @@ def explanations_by_section_id__llm(
 def explanations_by_section_id__none(
     plate_language: Language,
     pdf_pages: list[Page],
-    filtered_sections_by_page_id: dict[str, PageSections],
-    processed_pdf_texts_by_id: dict[str, PageText],
-    processed_images_by_id: dict[str, ProcessedImage],
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    processed_pdf_texts_by_id: dict[TextID, Text],
+    processed_images_by_id: dict[ImageID, ProcessedImage],
     section_explanation_prompt_config: PromptConfig,
-) -> dict[str, SectionExplanation]:
+) -> dict[SectionID, SectionExplanation]:
     return {}
 
 
@@ -173,9 +174,9 @@ def explanations_by_section_id__none(
 def section_glossaries_by_id__llm(
     plate_language: Language,
     section_glossary_prompt_config: PromptConfig,
-    filtered_sections_by_page_id: dict[str, PageSections],
-    pdf_text_groups_by_id: dict[str, PageTextGroup],
-) -> dict[str, SectionGlossary]:
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    pdf_text_groups_by_id: dict[TextGroupID, TextGroup],
+) -> dict[SectionID, SectionGlossary]:
     async def get_glossaries():
         tasks = []
         for page_sections in filtered_sections_by_page_id.values():
@@ -197,7 +198,7 @@ def section_glossaries_by_id__llm(
 def section_glossaries_by_id__none(
     plate_language: Language,
     section_glossary_prompt_config: PromptConfig,
-    filtered_sections_by_page_id: dict[str, PageSections],
-    processed_pdf_texts_by_id: dict[str, PageText],
-) -> dict[str, SectionGlossary]:
+    filtered_sections_by_page_id: dict[PageID, PageSections],
+    processed_pdf_texts_by_id: dict[TextID, Text],
+) -> dict[SectionID, SectionGlossary]:
     return {}

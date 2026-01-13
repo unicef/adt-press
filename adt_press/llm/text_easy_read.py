@@ -2,7 +2,7 @@ from banks import Prompt
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig
-from adt_press.models.text import EasyReadText, PageText
+from adt_press.models.text import EasyReadText, Text
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
@@ -13,7 +13,7 @@ class EasyReadResponse(CleanTextBaseModel):
     reasoning: str
 
 
-async def get_text_easy_read(output_language: Language, config: PromptConfig, text: PageText) -> EasyReadText:
+async def get_text_easy_read(output_language: Language, config: PromptConfig, text: Text) -> EasyReadText:
     context = dict(
         text=text,
         output_language=output_language.name,

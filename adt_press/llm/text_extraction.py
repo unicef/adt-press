@@ -3,8 +3,9 @@ from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig, TextGroupType, TextGroupTypeName, TextType, TextTypeName
+from adt_press.models.ids import TextGroupID, TextID
 from adt_press.models.pdf import Page
-from adt_press.models.text import PageText, PageTextGroup, PageTexts
+from adt_press.models.text import Text as ADTText, TextGroup as ADTTextGroup, PageTextGroups
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
@@ -49,11 +50,11 @@ async def get_page_text(
     output_dir: str,
     task_id: str,
     config: PromptConfig,
-    text_types: dict[str, TextType],
-    text_group_types: dict[str, TextGroupType],
+    text_types: dict[TextTypeName, TextType],
+    text_group_types: dict[TextGroupTypeName, TextGroupType],
     page: Page,
     language: Language,
-) -> PageTexts:
+) -> PageTextGroups:
     context = dict(
         page=page,
         language=language,  # Add to context
@@ -80,14 +81,14 @@ async def get_page_text(
         context=validation_context,
     )
 
-    return PageTexts(
+    return PageTextGroups(
         page_id=page.page_id,
         groups=[
-            PageTextGroup(
-                group_id=f"grp_p{page.page_number}_g{gi}",
+            ADTTextGroup(
+                group_id=TextGroupID(f"grp_p{page.page_number}_g{gi}"),
                 group_type=g.group_type,
                 texts=[
-                    PageText(text_id=f"txt_p{page.page_number}_g{gi}_t{ti}", text=t.text, text_type=t.text_type)
+                    ADTText(text_id=TextID(f"txt_p{page.page_number}_g{gi}_t{ti}"), text=t.text, text_type=t.text_type)
                     for ti, t in enumerate(g.texts)
                 ],
             )

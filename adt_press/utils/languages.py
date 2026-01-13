@@ -1,9 +1,11 @@
+from typing import NewType
 import pycountry
 from pydantic import BaseModel
 
+LanguageCode = NewType("LanguageCode", str)
 
 class Language(BaseModel):
-    code: str
+    code: LanguageCode
     language_code: str
     country_code: str = ""
     name: str

@@ -13,10 +13,13 @@ from adt_press.models.config import (
     HTMLPromptConfig,
     PromptConfig,
     RenderStrategy,
+    RenderStrategyName,
     SectionType,
+    SectionTypeName,
     TemplateConfig,
     TemplateRenderConfig,
 )
+from adt_press.models.ids import OutputTextID
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.section import GlossaryItem
 from adt_press.models.speech import SpeechFile
@@ -24,7 +27,7 @@ from adt_press.models.web import RenderTextGroup, WebPage
 from adt_press.utils.file import write_json_file
 from adt_press.utils.html import contains_math_content, render_template, replace_images, replace_texts
 from adt_press.utils.image import compress_image_for_web
-from adt_press.utils.languages import Language
+from adt_press.utils.languages import Language, LanguageCode
 from adt_press.utils.sync import gather_with_limit, run_async_task
 from adt_press.utils.web_assets import build_config_json, build_web_assets
 
@@ -35,9 +38,9 @@ def web_pages(
     plate_language: Language,
     plate: Plate,
     default_model_config: str,
-    active_section_types_config: dict[str, SectionType],  # ← TO THIS
-    render_strategy_config: str,
-    render_strategies_config: dict[str, RenderStrategy],
+    active_section_types_config: dict[SectionTypeName, SectionType],
+    render_strategy_config: RenderStrategyName,
+    render_strategies_config: dict[RenderStrategyName, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
     activity_answers_prompts_config: dict[str, PromptConfig],
 ) -> list[WebPage]:
@@ -154,9 +157,9 @@ def package_adt_web(
     pdf_title_config: str,
     plate_language: Language,
     plate: Plate,
-    plate_translations: dict[str, dict[str, str]],
-    plate_glossary_translations: dict[str, list[GlossaryItem]],
-    speech_files: dict[str, dict[str, SpeechFile]],
+    plate_translations: dict[LanguageCode, dict[OutputTextID, str]],
+    plate_glossary_translations: dict[LanguageCode, list[GlossaryItem]],
+    speech_files: dict[LanguageCode, dict[OutputTextID, SpeechFile]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
 ) -> str:

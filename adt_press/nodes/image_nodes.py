@@ -4,6 +4,7 @@ from adt_press.llm.image_caption import get_image_caption
 from adt_press.llm.image_crop import CropPromptConfig, get_image_crop_coordinates
 from adt_press.llm.image_meaningfulness import get_image_meaningfulness
 from adt_press.models.config import PromptConfig
+from adt_press.models.ids import ImageID, PageID
 from adt_press.models.image import (
     CropCoordinates,
     Image,
@@ -22,7 +23,7 @@ from adt_press.utils.languages import Language
 from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
-def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config: ImageSizeFilterConfig) -> dict[str, ImageFilterFailure]:
+def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config: ImageSizeFilterConfig) -> dict[ImageID, ImageFilterFailure]:
     failures = {}
     for img in pdf_images:
         failed = []
@@ -42,7 +43,7 @@ def image_size_filter_failures(pdf_images: list[Image], image_size_filter_config
 
 def image_blank_filter_failures(
     pdf_images: list[Image], blank_image_filter_config: BlankImageFilterConfig
-) -> dict[str, ImageFilterFailure]:
+) -> dict[ImageID, ImageFilterFailure]:
     failures = {}
     for img in pdf_images:
         img_bytes = image_bytes(img.image_path)
@@ -55,9 +56,9 @@ def image_blank_filter_failures(
 def image_meaningfulness(
     meaningfulness_prompt_config: PromptConfig,
     pdf_pages: list[Page],
-    image_blank_filter_failures: dict[str, ImageFilterFailure],
-    image_size_filter_failures: dict[str, ImageFilterFailure],
-) -> dict[str, ImageMeaningfulness]:
+    image_blank_filter_failures: dict[ImageID, ImageFilterFailure],
+    image_size_filter_failures: dict[ImageID, ImageFilterFailure],
+) -> dict[ImageID, ImageMeaningfulness]:
     async def generate_meaningfulness():
         meaningfulness = []
         for page in pdf_pages:
@@ -71,7 +72,7 @@ def image_meaningfulness(
     return {m.image_id: m for m in run_async_task(generate_meaningfulness)}
 
 
-def image_meaningfulness_failures(image_meaningfulness: dict[str, ImageMeaningfulness]) -> dict[str, ImageFilterFailure]:
+def image_meaningfulness_failures(image_meaningfulness: dict[ImageID, ImageMeaningfulness]) -> dict[ImageID, ImageFilterFailure]:
     failures = {}
 
     # map our list back to a dict of failures
@@ -88,9 +89,9 @@ def image_meaningfulness_failures(image_meaningfulness: dict[str, ImageMeaningfu
 
 def pruned_images(
     pdf_images: list[Image],
-    image_size_filter_failures: dict[str, ImageFilterFailure],
-    image_blank_filter_failures: dict[str, ImageFilterFailure],
-    image_meaningfulness_failures: dict[str, ImageFilterFailure],
+    image_size_filter_failures: dict[ImageID, ImageFilterFailure],
+    image_blank_filter_failures: dict[ImageID, ImageFilterFailure],
+    image_meaningfulness_failures: dict[ImageID, ImageFilterFailure],
 ) -> list[PrunedImage]:
     pruned_images = []
     for img in pdf_images:
@@ -108,18 +109,18 @@ def pruned_images(
     return pruned_images
 
 
-def pruned_image_ids(pruned_images: list[PrunedImage]) -> set[str]:
+def pruned_image_ids(pruned_images: list[PrunedImage]) -> set[ImageID]:
     return {img.image_id for img in pruned_images}
 
 
-def filtered_images(pdf_images: list[Image], pruned_image_ids: set[str]) -> list[Image]:
+def filtered_images(pdf_images: list[Image], pruned_image_ids: set[ImageID]) -> list[Image]:
     return [img for img in pdf_images if img.image_id not in pruned_image_ids]
 
 
 @config.when(caption_strategy="llm")
 def image_captions_by_id__llm(
-    plate_language: Language, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
-) -> dict[str, ImageCaption]:
+    plate_language: Language, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[ImageID]
+) -> dict[ImageID, ImageCaption]:
     async def generate_captions():
         captions = []
         for page in pdf_pages:
@@ -134,8 +135,8 @@ def image_captions_by_id__llm(
 
 @config.when(caption_strategy="none")
 def image_captions_by_id__none(
-    plate_language: Language, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]
-) -> dict[str, ImageCaption]:
+    plate_language: Language, caption_prompt_config: PromptConfig, pdf_pages: list[Page], pruned_image_ids: set[ImageID]
+) -> dict[ImageID, ImageCaption]:
     captions = {}
     for page in pdf_pages:
         for image in page.images:
@@ -145,7 +146,7 @@ def image_captions_by_id__none(
 
 
 @config.when(crop_strategy="none")
-def image_crops__none(pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
+def image_crops__none(pdf_pages: list[Page], pruned_image_ids: set[ImageID]) -> dict[ImageID, ImageCrop]:
     # in the noop case, we return the full image as the crop
     return {
         img.image_id: ImageCrop(
@@ -160,7 +161,7 @@ def image_crops__none(pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict
 
 
 @config.when(crop_strategy="llm")
-def image_crops__llm(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[str]) -> dict[str, ImageCrop]:
+def image_crops__llm(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page], pruned_image_ids: set[ImageID]) -> dict[ImageID, ImageCrop]:
     async def generate_crop(page: Page, img: Image) -> ImageCrop:
         coord = await get_image_crop_coordinates(crop_prompt_config, page, img)
 
@@ -188,8 +189,8 @@ def image_crops__llm(crop_prompt_config: CropPromptConfig, pdf_pages: list[Page]
     return {c.image_id: c for c in run_async_task(generate_crops)}
 
 
-def processed_images_by_page(pdf_pages: list[Page], processed_images: list[ProcessedImage]) -> dict[str, list[ProcessedImage]]:
-    by_page: dict[str, list[ProcessedImage]] = {}
+def processed_images_by_page(pdf_pages: list[Page], processed_images: list[ProcessedImage]) -> dict[PageID, list[ProcessedImage]]:
+    by_page: dict[PageID, list[ProcessedImage]] = {}
     for page in pdf_pages:
         by_page[page.page_id] = []
 
@@ -199,15 +200,15 @@ def processed_images_by_page(pdf_pages: list[Page], processed_images: list[Proce
     return by_page
 
 
-def processed_images_by_id(processed_images: list[ProcessedImage]) -> dict[str, ProcessedImage]:
+def processed_images_by_id(processed_images: list[ProcessedImage]) -> dict[ImageID, ProcessedImage]:
     return {img.image_id: img for img in processed_images}
 
 
 def processed_images(
     filtered_images: list[Image],
-    image_captions_by_id: dict[str, ImageCaption],
-    image_crops: dict[str, ImageCrop],
-    image_meaningfulness: dict[str, ImageMeaningfulness],
+    image_captions_by_id: dict[ImageID, ImageCaption],
+    image_crops: dict[ImageID, ImageCrop],
+    image_meaningfulness: dict[ImageID, ImageMeaningfulness],
 ) -> list[ProcessedImage]:
     processed_images = []
     for img in filtered_images:
