@@ -63,7 +63,7 @@ def pdf_texts(
 def easy_reads_by_text_id__llm(
     input_language: Language,
     text_easy_read_prompt_config: PromptConfig,
-    processed_pdf_texts: dict[str, PageTextGroups],
+    processed_pdf_texts: dict[PageID, PageTextGroups],
 ) -> dict[TextID, EasyReadText]:
     async def get_easy_reads():
         tasks = []
