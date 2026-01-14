@@ -87,13 +87,13 @@ def package_webpub(
     }
 
     sections_by_id = {section.section_id: section for section in plate.sections}
-    quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
+    quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
     def section_number_for_page(webpage: WebPage) -> int:
         section = sections_by_id.get(webpage.section_id)
         if section and section.page_number is not None:
             return section.page_number
-        quiz = quizzes_by_id.get(webpage.section_id)
+        quiz = quizzes_by_section_id.get(webpage.section_id)
         if quiz:
             parent_section = sections_by_id.get(quiz.section_id)
             if parent_section and parent_section.page_number is not None:

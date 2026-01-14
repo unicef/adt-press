@@ -184,7 +184,7 @@ def package_adt_web(
     plate_images = {img.image_id: img for img in plate.images}
     plate_texts = {txt.text_id: txt for txt in plate.texts}
     sections_by_id = {section.section_id: section for section in plate.sections}
-    quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
+    quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
     page_list = []
     has_math = False
@@ -195,7 +195,7 @@ def package_adt_web(
         section = sections_by_id.get(webpage.section_id)
         is_quiz_page = False
         if section is None:
-            quiz = quizzes_by_id.get(webpage.section_id)
+            quiz = quizzes_by_section_id.get(webpage.section_id)
             if quiz:
                 is_quiz_page = True
                 section = sections_by_id.get(quiz.section_id)

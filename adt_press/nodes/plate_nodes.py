@@ -80,9 +80,9 @@ def generated_plate(
         for i in processed_images_by_id.values()
     ]
 
-    cover_image_id = ""
+    cover_image_id: ImageID | None = None
     if cover_image_path:
-        cover_image_id = "cover"
+        cover_image_id = ImageID("cover")
         images.append(PlateImage(image_id=ImageID(cover_image_id), image_path=cover_image_path, caption_id=ImageID(cover_image_id)))
 
     table_of_contents: list[PlateChapter] = []
