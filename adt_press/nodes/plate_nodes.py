@@ -76,14 +76,14 @@ def generated_plate(
     # build our plate texts and images from our output texts and processed images
     texts = [PlateText(text_id=t.text_id, text_type=t.text_type, text=t.text) for t in plate_output_texts_by_id.values()]
     images = [
-        PlateImage(image_id=ImageID(i.image_id), image_path=i.crop.image_path, caption_id=ImageID(i.image_id))
+        PlateImage(image_id=ImageID(i.image_id), image_path=i.crop.image_path, caption_id=TextID(i.image_id))
         for i in processed_images_by_id.values()
     ]
 
     cover_image_id: ImageID | None = None
     if cover_image_path:
         cover_image_id = ImageID("cover")
-        images.append(PlateImage(image_id=ImageID(cover_image_id), image_path=cover_image_path, caption_id=ImageID(cover_image_id)))
+        images.append(PlateImage(image_id=ImageID(cover_image_id), image_path=cover_image_path, caption_id=TextID(cover_image_id)))
 
     table_of_contents: list[PlateChapter] = []
     for chapter in book_metadata.table_of_contents:

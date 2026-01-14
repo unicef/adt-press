@@ -21,7 +21,7 @@ class PlateGroup(BaseModel):
 class PlateImage(BaseModel):
     image_id: ImageID
     image_path: str
-    caption_id: str
+    caption_id: TextID
 
 
 class PlateSection(BaseModel):

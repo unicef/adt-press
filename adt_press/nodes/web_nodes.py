@@ -140,7 +140,7 @@ def web_pages(
 
     image_urls = {
         ImageID(img.image_id): PlateImage(
-            image_id=img.image_id, image_path=f"images/{os.path.basename(img.image_path)}", caption_id=img.image_id
+            image_id=img.image_id, image_path=f"images/{os.path.basename(img.image_path)}", caption_id=img.caption_id
         )
         for img in plate.images
     }
