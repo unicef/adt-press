@@ -3,7 +3,7 @@ from typing import Optional
 
 from ebooklib import epub
 
-from adt_press.models.ids import ImageID, OutputTextID
+from adt_press.models.ids import ImageID, TextID
 from adt_press.models.plate import Plate, PlateImage, PlateText
 from adt_press.models.web import WebPage
 from adt_press.utils.file import cached_read_file
@@ -17,8 +17,8 @@ def create_epub_file(
     authors: list[str],
     plate: Plate,
     web_pages: list[WebPage],
-    plate_texts: dict[OutputTextID, PlateText],
-    translations: dict[OutputTextID, str],
+    plate_texts: dict[TextID, PlateText],
+    translations: dict[TextID, str],
     image_dir: str,
     css_content: Optional[str] = None,
 ) -> str:
@@ -56,7 +56,7 @@ def create_epub_file(
 
     # Add images
     images_by_id: dict[ImageID, PlateImage] = {img.image_id: img for img in plate.images}
-    texts_by_id: dict[OutputTextID, PlateText] = {OutputTextID(txt.text_id): txt for txt in plate.texts}
+    texts_by_id: dict[TextID, PlateText] = {txt.text_id: txt for txt in plate.texts}
 
     if plate.cover_image_id:
         img = images_by_id[ImageID(plate.cover_image_id)]

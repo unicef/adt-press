@@ -10,8 +10,6 @@ SpeechID = NewType("SpeechID", str)
 ChapterID = NewType("ChapterID", str)
 EasyReadID = NewType("EasyReadID", str)
 
-OutputTextID = NewType("OutputTextID", str)
-
 QuizID = NewType("QuizID", str)
 QuizQuestionID = NewType("QuizQuestionID", str)
 QuizExplanationID = NewType("QuizExplanationID", str)

@@ -5,7 +5,7 @@ from hamilton.function_modifiers import cache
 from adt_press.llm.glossary_translation import get_glossary_translation
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import PromptConfig, TextTypeName
-from adt_press.models.ids import ImageID, OutputTextID, PageID, SectionID, TextID
+from adt_press.models.ids import ImageID, PageID, SectionID, TextID
 from adt_press.models.image import ImageCaption, ProcessedImage
 from adt_press.models.metadata import BookChapter, BookMetadata
 from adt_press.models.pdf import Page
@@ -26,7 +26,7 @@ def generated_plate(
     filtered_sections_by_page_id: dict[PageID, PageSections],
     processed_images_by_id: dict[ImageID, ProcessedImage],
     plate_groups: list[PlateGroup],
-    plate_output_texts_by_id: dict[OutputTextID, OutputText],
+    plate_output_texts_by_id: dict[TextID, OutputText],
     explanations_by_section_id: dict[SectionID, SectionExplanation],
     quizzes_by_section_id: dict[SectionID, SectionQuiz],
     plate_glossary: list[GlossaryItem],
@@ -204,7 +204,7 @@ def plate_output_texts_by_id(
     quizzes_by_section_id: dict[SectionID, SectionQuiz],
     input_language: Language,
     plate_language: Language,
-) -> dict[OutputTextID, OutputText]:
+) -> dict[TextID, OutputText]:
     # Collect all texts that need processing
     texts_to_process = list[tuple[TextID, TextTypeName, str]]()
 
@@ -242,8 +242,8 @@ def plate_output_texts_by_id(
     # Handle same language case (no translation needed)
     if input_language.code == plate_language.code:
         return {
-            OutputTextID(text_id): OutputText(
-                text_id=OutputTextID(text_id),
+            TextID(text_id): OutputText(
+                text_id=text_id,
                 text_type=text_type,
                 text=text_content,
                 language_code=plate_language.code,
@@ -268,7 +268,7 @@ def plate_output_texts_by_id(
     results = run_async_task(translate_texts)
     # Flatten results - each result is a list with one item
     texts = [text for result_list in results for text in result_list]
-    return {OutputTextID(t.text_id): t for t in texts}
+    return {TextID(t.text_id): t for t in texts}
 
 
 def plate_translations(
@@ -277,16 +277,16 @@ def plate_translations(
     plate_groups: list[PlateGroup],
     plate_texts: list[PlateText],
     output_languages: list[Language],
-) -> dict[LanguageCode, dict[OutputTextID, str]]:
-    plate_translations: dict[LanguageCode, dict[OutputTextID, str]] = {}
+) -> dict[LanguageCode, dict[TextID, str]]:
+    plate_translations: dict[LanguageCode, dict[TextID, str]] = {}
 
     # Create a lookup for plate texts by ID
     plate_texts_by_id = {t.text_id: t for t in plate_texts}
 
     # Identify which text IDs are in groups
-    text_ids_in_groups: set[OutputTextID] = set()
+    text_ids_in_groups = set()
     for group in plate_groups:
-        text_ids_in_groups.update(OutputTextID(tid) for tid in group.text_ids)
+        text_ids_in_groups.update(group.text_ids)
 
     # Identify texts not in any group
     ungrouped_text_ids = set(plate_texts_by_id.keys()) - text_ids_in_groups

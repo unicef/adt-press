@@ -3,7 +3,7 @@ from pydantic import ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import PromptConfig, TextTypeName
-from adt_press.models.ids import OutputTextID
+from adt_press.models.ids import TextID
 from adt_press.models.text import OutputText
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
@@ -81,7 +81,7 @@ async def get_text_translation(
     text_type_map = {text_id: text_type for text_id, text_type, _ in texts}
     return [
         OutputText(
-            text_id=OutputTextID(translation.text_id),
+            text_id=TextID(translation.text_id),
             text_type=TextTypeName(text_type_map[translation.text_id]),
             text=translation.text,
             reasoning=response.reasoning,

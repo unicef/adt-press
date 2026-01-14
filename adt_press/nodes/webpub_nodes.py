@@ -6,7 +6,7 @@ import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
-from adt_press.models.ids import OutputTextID
+from adt_press.models.ids import TextID
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
 from adt_press.utils.file import write_json_file
@@ -22,7 +22,7 @@ def package_webpub(
     pdf_title_config: str,
     run_output_dir_config: str,
     plate: Plate,
-    plate_translations: dict[LanguageCode, dict[OutputTextID, str]],
+    plate_translations: dict[LanguageCode, dict[TextID, str]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
@@ -106,7 +106,7 @@ def package_webpub(
         page_number = section_number_for_page(webpage)
         title = f"{page_number}"
         if len(webpage.text_ids):
-            title += f" - {plate_translations[default_language].get(OutputTextID(webpage.text_ids[0]), '')}"
+            title += f" - {plate_translations[default_language].get(TextID(webpage.text_ids[0]), '')}"
 
         page_entry = {
             "href": f"{webpage.section_id}.html",

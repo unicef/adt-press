@@ -57,7 +57,7 @@ async def generate_speech_file(
     config: SpeechPromptConfig,
     voice_maps: dict[str, dict[str, str]],  # Add cached voice maps parameter
     language: Language,
-    text_id: str,
+    text_id: TextID,
     text: str,
 ) -> SpeechFile:
     """
@@ -92,7 +92,7 @@ async def generate_speech_file(
         )
 
     # Setup common paths and metadata
-    speech_id = f"{text_id}_{language_code}"
+    speech_id = SpeechID(f"{text_id}_{language_code}")
     speech_dir = os.path.join(run_output_dir, "audio", language_code)
     os.makedirs(speech_dir, exist_ok=True)
     speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
@@ -113,8 +113,8 @@ async def generate_speech_file(
         shutil.copy2(empty_template, speech_path)
 
         return SpeechFile(
-            text_id=TextID(text_id),
-            speech_id=SpeechID(speech_id),
+            speech_id=speech_id,
+            text_id=text_id,
             speech_path=speech_relative_path,
             language_code=language_code,
             provider=resolved_provider,
@@ -173,10 +173,10 @@ async def generate_speech_file(
     raw.export(speech_path, bitrate=config.bit_rate, format=config.format, parameters=["-ac", "1"])
 
     return SpeechFile(
-        speech_id=SpeechID(speech_id),
+        speech_id=speech_id,
+        text_id=text_id,
         speech_path=speech_relative_path,
         language_code=language_code,
-        text_id=TextID(text_id),
         provider=resolved_provider,
         voice=resolved_voice,
         model=model,

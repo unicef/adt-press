@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from adt_press.models.config import TextGroupTypeName, TextTypeName
-from adt_press.models.ids import EasyReadID, OutputTextID, PageID, TextGroupID, TextID
+from adt_press.models.ids import EasyReadID, PageID, TextGroupID, TextID
 
 
 class EasyReadText(BaseModel):
@@ -31,7 +31,7 @@ class PageTextGroups(BaseModel):
 
 
 class OutputText(BaseModel):
-    text_id: OutputTextID
+    text_id: TextID
     text_type: TextTypeName
     language_code: str
     text: str

@@ -127,3 +127,10 @@ Modular JavaScript in `assets/web/assets/`: `base.js` initializes modules from `
 - **Pipeline cache issues**: Run with `clear_cache=true` to reset: `uv run python adt-press.py clear_cache=true label=test pdf_path=...`
 - **Hamilton node errors**: Check function names don't conflict. Hamilton uses function names as node IDs - duplicate names break the DAG.
 - **Config validation errors**: OmegaConf struct mode enforces schema. All CLI params must exist in `config/config.yaml`.
+
+## Python version and typing conventions
+
+- This repository targets Python 3.11+ (PEP 585 is available).
+- `dict[K, V]()` / `list[T]()` are valid runtime constructors in Python 3.9+ and should NOT be flagged as invalid syntax.
+- Do not suggest replacing `dict[K, V]()` with `{}` or `dict()` solely because of typing syntax.
+- Note: `typing.Dict[K, V]()` is not instantiable; only built-in generics are.

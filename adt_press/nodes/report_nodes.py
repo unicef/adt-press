@@ -2,7 +2,7 @@ from hamilton.function_modifiers import cache
 from omegaconf import DictConfig, OmegaConf
 
 from adt_press.models.config import MetadataPromptConfig, TemplateConfig
-from adt_press.models.ids import ImageID, OutputTextID, PageID, SectionID, TextGroupID, TextID
+from adt_press.models.ids import ImageID, PageID, SectionID, TextGroupID, TextID
 from adt_press.models.image import ProcessedImage, PrunedImage
 from adt_press.models.metadata import BookMetadata
 from adt_press.models.pdf import Page
@@ -55,7 +55,7 @@ def report_pages(
     pdf_text_groups_by_id: dict[TextGroupID, TextGroup],
     processed_images_by_id: dict[ImageID, ProcessedImage],
     explanations_by_section_id: dict[SectionID, SectionExplanation],
-    plate_output_texts_by_id: dict[OutputTextID, OutputText],
+    plate_output_texts_by_id: dict[TextID, OutputText],
     section_glossaries_by_id: dict[SectionID, SectionGlossary],
     easy_reads_by_text_id: dict[TextID, EasyReadText],
     input_language: Language,
@@ -112,8 +112,8 @@ def translation_report(
     template_config: TemplateConfig,
     output_languages: list[Language],
     plate: Plate,
-    plate_translations: dict[LanguageCode, dict[OutputTextID, str]],
-    speech_files: dict[LanguageCode, dict[OutputTextID, SpeechFile]],
+    plate_translations: dict[LanguageCode, dict[TextID, str]],
+    speech_files: dict[LanguageCode, dict[TextID, SpeechFile]],
 ) -> str:
     return render_template(
         template_config,

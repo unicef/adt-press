@@ -4,8 +4,8 @@ from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
 from adt_press.models.epub import create_epub_file
-from adt_press.models.ids import OutputTextID
-from adt_press.models.plate import Plate, PlateText
+from adt_press.models.ids import TextID
+from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
 from adt_press.utils.languages import Language, LanguageCode
 from adt_press.utils.web_assets import build_config_json
@@ -18,7 +18,7 @@ def package_epub(
     pdf_title_config: str,
     plate_language: Language,
     plate: Plate,  # This is the issue - plate object has wrong paths
-    plate_translations: dict[LanguageCode, dict[OutputTextID, str]],
+    plate_translations: dict[LanguageCode, dict[TextID, str]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
@@ -50,7 +50,7 @@ def package_epub(
         feature_overrides=feature_overrides,
     )
 
-    plate_texts: dict[OutputTextID, PlateText] = {OutputTextID(txt.text_id): txt for txt in plate.texts}
+    plate_texts = {txt.text_id: txt for txt in plate.texts}
 
     # Load CSS if available
     css_content = None

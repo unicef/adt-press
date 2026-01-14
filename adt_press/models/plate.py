@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
-from adt_press.models.ids import ImageID, OutputTextID, TextGroupID, TextID
+from adt_press.models.ids import ImageID, TextGroupID, TextID
 from adt_press.models.section import GlossaryItem
 
 
 class PlateText(BaseModel):
-    text_id: OutputTextID
+    text_id: TextID
     text_type: str
     text: str
 
