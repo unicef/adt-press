@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_07d76e7257794af8_speech_generation_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-01-12 19:34 +0000
+            created at 2026-01-14 18:32 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -89,7 +89,7 @@
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">config</span> <span class="key">import</span> <span class="nam">QuizPromptConfig</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">quiz</span> <span class="key">import</span> <span class="nam">SectionQuiz</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">section</span> <span class="key">import</span> <span class="nam">PageSection</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">text</span> <span class="key">import</span> <span class="nam">PageTextGroup</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">models</span><span class="op">.</span><span class="nam">text</span> <span class="key">import</span> <span class="nam">TextGroup</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">utils</span><span class="op">.</span><span class="nam">file</span> <span class="key">import</span> <span class="nam">cached_read_text_file</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">adt_press</span><span class="op">.</span><span class="nam">utils</span><span class="op">.</span><span class="nam">languages</span> <span class="key">import</span> <span class="nam">Language</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -141,7 +141,7 @@
     <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">generate_quiz</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="nam">config</span><span class="op">:</span> <span class="nam">QuizPromptConfig</span><span class="op">,</span> <span class="nam">language</span><span class="op">:</span> <span class="nam">Language</span><span class="op">,</span> <span class="nam">sections</span><span class="op">:</span> <span class="nam">list</span><span class="op">[</span><span class="nam">PageSection</span><span class="op">]</span><span class="op">,</span> <span class="nam">text_groups_by_id</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">PageTextGroup</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="nam">config</span><span class="op">:</span> <span class="nam">QuizPromptConfig</span><span class="op">,</span> <span class="nam">language</span><span class="op">:</span> <span class="nam">Language</span><span class="op">,</span> <span class="nam">sections</span><span class="op">:</span> <span class="nam">list</span><span class="op">[</span><span class="nam">PageSection</span><span class="op">]</span><span class="op">,</span> <span class="nam">text_groups_by_id</span><span class="op">:</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">TextGroup</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t"><span class="op">)</span> <span class="op">-></span> <span class="nam">SectionQuiz</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">    <span class="nam">context</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis mis2 show_mis"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">        <span class="nam">sections</span><span class="op">=</span><span class="nam">sections</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -183,7 +183,7 @@
             <a class="nav" href="z_07d76e7257794af8_speech_generation_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-01-12 19:34 +0000
+            created at 2026-01-14 18:32 +0000
         </p>
     </div>
 </footer>
