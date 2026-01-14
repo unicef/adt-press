@@ -5,6 +5,7 @@ import litellm
 from pydub import AudioSegment
 
 from adt_press.models.config import SpeechPromptConfig
+from adt_press.models.ids import SpeechID, TextID
 from adt_press.models.speech import SpeechFile
 from adt_press.utils.encoding import strip_emojis
 from adt_press.utils.html import render_template_to_string
@@ -56,7 +57,7 @@ async def generate_speech_file(
     config: SpeechPromptConfig,
     voice_maps: dict[str, dict[str, str]],  # Add cached voice maps parameter
     language: Language,
-    text_id: str,
+    text_id: TextID,
     text: str,
 ) -> SpeechFile:
     """
@@ -91,7 +92,7 @@ async def generate_speech_file(
         )
 
     # Setup common paths and metadata
-    speech_id = f"{text_id}_{language_code}"
+    speech_id = SpeechID(f"{text_id}_{language_code}")
     speech_dir = os.path.join(run_output_dir, "audio", language_code)
     os.makedirs(speech_dir, exist_ok=True)
     speech_path = os.path.join(speech_dir, f"{speech_id}.{config.format}")
@@ -112,8 +113,8 @@ async def generate_speech_file(
         shutil.copy2(empty_template, speech_path)
 
         return SpeechFile(
-            text_id=text_id,
             speech_id=speech_id,
+            text_id=text_id,
             speech_path=speech_relative_path,
             language_code=language_code,
             provider=resolved_provider,
@@ -173,9 +174,9 @@ async def generate_speech_file(
 
     return SpeechFile(
         speech_id=speech_id,
+        text_id=text_id,
         speech_path=speech_relative_path,
         language_code=language_code,
-        text_id=text_id,
         provider=resolved_provider,
         voice=resolved_voice,
         model=model,

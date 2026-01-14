@@ -7,7 +7,7 @@ class SectionQuiz(BaseModel):
     quiz_id: QuizID
     section_id: SectionID
     question: str
-    question_id: QuizQuestionID = ""
+    question_id: QuizQuestionID = QuizQuestionID("")
     options: list[str]
     option_ids: list[QuizOptionID] = []
     explanations: list[str]

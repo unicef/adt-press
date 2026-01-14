@@ -2,11 +2,12 @@ from banks import Prompt
 from pydantic import AliasChoices, BaseModel, Field, ValidationInfo, field_validator
 
 from adt_press.llm import get_instructor_client
-from adt_press.models.config import PromptConfig, SectionType
+from adt_press.models.config import PromptConfig, SectionType, SectionTypeName
+from adt_press.models.ids import SectionID
 from adt_press.models.image import ProcessedImage
 from adt_press.models.pdf import Page
 from adt_press.models.section import PageSection, PageSections
-from adt_press.models.text import PageTextGroup
+from adt_press.models.text import TextGroup
 from adt_press.utils.encoding import CleanTextBaseModel
 from adt_press.utils.file import cached_read_text_file
 
@@ -62,7 +63,7 @@ async def get_page_sections(
     spread_mode: bool,
     page: Page,
     images: list[ProcessedImage],
-    groups: list[PageTextGroup],
+    groups: list[TextGroup],
 ) -> PageSections:
     context = dict(
         page=page,
@@ -97,8 +98,8 @@ async def get_page_sections(
     sections = []
     for i, s in enumerate(response.sections):
         section = PageSection(
-            section_id=f"sec_{page.page_id}_s{i}",
-            section_type=types_by_id[s.section_type],
+            section_id=SectionID(f"sec_{page.page_id}_s{i}"),
+            section_type=types_by_id[SectionTypeName(s.section_type)],
             part_ids=s.part_ids.copy(),
             background_color=s.background_color,
             text_color=s.text_color,

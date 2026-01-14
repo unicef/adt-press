@@ -4,10 +4,11 @@ import os
 from bs4 import BeautifulSoup, Comment, NavigableString
 
 from adt_press.models.config import TemplateConfig
+from adt_press.models.ids import ImageID, TextID
 from adt_press.models.plate import PlateImage, PlateText
 
 
-def replace_images(html_content: str, image_replacements: dict[str, PlateImage], text_replacements: dict[str, PlateText]) -> str:
+def replace_images(html_content: str, image_replacements: dict[ImageID, PlateImage], text_replacements: dict[TextID, PlateText]) -> str:
     soup = BeautifulSoup(html_content, "html.parser")
 
     for tag in soup.find_all("img"):
@@ -21,7 +22,7 @@ def replace_images(html_content: str, image_replacements: dict[str, PlateImage],
     return str(soup)
 
 
-def replace_texts(html_content: str, text_replacements: dict[str, PlateText]) -> str:
+def replace_texts(html_content: str, text_replacements: dict[TextID, PlateText]) -> str:
     soup = BeautifulSoup(html_content, "html.parser")
 
     # NOTE: setting tag.string overwrites child nodes.

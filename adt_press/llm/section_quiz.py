@@ -7,7 +7,7 @@ from pydantic import BaseModel, ValidationInfo, field_validator
 from adt_press.models.config import QuizPromptConfig
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import PageSection
-from adt_press.models.text import PageTextGroup
+from adt_press.models.text import TextGroup
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
 
@@ -59,7 +59,7 @@ class QuizResponse(BaseModel):
 
 
 async def generate_quiz(
-    config: QuizPromptConfig, language: Language, sections: list[PageSection], text_groups_by_id: dict[str, PageTextGroup]
+    config: QuizPromptConfig, language: Language, sections: list[PageSection], text_groups_by_id: dict[str, TextGroup]
 ) -> SectionQuiz:
     context = dict(
         sections=sections,
