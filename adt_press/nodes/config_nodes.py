@@ -50,6 +50,20 @@ def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
 
 
+def regenerate_section_id_config(config: DictConfig) -> str:
+    """Returns the section_id to regenerate from scratch, or empty string if not regenerating."""
+    return str(config.get("regenerate_section_id", ""))
+
+
+def edit_sections_config(config: DictConfig) -> dict[str, str]:
+    """Returns dict mapping section_id to edit instruction, or empty dict if not editing."""
+    edit_sections = config.get("edit_sections", {})
+    if not edit_sections:
+        return {}
+    # Convert to regular dict with string keys and values
+    return {str(k): str(v) for k, v in dict(edit_sections).items()}
+
+
 def input_language_config(config: DictConfig) -> str:
     result = OmegaConf.select(config, "input_language", default="auto")
     return str(result) if result is not None else "auto"
@@ -325,6 +339,11 @@ def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
 @cache(behavior="recompute")
 def web_generation_activity_prompt_config(config: DictConfig) -> HTMLPromptConfig:
     return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_activity"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def web_edit_prompt_config(config: DictConfig) -> HTMLPromptConfig:
+    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_edit"], config["default_model"]))
 
 
 @cache(behavior="recompute")

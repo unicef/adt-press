@@ -12,8 +12,13 @@ def main() -> None:
     cli_config = OmegaConf.from_cli()
     default_config = OmegaConf.load("config/config.yaml")
 
+    # Disable struct mode for edit_sections to allow arbitrary section IDs from CLI
+    if "edit_sections" in default_config:
+        OmegaConf.set_struct(default_config.edit_sections, False)
+    
     # Enable struct mode to validate CLI parameters against config schema
     OmegaConf.set_struct(default_config, True)
+    
     default_config = DictConfig(OmegaConf.merge(default_config, cli_config))
 
     run_output_dir = default_config["run_output_dir"]

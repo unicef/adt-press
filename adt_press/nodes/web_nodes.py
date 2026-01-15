@@ -6,6 +6,7 @@ import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.llm.web_generation_activity import generate_web_page_activity
+from adt_press.llm.web_generation_edit import edit_web_page_with_llm
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_quiz import generate_web_quiz
 from adt_press.llm.web_generation_template import generate_web_page_template
@@ -34,6 +35,28 @@ from adt_press.utils.web_assets import build_config_json, build_web_assets
 log = structlog.get_logger(__name__)
 
 
+@cache(behavior="recompute")
+def cached_web_pages(run_output_dir_config: str) -> list[WebPage]:
+    """
+    Load all previously generated web pages from disk.
+    
+    This enables incremental regeneration and editing - returns empty list
+    on first run, loads from web_pages.json on subsequent runs.
+    """
+    web_pages_path = os.path.join(run_output_dir_config, "web_pages.json")
+    if not os.path.exists(web_pages_path):
+        return []
+    
+    import json
+    with open(web_pages_path, 'r') as f:
+        pages_data = json.load(f)
+    
+    pages = [WebPage.model_validate(p) for p in pages_data]
+    log.info("loaded_cached_web_pages", path=web_pages_path, count=len(pages), 
+             section_ids=[p.section_id for p in pages[:5]])
+    return pages
+
+
 def web_pages(
     plate_language: Language,
     plate: Plate,
@@ -43,17 +66,59 @@ def web_pages(
     render_strategies_config: dict[RenderStrategyName, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
     activity_answers_prompts_config: dict[str, PromptConfig],
+    cached_web_pages: list[WebPage],
+    regenerate_section_id_config: str,
+    edit_sections_config: dict[str, str],
+    run_output_dir_config: str,
+    web_edit_prompt_config: HTMLPromptConfig,
 ) -> list[WebPage]:
+    """
+    Generate or update web pages for all sections.
+    
+    This function supports three modes:
+    1. Full generation (default): Generate all pages from scratch
+    2. Regeneration: Use cached pages, regenerate one section from scratch
+    3. Editing: Use cached pages, edit one or more sections with LLM guidance
+    
+    The function always returns the complete set of pages and saves them to
+    web_pages.json for use in subsequent runs.
+    """
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id: dict[TextID, PlateText] = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
     quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
+    # Build lookup for cached pages by section_id
+    cached_by_section_id = {page.section_id: page for page in cached_web_pages}
+    
+    # Determine which sections to regenerate vs use from cache
+    regenerate_section_ids = set()
+    if regenerate_section_id_config:
+        regenerate_section_ids.add(regenerate_section_id_config)
+        log.info("regenerating_section", section_id=regenerate_section_id_config)
+    
+    # Track edits to apply
+    edits_to_apply = edit_sections_config
+    if edits_to_apply:
+        log.info("editing_sections", section_ids=list(edits_to_apply.keys()), count=len(edits_to_apply))
+
     cached_configs: dict[str, Any] = {}
 
     async def generate_pages():
-        web_pages = []
+        # Separate lists for cached vs new/edited pages
+        cached_pages_list = []
+        async_tasks = []
+        
         for section in plate.sections:
+            section_id = section.section_id
+            
+            # Check if we should use cached version (unless regenerating or editing)
+            if section_id in cached_by_section_id and section_id not in regenerate_section_ids and section_id not in edits_to_apply:
+                log.debug("using_cached_web_page", section_id=section_id)
+                cached_pages_list.append(cached_by_section_id[section_id])
+                continue
+            
+            # Collect section content
             texts: list[PlateText] = []
             images: list[PlateImage] = []
             groups: list[RenderTextGroup] = []
@@ -98,43 +163,77 @@ def web_pages(
                     raise ValueError(f"Unknown render strategy type: {strategy.render_type}")
                 cached_configs[strategy_name] = config
 
-            if strategy.render_type == "html":
-                web_pages.append(
-                    generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language)
-                )
-            elif strategy.render_type == "template":
-                web_pages.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))
-            elif strategy.render_type == "activity":
-                web_pages.append(
-                    generate_web_page_activity(
-                        strategy_name,
-                        config,
-                        config.examples,
-                        section,
-                        groups,
-                        texts,
-                        images,
-                        plate_language,
-                        activity_prompts_config,
-                        activity_answers_prompts_config,
+            # Check if this section should be edited
+            if section_id in edits_to_apply:
+                existing_page = cached_by_section_id.get(section_id)
+                if not existing_page:
+                    raise ValueError(f"Cannot edit section {section_id} - not found in cached pages")
+                
+                edit_instruction = edits_to_apply[section_id]
+                log.info("editing_web_page", section_id=section_id, instruction=edit_instruction, 
+                         original_strategy=existing_page.render_strategy)
+                
+                # Edit with LLM (works for any HTML content regardless of how it was originally generated)
+                async_tasks.append(
+                    edit_web_page_with_llm(
+                        section_id=section_id,
+                        existing_page=existing_page,
+                        edit_instruction=edit_instruction,
+                        section=section,
+                        config=web_edit_prompt_config,
+                        language=plate_language,
                     )
                 )
+            else:
+                # Generate from scratch (either first run or explicit regeneration)
+                log.debug("generating_web_page", section_id=section_id, regenerate=section_id in regenerate_section_ids)
+                
+                if strategy.render_type == "html":
+                    async_tasks.append(
+                        generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language)
+                    )
+                elif strategy.render_type == "template":
+                    async_tasks.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))
+                elif strategy.render_type == "activity":
+                    async_tasks.append(
+                        generate_web_page_activity(
+                            strategy_name,
+                            config,
+                            config.examples,
+                            section,
+                            groups,
+                            texts,
+                            images,
+                            plate_language,
+                            activity_prompts_config,
+                            activity_answers_prompts_config,
+                        )
+                    )
 
             # should we insert a quiz after this section?
             quiz = quizzes_by_section_id.get(section.section_id)
             if quiz:
-                texts: list[PlateText] = []
-                texts.append(texts_by_id[quiz.question_id])
-                for option_id in quiz.option_ids:
-                    texts.append(texts_by_id[option_id])
-                for explanation_id in quiz.explanation_ids:
-                    texts.append(texts_by_id[explanation_id])
+                quiz_section_id = f"{section.section_id}_quiz"
+                
+                # Check if cached quiz exists (unless we're regenerating this section)
+                if quiz_section_id in cached_by_section_id and section.section_id not in regenerate_section_ids:
+                    log.debug("using_cached_quiz", section_id=quiz_section_id)
+                    cached_pages_list.append(cached_by_section_id[quiz_section_id])
+                else:
+                    texts: list[PlateText] = []
+                    texts.append(texts_by_id[quiz.question_id])
+                    for option_id in quiz.option_ids:
+                        texts.append(texts_by_id[option_id])
+                    for explanation_id in quiz.explanation_ids:
+                        texts.append(texts_by_id[explanation_id])
 
-                strategy = render_strategies_config.get("section_quiz")
-                config = TemplateRenderConfig.model_validate(strategy.config)
-                web_pages.append(generate_web_quiz("section_quiz", config, plate_language, quiz, texts))
+                    strategy = render_strategies_config.get("section_quiz")
+                    config = TemplateRenderConfig.model_validate(strategy.config)
+                    async_tasks.append(generate_web_quiz("section_quiz", config, plate_language, quiz, texts))
 
-        return await gather_with_limit(web_pages, 300)
+        # Execute all async tasks and combine with cached pages
+        new_pages = await gather_with_limit(async_tasks, 300) if async_tasks else []
+        return cached_pages_list + new_pages
 
     pages: list[WebPage] = run_async_task(generate_pages)
 
@@ -148,6 +247,24 @@ def web_pages(
     # for each page, remap images
     for page in pages:
         page.content = replace_images(page.content, image_urls, texts_by_id)
+
+    # Sort pages to match original section order (important when mixing cached and new pages)
+    section_order = {}
+    page_index = 0
+    for section in plate.sections:
+        section_order[section.section_id] = page_index
+        page_index += 1
+        # Account for quiz pages that follow sections
+        if section.section_id in quizzes_by_section_id:
+            section_order[f"{section.section_id}_quiz"] = page_index
+            page_index += 1
+    
+    pages.sort(key=lambda p: section_order.get(p.section_id, 999999))
+
+    # Save web_pages.json for next run
+    web_pages_path = os.path.join(run_output_dir_config, "web_pages.json")
+    write_json_file(web_pages_path, [p.model_dump() for p in pages])
+    log.info("saved_web_pages", path=web_pages_path, count=len(pages))
 
     return pages
 

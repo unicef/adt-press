@@ -43,6 +43,15 @@ quiz_strategy: none
 # if specified, the plate at this path will be used to generate the ADT
 custom_plate_path: ""
 
+# REGENERATION/EDITING: Regenerate a specific section from scratch
+# Usage: uv run python adt-press.py label=momo regenerate_section_id=sec_page_5_s0
+regenerate_section_id: ""
+
+# REGENERATION/EDITING: Edit existing pages with LLM-based instructions
+# Format: dict mapping section_id to edit instruction
+# Usage: uv run python adt-press.py label=momo "edit_sections={sec_page_5_s0:'make the title bigger'}"
+edit_sections: {}
+
 # the default model used for all prompts, unless overridden in a specific prompt config
 default_model: gpt-5
 
@@ -350,6 +359,12 @@ prompts:
   text_easy_read:
     model: default
     template_path: prompts/text_easy_read.jinja2
+
+  web_edit:
+    model: default
+    template_path: prompts/web_edit.jinja2
+    max_retries: 3
+    timeout: 120
 
   # Activity-specific prompts for HTML generation
   activity_sorting:
