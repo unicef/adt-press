@@ -4,6 +4,7 @@ from banks import Prompt
 
 from adt_press.llm import get_instructor_client
 from adt_press.models.config import HTMLPromptConfig
+from adt_press.models.ids import SectionID
 from adt_press.models.plate import PlateSection
 from adt_press.models.web import WebPage
 from adt_press.utils.encoding import CleanTextBaseModel
@@ -19,7 +20,7 @@ class WebEditResponse(CleanTextBaseModel):
 
 
 async def edit_web_page_with_llm(
-    section_id: str,
+    section_id: SectionID,
     existing_page: WebPage,
     edit_instruction: str,
     section: PlateSection,
