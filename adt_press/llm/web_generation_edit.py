@@ -29,7 +29,7 @@ async def edit_web_page_with_llm(
 ) -> WebPage:
     """
     Edit an existing web page using LLM based on user instruction.
-    
+
     Args:
         section_id: The section ID being edited
         existing_page: The current WebPage object
@@ -37,12 +37,12 @@ async def edit_web_page_with_llm(
         section: The PlateSection metadata
         config: Configuration for the LLM call
         language: Language for the page
-    
+
     Returns:
         Updated WebPage with modified content
     """
     prompt = Prompt(cached_read_text_file(config.template_path))
-    
+
     context = dict(
         section_id=section_id,
         existing_html=existing_page.content,
@@ -51,7 +51,7 @@ async def edit_web_page_with_llm(
         page_number=section.page_number,
         language=language.name,
     )
-    
+
     client = get_instructor_client()
     response: WebEditResponse = await client.chat.completions.create(
         model=config.model,
@@ -60,7 +60,7 @@ async def edit_web_page_with_llm(
         max_retries=config.max_retries,
         timeout=config.timeout,
     )
-    
+
     # Return updated WebPage with new content and reasoning
     return WebPage(
         section_id=existing_page.section_id,

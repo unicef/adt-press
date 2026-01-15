@@ -1,13 +1,12 @@
 import hashlib
+import json
 import os
 import pickle
-import json
 import shutil
 from typing import Any
 
 import structlog
 from hamilton.function_modifiers import cache
-from omegaconf import OmegaConf
 
 from adt_press.llm.web_generation_activity import generate_web_page_activity
 from adt_press.llm.web_generation_edit import edit_web_page_with_llm
@@ -51,7 +50,7 @@ def web_pages_cache_key(
 ) -> str:
     """
     Generate a cache key that invalidates when any dependency changes.
-    
+
     This includes all parameters that affect web page generation except:
     - cached_web_pages (this is what we're caching)
     - regenerate_section_ids_config (editing-specific)
@@ -70,11 +69,11 @@ def web_pages_cache_key(
         "activity_prompts": activity_prompts_config,
         "activity_answers_prompts": activity_answers_prompts_config,
     }
-    
+
     # Generate deterministic hash using pickle (same as Hamilton's caching)
     cache_bytes = pickle.dumps(cache_data, protocol=pickle.HIGHEST_PROTOCOL)
     cache_hash = hashlib.sha256(cache_bytes).hexdigest()
-    
+
     return cache_hash
 
 
@@ -85,39 +84,43 @@ def cached_web_pages(
 ) -> list[WebPage]:
     """
     Load all previously generated web pages from disk.
-    
+
     This enables incremental regeneration and editing - returns empty list
     on first run, loads from web_pages.json on subsequent runs.
-    
+
     Cache is automatically invalidated when upstream dependencies change
     (render strategies, prompts, models, etc.) by comparing cache keys.
     """
     web_pages_path = os.path.join(run_output_dir_config, "web_pages.json")
     cache_key_path = os.path.join(run_output_dir_config, "web_pages_cache_key.txt")
-    
+
     if not os.path.exists(web_pages_path):
         log.info("no_cached_web_pages", reason="file_not_found")
         return []
-    
+
     # Check if cache key matches - if not, invalidate cache
     if os.path.exists(cache_key_path):
-        with open(cache_key_path, 'r') as f:
+        with open(cache_key_path, "r") as f:
             stored_key = f.read().strip()
-        
+
         if stored_key != web_pages_cache_key:
-            log.info("cache_invalidated", reason="dependency_changed",
-                    stored_key=stored_key[:8], current_key=web_pages_cache_key[:8])
+            log.info("cache_invalidated", reason="dependency_changed", stored_key=stored_key[:8], current_key=web_pages_cache_key[:8])
             return []
     else:
         log.info("cache_invalidated", reason="no_cache_key")
         return []
-    
-    with open(web_pages_path, 'r') as f:
+
+    with open(web_pages_path, "r") as f:
         pages_data = json.load(f)
-    
+
     pages = [WebPage.model_validate(p) for p in pages_data]
-    log.info("loaded_cached_web_pages", path=web_pages_path, count=len(pages), 
-             section_ids=[p.section_id for p in pages[:5]], cache_key=web_pages_cache_key[:8])
+    log.info(
+        "loaded_cached_web_pages",
+        path=web_pages_path,
+        count=len(pages),
+        section_ids=[p.section_id for p in pages[:5]],
+        cache_key=web_pages_cache_key[:8],
+    )
     return pages
 
 
@@ -139,12 +142,12 @@ def web_pages(
 ) -> list[WebPage]:
     """
     Generate or update web pages for all sections.
-    
+
     This function supports three modes:
     1. Full generation (default): Generate all pages from scratch
     2. Regeneration: Use cached pages, regenerate one section from scratch
     3. Editing: Use cached pages, edit one or more sections with LLM guidance
-    
+
     The function always returns the complete set of pages and saves them to
     web_pages.json for use in subsequent runs.
     """
@@ -155,12 +158,12 @@ def web_pages(
 
     # Build lookup for cached pages by section_id
     cached_by_section_id = {page.section_id: page for page in cached_web_pages}
-    
+
     # Determine which sections to regenerate vs use from cache
     regenerate_section_ids = set(regenerate_sections_config)
     if regenerate_section_ids:
         log.info("regenerating_sections", section_ids=list(regenerate_section_ids), count=len(regenerate_section_ids))
-    
+
     # Track edits to apply
     edits_to_apply = edit_sections_config
     if edits_to_apply:
@@ -172,16 +175,16 @@ def web_pages(
         # Separate lists for cached vs new/edited pages
         cached_pages_list = []
         async_tasks = []
-        
+
         for section in plate.sections:
             section_id = section.section_id
-            
+
             # Check if we should use cached version (unless regenerating or editing)
             if section_id in cached_by_section_id and section_id not in regenerate_section_ids and section_id not in edits_to_apply:
                 log.debug("using_cached_web_page", section_id=section_id)
                 cached_pages_list.append(cached_by_section_id[section_id])
                 continue
-            
+
             # Collect section content
             texts: list[PlateText] = []
             images: list[PlateImage] = []
@@ -232,11 +235,12 @@ def web_pages(
                 existing_page = cached_by_section_id.get(section_id)
                 if not existing_page:
                     raise ValueError(f"Cannot edit section {section_id} - not found in cached pages")
-                
+
                 edit_instruction = edits_to_apply[section_id]
-                log.info("editing_web_page", section_id=section_id, instruction=edit_instruction, 
-                         original_strategy=existing_page.render_strategy)
-                
+                log.info(
+                    "editing_web_page", section_id=section_id, instruction=edit_instruction, original_strategy=existing_page.render_strategy
+                )
+
                 # Edit with LLM (works for any HTML content regardless of how it was originally generated)
                 async_tasks.append(
                     edit_web_page_with_llm(
@@ -275,7 +279,7 @@ def web_pages(
             quiz = quizzes_by_section_id.get(section.section_id)
             if quiz:
                 quiz_section_id = f"{section.section_id}_quiz"
-                
+
                 # Check if cached quiz exists (unless we're regenerating this section)
                 if quiz_section_id in cached_by_section_id and section.section_id not in regenerate_section_ids:
                     log.debug("using_cached_quiz", section_id=quiz_section_id)
@@ -320,18 +324,18 @@ def web_pages(
             quiz_section_id = SectionID(f"{section.section_id}_quiz")
             section_order[quiz_section_id] = page_index
             page_index += 1
-    
+
     pages.sort(key=lambda p: section_order.get(p.section_id, 999999))
 
     # Save web_pages.json and cache key for next run
     web_pages_path = os.path.join(run_output_dir_config, "web_pages.json")
     cache_key_path = os.path.join(run_output_dir_config, "web_pages_cache_key.txt")
-    
+
     write_json_file(web_pages_path, [p.model_dump() for p in pages])
     log.info("saved_web_pages", path=web_pages_path, count=len(pages))
-    
+
     # Save cache key to enable validation on next run
-    with open(cache_key_path, 'w') as f:
+    with open(cache_key_path, "w") as f:
         f.write(web_pages_cache_key)
     log.info("saved_cache_key", path=cache_key_path, key=web_pages_cache_key[:8])
 
