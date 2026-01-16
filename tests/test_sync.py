@@ -5,55 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from adt_press.utils.sync import custom_exception_handler, gather_with_limit, run_async_task
-
-
-class TestCustomExceptionHandler:
-    """Test custom exception handler for suppressing LiteLLM errors."""
-
-    def test_suppresses_event_loop_runtime_error(self):
-        """Test that RuntimeError with event loop message is suppressed."""
-        loop = MagicMock()
-        context = {
-            "exception": RuntimeError("Queue at 0x123 is bound to a different event loop"),
-            "message": "Task exception was never retrieved",
-        }
-
-        # Should not call default_exception_handler for this specific error
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_not_called()
-
-    def test_passes_through_other_runtime_errors(self):
-        """Test that other RuntimeErrors are passed to default handler."""
-        loop = MagicMock()
-        context = {
-            "exception": RuntimeError("Some other runtime error"),
-            "message": "Task exception was never retrieved",
-        }
-
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_called_once_with(context)
-
-    def test_passes_through_other_exception_types(self):
-        """Test that non-RuntimeError exceptions are passed to default handler."""
-        loop = MagicMock()
-        context = {
-            "exception": ValueError("Some value error"),
-            "message": "Task exception was never retrieved",
-        }
-
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_called_once_with(context)
-
-    def test_handles_context_without_exception(self):
-        """Test that contexts without exception key are passed through."""
-        loop = MagicMock()
-        context = {
-            "message": "Some message without exception",
-        }
-
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_called_once_with(context)
+from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 class TestRunAsyncTask:
