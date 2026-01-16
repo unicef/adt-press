@@ -53,7 +53,7 @@ def web_pages_cache_key(
 
     This includes all parameters that affect web page generation except:
     - cached_web_pages (this is what we're caching)
-    - regenerate_section_ids_config (editing-specific)
+    - regenerate_sections_config (editing-specific)
     - edit_sections_config (editing-specific)
     - run_output_dir_config (filesystem path)
     - web_edit_prompt_config (only affects editing)

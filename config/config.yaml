@@ -44,7 +44,7 @@ quiz_strategy: none
 custom_plate_path: ""
 
 # REGENERATION/EDITING: Regenerate specific sections from scratch
-# Usage: uv run python adt-press.py label=momo regenerate_section_ids=[sec_page_5_s0,sec_page_7_s1]
+# Usage: uv run python adt-press.py label=momo regenerate_sections=[sec_page_5_s0,sec_page_7_s1]
 regenerate_sections: []
 
 # REGENERATION/EDITING: Edit existing pages with LLM-based instructions

@@ -5,7 +5,7 @@ from omegaconf import DictConfig, OmegaConf
 from adt_press.pipeline import run_pipeline
 
 # never write these flags to our config file
-TEMP_FLAGS = ["clear_cache", "print_available_models", "regenerate_section_ids", "edit_sections"]
+TEMP_FLAGS = ["clear_cache", "print_available_models", "regenerate_sections", "edit_sections"]
 
 
 def main() -> None:
