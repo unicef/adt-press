@@ -6,6 +6,11 @@ import litellm
 import mlflow
 from litellm import acompletion
 
+from adt_press.utils.logging import configure_litellm_logging
+
+# Configure logging to suppress known LiteLLM bugs
+configure_litellm_logging()
+
 # if langfuse is configured, set up callbacks for litellm
 if os.getenv("LANGFUSE_HOST"):
     # set callbacks
