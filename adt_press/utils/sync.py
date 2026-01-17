@@ -26,8 +26,8 @@ def run_async_task(task: Callable[[], Coroutine[Any, Any, T]]) -> T:
             pending = asyncio.all_tasks(loop)
 
             # Cancel all pending tasks
-            for task in pending:
-                task.cancel()
+            for pending_task in pending:
+                pending_task.cancel()
 
             # Wait for all tasks to finish cancelling
             if pending:
