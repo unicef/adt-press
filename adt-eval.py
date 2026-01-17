@@ -128,7 +128,7 @@ async def main():
         mlflow_dir = Path("mlruns").absolute()
         mlflow_dir.mkdir(exist_ok=True)
         mlflow.set_tracking_uri(f"file://{mlflow_dir}")
-    
+
     # Disable model registry since we're not using it (avoids unsupported URI errors)
     os.environ["MLFLOW_REGISTRY_URI"] = ""
 
