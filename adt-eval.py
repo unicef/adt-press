@@ -16,6 +16,7 @@ import asyncio
 import os
 import sys
 import traceback
+import warnings
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -124,13 +125,26 @@ async def main():
     # Configure MLflow tracking
     # MLflow 3.8+ removed sqlite:// URI support for model registry
     # Use file:// URI for tracking (still writes to mlruns/) and disable registry
+    # Note: mlflow-skinny doesn't support SQLAlchemy/sqlite, so file-based is the only option
     if not os.getenv("MLFLOW_TRACKING_URI"):
         mlflow_dir = Path("mlruns").absolute()
         mlflow_dir.mkdir(exist_ok=True)
         mlflow.set_tracking_uri(f"file://{mlflow_dir}")
+        
+        # Suppress deprecation warning about filesystem tracking
+        # We use mlflow-skinny which doesn't support database backends
+        warnings.filterwarnings("ignore", category=FutureWarning, module="mlflow")
     
     # Disable model registry since we're not using it (avoids unsupported URI errors)
     os.environ["MLFLOW_REGISTRY_URI"] = ""
+    
+    # Create or get the default experiment (experiment_id=0)
+    # This ensures the experiment exists before we try to create runs
+    try:
+        mlflow.get_experiment("0")
+    except Exception:
+        # Create default experiment if it doesn't exist
+        mlflow.create_experiment("Default", artifact_location=str(mlflow_dir / "0"))
 
     # Determine tasks to run
     tasks_to_run = get_tasks_to_run(config)
