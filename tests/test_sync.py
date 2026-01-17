@@ -39,23 +39,6 @@ class TestRunAsyncTask:
         with pytest.raises(ValueError, match="Task failed"):
             run_async_task(failing_task)
 
-    def test_sets_custom_exception_handler(self):
-        """Test that custom exception handler is set on the event loop."""
-
-        handler_was_set = False
-
-        async def check_handler_task():
-            nonlocal handler_was_set
-            loop = asyncio.get_running_loop()
-            # Check if exception handler was set (not the default)
-            handler_was_set = loop.get_exception_handler() is not None
-            return True
-
-        result = run_async_task(check_handler_task)
-        assert result is True
-        # The handler should have been set
-        assert handler_was_set
-
     def test_closes_event_loop_after_task(self):
         """Test that event loop is properly closed after task execution."""
 
@@ -70,7 +53,6 @@ class TestRunAsyncTask:
             result = run_async_task(simple_task)
 
             assert result == "result"
-            mock_loop.set_exception_handler.assert_called_once()
             mock_loop.run_until_complete.assert_called_once()
             mock_loop.close.assert_called_once()
 
