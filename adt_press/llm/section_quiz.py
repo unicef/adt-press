@@ -1,8 +1,9 @@
 # mypy: ignore-errors
-import instructor
 from banks import Prompt
-from litellm import acompletion
 from pydantic import BaseModel, ValidationInfo, field_validator
+import structlog
+
+from adt_press.llm import get_instructor_client
 
 from adt_press.models.config import QuizPromptConfig
 from adt_press.models.quiz import SectionQuiz
@@ -11,6 +12,7 @@ from adt_press.models.text import TextGroup
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
 
+log = structlog.get_logger(__name__)
 
 class Quiz(BaseModel):
     question: str
@@ -60,7 +62,7 @@ class QuizResponse(BaseModel):
 
 async def generate_quiz(
     config: QuizPromptConfig, language: Language, sections: list[PageSection], text_groups_by_id: dict[str, TextGroup]
-) -> SectionQuiz:
+) -> SectionQuiz | None:
     context = dict(
         sections=sections,
         text_groups=text_groups_by_id,
@@ -69,14 +71,19 @@ async def generate_quiz(
     )
 
     prompt = Prompt(cached_read_text_file(config.template_path))
-    client = instructor.from_litellm(acompletion)
-    response: QuizResponse = await client.chat.completions.create(
-        model=config.model,
-        response_model=QuizResponse,
-        messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
-        max_retries=config.max_retries,
-        context={},
-    )
+    client = get_instructor_client()
+    try:
+        response: QuizResponse = await client.chat.completions.create(
+            model=config.model,
+            response_model=QuizResponse,
+            messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
+            max_retries=config.max_retries,
+            timeout=config.timeout,
+            context={},
+        )
+    except Exception as exc:
+        log.warning("quiz_generation_failed", error=str(exc))
+        return None
 
     after_section = sections[-1]
 

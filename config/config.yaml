@@ -297,6 +297,13 @@ section_filters:
     - back_cover
     - credits
     - inside_cover
+  # Only these section types count toward quiz grouping. Empty list means all non-pruned sections count.
+  quiz_count_section_types:
+    - boxed_text
+    - text_only
+    - text_and_single_image
+    - text_and_images
+    - images_only
 
 prompts:
   metadata_extraction:
