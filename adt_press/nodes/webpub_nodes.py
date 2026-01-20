@@ -26,6 +26,7 @@ def package_webpub(
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
+    bundle_version_config: str,
 ) -> str:
     languages = list(plate_translations.keys())
     default_language = languages[0]
@@ -130,6 +131,7 @@ def package_webpub(
         default_language=default_language,
         strategy_config=strategy_config,
         output_subdir="webpub",
+        bundle_version=bundle_version_config,
         feature_overrides={
             "showNavigationControls": False,
             "showTutorial": False,

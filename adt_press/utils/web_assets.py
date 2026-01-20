@@ -341,7 +341,7 @@ def build_config_json(
     languages: Sequence[str],
     default_language: str,
     strategy_config: dict[str, Any],
-    bundle_version_config: str,
+    bundle_version: str,
     output_subdir: str = "adt",
     feature_overrides: dict[str, Any] | None = None,
 ) -> str:
@@ -380,7 +380,7 @@ def build_config_json(
         "book_title": book_title,
         "config": strategy_config,
         "features": feature_flags,
-        "bundle_version": bundle_version_config,
+        "bundle_version": bundle_version,
     }
 
     render_template(

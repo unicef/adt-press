@@ -22,6 +22,7 @@ def package_epub(
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
+    bundle_version_config: str,
 ) -> dict[LanguageCode, str]:
     """
     Generate EPUB files for each language translation.
@@ -46,6 +47,7 @@ def package_epub(
         languages=languages,
         default_language=default_language,
         strategy_config=strategy_config,
+        bundle_version=bundle_version_config,
         output_subdir="epub",
         feature_overrides=feature_overrides,
     )
