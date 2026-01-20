@@ -1,10 +1,9 @@
 # mypy: ignore-errors
+import structlog
 from banks import Prompt
 from pydantic import BaseModel, ValidationInfo, field_validator
-import structlog
 
 from adt_press.llm import get_instructor_client
-
 from adt_press.models.config import QuizPromptConfig
 from adt_press.models.quiz import SectionQuiz
 from adt_press.models.section import PageSection
@@ -13,6 +12,7 @@ from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
 
 log = structlog.get_logger(__name__)
+
 
 class Quiz(BaseModel):
     question: str
