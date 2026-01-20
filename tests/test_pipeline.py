@@ -121,6 +121,17 @@ class PipelineTest(unittest.TestCase):
 
             self.assertFileContainsIgnoreCase("page_report.html", "corbeau", "Translated text 'corbeau' not found in page report")
 
+            # now rerun the pipeline with a regeneration and an edit
+            test_config["edit_sections"] = {}
+            test_config["edit_sections"]["sec_p1_s0"] = "Remove the image from this page"
+
+            test_config["regenerate_sections"] = ["sec_p2_s0"]
+            config = DictConfig(OmegaConf.merge(file_config, test_config))
+            run_pipeline(config)
+
+            # validate our new output doesn't have an image
+            self.assertFileDoesNotContain("web_report.html", "img_p2_r1", "Image was not removed from edited section")
+
     def test_pipeline_integration_no_translation(self):
         # Create a temporary output directory for this test
         with tempfile.TemporaryDirectory() as self.temp_dir:

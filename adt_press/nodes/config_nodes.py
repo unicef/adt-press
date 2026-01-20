@@ -27,6 +27,7 @@ from adt_press.models.config import (
     TextType,
     TextTypeName,
 )
+from adt_press.models.ids import SectionID
 from adt_press.utils.config import prompt_config_with_model
 from adt_press.utils.file import calculate_file_hash
 from adt_press.utils.html import TemplateConfig
@@ -48,6 +49,25 @@ def pdf_path_config(config: DictConfig) -> str:
 
 def custom_plate_path_config(config: DictConfig) -> str:
     return str(config.get("custom_plate_path", ""))
+
+
+@cache(behavior="recompute")
+def regenerate_sections_config(config: DictConfig) -> list[SectionID]:
+    """Returns list of section_ids to regenerate from scratch, or empty list if not regenerating."""
+    section_ids = config.get("regenerate_sections", [])
+    if not section_ids:
+        return []
+    return [SectionID(str(sid)) for sid in section_ids]
+
+
+@cache(behavior="recompute")
+def edit_sections_config(config: DictConfig) -> dict[SectionID, str]:
+    """Returns dict mapping section_id to edit instruction, or empty dict if not editing."""
+    edit_sections = config.get("edit_sections", {})
+    if not edit_sections:
+        return {}
+    # Convert to regular dict with string keys and values
+    return {SectionID(str(k)): str(v) for k, v in dict(edit_sections).items()}
 
 
 def input_language_config(config: DictConfig) -> str:
@@ -325,6 +345,11 @@ def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
 @cache(behavior="recompute")
 def web_generation_activity_prompt_config(config: DictConfig) -> HTMLPromptConfig:
     return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_activity"], config["default_model"]))
+
+
+@cache(behavior="recompute")
+def web_edit_prompt_config(config: DictConfig) -> HTMLPromptConfig:
+    return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_edit"], config["default_model"]))
 
 
 @cache(behavior="recompute")
