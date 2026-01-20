@@ -38,16 +38,16 @@
 | adt\_press/models/text.py                   |        9 |        0 |    100% |           |
 | adt\_press/models/web.py                    |       14 |        0 |    100% |           |
 | adt\_press/nodes/\_\_init\_\_.py            |        0 |        0 |    100% |           |
-| adt\_press/nodes/config\_nodes.py           |      220 |       25 |     89% |88, 110, 129, 163, 244, 251-268, 282-300, 335-337, 342, 347, 357, 362 |
-| adt\_press/nodes/epub\_nodes.py             |       29 |        2 |     93% |     59-60 |
+| adt\_press/nodes/config\_nodes.py           |      225 |       25 |     89% |103, 125, 144, 178, 259, 266-283, 297-315, 350-352, 357, 362, 372, 377 |
+| adt\_press/nodes/epub\_nodes.py             |       29 |        2 |     93% |     61-62 |
 | adt\_press/nodes/image\_nodes.py            |      111 |       10 |     91% |53, 104, 126-135 |
 | adt\_press/nodes/pdf\_nodes.py              |      134 |       11 |     92% |68-78, 184, 232 |
 | adt\_press/nodes/plate\_nodes.py            |      153 |       22 |     86% |45, 65, 91-93, 144, 148-150, 166, 219, 224, 228, 232, 236-240, 314, 328-329 |
 | adt\_press/nodes/report\_nodes.py           |       71 |        7 |     90% |186-188, 245-249 |
 | adt\_press/nodes/section\_nodes.py          |      102 |       53 |     48% |38, 97-121, 133-158, 180-194 |
 | adt\_press/nodes/speech\_nodes.py           |       27 |        6 |     78% |     19-34 |
-| adt\_press/nodes/web\_nodes.py              |      242 |       41 |     83% |107-111, 209, 222, 224, 226, 230, 237, 257, 262-263, 281-297, 324-326, 388-391, 396-398, 405, 461-462, 509-513 |
-| adt\_press/nodes/webpub\_nodes.py           |       88 |        3 |     97% |    98-100 |
+| adt\_press/nodes/web\_nodes.py              |      242 |       41 |     83% |107-111, 209, 222, 224, 226, 230, 237, 257, 262-263, 281-297, 324-326, 389-392, 397-399, 406, 463-464, 511-515 |
+| adt\_press/nodes/webpub\_nodes.py           |       88 |        3 |     97% |    99-101 |
 | adt\_press/pipeline.py                      |       35 |        0 |    100% |           |
 | adt\_press/utils/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | adt\_press/utils/encoding.py                |       32 |        7 |     78% |10, 57-60, 65-68 |
@@ -82,7 +82,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-| **TOTAL**                                   | **4641** |  **783** | **83%** |           |
+| **TOTAL**                                   | **4646** |  **783** | **83%** |           |
 
 
 ## Setup coverage badge
