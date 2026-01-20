@@ -1,5 +1,6 @@
 {
   "title": "{{ book_title }}",
+  "bundleVersion": "{{ bundle_version }}",
   "languages": {
     "available": [
       {% for lang in languages %}"{{ lang }}"{% if not loop.last %}, {% endif %}{% endfor %}

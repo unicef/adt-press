@@ -385,11 +385,15 @@ export const cycleLanguage = () => {
  */
 export const fetchContentFiles = async (basePath) => {
     try {
+        // Get cache-busting version from config
+        const version = window.appConfig?.bundleVersion || '';
+        const versionParam = version ? `?v=${version}` : '';
+        
         // Fetch all three files in parallel
         const [textsResponse, audiosResponse, videosResponse] = await Promise.allSettled([
-            fetch(`${basePath}/texts.json`),
-            fetch(`${basePath}/audios.json`),
-            fetch(`${basePath}/videos.json`)
+            fetch(`${basePath}/texts.json${versionParam}`),
+            fetch(`${basePath}/audios.json${versionParam}`),
+            fetch(`${basePath}/videos.json${versionParam}`)
         ]);
 
         // Process texts.json
