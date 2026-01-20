@@ -45,6 +45,7 @@ def template_config(run_output_dir_config: str) -> TemplateConfig:
     return TemplateConfig(output_dir=run_output_dir_config)
 
 
+@cache(behavior="recompute")
 def bundle_version_config() -> str:
     """Generate a unique cache-busting version for the current build.
 
