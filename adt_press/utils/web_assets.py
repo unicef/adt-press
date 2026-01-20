@@ -341,9 +341,9 @@ def build_config_json(
     languages: Sequence[str],
     default_language: str,
     strategy_config: dict[str, Any],
+    bundle_version_config: str,
     output_subdir: str = "adt",
     feature_overrides: dict[str, Any] | None = None,
-    bundle_version: str | None = None,
 ) -> str:
     """Render config.json for the requested output and apply feature overrides if provided."""
 
@@ -351,11 +351,6 @@ def build_config_json(
     absolute_path = os.path.join(run_output_dir_config, relative_path)
 
     os.makedirs(os.path.dirname(absolute_path), exist_ok=True)
-    
-    # Generate cache-busting version if not provided
-    if bundle_version is None:
-        import time
-        bundle_version = hashlib.md5(str(int(time.time())).encode()).hexdigest()[:8]
 
     # Compute feature flags so templates stay deterministic.
     feature_flags: dict[str, Any] = {
@@ -385,7 +380,7 @@ def build_config_json(
         "book_title": book_title,
         "config": strategy_config,
         "features": feature_flags,
-        "bundle_version": bundle_version,
+        "bundle_version": bundle_version_config,
     }
 
     render_template(

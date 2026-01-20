@@ -3,7 +3,6 @@ import json
 import os
 import pickle
 import shutil
-import time
 from typing import Any
 
 import structlog
@@ -355,11 +354,9 @@ def package_adt_web(
     speech_files: dict[LanguageCode, dict[TextID, SpeechFile]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
+    bundle_version_config: str,
 ) -> str:
     default_language = list(plate_translations.keys())[0]
-    
-    # Generate cache-busting version once for all assets (JS bundle and JSON files)
-    bundle_version = hashlib.md5(str(int(time.time())).encode()).hexdigest()[:8]
 
     adt_dir = os.path.join(run_output_dir_config, "adt")
 
@@ -443,7 +440,7 @@ def package_adt_web(
                 webpage_number=webpage_index + 1,
                 activity_answers=webpage.activity_answers,
                 has_math=page_has_math,
-                bundle_version=bundle_version,
+                bundle_version=bundle_version_config,
             ),
             output_name=f"adt/{webpage.section_id}.html",
         )
@@ -538,7 +535,7 @@ def package_adt_web(
         default_language=default_language,
         strategy_config=strategy_config,
         output_subdir="adt",
-        bundle_version=bundle_version,
+        bundle_version=bundle_version_config,
     )
 
     build_web_assets(run_output_dir_config, list(plate_translations.keys()), has_math=has_math, has_open_ended=has_open_ended)
