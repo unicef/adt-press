@@ -138,13 +138,8 @@ async def main():
     # Disable model registry since we're not using it (avoids unsupported URI errors)
     os.environ["MLFLOW_REGISTRY_URI"] = ""
 
-    # Create or get the default experiment (experiment_id=0)
-    # This ensures the experiment exists before we try to create runs
-    try:
-        mlflow.get_experiment("0")
-    except Exception:
-        # Create default experiment if it doesn't exist
-        mlflow.create_experiment("Default", artifact_location=str(mlflow_dir / "0"))
+    # Ensure default experiment exists and set it for all subsequent runs
+    mlflow.set_experiment("Default")
 
     # Determine tasks to run
     tasks_to_run = get_tasks_to_run(config)
