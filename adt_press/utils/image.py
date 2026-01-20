@@ -75,12 +75,16 @@ def compress_image_for_web(
 
         if has_alpha:
             if image.mode not in ("RGBA", "LA"):
-                image = image.convert("RGBA")
+                output_image = image.convert("RGBA")
+            else:
+                output_image = image
             filename = f"{base_name}.png"
             save_kwargs: dict[str, object] = {"optimize": True}
         else:
             if image.mode not in ("RGB", "L"):
-                image = image.convert("RGB")
+                output_image = image.convert("RGB")
+            else:
+                output_image = image
             filename = f"{base_name}.jpg"
             save_kwargs = {
                 "optimize": True,
@@ -89,7 +93,7 @@ def compress_image_for_web(
             }
 
         dest_path = os.path.join(dest_dir, filename)
-        image.save(dest_path, **save_kwargs)
+        output_image.save(dest_path, **save_kwargs)  # type: ignore[arg-type]
 
     return filename
 

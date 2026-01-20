@@ -130,7 +130,7 @@ class PipelineTest(unittest.TestCase):
             run_pipeline(config)
 
             # validate our new output doesn't have an image
-            self.assertFileDoesNotContain("web_report.html", "img_p2_r1", "Image was not removed from edited section")
+            self.assertFileDoesNotContain("adt/sec_p1_s0.html", "img_p1_r0", "Image was not removed from edited section")
 
     def test_pipeline_integration_no_translation(self):
         # Create a temporary output directory for this test

@@ -5,55 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from adt_press.utils.sync import custom_exception_handler, gather_with_limit, run_async_task
-
-
-class TestCustomExceptionHandler:
-    """Test custom exception handler for suppressing LiteLLM errors."""
-
-    def test_suppresses_event_loop_runtime_error(self):
-        """Test that RuntimeError with event loop message is suppressed."""
-        loop = MagicMock()
-        context = {
-            "exception": RuntimeError("Queue at 0x123 is bound to a different event loop"),
-            "message": "Task exception was never retrieved",
-        }
-
-        # Should not call default_exception_handler for this specific error
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_not_called()
-
-    def test_passes_through_other_runtime_errors(self):
-        """Test that other RuntimeErrors are passed to default handler."""
-        loop = MagicMock()
-        context = {
-            "exception": RuntimeError("Some other runtime error"),
-            "message": "Task exception was never retrieved",
-        }
-
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_called_once_with(context)
-
-    def test_passes_through_other_exception_types(self):
-        """Test that non-RuntimeError exceptions are passed to default handler."""
-        loop = MagicMock()
-        context = {
-            "exception": ValueError("Some value error"),
-            "message": "Task exception was never retrieved",
-        }
-
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_called_once_with(context)
-
-    def test_handles_context_without_exception(self):
-        """Test that contexts without exception key are passed through."""
-        loop = MagicMock()
-        context = {
-            "message": "Some message without exception",
-        }
-
-        custom_exception_handler(loop, context)
-        loop.default_exception_handler.assert_called_once_with(context)
+from adt_press.utils.sync import gather_with_limit, run_async_task
 
 
 class TestRunAsyncTask:
@@ -87,23 +39,6 @@ class TestRunAsyncTask:
         with pytest.raises(ValueError, match="Task failed"):
             run_async_task(failing_task)
 
-    def test_sets_custom_exception_handler(self):
-        """Test that custom exception handler is set on the event loop."""
-
-        handler_was_set = False
-
-        async def check_handler_task():
-            nonlocal handler_was_set
-            loop = asyncio.get_running_loop()
-            # Check if exception handler was set (not the default)
-            handler_was_set = loop.get_exception_handler() is not None
-            return True
-
-        result = run_async_task(check_handler_task)
-        assert result is True
-        # The handler should have been set
-        assert handler_was_set
-
     def test_closes_event_loop_after_task(self):
         """Test that event loop is properly closed after task execution."""
 
@@ -118,7 +53,6 @@ class TestRunAsyncTask:
             result = run_async_task(simple_task)
 
             assert result == "result"
-            mock_loop.set_exception_handler.assert_called_once()
             mock_loop.run_until_complete.assert_called_once()
             mock_loop.close.assert_called_once()
 
