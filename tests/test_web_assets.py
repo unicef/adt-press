@@ -402,6 +402,7 @@ class TestBuildConfigJson:
                         book_title="Test Book",
                         languages=["en", "es"],
                         default_language="en",
+                        bundle_version="arst",
                         strategy_config={"speech_strategy": "openai"},
                     )
 
@@ -433,6 +434,7 @@ class TestBuildConfigJson:
                         languages=["en"],
                         default_language="en",
                         strategy_config={},
+                        bundle_version="arst",
                         feature_overrides={"notepad": True, "highlight": True},
                     )
 
