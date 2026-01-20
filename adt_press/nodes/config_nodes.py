@@ -47,10 +47,10 @@ def template_config(run_output_dir_config: str) -> TemplateConfig:
 
 def bundle_version_config() -> str:
     """Generate a unique cache-busting version for the current build.
-    
+
     This node is intentionally NOT cached and will generate a new version on every run
     to ensure assets are not cached by browsers between builds.
-    
+
     Returns:
         8-character MD5 hash based on current timestamp
     """
