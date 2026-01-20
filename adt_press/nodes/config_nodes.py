@@ -1,4 +1,6 @@
+import hashlib
 import os
+import time
 from typing import Any, cast
 
 import structlog
@@ -41,6 +43,19 @@ def config() -> DictConfig:  # pragma: no cover
 
 def template_config(run_output_dir_config: str) -> TemplateConfig:
     return TemplateConfig(output_dir=run_output_dir_config)
+
+
+@cache(behavior="recompute")
+def bundle_version_config() -> str:
+    """Generate a unique cache-busting version for the current build.
+
+    This node is intentionally NOT cached and will generate a new version on every run
+    to ensure assets are not cached by browsers between builds.
+
+    Returns:
+        8-character MD5 hash based on current timestamp
+    """
+    return hashlib.md5(str(int(time.time())).encode()).hexdigest()[:8]
 
 
 def pdf_path_config(config: DictConfig) -> str:

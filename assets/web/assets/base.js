@@ -330,23 +330,36 @@ function initializeLanguage() {
   const defaultLanguage = window.appConfig?.languages?.default || htmlLang || "en";
   const availableLanguages = window.appConfig?.languages?.available || [];
 
-  // Simple validation: check if cookie language exists in available languages
-  let selectedLanguage = cookieLanguage;
+  let selectedLanguage = null;
 
-  if (cookieLanguage && availableLanguages.length > 0 && !availableLanguages.includes(cookieLanguage)) {
-    console.warn(`Cookie language "${cookieLanguage}" not available. Available languages:`, availableLanguages);
-    // Clear invalid cookie on root path
-    eraseCookie("currentLanguage", "/");
-    // Also clear cookie on current page path (in case it was set with specific path)
-    const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1);
-    if (currentPath !== "/") {
-      eraseCookie("currentLanguage", currentPath);
+  // If we have config loaded, validate the cookie language
+  if (availableLanguages.length > 0) {
+    // Check if cookie language is valid
+    if (cookieLanguage && availableLanguages.includes(cookieLanguage)) {
+      selectedLanguage = cookieLanguage;
+    } else {
+      // Cookie is invalid or missing, use default
+      if (cookieLanguage && !availableLanguages.includes(cookieLanguage)) {
+        console.warn(`Cookie language "${cookieLanguage}" not available. Available languages:`, availableLanguages, ". Using default:", defaultLanguage);
+        // Clear invalid cookie on root path
+        eraseCookie("currentLanguage", "/");
+        // Also clear cookie on current page path (in case it was set with specific path)
+        const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1);
+        if (currentPath !== "/") {
+          eraseCookie("currentLanguage", currentPath);
+        }
+      }
+      selectedLanguage = defaultLanguage;
+      // Set the cookie to the correct language
+      setCookie("currentLanguage", defaultLanguage, 7);
     }
-    // Use default instead
-    selectedLanguage = defaultLanguage;
+  } else {
+    // Config not loaded yet, use cookie or fallback
+    selectedLanguage = cookieLanguage || defaultLanguage;
   }
 
-  setState("currentLanguage", selectedLanguage || defaultLanguage);
+  // Always update state
+  setState("currentLanguage", selectedLanguage);
 }
 
 const handleResponse = async (response) => {
