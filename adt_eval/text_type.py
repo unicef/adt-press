@@ -204,6 +204,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
         )
         if use_cached_llm_results and os.path.exists(cache_path):
             page_texts = self.build_page_texts_from_log(Path(cache_path))
+            print(f"Skipping LLM call for case {inputs['case_id']} and using cached results from the logs.")
         else:
             page_texts = self._run_coro(
                 get_page_text(
