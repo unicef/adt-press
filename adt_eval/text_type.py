@@ -256,7 +256,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
             assessments = row.get("assessments", {})
             rationale = assessments[0].get("rationale", {})
             matches = json.loads(rationale) if rationale else []
-            score = row.get("text_type_score/value")
+            score = row.get("text_type_score/value") or 0
 
             results.append(
                 {
