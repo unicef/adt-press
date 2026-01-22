@@ -546,14 +546,21 @@ const updateVisibleQuizFeedbackLanguage = () => {
 };
 
 const announceQuizSelection = (option) => {
-  const optionLetter = option.querySelector('.option-letter')?.textContent || '';
+  const optionLetter = option.querySelector('.option-letter')?.textContent?.trim() || '';
+  const optionText = option.querySelector('.option-text')?.textContent?.trim() || '';
   const liveRegion = document.getElementById('validation-results-announcement');
   if (!liveRegion) {
     return;
   }
 
   liveRegion.setAttribute('aria-live', 'polite');
-  liveRegion.textContent = `Option ${optionLetter} selected`;
+  if (optionLetter) {
+    liveRegion.textContent = `Option ${optionLetter} selected`;
+  } else if (optionText) {
+    liveRegion.textContent = `Selected ${optionText}`;
+  } else {
+    liveRegion.textContent = 'Option selected';
+  }
   setTimeout(() => {
     liveRegion.textContent = '';
   }, 1000);
@@ -695,14 +702,23 @@ export const prepareQuiz = (section) => {
       }
     });
 
-    const optionLetter = option.querySelector('.option-letter')?.textContent || '';
-    const imgAlt = option.querySelector('img')?.alt || '';
+    const optionText = option.querySelector('.option-text')?.textContent?.trim() || '';
+    const imgAlt = option.querySelector('img')?.alt?.trim() || '';
     const shadowInput = option.querySelector('input[type="radio"]');
     if (shadowInput) {
       shadowInput.setAttribute('tabindex', '-1');
     }
 
-    option.setAttribute('aria-label', `Option ${optionLetter}: ${imgAlt}`);
+    const labelParts = [];
+    if (optionText) {
+      labelParts.push(optionText);
+    }
+    if (imgAlt && imgAlt !== optionText) {
+      labelParts.push(imgAlt);
+    }
+
+    const ariaLabel = labelParts.join(' ').trim() || 'Option';
+    option.setAttribute('aria-label', ariaLabel);
     option.setAttribute('role', 'radio');
     option.setAttribute('aria-checked', 'false');
 
