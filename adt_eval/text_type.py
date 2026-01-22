@@ -9,13 +9,13 @@ Some notes on the scoring of matches:
 """
 
 import asyncio
-import nest_asyncio
-import threading
 import json
 import os
+import threading
 from pathlib import Path
 from typing import Any, Dict, List
 
+import nest_asyncio
 from mlflow.entities import Feedback
 from mlflow.genai import scorer
 
