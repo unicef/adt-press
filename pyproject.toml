@@ -24,7 +24,7 @@ dependencies = [
     "langfuse>=2,<3",
     "litellm>=1.79.3",
     "matplotlib>=3.10.3",
-    "mlflow-skinny>=3.4.0",
+    "mlflow>=3.8.1",
     "numpy>=2.3.1",
     "openai>=1.95.1",
     "opencv-python>=4.11.0.86",
@@ -44,6 +44,7 @@ dependencies = [
     "structlog>=25.4.0",
     "types-pyyaml>=6.0.12.20250516",
     "universal-pathlib>=0.2.6",
+    "nest_asyncio>=1.6.0",
 ]
 
 [dependency-groups]
