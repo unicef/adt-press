@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
+import inspect
 from abc import abstractmethod
 from datetime import datetime
-import inspect
 from typing import Any, Dict, List
 
 import mlflow
-import json
 
 from adt_eval.base import BaseEvaluator
+
 
 class MLflowEvaluatorBase(BaseEvaluator):
     """Base evaluator that wraps the core run in an MLflow run."""

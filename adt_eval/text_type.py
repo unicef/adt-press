@@ -15,7 +15,6 @@ import threading
 from pathlib import Path
 from typing import Any, Dict, List
 
-import nest_asyncio
 from mlflow.entities import Feedback
 from mlflow.genai import scorer
 
@@ -32,12 +31,12 @@ from adt_press.utils.languages import Language
 def text_type_per_page_scorer(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
     truth = inputs.get("truth", [])
     page_texts_data = outputs.get("page_texts") or {}
-    page_texts = PageTexts.model_validate(page_texts_data)
+    page_text_groups = PageTextGroups.model_validate(page_texts_data)
 
     #Logic to match LLM output to Gold Standard
     matches: List[Dict[str, Any]] = []
     actual_type_by_text: Dict[str, List[str]] = {}
-    for group in page_texts.groups:
+    for group in page_text_groups.groups:
         for text_item in group.texts:
             normalized_key = normalize_transcript(standardize_transcript(text_item.text))
             actual_type_by_text.setdefault(normalized_key, []).append(text_item.text_type)
@@ -107,7 +106,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
             self.text_group_types_config[name] = TextGroupType.model_validate(params)
 
     def build_page_texts_from_log(self, fpath: Path) -> PageTextGroups:
-        """Build PageTexts object from logged JSON file, as an alternative to LLM call."""
+        """Build PageTextGroups object from logged JSON file, as an alternative to LLM call."""
         with open(fpath, "r", encoding="utf8") as f:
             page_texts = json.load(f)
             output = page_texts["output"]
@@ -163,8 +162,24 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
             loop = None
 
         if loop and loop.is_running():
-            nest_asyncio.apply()
-            return loop.run_until_complete(coro)
+            # If an event loop is already running (e.g., in notebooks), offload to a thread
+            # and wait for the result to avoid nested loop issues.
+            result_container: Dict[str, Any] = {}
+            error_container: Dict[str, BaseException] = {}
+
+            def _runner():
+                try:
+                    result_container["value"] = asyncio.run(coro)
+                except BaseException as exc:  # pragma: no cover - re-raise below
+                    error_container["error"] = exc
+
+            thread = threading.Thread(target=_runner, daemon=True)
+            thread.start()
+            thread.join()
+
+            if "error" in error_container:
+                raise error_container["error"]
+            return result_container.get("value")
 
         result_container: Dict[str, Any] = {}
         error_container: Dict[str, BaseException] = {}

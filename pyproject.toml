@@ -45,7 +45,6 @@ dependencies = [
     "structlog>=25.4.0",
     "types-pyyaml>=6.0.12.20250516",
     "universal-pathlib>=0.2.6",
-    "nest_asyncio>=1.6.0",
 ]
 
 [dependency-groups]
