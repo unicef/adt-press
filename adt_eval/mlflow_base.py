@@ -81,9 +81,7 @@ class MLflowEvaluatorBase(BaseEvaluator):
         """Return report-ready results and metrics from mlflow.genai.evaluate output."""
         metrics = {}
         if hasattr(eval_results, "metrics"):
-            metrics = {
-                key.replace("/mean", ""): value for key, value in eval_results.metrics.items()
-            }
+            metrics = {key.replace("/mean", ""): value for key, value in eval_results.metrics.items()}
         if "score" not in metrics and "page_score" in metrics:
             metrics["score"] = metrics["page_score"]
 
@@ -109,7 +107,7 @@ class MLflowEvaluatorBase(BaseEvaluator):
                 scorers=self.get_scorers(),
                 **self._get_evaluate_kwargs(),
             )
-           
+
             results, metrics = self.get_report_results_and_metrics(eval_results)
 
             self.log_run_metrics(metrics)

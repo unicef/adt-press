@@ -33,7 +33,7 @@ def text_type_per_page_scorer(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
     page_texts_data = outputs.get("page_texts") or {}
     page_text_groups = PageTextGroups.model_validate(page_texts_data)
 
-    #Logic to match LLM output to Gold Standard
+    # Logic to match LLM output to Gold Standard
     matches: List[Dict[str, Any]] = []
     actual_type_by_text: Dict[str, List[str]] = {}
     for group in page_text_groups.groups:
@@ -74,7 +74,7 @@ def text_type_per_page_scorer(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
             }
         )
 
-    #Calculate score
+    # Calculate score
     correct_matches = sum(1 for m in matches if m["expected"] == m["actual"])
     score = correct_matches / len(matches) if matches else 1.0
 
@@ -214,9 +214,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
         language = Language.from_code(input_language_code)
 
         use_cached_llm_results = self.global_config["eval"]["use_cached_llm_results"]
-        cache_path = (
-            f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{inputs['case_id']}.json"
-        )
+        cache_path = f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{inputs['case_id']}.json"
         if use_cached_llm_results and os.path.exists(cache_path):
             page_texts = self.build_page_texts_from_log(Path(cache_path))
             print(f"Skipping LLM call for case {inputs['case_id']} and using cached results from the logs.")
@@ -239,8 +237,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
             "book_title": inputs["book_title"],
             "page_number": inputs["page_number"],
             "label_studio_url": (
-                f"https://{self.label_studio_config.host}/projects/"
-                f"{inputs['label_studio_project']}/data?task={inputs['case_id']}"
+                f"https://{self.label_studio_config.host}/projects/{inputs['label_studio_project']}/data?task={inputs['case_id']}"
             ),
             "page_text": page_text,
             "page_image_path": str(Path(page_image_path).relative_to(self.output_dir)),
@@ -277,8 +274,6 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
                 }
             )
 
-        metrics = {
-            key.replace("/mean", ""): value for key, value in eval_results.metrics.items()
-        }
+        metrics = {key.replace("/mean", ""): value for key, value in eval_results.metrics.items()}
         metrics["score"] = metrics.get("text_type_score", 0.0)
         return results, metrics
