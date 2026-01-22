@@ -24,7 +24,7 @@ from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
-from adt_press.models.text import PageText, PageTextGroup, PageTexts
+from adt_press.models.text import PageTextGroups, Text, TextGroup
 from adt_press.utils.languages import Language
 
 
@@ -106,7 +106,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
             params["name"] = name
             self.text_group_types_config[name] = TextGroupType.model_validate(params)
 
-    def build_page_texts_from_log(self, fpath: Path) -> PageTexts:
+    def build_page_texts_from_log(self, fpath: Path) -> PageTextGroups:
         """Build PageTexts object from logged JSON file, as an alternative to LLM call."""
         with open(fpath, "r", encoding="utf8") as f:
             page_texts = json.load(f)
@@ -116,11 +116,11 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
         for g in output["groups"]:
             page_texts = []
             for t in g["texts"]:
-                page_text = PageText(text_id=t["text_id"], text=t["text"], text_type=t["text_type"])
+                page_text = Text(text_id=t["text_id"], text=t["text"], text_type=t["text_type"])
                 page_texts.append(page_text)
-            page_text_group = PageTextGroup(group_id=g["group_id"], group_type=g["group_type"], texts=page_texts)
+            page_text_group = TextGroup(group_id=g["group_id"], group_type=g["group_type"], texts=page_texts)
             page_text_groups.append(page_text_group)
-        page_texts = PageTexts(page_id=output["page_id"], groups=page_text_groups, reasoning=output["reasoning"])
+        page_texts = PageTextGroups(page_id=output["page_id"], groups=page_text_groups, reasoning=output["reasoning"])
 
         return page_texts
 

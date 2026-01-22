@@ -1,12 +1,16 @@
-type PageID = str
-type SectionID = str
-type ImageID = str
-type TextID = str
-type TextGroupID = str
-type SpeechID = str
-type ChapterID = str
+from typing import NewType
 
-type QuizID = str
-type QuizQuestionID = str
-type QuizExplanationID = str
-type QuizOptionID = str
+PageID = NewType("PageID", str)
+SectionID = NewType("SectionID", str)
+ExplanationID = NewType("ExplanationID", str)
+ImageID = NewType("ImageID", str)
+TextID = NewType("TextID", str)
+TextGroupID = NewType("TextGroupID", str)
+SpeechID = NewType("SpeechID", str)
+ChapterID = NewType("ChapterID", str)
+EasyReadID = NewType("EasyReadID", str)
+
+QuizID = NewType("QuizID", str)
+QuizQuestionID = NewType("QuizQuestionID", str)
+QuizExplanationID = NewType("QuizExplanationID", str)
+QuizOptionID = NewType("QuizOptionID", str)

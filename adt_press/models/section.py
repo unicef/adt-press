@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from adt_press.models.config import SectionType
-from adt_press.models.ids import PageID, SectionID
+from adt_press.models.ids import ExplanationID, PageID, SectionID
 
 
 class PageSection(BaseModel):
@@ -12,9 +12,6 @@ class PageSection(BaseModel):
     is_pruned: bool = False
     background_color: str
     text_color: str
-
-
-type ExplanationID = str
 
 
 class SectionExplanation(BaseModel):

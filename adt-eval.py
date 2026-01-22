@@ -16,9 +16,11 @@ import asyncio
 import os
 import sys
 import traceback
+import warnings
 from pathlib import Path
 from typing import Any, Dict, List
 
+import mlflow
 from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
@@ -119,6 +121,25 @@ async def main():
         print(f"Error: {e}")
         traceback.print_exc()
         sys.exit(1)
+
+    # Configure MLflow tracking
+    # MLflow 3.8+ removed sqlite:// URI support for model registry
+    # Use file:// URI for tracking (still writes to mlruns/) and disable registry
+    # Note: mlflow-skinny doesn't support SQLAlchemy/sqlite, so file-based is the only option
+    if not os.getenv("MLFLOW_TRACKING_URI"):
+        mlflow_dir = Path("mlruns").absolute()
+        mlflow_dir.mkdir(exist_ok=True)
+        mlflow.set_tracking_uri(f"file://{mlflow_dir}")
+
+        # Suppress deprecation warning about filesystem tracking
+        # We use mlflow-skinny which doesn't support database backends
+        warnings.filterwarnings("ignore", category=FutureWarning, module="mlflow")
+
+    # Disable model registry since we're not using it (avoids unsupported URI errors)
+    os.environ["MLFLOW_REGISTRY_URI"] = ""
+
+    # Ensure default experiment exists and set it for all subsequent runs
+    mlflow.set_experiment("Default")
 
     # Determine tasks to run
     tasks_to_run = get_tasks_to_run(config)

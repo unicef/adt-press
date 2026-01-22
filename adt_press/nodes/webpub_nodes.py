@@ -6,9 +6,11 @@ import structlog
 from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
+from adt_press.models.ids import TextID
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
 from adt_press.utils.file import write_json_file
+from adt_press.utils.languages import LanguageCode
 from adt_press.utils.web_assets import build_config_json
 
 log = structlog.get_logger(__name__)
@@ -20,10 +22,11 @@ def package_webpub(
     pdf_title_config: str,
     run_output_dir_config: str,
     plate: Plate,
-    plate_translations: dict[str, dict[str, str]],
+    plate_translations: dict[LanguageCode, dict[TextID, str]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
+    bundle_version_config: str,
 ) -> str:
     languages = list(plate_translations.keys())
     default_language = languages[0]
@@ -85,13 +88,13 @@ def package_webpub(
     }
 
     sections_by_id = {section.section_id: section for section in plate.sections}
-    quizzes_by_id = {quiz.quiz_id: quiz for quiz in plate.quizzes}
+    quizzes_by_section_id = {quiz.section_id: quiz for quiz in plate.quizzes}
 
     def section_number_for_page(webpage: WebPage) -> int:
         section = sections_by_id.get(webpage.section_id)
         if section and section.page_number is not None:
             return section.page_number
-        quiz = quizzes_by_id.get(webpage.section_id)
+        quiz = quizzes_by_section_id.get(webpage.section_id)
         if quiz:
             parent_section = sections_by_id.get(quiz.section_id)
             if parent_section and parent_section.page_number is not None:
@@ -104,7 +107,7 @@ def package_webpub(
         page_number = section_number_for_page(webpage)
         title = f"{page_number}"
         if len(webpage.text_ids):
-            title += f" - {plate_translations[default_language].get(webpage.text_ids[0], '')}"
+            title += f" - {plate_translations[default_language].get(TextID(webpage.text_ids[0]), '')}"
 
         page_entry = {
             "href": f"{webpage.section_id}.html",
@@ -128,6 +131,7 @@ def package_webpub(
         default_language=default_language,
         strategy_config=strategy_config,
         output_subdir="webpub",
+        bundle_version=bundle_version_config,
         feature_overrides={
             "showNavigationControls": False,
             "showTutorial": False,

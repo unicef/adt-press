@@ -4,9 +4,10 @@ from hamilton.function_modifiers import cache
 
 from adt_press.models.config import TemplateConfig
 from adt_press.models.epub import create_epub_file
+from adt_press.models.ids import TextID
 from adt_press.models.plate import Plate
 from adt_press.models.web import WebPage
-from adt_press.utils.languages import Language
+from adt_press.utils.languages import Language, LanguageCode
 from adt_press.utils.web_assets import build_config_json
 
 
@@ -17,11 +18,12 @@ def package_epub(
     pdf_title_config: str,
     plate_language: Language,
     plate: Plate,  # This is the issue - plate object has wrong paths
-    plate_translations: dict[str, dict[str, str]],
+    plate_translations: dict[LanguageCode, dict[TextID, str]],
     web_pages: list[WebPage],
     strategy_config: dict[str, str],
     package_adt_web: str,
-) -> dict[str, str]:
+    bundle_version_config: str,
+) -> dict[LanguageCode, str]:
     """
     Generate EPUB files for each language translation.
 
@@ -45,6 +47,7 @@ def package_epub(
         languages=languages,
         default_language=default_language,
         strategy_config=strategy_config,
+        bundle_version=bundle_version_config,
         output_subdir="epub",
         feature_overrides=feature_overrides,
     )

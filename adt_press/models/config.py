@@ -1,6 +1,6 @@
 import enum
 import os
-from typing import Any, Self
+from typing import Any, NewType, Self
 
 import yaml
 from pydantic import BaseModel, Field, model_validator
@@ -16,8 +16,10 @@ class RenderType(str, enum.Enum):
     activity = "activity"
 
 
-type TextTypeName = str
-type TextGroupTypeName = str
+TextTypeName = NewType("TextTypeName", str)
+TextGroupTypeName = NewType("TextGroupTypeName", str)
+SectionTypeName = NewType("SectionTypeName", str)
+RenderStrategyName = NewType("RenderStrategyName", str)
 
 
 class TextType(BaseModel):
@@ -31,13 +33,13 @@ class TextGroupType(BaseModel):
 
 
 class SectionType(BaseModel):
-    name: str
+    name: SectionTypeName
     description: str
     render_strategy: str = "html"
 
 
 class RenderStrategy(BaseModel):
-    name: str
+    name: RenderStrategyName
     render_type: RenderType
     config: dict
     config_path_hash: str | None = Field(default=None, exclude=True)

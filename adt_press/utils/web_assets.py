@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from typing import Any
+from typing import Any, Sequence
 
 from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
@@ -337,9 +337,10 @@ def build_config_json(
     run_output_dir_config: str,
     *,
     book_title: str,
-    languages: list[str],
+    languages: Sequence[str],
     default_language: str,
     strategy_config: dict[str, Any],
+    bundle_version: str,
     output_subdir: str = "adt",
     feature_overrides: dict[str, Any] | None = None,
 ) -> str:
@@ -378,6 +379,7 @@ def build_config_json(
         "book_title": book_title,
         "config": strategy_config,
         "features": feature_flags,
+        "bundle_version": bundle_version,
     }
 
     render_template(

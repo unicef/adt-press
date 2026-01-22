@@ -1,4 +1,6 @@
 import functools
+import logging
+import warnings
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, TypeVar, cast
@@ -8,6 +10,31 @@ from pydantic import BaseModel
 from adt_press.utils.file import write_json_file
 
 F = TypeVar("F", bound=Callable[..., Any])
+
+
+class LiteLLMLangfuseFilter(logging.Filter):
+    """Filter to suppress specific known LiteLLM Langfuse integration bugs."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        # Suppress the AttributeError: 'CompletionUsage' object has no attribute 'get'
+        # This is a bug in litellm's langfuse integration where it incorrectly
+        # treats CompletionUsage as a dict instead of a Pydantic model
+        # https://github.com/BerriAI/litellm/issues/17219
+        if "'CompletionUsage' object has no attribute 'get'" in record.getMessage():
+            return False
+        return True
+
+
+def configure_litellm_logging():
+    """Configure logging to suppress known LiteLLM bugs and warnings."""
+    # Apply filter to suppress specific LiteLLM errors
+    logging.getLogger("LiteLLM").addFilter(LiteLLMLangfuseFilter())
+
+    # Suppress Pydantic serialization warnings from LiteLLM/Langfuse response model mismatches
+    # LiteLLM's response models don't always match what Pydantic expects during serialization
+    # https://github.com/BerriAI/litellm/issues/11759
+    warnings.filterwarnings("ignore", message=".*Pydantic serializer warnings.*", category=UserWarning)
+    warnings.filterwarnings("ignore", message=".*PydanticSerializationUnexpectedValue.*", category=UserWarning)
 
 
 def json_serializer(obj: Any) -> Any:

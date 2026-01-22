@@ -1,9 +1,13 @@
+from typing import NewType
+
 import pycountry
 from pydantic import BaseModel
 
+LanguageCode = NewType("LanguageCode", str)
+
 
 class Language(BaseModel):
-    code: str
+    code: LanguageCode
     language_code: str
     country_code: str = ""
     name: str
@@ -37,7 +41,7 @@ class Language(BaseModel):
         if country_code:
             name = f"{name} ({country.name})"
 
-        return cls(code=normalized, language_code=lang_code, country_code=country_code, name=name)
+        return cls(code=LanguageCode(normalized), language_code=lang_code, country_code=country_code, name=name)
 
     def __eq__(self, other):
         if not isinstance(other, Language):
