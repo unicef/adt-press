@@ -94,7 +94,9 @@ def edit_sections_config(config: DictConfig) -> dict[SectionID, str]:
 
         # Validate that image file exists
         if not os.path.exists(image_path):
-            log.warning("edit_image_not_found", section_id=section_id, image_path=image_path, message=f"Image file not found: {image_path}")
+            message = f"Annotated edit image file not found for section {section_id}: {image_path}"
+            log.error("edit_image_not_found", section_id=section_id, image_path=image_path, message=message)
+            raise FileNotFoundError(message)
 
         result[section_id] = image_path
 
