@@ -53,7 +53,6 @@
                     aria-labelledby="{{ quiz.quiz_id }}-question-label"
                 >
                     {% for option_id in quiz.option_ids %}
-                        {% set option_number = loop.index %}
                         {% set option_explanation_id = explanations.mapping.get(option_id) %}
                         {% set option_explanation = texts[option_explanation_id].text if option_explanation_id and texts[option_explanation_id] is defined else '' %}
                         <label
@@ -71,16 +70,12 @@
                                 class="sr-only"
                                 aria-labelledby="{{ option_id }}-option-label"
                             />
-
-                            <div class="option-letter-wrapper sr-only" data-letter-hidden="true">
-                                <span class="option-letter" data-letter-hidden="true">{{ option_number }}</span>
-                            </div>
                             <span
                                 id="{{ option_id }}-option-label"
                                 class="option-text block text-lg md:text-2xl text-gray-900"
                                 data-id="{{ option_id }}"
                             >
-                                {{ option_number }}) {{ texts[option_id].text }}
+                                {{ texts[option_id].text }}
                             </span>
 
                             <div class="feedback-container hidden w-full rounded-md border border-transparent bg-transparent px-3 py-2 text-gray-700" aria-live="polite">

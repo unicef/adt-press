@@ -423,6 +423,10 @@ def pruned_section_types_config(config: DictConfig) -> list[SectionTypeName]:
     return list[SectionTypeName](config.get("section_filters", {}).get("pruned_section_types", []))
 
 
+def quiz_count_section_types_config(config: DictConfig) -> list[SectionTypeName]:
+    return list[SectionTypeName](config.get("section_filters", {}).get("quiz_count_section_types", []))
+
+
 @cache(behavior="recompute")
 def activity_strategy_config(config: DictConfig) -> str:
     """Get the activity generation strategy from config."""

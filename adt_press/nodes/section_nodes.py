@@ -93,9 +93,12 @@ def quizzes_by_section_id__llm(
     filtered_sections_by_page_id: dict[PageID, PageSections],
     pdf_text_groups_by_id: dict[TextGroupID, TextGroup],
     quiz_prompt_config: QuizPromptConfig,
+    quiz_count_section_types_config: list[SectionTypeName],
 ) -> dict[SectionID, SectionQuiz]:
     if quiz_prompt_config.sections_per_quiz < 1:
         raise ValueError("sections_per_quiz must be at least 1, use quiz_strategy 'none' to disable quizzes")
+
+    quiz_count_section_types = set(quiz_count_section_types_config)
 
     async def get_quizzes():
         tasks = []
@@ -105,6 +108,9 @@ def quizzes_by_section_id__llm(
             page_sections = filtered_sections_by_page_id[page.page_id]
             for section in page_sections.sections:
                 if section.is_pruned:
+                    continue
+
+                if quiz_count_section_types and section.section_type.name not in quiz_count_section_types:
                     continue
 
                 count += 1
@@ -118,7 +124,7 @@ def quizzes_by_section_id__llm(
         return await gather_with_limit(tasks, quiz_prompt_config.rate_limit)
 
     results = run_async_task(get_quizzes)
-    return {quiz.section_id: quiz for quiz in results}
+    return {quiz.section_id: quiz for quiz in results if quiz}
 
 
 @config.when(explanation_strategy="llm")
