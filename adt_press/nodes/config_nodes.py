@@ -77,12 +77,28 @@ def regenerate_sections_config(config: DictConfig) -> list[SectionID]:
 
 @cache(behavior="recompute")
 def edit_sections_config(config: DictConfig) -> dict[SectionID, str]:
-    """Returns dict mapping section_id to edit instruction, or empty dict if not editing."""
+    """Returns dict mapping section_id to annotated image path, or empty dict if not editing.
+
+    Each value should be a path to an annotated screenshot showing desired edits
+    via red boxes with white text comments.
+    """
     edit_sections = config.get("edit_sections", {})
     if not edit_sections:
         return {}
+
     # Convert to regular dict with string keys and values
-    return {SectionID(str(k)): str(v) for k, v in dict(edit_sections).items()}
+    result = {}
+    for k, v in dict(edit_sections).items():
+        section_id = SectionID(str(k))
+        image_path = str(v)
+
+        # Validate that image file exists
+        if not os.path.exists(image_path):
+            log.warning("edit_image_not_found", section_id=section_id, image_path=image_path, message=f"Image file not found: {image_path}")
+
+        result[section_id] = image_path
+
+    return result
 
 
 def input_language_config(config: DictConfig) -> str:
