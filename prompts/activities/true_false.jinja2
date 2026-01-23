@@ -110,6 +110,20 @@ Example true/false activity:
 - Add accessibility announcements at the end
 - Use consistent spacing with `ml-8` for radio button indentation
 - Include proper focus and hover states for accessibility
+{% if retrieved_context %}
+
+### Reference Context
+The following reference information may help guide your design:
+
+{{ retrieved_context }}
+{% endif %}
+{% if styleguide %}
+
+### Style Guide
+Follow these design patterns for consistent output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

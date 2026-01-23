@@ -53,6 +53,8 @@ async def generate_web_page_html(
     texts: list[PlateText],
     images: list[PlateImage],
     language: Language,
+    retrieved_context: str = "",
+    styleguide: str = "",
 ) -> WebPage:
     context = dict(
         section=section,
@@ -61,6 +63,8 @@ async def generate_web_page_html(
         images=[i.model_dump() for i in images],
         language=language.name,
         examples=examples,
+        retrieved_context=retrieved_context,
+        styleguide=styleguide,
     )
 
     template_path = config.template_path

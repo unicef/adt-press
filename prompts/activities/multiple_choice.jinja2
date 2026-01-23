@@ -188,7 +188,20 @@ Remember:
 - Keep feedback containers hidden (JavaScript handles display)
 - Use semantic HTML and ARIA labels for accessibility
 - Maintain consistent styling with Tailwind CSS classes
+{% if retrieved_context %}
 
+### Reference Context
+The following reference information may help guide your design:
+
+{{ retrieved_context }}
+{% endif %}
+{% if styleguide %}
+
+### Style Guide
+Follow these design patterns for consistent output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% chat role="user" %}

@@ -113,6 +113,20 @@ Example matching activity:
 - All elements need proper ARIA labels and accessibility attributes
 - Use varied background colors for visual distinction
 - Feedback area at bottom for activity results
+{% if retrieved_context %}
+
+### Reference Context
+The following reference information may help guide your design:
+
+{{ retrieved_context }}
+{% endif %}
+{% if styleguide %}
+
+### Style Guide
+Follow these design patterns for consistent output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

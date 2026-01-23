@@ -14,6 +14,7 @@ from adt_press.nodes import (
     image_nodes,
     pdf_nodes,
     plate_nodes,
+    rag_nodes,
     report_nodes,
     section_nodes,
     speech_nodes,
@@ -30,6 +31,7 @@ log = structlog.get_logger()
 modules = [
     config_nodes,
     image_nodes,
+    rag_nodes,
     report_nodes,
     pdf_nodes,
     section_nodes,

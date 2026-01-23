@@ -49,6 +49,25 @@ This template is a simple fallback for activities without specific templates.
 ```
 
 **Note**: This template should rarely be used. Specific activity types (sorting, matching, fill_in_a_table, true_false) have dedicated templates with proper interactivity.
+{% if retrieved_context %}
+
+### Reference Context
+The following reference information may help guide your design:
+
+{{ retrieved_context }}
+
+Use this context to:
+- Follow curriculum standards for educational content
+- Use correct character names or entity descriptions
+- Apply pedagogical best practices for activities
+{% endif %}
+{% if styleguide %}
+
+### Style Guide
+Follow these design patterns and guidelines for consistent HTML/CSS output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

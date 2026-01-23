@@ -1,0 +1,10 @@
+# Landmark and location definitions for consistent naming
+# Add places and landmarks that appear in your books here
+
+landmarks:
+  # Example format:
+  # - name: "Plaza Central"
+  #   aliases: ["the plaza", "central plaza"]
+  #   description: "The main town square with a fountain in the center"
+  #   location: "downtown"
+  #   appears_in: ["chapter_3"]

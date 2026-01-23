@@ -1,0 +1,167 @@
+# Chapter summaries for Cuaderno 3 - Cuaderno para leer y escribir en tercero
+
+chapters:
+  - number: 1
+    title: "Yo Soy Guazubirá"
+    pages: "6-10"
+    summary: >
+      Introduction to the book's mascot Guazubirá, a small deer native to Uruguay.
+      Students learn about the activity icons (pencil=write, book=read, circle=listen)
+      and are introduced to Guazubirá's friends: Zorrito, Mulita, and Lobito.
+      Students create their own profile page with personal information and drawings.
+    main_characters:
+      - Guazubirá
+      - Zorrito
+      - Mulita
+      - Lobito
+    activity_types:
+      - Personal profile creation
+      - Drawing activities
+      - Getting-to-know-you exercises
+    skills_practiced:
+      - Self-expression
+      - Writing personal information
+      - Following activity icons
+
+  - number: 2
+    title: "Luces y Sombras"
+    pages: "11-30"
+    summary: >
+      The main story "¿Quién corre conmigo?" tells of Elena, a girl who loves
+      running races. When she visits her grandfather Abuelo Enrique, she's bored
+      because he can barely walk. He challenges her to race against her shadow.
+      She wins and loses several times until he teaches her the "Gran Secreto
+      para Vencer a las Sombras" - a poem explaining that when you face the sun,
+      your shadow is behind you and you always win. The chapter also includes
+      an informational article about light and shadows from a scientific perspective.
+    main_characters:
+      - Elena
+      - Abuelo Enrique
+    story_elements:
+      - Elena's competitive nature
+      - Racing against shadows
+      - The Gran Secreto para Vencer a las Sombras (poem)
+      - Tortilla de papas dinner
+      - 87 victories counted by grandfather
+    activity_types:
+      - Reading comprehension
+      - Character portraits and descriptions
+      - Dialogue completion
+      - Story sequencing
+      - Summary writing
+      - Antonyms and synonyms
+      - Pronoun practice
+      - Scientific text analysis
+    skills_practiced:
+      - Reading comprehension
+      - Character analysis
+      - Writing descriptions using comparisons
+      - Understanding antonyms (lento/ligero)
+      - Science vocabulary
+    key_vocabulary:
+      - sombra (shadow)
+      - luz (light)
+      - opaco (opaque)
+      - transparente (transparent)
+      - traslúcido (translucent)
+    poem_text: |
+      GRAN SECRETO PARA VENCER A LAS SOMBRAS
+      Cuando al sol la cara pones,
+      sombra muerde tus talones.
+      Corras lento o ligero,
+      siempre llegarás primero.
+      Cuando el sol está a tu espalda,
+      sombra ante ti se alarga,
+      y aunque corras mucho y duro,
+      ella ganará seguro.
+
+  - number: 3
+    title: "Sartenes y Cacerolas"
+    pages: "31-50"
+    summary: >
+      This chapter focuses on cooking and kitchen themes. It includes information
+      about solar cookers (cocinas solares) and how they use the sun as an energy
+      source. Students practice editing texts by removing repetitions and improving
+      writing clarity. Activities include working with Chinese shadow puppets
+      (sombras chinescas) instructions.
+    main_topics:
+      - Cooking and kitchen items
+      - Solar cookers and renewable energy
+      - Chinese shadow puppets
+    activity_types:
+      - Text editing (removing repetitions)
+      - Comprehension questions
+      - Writing instructions
+    skills_practiced:
+      - Text revision and editing
+      - Identifying repetitive language
+      - Technical vocabulary
+
+  - number: 4
+    title: "Hablar y Volar"
+    pages: "51-70"
+    summary: >
+      The main story features Pedrito, a parrot who was shot and injured, then
+      adopted by a family. He learns to talk and loves tea with milk. One day
+      he encounters a tiger in the forest and innocently invites him for tea.
+      The tiger attacks him and plucks his feathers. After recovering, Pedrito
+      and his owner hunt down the tiger for revenge. The chapter includes fun
+      facts about food world records.
+    main_characters:
+      - Pedrito (the parrot)
+      - El Tigre (the tiger)
+    story_elements:
+      - Pedrito's famous phrases ("¡Rica papa!", "¡La pata, Pedrito!")
+      - The tiger attack and feather loss
+      - Pedrito's recovery and revenge
+      - Tea with milk as Pedrito's favorite
+    activity_types:
+      - Character comparison (Pedrito vs Tiger)
+      - Dialogue completion
+      - Story sequencing
+      - Sentence construction
+    skills_practiced:
+      - Character analysis and comparison
+      - Understanding dialogue
+      - Narrative sequencing
+    fun_facts_section:
+      - Sonya Thomas ate 65 hard-boiled eggs in 6 minutes 40 seconds (2012)
+      - Longest sandwich: 735 meters (Lebanon, 2011)
+      - Largest chocolate coin: 874 kg (Caracas, 2015)
+      - Largest torta frita: 3.63 meters diameter (Durazno, Uruguay, 2013)
+
+  - number: 5
+    title: "Juegos y Juguetes"
+    pages: "71-90"
+    summary: >
+      This chapter explores games and traditional toys. It includes information
+      about parrot nests (cotorras) and their communal living structures. Students
+      learn about traditional toys like the "pelota de trapo" (rag ball) made from
+      old socks and fabric scraps. The activities focus on text editing and
+      improving writing.
+    main_topics:
+      - Traditional games and toys
+      - Parrot nests and behavior
+      - Pelota de trapo (rag ball)
+    activity_types:
+      - Text editing
+      - Comprehension questions
+      - Writing about traditional toys
+    skills_practiced:
+      - Text revision
+      - Understanding informational texts
+      - Cultural knowledge
+    cultural_content:
+      - Pelota de trapo: Traditional homemade soccer ball made from old socks
+      - Instructions for making traditional toys
+
+  - number: 6
+    title: "Álbum de Palabras y Expresiones"
+    pages: "91-100"
+    summary: >
+      A reference section serving as a word and expression album where students
+      can collect and organize vocabulary learned throughout the workbook.
+    purpose: Vocabulary reference and collection
+    activity_types:
+      - Vocabulary organization
+      - Word collection

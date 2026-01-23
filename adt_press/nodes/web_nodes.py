@@ -15,13 +15,20 @@ from adt_press.llm.web_generation_quiz import generate_web_quiz
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
+    KnowledgeBaseConfig,
     PromptConfig,
     RenderStrategy,
     RenderStrategyName,
     SectionType,
     SectionTypeName,
+    StyleguideConfig,
     TemplateConfig,
     TemplateRenderConfig,
+)
+from adt_press.nodes.rag_nodes import (
+    KnowledgeIndex,
+    format_retrieved_context,
+    retrieve_context,
 )
 from adt_press.models.ids import ImageID, SectionID, TextID
 from adt_press.models.plate import Plate, PlateImage, PlateText
@@ -139,6 +146,9 @@ def web_pages(
     run_output_dir_config: str,
     web_edit_prompt_config: HTMLPromptConfig,
     web_pages_cache_key: str,
+    knowledge_index: KnowledgeIndex | None,
+    knowledge_base_config: KnowledgeBaseConfig,
+    styleguide_content: str,
 ) -> list[WebPage]:
     """
     Generate or update web pages for all sections.
@@ -170,6 +180,25 @@ def web_pages(
         log.info("editing_sections", section_ids=list(edits_to_apply.keys()), count=len(edits_to_apply))
 
     cached_configs: dict[str, Any] = {}
+
+    def build_rag_query(section: Any, texts: list[PlateText]) -> str:
+        """Build a query string for RAG retrieval from section content."""
+        parts = [f"Section type: {section.section_type}"]
+        # Include first few texts to provide context
+        text_content = " ".join([t.text for t in texts[:5]])
+        if text_content:
+            parts.append(text_content[:500])  # Limit query size
+        return " ".join(parts)
+
+    def get_retrieved_context(section: Any, texts: list[PlateText]) -> str:
+        """Retrieve relevant context from knowledge base if enabled."""
+        if not knowledge_index or not knowledge_base_config.enabled:
+            return ""
+        query = build_rag_query(section, texts)
+        retrieved_docs = retrieve_context(
+            knowledge_index, knowledge_base_config, query
+        )
+        return format_retrieved_context(retrieved_docs)
 
     async def generate_pages():
         # Separate lists for cached vs new/edited pages
@@ -253,12 +282,42 @@ def web_pages(
                     )
                 )
             else:
+                # Retrieve RAG context for this section
+                retrieved_ctx = get_retrieved_context(section, texts)
+                if retrieved_ctx:
+                    log.debug(
+                        "rag_context_retrieved",
+                        section_id=section_id,
+                        context_length=len(retrieved_ctx),
+                    )
+
                 if strategy.render_type == "html":
                     async_tasks.append(
-                        generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language)
+                        generate_web_page_html(
+                            strategy_name,
+                            config,
+                            config.examples,
+                            section,
+                            groups,
+                            texts,
+                            images,
+                            plate_language,
+                            retrieved_context=retrieved_ctx,
+                            styleguide=styleguide_content,
+                        )
                     )
                 elif strategy.render_type == "template":
-                    async_tasks.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))
+                    async_tasks.append(
+                        generate_web_page_template(
+                            strategy_name,
+                            config,
+                            section,
+                            groups,
+                            texts,
+                            images,
+                            plate_language,
+                        )
+                    )
                 elif strategy.render_type == "activity":
                     async_tasks.append(
                         generate_web_page_activity(
@@ -272,6 +331,8 @@ def web_pages(
                             plate_language,
                             activity_prompts_config,
                             activity_answers_prompts_config,
+                            retrieved_context=retrieved_ctx,
+                            styleguide=styleguide_content,
                         )
                     )
 

@@ -1,0 +1,131 @@
+# Character definitions for Cuaderno 3 - Cuaderno para leer y escribir en tercero
+# These characters appear throughout the workbook
+
+characters:
+  - name: Guazubirá
+    aliases: ["guazubirá", "Guazubira"]
+    description: >
+      A small deer (ciervo pequeño) who serves as the book's mascot and guide.
+      He accompanies students throughout the workbook, appearing with icons to
+      indicate different activities: a pencil means write, a book means read,
+      and a circle means listen to a reading.
+    species: Deer (Mazama gouazoubira)
+    physical_traits:
+      - Reddish-brown, grayish or brownish fur (pelaje marrón rojizo, pardo o grisáceo)
+      - Males have thin antlers about 15cm long
+      - Up to 1.20 meters long, weighs up to 20 kilos
+    habitat: Forest areas (zonas de monte) in some regions of Uruguay
+    diet: Grasses, leaves, and fruits (pastos, hojas y frutos)
+    role: narrator, guide
+    appears_in:
+      - "Yo Soy Guazubirá"
+      - Throughout all chapters as guide
+
+  - name: Zorrito
+    aliases: ["zorrito"]
+    description: Guazubirá's friend, a small fox character
+    role: supporting character
+    appears_in:
+      - "Yo Soy Guazubirá"
+
+  - name: Mulita
+    aliases: ["mulita"]
+    description: Guazubirá's friend, an armadillo character
+    role: supporting character
+    appears_in:
+      - "Yo Soy Guazubirá"
+
+  - name: Lobito
+    aliases: ["lobito"]
+    description: Guazubirá's friend, a small wolf/sea lion character
+    role: supporting character
+    appears_in:
+      - "Yo Soy Guazubirá"
+
+  - name: Elena
+    aliases: ["elena"]
+    description: >
+      A young girl who loves running races more than anything - more than TV,
+      ice cream, or picture books. She has a competitive spirit but learns
+      important lessons from her grandfather about shadows and winning/losing.
+    physical_traits:
+      - Very fast legs (piernas muy veloces)
+      - Wears sneakers (championes)
+      - Often has scraped knees (rodillas lastimadas)
+      - Messy hair from running (melena despeinada)
+      - Heart beats fast when running
+    personality:
+      - Loves to win, gets upset when losing
+      - Competitive but learns sportsmanship
+      - Initially reluctant to visit grandfather
+    family:
+      - Has a brother who crawls (hermano que gatea)
+      - Has a dog and a turtle as pets
+      - Her father is the son of Abuelo Enrique
+    role: protagonist
+    appears_in:
+      - "Luces y Sombras"
+      - "¿Quién corre conmigo?"
+
+  - name: Abuelo Enrique
+    aliases: ["abuelo Enrique", "el abuelo", "abuelo"]
+    description: >
+      Elena's grandfather. He is elderly and can barely walk, but he is wise
+      and patient. He has a house with a beautiful garden and fabulous books.
+      He teaches Elena the "Gran Secreto para Vencer a las Sombras" (Great
+      Secret to Defeat Shadows) and cooks a delicious potato tortilla.
+    personality:
+      - Wise and patient
+      - Good at teaching through play
+      - Gentle and understanding
+    role: mentor, supporting character
+    appears_in:
+      - "Luces y Sombras"
+
+  - name: Pedrito
+    aliases: ["Pedrito", "el loro", "loro"]
+    description: >
+      A parrot (loro) who was injured by a farmworker and adopted by a family.
+      He learned to talk and loves tea with milk (té con leche). He is curious
+      and talkative, mixing words without much sense like parrots do. His
+      famous phrases include "¡La pata, Pedrito!" and "¡Rica papa!"
+    species: Parrot (loro)
+    physical_traits:
+      - Green feathers (when healthy)
+      - Was once plucked of feathers by the tiger
+    personality:
+      - Very curious (muy curioso)
+      - Talkative (hablador)
+      - Innocent and friendly
+      - Proud of his feathers
+    favorite_things:
+      - Tea with milk (té con leche)
+      - Bread soaked in tea with milk (pan mojado en té con leche)
+    famous_phrases:
+      - "¡La pata, Pedrito!"
+      - "¡Rica papa!"
+      - "¡Rico té con leche!"
+      - "¡Buen día!"
+    role: protagonist
+    appears_in:
+      - "Hablar y Volar"
+
+  - name: El Tigre
+    aliases: ["tigre", "el tigre"]
+    description: >
+      A wild tiger who encounters Pedrito in the forest. He has a terribly
+      hoarse voice (voz terriblemente ronca) and green eyes that glow in the
+      dark. He is fierce and gets angry easily, especially when he thinks
+      someone is mocking him.
+    physical_traits:
+      - Green eyes that glow (ojos verdes que brillan)
+      - Terribly hoarse voice (voz terriblemente ronca)
+      - Sharp claws (uñas afiladas)
+    personality:
+      - Fierce (feroz)
+      - Gets angry easily (se enoja fácilmente)
+      - Wild (salvaje)
+      - Silent hunter (silencioso)
+    role: antagonist
+    appears_in:
+      - "Hablar y Volar"

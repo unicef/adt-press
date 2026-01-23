@@ -65,6 +65,25 @@ These is when I've provided images and text with the following ids: img-26-2, te
 
 Provide me the answer in the given structure. Please take your time and think carefully before giving me the answers.
 Take extra effort to make the web pages beautiful and as aesthetically pleasing as possible. Give the background a color or gradient that matches the textbook.
+{% if retrieved_context %}
+
+REFERENCE CONTEXT:
+The following reference information may help guide your design and content decisions:
+
+{{ retrieved_context }}
+
+Use this reference context to inform your design choices where relevant, such as:
+- Following curriculum standards for educational content
+- Using correct character names or entity descriptions
+- Applying pedagogical best practices for activities
+{% endif %}
+{% if styleguide %}
+
+STYLE GUIDE:
+Follow these design patterns and guidelines for consistent HTML/CSS output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

@@ -267,3 +267,36 @@ class PageRangeConfig(BaseModel):
 
 class TemplateConfig(BaseModel):
     output_dir: str
+
+
+class KnowledgeBaseConfig(BaseModel):
+    """Configuration for RAG-based knowledge retrieval."""
+
+    enabled: bool = False
+    references_path: str = "assets/references"
+    embedding_model: str = "text-embedding-3-small"
+    chunk_size: int = 500
+    chunk_overlap: int = 50
+    top_k: int = 5
+    collection_name: str = "adt_references"
+
+    # Which collections to index (subdirectories of references_path)
+    collections: list[str] = Field(
+        default_factory=lambda: ["curriculum", "entities", "pedagogy", "book_context"]
+    )
+
+
+class StyleguideConfig(BaseModel):
+    """Configuration for styleguide full injection.
+
+    Styleguides are injected in full (not via RAG) to ensure design consistency.
+    They provide HTML/CSS patterns, color palettes, and layout guidelines.
+    """
+
+    enabled: bool = False
+    styleguides_path: str = "assets/prompts/styleguides"
+    name: str = "default"  # Which styleguide to use (maps to styleguide_{name}.md)
+
+    def get_styleguide_path(self) -> str:
+        """Get the full path to the selected styleguide file."""
+        return os.path.join(self.styleguides_path, f"styleguide_{self.name}.md")

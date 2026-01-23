@@ -59,6 +59,8 @@ async def generate_web_page_activity(
     activity_prompts_config: dict[str, HTMLPromptConfig],
     activity_answers_prompts_config: dict[str, PromptConfig],
     activity_rendering_enabled: bool = True,
+    retrieved_context: str = "",
+    styleguide: str = "",
 ) -> WebPage:
     # Override config with activity-specific config if available
     section_type_key = section.section_type
@@ -81,6 +83,8 @@ async def generate_web_page_activity(
         images=[i.model_dump() for i in images],
         language=language.name,
         examples=examples,
+        retrieved_context=retrieved_context,
+        styleguide=styleguide,
     )
 
     template_path = config.template_path

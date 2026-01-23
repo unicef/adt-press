@@ -92,6 +92,20 @@ Example sorting activity:
 - Use color-coded category backgrounds for visual differentiation
 - Include proper ARIA labels and roles for accessibility
 - Text content should be wrapped in `<span data-id="...">` within word cards
+{% if retrieved_context %}
+
+### Reference Context
+The following reference information may help guide your design:
+
+{{ retrieved_context }}
+{% endif %}
+{% if styleguide %}
+
+### Style Guide
+Follow these design patterns for consistent output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

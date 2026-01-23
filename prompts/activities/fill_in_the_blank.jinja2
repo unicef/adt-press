@@ -133,7 +133,20 @@ IMPORTANT: Your reasoning MUST be written in English, regardless of the activity
 
 **Hierarchical diagram:**
 Use when showing text structure, concept maps, or organizational charts.
+{% if retrieved_context %}
 
+### Reference Context
+The following reference information may help guide your design:
+
+{{ retrieved_context }}
+{% endif %}
+{% if styleguide %}
+
+### Style Guide
+Follow these design patterns for consistent output:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

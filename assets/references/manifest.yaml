@@ -1,0 +1,27 @@
+# Knowledge Base References Manifest
+# This file documents the reference content available for RAG retrieval.
+# Files in this directory are chunked, embedded, and indexed for semantic search.
+
+collections:
+  curriculum:
+    description: "Curriculum standards, learning objectives, and grade-level requirements"
+    file_types: [".md", ".yaml"]
+    chunk_by: section  # Chunk by markdown headers
+
+  entities:
+    description: "Named entities like characters, landmarks, and proper nouns for consistency"
+    file_types: [".yaml", ".md"]
+    chunk_by: entry  # Each YAML entry is a chunk
+
+  pedagogy:
+    description: "Pedagogical guidelines for activity design and educational adaptation"
+    file_types: [".md"]
+    chunk_by: section
+
+  book_context:
+    description: "Book-specific content, summaries, and contextual information"
+    file_types: [".md", ".yaml"]
+    chunk_by: section
+
+# Note: Styleguides remain in assets/prompts/styleguides/ and are
+# injected in full (not via RAG) for design consistency.
