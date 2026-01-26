@@ -429,6 +429,105 @@ def activity_strategy_config(config: DictConfig) -> str:
     return str(config.get("activity_strategy", "none"))
 
 
+@cache(behavior="recompute")
+def styleguide_config(config: DictConfig) -> str:
+    """Load the styleguide content from the configured styleguide file.
+
+    Styleguides are stored in assets/prompts/styleguides/styleguide_{name}.md.
+    Returns empty string if no styleguide is configured.
+    """
+    styleguide_name = str(config.get("styleguide", ""))
+    if not styleguide_name:
+        return ""
+
+    styleguide_path = f"assets/prompts/styleguides/styleguide_{styleguide_name}.md"
+    if not os.path.exists(styleguide_path):
+        log.warning("styleguide_not_found", path=styleguide_path, name=styleguide_name)
+        return ""
+
+    with open(styleguide_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    log.info("loaded_styleguide", name=styleguide_name, path=styleguide_path, length=len(content))
+    return content
+
+
+@cache(behavior="recompute")
+def use_dynamic_styleguide_config(config: DictConfig) -> bool:
+    """Whether to generate a dynamic styleguide based on book analysis.
+
+    When enabled, the system will analyze the book structure in a first pass
+    and generate section-specific templates to ensure consistent output.
+    """
+    return bool(config.get("use_dynamic_styleguide", False))
+
+
+@cache(behavior="recompute")
+def run_consistency_pass_config(config: DictConfig) -> bool:
+    """Whether to run a post-generation consistency pass.
+
+    When enabled, the system will review all generated pages after initial
+    generation and ensure consistent styling across pages of the same type.
+    The first page of each section type becomes the reference, and subsequent
+    pages are adjusted to match.
+    """
+    return bool(config.get("run_consistency_pass", False))
+
+
+@cache(behavior="recompute")
+def use_component_library_config(config: DictConfig) -> bool:
+    """Whether to use component-based generation with visual design extraction.
+
+    When enabled, the system will:
+    1. Analyze PDF pages using vision to extract the design system
+    2. Generate a component library with reusable HTML/Tailwind components
+    3. Force the LLM to select and populate components for consistency
+
+    This provides the highest level of design consistency.
+    """
+    return bool(config.get("use_component_library", False))
+
+
+@cache(behavior="recompute")
+def use_fixed_templates_config(config: DictConfig) -> bool:
+    """Whether to use fixed template-based generation for maximum consistency.
+
+    When enabled, the system will:
+    1. Analyze sample pages to extract fixed HTML templates (one per section type)
+    2. All pages of the same type use the EXACT same template
+    3. The LLM only fills slots - no layout decisions allowed
+
+    This provides the highest level of visual consistency across the book.
+    Takes priority over use_component_library when both are enabled.
+    """
+    return bool(config.get("use_fixed_templates", False))
+
+
+@cache(behavior="recompute")
+def use_manifest_generation_config(config: DictConfig) -> bool:
+    """Whether to use manifest-based generation for consistent styling.
+
+    When enabled, the system will:
+    1. Generate a content manifest with all text content and a style map
+    2. Apply consistent styling based on text_type (no vision model needed)
+    3. The LLM receives exact styling rules and just arranges content
+
+    This is the simplest and most consistent approach.
+    Takes priority over use_fixed_templates and use_component_library.
+    """
+    return bool(config.get("use_manifest_generation", False))
+
+
+@cache(behavior="recompute")
+def manifest_deterministic_config(config: DictConfig) -> bool:
+    """Whether to use deterministic HTML generation (no LLM for layout).
+
+    Only works when use_manifest_generation is true.
+    Generates HTML directly from the style map without LLM involvement.
+    """
+    return bool(config.get("manifest_deterministic", False))
+
+
 def active_section_types_config(
     section_types_config: dict[SectionTypeName, SectionType],
     render_strategies_config: dict[RenderStrategyName, RenderStrategy],

@@ -113,6 +113,7 @@ def run_pipeline(config: DictConfig) -> None:
         "report_quizzes",
         "plate_report",
         "glossary_report",
+        "content_manifest",  # Generate manifest for debugging when use_manifest_generation is enabled
         "web_report",
         "report_index",
         "package_epub",

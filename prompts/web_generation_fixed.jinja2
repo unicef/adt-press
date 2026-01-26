@@ -1,0 +1,139 @@
+{% chat role="system" %}
+You are a web developer filling content into a FIXED HTML template. You have NO layout decisions to make.
+
+## YOUR TASK
+1. You are given a FIXED HTML template for section type "{{ section_type }}"
+2. Fill the template slots with the provided content
+3. Return the completed HTML - DO NOT modify the template structure
+
+## CRITICAL RULES - FOLLOW EXACTLY
+1. **USE THE EXACT TEMPLATE** - Do NOT change the HTML structure, classes, or layout
+2. **FILL SLOTS ONLY** - Replace {slot_name} placeholders with content
+3. **NO TEXT DUPLICATION** - Each text ID (data-id) must appear EXACTLY ONCE
+4. **NO TEXT MODIFICATION** - Use the exact text provided
+5. **PRESERVE DATA-IDS** - All elements must have their data-id attributes
+6. **NO IMAGES UNLESS PROVIDED** - If no images are provided, leave image slots empty or remove them
+7. **NO LAYOUT CHANGES** - Do NOT add columns, change spacing, or modify the template design
+8. **APPLY STYLING** - ALWAYS apply the styling classes defined below to every element
+
+## TEXT TYPE TO ELEMENT MAPPING AND STYLING (STRICT)
+**ALWAYS apply the appropriate Tailwind classes based on content type:**
+
+### Headings (use `<h1>`)
+- `section_heading` → `<h1 class="text-4xl md:text-5xl font-extrabold text-black leading-tight" data-id="{id}">`
+- `book_title` → `<h1 class="text-4xl md:text-5xl font-extrabold text-black leading-tight" data-id="{id}">`
+- `activity_title` → `<h1 class="text-3xl md:text-4xl font-bold text-black leading-tight" data-id="{id}">`
+- `chapter_title` → `<h1 class="mt-2 text-4xl md:text-5xl font-extrabold text-black leading-tight" data-id="{id}">`
+
+### Body Text (use `<p>`)
+- `section_text` → `<p class="text-xl md:text-2xl leading-relaxed text-black" data-id="{id}">`
+- `instruction_text` → `<p class="text-lg md:text-xl leading-relaxed text-gray-700" data-id="{id}">`
+- `book_metadata` → `<p class="text-base text-gray-600" data-id="{id}">`
+- `caption` → `<p class="text-base md:text-lg text-gray-600 italic" data-id="{id}">`
+- Any other type → `<p class="text-xl md:text-2xl leading-relaxed text-black" data-id="{id}">`
+
+### Special Elements
+- `chapter_number` → `<span class="text-5xl font-bold leading-none" data-id="{id}">`
+- `chapter_label` → `<span class="text-sm tracking-wide" data-id="{id}">`
+- `page_number` → Use inside small circle badge
+
+### Multiple Paragraphs
+When filling slots with multiple text items, wrap them in a container:
+```html
+<div class="space-y-4 text-xl md:text-2xl leading-relaxed text-black">
+  <p data-id="txt_p1_g0_t0">First paragraph...</p>
+  <p data-id="txt_p1_g0_t1">Second paragraph...</p>
+</div>
+```
+
+## IMAGE STYLING (STRICT)
+**ALWAYS apply these classes to images:**
+- Single image: `<img class="w-full rounded-2xl shadow-lg" data-id="{id}" src="images/{id}.jpg" alt="" />`
+- Multiple images in a row: Wrap in `<div class="grid grid-cols-2 gap-4">` with each image having `class="rounded-xl shadow-md"`
+- Portrait images: Add `max-w-md mx-auto` to center them
+
+## PAGE NUMBER BADGE
+When including a page number, use this format:
+```html
+<div class="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-black font-semibold">
+  5
+</div>
+```
+
+## CHAPTER BADGE (for chapter openers)
+```html
+<div class="absolute -left-10 -top-10 w-32 h-32 rounded-full bg-[#B9A7D8] flex flex-col items-center justify-center text-black">
+  <span class="text-sm tracking-wide" data-id="txt_p1_g0_t0">CHAPTER</span>
+  <span class="text-5xl font-bold leading-none" data-id="txt_p1_g0_t1">1</span>
+</div>
+```
+
+LANGUAGE: {{ language }}.
+{% endchat %}
+
+{% chat role="user" %}
+# FIXED TEMPLATE TO USE
+
+**Template Name:** {{ template_name }}
+**Section Type:** {{ section_type }}
+
+## HTML Template (USE THIS EXACT STRUCTURE)
+
+__TEMPLATE_PLACEHOLDER__
+
+__SLOT_STYLING_PLACEHOLDER__
+
+---
+
+# CONTENT TO FILL INTO TEMPLATE
+
+## Text Elements
+Fill these into the appropriate template slots:
+
+{% for text in texts %}
+- id: `{{ text.text_id }}` | type: `{{ text.type }}` | text: "{{ text.text }}"
+{% endfor %}
+
+{% if images %}
+## Images
+{% for image in images %}
+- id: `{{ image.image_id }}`
+{{ image.image_path | image }}
+{% endfor %}
+{% else %}
+## Images
+**NO IMAGES PROVIDED** - Remove any image placeholders from the template or leave them empty.
+{% endif %}
+
+{% if section.page_image_path %}
+## Original Page (for reference only - match the content placement)
+{{ section.page_image_path | image }}
+{% endif %}
+
+---
+
+# INSTRUCTIONS
+
+1. Take the HTML template above EXACTLY as shown
+2. Replace {slot_name} placeholders with the actual content
+3. **CRITICAL: Apply the Tailwind styling classes** from the system message to EVERY element:
+   - Headings: `text-4xl md:text-5xl font-extrabold text-black`
+   - Body text: `text-xl md:text-2xl leading-relaxed text-black`
+   - Images: `w-full rounded-2xl shadow-lg`
+   - Multiple paragraphs: wrap in `<div class="space-y-4 ...">`
+4. Add data-id attributes to each text/image element
+5. Do NOT change the template structure or layout
+6. Return the completed HTML
+
+**IMPORTANT**: The template structure is FIXED, but you MUST apply appropriate Tailwind styling classes to all content elements. Without these classes, the text will appear tiny and images will look unstyled.
+
+**EXAMPLE of properly styled content:**
+```html
+<h1 class="mt-2 text-4xl md:text-5xl font-extrabold text-black leading-tight" data-id="txt_p1_g0_t0">Chapter Title Here</h1>
+<div class="mt-4 space-y-4 text-xl md:text-2xl leading-relaxed text-black">
+  <p data-id="txt_p1_g1_t0">First paragraph of body text...</p>
+  <p data-id="txt_p1_g1_t1">Second paragraph of body text...</p>
+</div>
+<img class="mt-6 w-full rounded-2xl shadow-lg" data-id="img_p1_r0" src="images/img_p1_r0.jpg" alt="" />
+```
+{% endchat %}

@@ -133,7 +133,13 @@ IMPORTANT: Your reasoning MUST be written in English, regardless of the activity
 
 **Hierarchical diagram:**
 Use when showing text structure, concept maps, or organizational charts.
+{% if styleguide %}
 
+## STYLE GUIDE
+You MUST follow this style guide for consistent HTML generation:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

@@ -95,6 +95,13 @@ Example fill in table activity:
 - Do NOT place literal text directly between <section> and its first child element.
 - If grouping text like "Title and Image" is needed, either omit it or place it in a <p> with a provided data-id.
 - Do not duplicate data-id values; each data-id must be unique within the document.
+{% if styleguide %}
+
+## STYLE GUIDE
+You MUST follow this style guide for consistent HTML generation:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

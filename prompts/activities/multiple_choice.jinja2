@@ -188,7 +188,13 @@ Remember:
 - Keep feedback containers hidden (JavaScript handles display)
 - Use semantic HTML and ARIA labels for accessibility
 - Maintain consistent styling with Tailwind CSS classes
+{% if styleguide %}
 
+## STYLE GUIDE
+You MUST follow this style guide for consistent HTML generation:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% chat role="user" %}

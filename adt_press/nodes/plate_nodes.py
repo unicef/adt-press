@@ -56,6 +56,7 @@ def generated_plate(
                     part_ids=page_section.part_ids,
                     background_color=page_section.background_color,
                     text_color=page_section.text_color,
+                    layout_hint=page_section.layout_hint,
                 )
             )
 

@@ -8,10 +8,25 @@ from typing import Any
 import structlog
 from hamilton.function_modifiers import cache
 
+from adt_press.llm.book_analysis import BookAnalysis, analyze_book
+from adt_press.llm.component_library import generate_component_library_markdown, save_component_library
+from adt_press.llm.consistency_checker import run_consistency_pass
+from adt_press.llm.design_extraction import (
+    extract_design_system,
+    get_sample_pages_for_analysis,
+)
+from adt_press.llm.styleguide_generator import generate_dynamic_styleguide
 from adt_press.llm.web_generation_activity import generate_web_page_activity
+from adt_press.llm.web_generation_component import generate_web_page_component
 from adt_press.llm.web_generation_edit import edit_web_page_with_llm
 from adt_press.llm.web_generation_html import generate_web_page_html
 from adt_press.llm.web_generation_quiz import generate_web_quiz
+from adt_press.llm.template_extraction import (
+    BookTemplateSet,
+    extract_book_templates,
+)
+from adt_press.llm.web_generation_fixed import generate_web_page_fixed
+from adt_press.llm.web_generation_manifest import generate_web_page_manifest
 from adt_press.llm.web_generation_template import generate_web_page_template
 from adt_press.models.config import (
     HTMLPromptConfig,
@@ -38,6 +53,176 @@ from adt_press.utils.web_assets import build_config_json, build_web_assets
 log = structlog.get_logger(__name__)
 
 
+@cache(behavior="recompute")
+def book_analysis(plate: Plate) -> BookAnalysis:
+    """
+    Analyze the book structure to detect patterns for consistent generation.
+
+    This is the first pass of the two-pass generation approach. It identifies:
+    - Section type distributions and patterns
+    - Common layouts and structures
+    - Text type usage across the book
+    """
+    analysis = analyze_book(plate)
+    log.info(
+        "book_analysis_completed",
+        total_sections=analysis.total_sections,
+        section_types=list(analysis.section_types.keys()),
+    )
+    return analysis
+
+
+@cache(behavior="recompute")
+def effective_styleguide(
+    styleguide_config: str,
+    use_dynamic_styleguide_config: bool,
+    book_analysis: BookAnalysis,
+) -> str:
+    """
+    Generate the effective styleguide by combining static and dynamic components.
+
+    If use_dynamic_styleguide is enabled, generates section-specific templates
+    based on book analysis. Otherwise, returns the static styleguide.
+    """
+    if not use_dynamic_styleguide_config:
+        return styleguide_config
+
+    # Generate dynamic styleguide with book-specific templates
+    dynamic_styleguide = generate_dynamic_styleguide(
+        book_analysis,
+        base_styleguide=styleguide_config,
+    )
+
+    log.info(
+        "effective_styleguide_generated",
+        static_length=len(styleguide_config),
+        dynamic_length=len(dynamic_styleguide),
+        use_dynamic=use_dynamic_styleguide_config,
+    )
+
+    return dynamic_styleguide
+
+
+def component_library(
+    plate: Plate,
+    default_model_config: str,
+    use_component_library_config: bool,
+    run_output_dir_config: str,
+) -> str:
+    """
+    Extract visual design system and generate component library markdown.
+
+    This analyzes sample pages using vision to extract colors, typography,
+    layouts, and reusable components for consistent HTML generation.
+
+    Returns an empty string if component library is not enabled.
+    """
+    if not use_component_library_config:
+        return ""
+
+    log.info("extracting_design_system")
+
+    # Get sample pages for analysis
+    sample_pages = get_sample_pages_for_analysis(plate, max_pages=8)
+
+    if not sample_pages:
+        log.warning("no_sample_pages_for_design_extraction")
+        return ""
+
+    async def extract():
+        return await extract_design_system(plate, sample_pages, default_model_config)
+
+    system = run_async_task(extract)
+
+    # Generate component library markdown
+    library = generate_component_library_markdown(system)
+
+    # Save component library to output directory
+    output_path = os.path.join(run_output_dir_config, "component_library.md")
+    save_component_library(system, output_path)
+
+    log.info(
+        "component_library_generated",
+        num_components=len(system.components),
+        num_layouts=len(system.layouts),
+        length=len(library),
+        output_path=output_path,
+    )
+
+    return library
+
+
+def book_templates_json(
+    plate: Plate,
+    default_model_config: str,
+    use_fixed_templates_config: bool,
+    run_output_dir_config: str,
+) -> str:
+    """
+    Extract fixed page templates from the book for consistent generation.
+
+    This analyzes sample pages and generates a fixed set of HTML templates -
+    one per section type. All pages of the same type will use the same template,
+    ensuring visual consistency.
+
+    Returns JSON string (empty string if not enabled) - serialized to avoid pickle issues.
+    """
+    if not use_fixed_templates_config:
+        return ""
+
+    log.info("extracting_book_templates")
+
+    async def extract():
+        return await extract_book_templates(
+            plate, default_model_config, run_output_dir_config
+        )
+
+    templates = run_async_task(extract)
+
+    log.info(
+        "book_templates_extracted",
+        num_templates=len(templates.templates),
+        template_names=[t.name for t in templates.templates],
+    )
+
+    # Return as JSON string to avoid pickle issues with Pydantic models
+    return templates.model_dump_json()
+
+
+def content_manifest(
+    plate: Plate,
+    use_manifest_generation_config: bool,
+    run_output_dir_config: str,
+) -> str:
+    """
+    Generate a content manifest for the book.
+
+    This creates a markdown file with all content structured by sections,
+    with a consistent style map. Used for debugging and as reference.
+
+    Returns the manifest as a string (saved to file as side effect).
+    """
+    if not use_manifest_generation_config:
+        return ""
+
+    from adt_press.llm.content_manifest import generate_content_manifest
+
+    manifest = generate_content_manifest(plate)
+
+    # Save to file for debugging
+    output_path = os.path.join(run_output_dir_config, "content_manifest.md")
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(manifest)
+
+    log.info(
+        "content_manifest_generated",
+        output_path=output_path,
+        num_sections=len(plate.sections),
+    )
+
+    return manifest
+
+
 def web_pages_cache_key(
     plate_language: Language,
     plate: Plate,
@@ -47,6 +232,14 @@ def web_pages_cache_key(
     render_strategies_config: dict[RenderStrategyName, RenderStrategy],
     activity_prompts_config: dict[str, HTMLPromptConfig],
     activity_answers_prompts_config: dict[str, PromptConfig],
+    effective_styleguide: str,
+    use_dynamic_styleguide_config: bool,
+    use_component_library_config: bool,
+    component_library: str,
+    use_fixed_templates_config: bool,
+    book_templates_json: str,
+    use_manifest_generation_config: bool,
+    manifest_deterministic_config: bool,
 ) -> str:
     """
     Generate a cache key that invalidates when any dependency changes.
@@ -68,6 +261,14 @@ def web_pages_cache_key(
         "active_section_types": active_section_types_config,
         "activity_prompts": activity_prompts_config,
         "activity_answers_prompts": activity_answers_prompts_config,
+        "styleguide": effective_styleguide,
+        "use_dynamic_styleguide": use_dynamic_styleguide_config,
+        "use_component_library": use_component_library_config,
+        "component_library": component_library,
+        "use_fixed_templates": use_fixed_templates_config,
+        "book_templates": book_templates_json,
+        "use_manifest_generation": use_manifest_generation_config,
+        "manifest_deterministic": manifest_deterministic_config,
     }
 
     # Generate deterministic hash using pickle (same as Hamilton's caching)
@@ -139,6 +340,14 @@ def web_pages(
     run_output_dir_config: str,
     web_edit_prompt_config: HTMLPromptConfig,
     web_pages_cache_key: str,
+    effective_styleguide: str,
+    run_consistency_pass_config: bool,
+    use_component_library_config: bool,
+    component_library: str,
+    use_fixed_templates_config: bool,
+    book_templates_json: str,
+    use_manifest_generation_config: bool,
+    manifest_deterministic_config: bool,
 ) -> list[WebPage]:
     """
     Generate or update web pages for all sections.
@@ -151,6 +360,11 @@ def web_pages(
     The function always returns the complete set of pages and saves them to
     web_pages.json for use in subsequent runs.
     """
+    # Deserialize book templates from JSON (avoids pickle issues with Hamilton caching)
+    book_templates: BookTemplateSet | None = None
+    if book_templates_json:
+        book_templates = BookTemplateSet.model_validate_json(book_templates_json)
+
     images_by_id = {img.image_id: img for img in plate.images}
     texts_by_id: dict[TextID, PlateText] = {txt.text_id: txt for txt in plate.texts}
     groups_by_id = {grp.group_id: grp for grp in plate.groups}
@@ -254,11 +468,56 @@ def web_pages(
                 )
             else:
                 if strategy.render_type == "html":
-                    async_tasks.append(
-                        generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language)
-                    )
+                    # Priority: manifest > fixed templates > component library > standard
+                    if use_manifest_generation_config:
+                        # Convert RenderTextGroup to PlateGroup for the manifest function
+                        from adt_press.models.plate import PlateGroup
+                        plate_groups = [
+                            PlateGroup(
+                                group_id=g.group_id,
+                                group_type=g.group_type,
+                                text_ids=[t.text_id for t in g.texts]
+                            )
+                            for g in groups
+                        ]
+                        async_tasks.append(
+                            generate_web_page_manifest(
+                                strategy_name, config, section,
+                                texts, images, plate_groups, plate_language,
+                                use_llm=not manifest_deterministic_config,
+                            )
+                        )
+                    elif use_fixed_templates_config and book_templates:
+                        async_tasks.append(
+                            generate_web_page_fixed(
+                                strategy_name, config, section,
+                                texts, images, plate_language,
+                                book_templates=book_templates,
+                            )
+                        )
+                    elif use_component_library_config and component_library:
+                        async_tasks.append(
+                            generate_web_page_component(
+                                strategy_name, config, section,
+                                texts, images, plate_language,
+                                component_library=component_library,
+                            )
+                        )
+                    else:
+                        async_tasks.append(
+                            generate_web_page_html(
+                                strategy_name, config, config.examples, section,
+                                groups, texts, images, plate_language,
+                                styleguide=effective_styleguide,
+                            )
+                        )
                 elif strategy.render_type == "template":
-                    async_tasks.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))
+                    async_tasks.append(
+                        generate_web_page_template(
+                            strategy_name, config, section,
+                            groups, texts, images, plate_language
+                        )
+                    )
                 elif strategy.render_type == "activity":
                     async_tasks.append(
                         generate_web_page_activity(
@@ -272,6 +531,7 @@ def web_pages(
                             plate_language,
                             activity_prompts_config,
                             activity_answers_prompts_config,
+                            styleguide=effective_styleguide,
                         )
                     )
 
@@ -302,9 +562,20 @@ def web_pages(
 
     pages: list[WebPage] = run_async_task(generate_pages)
 
+    # Run consistency pass if enabled
+    if run_consistency_pass_config:
+        log.info("running_consistency_pass")
+
+        async def apply_consistency():
+            return await run_consistency_pass(pages, default_model_config)
+
+        pages = run_async_task(apply_consistency)
+
     image_urls = {
         ImageID(img.image_id): PlateImage(
-            image_id=img.image_id, image_path=f"images/{os.path.basename(img.image_path)}", caption_id=img.caption_id
+            image_id=img.image_id,
+            image_path=f"images/{os.path.basename(img.image_path)}",
+            caption_id=img.caption_id,
         )
         for img in plate.images
     }

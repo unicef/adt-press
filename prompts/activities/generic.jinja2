@@ -49,6 +49,13 @@ This template is a simple fallback for activities without specific templates.
 ```
 
 **Note**: This template should rarely be used. Specific activity types (sorting, matching, fill_in_a_table, true_false) have dedicated templates with proper interactivity.
+{% if styleguide %}
+
+## STYLE GUIDE
+You MUST follow this style guide for consistent HTML generation:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

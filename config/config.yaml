@@ -1,5 +1,5 @@
-pdf_path: "???"
-label: "${label_for_path:${pdf_path}}"
+pdf_path: "assets/ancient_egypt.pdf"
+label: "egypt_style_test-3"
 
 # the language of the book, auto will try to auto-detect
 input_language: auto
@@ -13,7 +13,7 @@ output_languages: ["${plate_language}"]
 output_dir: "output"
 run_output_dir: "${output_dir}/${label}"
 
-clear_cache: false
+clear_cache: true
 print_available_models: false
 
 # our strategy for cropping, either llm or none
@@ -50,16 +50,65 @@ regenerate_sections: []
 # REGENERATION/EDITING: Edit existing pages with LLM-based instructions
 # Format: dict mapping section_id to edit instruction
 # Usage: uv run python adt-press.py label=momo "edit_sections={sec_page_5_s0:'make the title bigger'}"
-edit_sections: {}
+edit_sections: {} 
 
 # the default model used for all prompts, unless overridden in a specific prompt config
-default_model: gpt-5
+default_model: gpt-5.2
 
 # what strategy is used to render sections into web pages, dynamic will choose based on section type
-render_strategy: dynamic
+render_strategy: html
 
 # the default render strategy used for section types when not explicitly specified
-default_render_strategy: html
+default_render_strategy: dynamic
+
+# styleguide to use for web generation (e.g., "default", "cuaderno3")
+# leave empty to not use a styleguide
+# styleguides are loaded from assets/prompts/styleguides/styleguide_{name}.md
+styleguide: "default"
+
+# Enable two-pass generation with dynamic styleguide
+# When true, the system will:
+# 1. First pass: Analyze the book structure to detect patterns
+# 2. Generate book-specific templates based on the analysis
+# 3. Second pass: Use those templates for consistent HTML generation
+use_dynamic_styleguide: false
+
+# Run post-generation consistency pass
+# When true, after all pages are generated:
+# 1. Group pages by section type
+# 2. Use the first page of each type as the reference style
+# 3. Adjust subsequent pages to match the reference (heading colors, layout, etc.)
+# This ensures all chapter pages look identical, all content pages look identical, etc.
+run_consistency_pass: false
+
+# Use component-based generation with visual design extraction
+# When true, the system will:
+# 1. Analyze PDF pages using vision to extract design patterns (colors, typography, layouts)
+# 2. Generate a component library with reusable HTML/Tailwind components
+# 3. Force the LLM to select and populate components for maximum consistency
+# This provides the highest level of design fidelity to the original book.
+# Note: This is more expensive as it requires vision model calls for design extraction.
+use_component_library: false
+
+# Use fixed templates for maximum consistency
+# When true, the system will:
+# 1. Analyze sample pages to extract FIXED HTML templates (one per section type)
+# 2. All pages of the same type use the EXACT same template structure
+# 3. The LLM only fills slots with content - NO layout decisions allowed
+# This provides the highest level of visual consistency across the entire book.
+# Takes priority over use_component_library when both are enabled.
+use_fixed_templates: false
+
+# Use manifest-based generation
+# When true, uses the built-in style map from content_manifest.py.
+# When false, uses the styleguide file from assets/prompts/styleguides/.
+# Set to false to use the editable styleguide approach.
+use_manifest_generation: false
+
+# If true, use deterministic HTML generation (no LLM for layout)
+# Only works when use_manifest_generation is true.
+# Generates HTML directly from the style map without LLM involvement.
+manifest_deterministic: false
 
 # Speech/TTS provider configuration
 speech:
@@ -333,7 +382,7 @@ prompts:
 
   page_sectioning:
     model: default
-    template_path: prompts/page_sectioning_by_page.jinja2
+    template_path: prompts/page_sectioning_by_page_backup.jinja2
 
   section_explanation:
     model: default

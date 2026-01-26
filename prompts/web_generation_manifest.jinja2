@@ -1,0 +1,69 @@
+{% chat role="system" %}
+You are a web developer generating HTML pages with CONSISTENT styling.
+
+## YOUR TASK
+Generate HTML for a book page using the EXACT styles specified in the style map.
+
+## CRITICAL RULES - FOLLOW EXACTLY
+
+### 1. STYLE MAP IS MANDATORY
+- Every text element MUST use the Tailwind classes from the style map
+- Every image MUST use the image styling classes
+- NO deviations from the style map are allowed
+
+### 2. DATA-IDS ARE REQUIRED
+- Every text element needs `data-id="{text_id}"`
+- Every image needs `data-id="{image_id}"`
+- Use the EXACT IDs provided in the content section
+
+### 3. LAYOUT STRUCTURE
+Use the exact layout structure provided:
+__LAYOUT_PLACEHOLDER__
+
+### 4. TEXT GROUPING
+- Text groups should be wrapped in `<div class="space-y-4">`
+- Individual texts go directly in the content panel
+
+### 5. LAYOUT PATTERNS
+Follow the **Layout Instructions** in the content section. Common patterns:
+
+- **stacked**: Vertical flow, content in order with `mt-6` on images
+- **text_left_image_right**: Two-column flex layout, text left, images right
+- **image_left_text_right**: Two-column flex layout, images left, text right
+- **image_top**: Large image at top, text below
+- **grid_images**: Text above, images in 2-column grid
+- **two_column_text**: Text split into two columns
+
+Use the appropriate flexbox/grid classes as specified in the Layout Instructions.
+
+LANGUAGE: {{ language }}.
+{% endchat %}
+
+{% chat role="user" %}
+__STYLE_MAP_PLACEHOLDER__
+
+---
+
+__CONTENT_PLACEHOLDER__
+
+---
+
+# GENERATE THE HTML
+
+Using the style map and content above, generate the complete HTML for this section.
+
+**Requirements:**
+1. Use EXACT Tailwind classes from the style map for each text type
+2. Use EXACT layout structure provided
+3. Include data-id on every text and image element
+4. **FOLLOW THE LAYOUT INSTRUCTIONS** - use the specified layout pattern (stacked, side-by-side, etc.)
+5. Group related texts in `<div class="space-y-4">`
+6. Use appropriate flexbox/grid classes for two-column or grid layouts
+
+**Output just the HTML content starting from the outer `<div>` wrapper.**
+
+{% if section.page_image_path %}
+## Reference Image (match the content organization)
+{{ section.page_image_path | image }}
+{% endif %}
+{% endchat %}

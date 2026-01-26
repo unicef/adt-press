@@ -12,17 +12,20 @@ The text context you will be provided follows this format:
     }
 ]
 
-Outputs:
-I want you to group the text and images into natural, logical sections that belong together as complete units.
-Keep related content together rather than breaking it apart unnecessarily. 
-If you detect two pages that are clearly meant to be separate, you can split them into two sections. ie. a cover page and an inside cover page.
-The image-ids and text-ids can be repeated across section ids only when it makes strong pedagogical sense.
-For example, if a text-id corresponds to instructions that apply for the whole page across sections, it should be repeated across sections.
+## CRITICAL RULE: ONE PAGE = ONE SECTION
+
+**You MUST create exactly ONE section per page.** Do NOT split a page into multiple sections.
+
+- ALL text and images on a single page belong to ONE section
+- The entire page content forms a single, cohesive unit
+- Choose the section_type that best describes the PRIMARY purpose of the page
+
+The ONLY exception is for two-page spreads where you are processing both pages together - in that case, create one section per physical page (so 2 sections for a 2-page spread).
 
 Additionally, extract the page number if one is present on the page. Look for numeric indicators (e.g., "1", "2", "Page 5") typically found in headers, footers, or margins. Make sure the page number is for the current page and not a reference to another page like in a table of contents.
 
 {% if spread_mode %}
-The page you are sectioning is part of a two-page spread. Keep logical sections that span both pages together but make sure to account for the spread when assigning page numbers to sections.
+The page you are sectioning is part of a two-page spread. Create ONE section per physical page (so 2 sections total for the spread). Assign content to the appropriate page's section based on its position.
 {% endif %}
 
 Section the text and images and provide a json output of this format:
@@ -32,13 +35,50 @@ Section the text and images and provide a json output of this format:
             "section_type": "<section_type>",
             "part_ids": ["<text-id or image-id>", "<text-id or image-id>", ...],
             "background_color": "#hexcode",
-            "text_color": "#hexcode"
+            "text_color": "#hexcode",
             "page_number": <integer or null if no page number found>,
+            "layout_hint": "<layout_hint>"
         }
     ]
 }
 
+## LAYOUT HINTS - CAREFULLY analyze the PDF page image
+
+**IMPORTANT: Look at how text and images are positioned relative to each other on the page.**
+
+Analyze the PDF page and choose the `layout_hint`:
+
+- **"text_left_image_right"**: Use when you see text blocks positioned to the LEFT of images horizontally (side-by-side). Look for text paragraphs that sit NEXT TO images, not above or below them.
+
+- **"image_left_text_right"**: Use when you see images positioned to the LEFT of text blocks horizontally. The image and text are side-by-side, with image on left.
+
+- **"stacked"**: Use ONLY when ALL content flows purely vertically - text above image, or image above text, with NO side-by-side arrangement anywhere on the page.
+
+- **"image_top"**: Use when a large image dominates the top 50%+ of the page, with text below.
+
+- **"grid_images"**: Use when 2+ images are arranged in a grid/matrix pattern (2x2, 2x1 side by side, etc).
+
+- **"two_column_text"**: Use when text is arranged in two vertical columns (newspaper style).
+
+**HOW TO DETECT SIDE-BY-SIDE LAYOUTS:**
+1. Look at the BOTTOM portion of the page - many textbook pages have side-by-side content at the bottom
+2. If a text block and an image are at roughly the same vertical position (same height on page), they are SIDE-BY-SIDE
+3. If text wraps around an image, or text is next to an image horizontally, use the appropriate side-by-side layout
+
+**When in doubt between stacked and side-by-side, choose side-by-side if ANY portion of the page shows text next to an image horizontally.**
+
 `part_ids` MUST contain the text ids and/or image ids that belong to this section.
+
+## CRITICAL: PRESERVE VISUAL READING ORDER
+
+**The order of IDs in `part_ids` MUST match the visual reading order on the page (top-to-bottom, left-to-right).**
+
+- Look at the PDF page image and determine where each text block and image appears
+- Order the IDs based on their VISUAL POSITION, not by ID number
+- If an image appears between two text blocks, put the image ID between those text IDs
+- Example: If the page has [Title at top] → [Image in middle] → [Caption below image] → [Body text at bottom]
+  Then part_ids should be: ["txt_title", "img_middle", "txt_caption", "txt_body"]
+- DO NOT group all text IDs together then all image IDs - interleave them based on visual position
 
 For background_color, MUST provide a hex color code that best represents the predominant background color you can see in this section. Choose colors that would provide good readability and contrast with text. Favor lighter backgrounds (like #ffffff, #f8f9fa, #f5f5f5) that work well with dark text unless the visual clearly shows a darker background theme. Default to #ffffff if uncertain.
 
@@ -52,24 +92,20 @@ For text_color, MUST provide a hex color code that best represents the predomina
 </section_type_definition>
 
 <section_definition>
-- Each entry in the data array represents one complete self-contained section.
-- KEEP RELATED CONTENT TOGETHER: Group related activities, questions, and explanations into single sections when they form a coherent unit.
-- FOR MULTIPLE SIMILAR ACTIVITIES: Only create separate sections if the activities are truly independent and don't form a cohesive group (e.g., a set of practice problems should typically stay together).
+- **ONE PAGE = ONE SECTION**: Create exactly ONE section that contains ALL content from the page.
+- Put ALL text IDs and ALL image IDs from the page into a SINGLE section.
+- Choose the section_type that best describes the overall purpose of the page.
 - Sections will be assigned IDs based on their position in the array (0, 1, 2, etc.).
-- Only create separate sections when content serves distinctly different purposes or topics.
 </section_definition>
 
 IMPORTANT:
-- Image ids and text-ids can be assigned to multiple sections only when it makes strong educational sense.
 - Image ids I provide can be excluded in the output if they do not make educational sense and are useless.
-- THE ENTIRE SECTION must be a self-contained section and not be missing any key text or images. e.g. for multiple choice answers, they should all belong in the same section as the question.
-- For longer text content, prefer keeping complete topics and concepts together rather than artificially splitting them. Only split very long content (5+ paragraphs) if it covers distinctly different topics.
+- THE ENTIRE PAGE belongs to ONE section - include all text and images together.
 
 VERY IMPORTANT:
-- ALL TEXT IDS PROVIDED BY THE USER MUST BE USED IN THE OUTPUT AND ASSOCIATED WITH A SECTION ID. I REPEAT, ALL TEXT IDS MUST BE INCLUDED IN THE OUTPUT.
-- PREFER COHESIVE SECTIONS: Group related activities together when they form a coherent learning unit. For example, if there are multiple related questions about the same topic, keep them in one section.
-- AVOID OVER-SEGMENTATION: Don't create separate sections unless the content truly serves different pedagogical purposes or covers different topics.
-- When in doubt, keep content together in fewer, more comprehensive sections rather than splitting into many small pieces.
+- ALL TEXT IDS PROVIDED BY THE USER MUST BE USED IN THE OUTPUT AND ASSOCIATED WITH THE SECTION. I REPEAT, ALL TEXT IDS MUST BE INCLUDED IN THE OUTPUT.
+- **DO NOT SPLIT THE PAGE INTO MULTIPLE SECTIONS** - create exactly ONE section per page.
+- Put ALL content into ONE section. Do not over-segment.
 
 Provide me the answer in the given structure. Please take your time and think carefully before giving me the answers.
 {% endchat %}
@@ -114,5 +150,11 @@ The following text are the text extracted from the PDF, associated with each ID.
 {{ text | tojson }}
 {% endfor %}
 
-Please section the image and text, and extract the page number if present.
+Create exactly ONE section containing ALL the text and images from this page.
+
+**IMPORTANT: Order the `part_ids` based on VISUAL POSITION on the page (top-to-bottom, left-to-right).** Interleave text and image IDs based on where they appear visually - do NOT put all texts first then all images.
+
+**LAYOUT DETECTION: Carefully examine if ANY text block sits horizontally NEXT TO an image (side-by-side).** If so, use "text_left_image_right" or "image_left_text_right". Only use "stacked" if content is purely vertical with no side-by-side arrangements.
+
+Extract the page number if present.
 {% endchat %}

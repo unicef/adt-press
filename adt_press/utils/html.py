@@ -288,7 +288,13 @@ def validate_generated_html_data_ids(
     section_element = sections[0]
 
     if section_type:
+        # Look for data-section-type on the section element first, then anywhere in the document
         data_section_type = section_element.get("data-section-type")
+        if not data_section_type:
+            # Try to find it on any element in the document
+            element_with_attr = soup.find(attrs={"data-section-type": True})
+            if element_with_attr:
+                data_section_type = element_with_attr.get("data-section-type")
         if data_section_type != section_type:
             raise ValueError(f"Section data-section-type attribute is invalid. Expected '{section_type}', got '{data_section_type}'.")
 

@@ -18,6 +18,8 @@ class Section(BaseModel):
     text_color: str
     page_number: int | None
     part_ids: list[str]
+    # Layout hint for HTML generation - describes how content should be arranged
+    layout_hint: str = "stacked"
 
 
 class SectionResponse(CleanTextBaseModel):
@@ -104,6 +106,7 @@ async def get_page_sections(
             background_color=s.background_color,
             text_color=s.text_color,
             page_number=s.page_number,
+            layout_hint=s.layout_hint,
         )
         sections.append(section)
 

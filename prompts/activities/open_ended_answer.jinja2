@@ -109,6 +109,13 @@ IMPORTANT: Your reasoning MUST be written in English, regardless of the activity
 - Focus on clear instructions and adequate space for student responses
 - Use warm colors (amber) to create inviting writing environment
 - Include helpful tips or scaffolding when available in text IDs
+{% if styleguide %}
+
+## STYLE GUIDE
+You MUST follow this style guide for consistent HTML generation:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}

@@ -12,6 +12,10 @@ class PageSection(BaseModel):
     is_pruned: bool = False
     background_color: str
     text_color: str
+    # Layout hint for HTML generation - describes how content should be arranged
+    # Options: "stacked", "text_left_image_right", "image_left_text_right",
+    #          "image_top", "two_column_text", "grid_images"
+    layout_hint: str = "stacked"
 
 
 class SectionExplanation(BaseModel):

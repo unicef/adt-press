@@ -113,6 +113,13 @@ Example matching activity:
 - All elements need proper ARIA labels and accessibility attributes
 - Use varied background colors for visual distinction
 - Feedback area at bottom for activity results
+{% if styleguide %}
+
+## STYLE GUIDE
+You MUST follow this style guide for consistent HTML generation:
+
+{{ styleguide }}
+{% endif %}
 {% endchat %}
 
 {% for example in examples %}
