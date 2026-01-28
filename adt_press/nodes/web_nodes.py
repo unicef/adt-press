@@ -139,6 +139,7 @@ def web_pages(
     run_output_dir_config: str,
     web_edit_prompt_config: HTMLPromptConfig,
     web_pages_cache_key: str,
+    styleguide_config: str,
 ) -> list[WebPage]:
     """
     Generate or update web pages for all sections.
@@ -255,7 +256,7 @@ def web_pages(
             else:
                 if strategy.render_type == "html":
                     async_tasks.append(
-                        generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language)
+                        generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language, styleguide_config)
                     )
                 elif strategy.render_type == "template":
                     async_tasks.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))

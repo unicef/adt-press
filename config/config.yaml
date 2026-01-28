@@ -61,6 +61,10 @@ render_strategy: dynamic
 # the default render strategy used for section types when not explicitly specified
 default_render_strategy: html
 
+# styleguide to use for web generation
+# styleguides are loaded from assets/prompts/styleguides/styleguide_{name}.md
+styleguide: "default"
+
 # Speech/TTS provider configuration
 speech:
   # provider selection, either dynamic (selection based on language) or specific provider (openai, azure)
@@ -268,7 +272,7 @@ render_strategies:
     render_type: html
     config:
       model: default
-      template_path: prompts/web_generation_html.jinja2
+      template_path: prompts/web_generation_html_styleguides.jinja2
       max_retries: 25
       example_dirs: []
 
