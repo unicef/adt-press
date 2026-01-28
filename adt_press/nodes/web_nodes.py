@@ -256,7 +256,9 @@ def web_pages(
             else:
                 if strategy.render_type == "html":
                     async_tasks.append(
-                        generate_web_page_html(strategy_name, config, config.examples, section, groups, texts, images, plate_language, styleguide_config)
+                        generate_web_page_html(
+                            strategy_name, config, config.examples, section, groups, texts, images, plate_language, styleguide_config
+                        )
                     )
                 elif strategy.render_type == "template":
                     async_tasks.append(generate_web_page_template(strategy_name, config, section, groups, texts, images, plate_language))
