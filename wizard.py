@@ -10,7 +10,7 @@ import re
 import subprocess
 import threading
 import webbrowser
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -760,15 +760,29 @@ class Handler(BaseHTTPRequestHandler):
 
         # Simple key=value params (skip pdf_path, already added; skip list/json params)
         SIMPLE_KEYS = [
-            "label", "input_language",
-            "glossary_strategy", "explanation_strategy", "easy_read_strategy",
-            "caption_strategy", "crop_strategy", "activity_strategy",
-            "quiz_strategy", "speech_strategy",
-            "render_strategy", "page_grouping",
-            "default_model", "output_dir", "custom_plate_path",
-            "speech.provider", "speech.format", "speech.bit_rate", "speech.sample_rate",
-            "speech.providers.openai.model", "speech.providers.azure.model",
-            "image_filters.size.max_side", "image_filters.size.min_side",
+            "label",
+            "input_language",
+            "glossary_strategy",
+            "explanation_strategy",
+            "easy_read_strategy",
+            "caption_strategy",
+            "crop_strategy",
+            "activity_strategy",
+            "quiz_strategy",
+            "speech_strategy",
+            "render_strategy",
+            "page_grouping",
+            "default_model",
+            "output_dir",
+            "custom_plate_path",
+            "speech.provider",
+            "speech.format",
+            "speech.bit_rate",
+            "speech.sample_rate",
+            "speech.providers.openai.model",
+            "speech.providers.azure.model",
+            "image_filters.size.max_side",
+            "image_filters.size.min_side",
             "image_filters.blank.threshold",
             "prompts.section_quiz.sections_per_quiz",
         ]
