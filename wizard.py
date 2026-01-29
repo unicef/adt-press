@@ -6,10 +6,12 @@ Opens a page in your default browser at http://localhost:<port>.
 
 import json
 import os
+import re
 import subprocess
 import threading
 import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from pathlib import Path
 from urllib.parse import parse_qs
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -86,7 +88,12 @@ HTML_PAGE = r"""<!DOCTYPE html>
 </head>
 <body>
 <div class="card">
-  <h1>ADT Press Wizard</h1>
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 24px 0;">
+    <h1 style="padding:0;">ADT Press Wizard</h1>
+    <button onclick="resetDefaults()"
+            style="background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; padding:4px 8px;"
+            title="Reset all settings to defaults">Reset</button>
+  </div>
 
   <!-- ── Tabs ── -->
   <div class="tabs">
@@ -99,6 +106,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
   <!-- ════════════════ TAB: Convert ════════════════ -->
   <div id="tab-convert" class="pane active">
+    <label for="preset">Preset</label>
+    <select id="preset" onchange="applyPreset(this.value)">
+      <option value="custom">Custom</option>
+      <option value="storybook_quiz">Storybook Quiz</option>
+      <option value="interactive_textbook">Interactive Textbook</option>
+      <option value="novel_with_images">Novel with Images</option>
+    </select>
+    <div class="hint">Choose a preset to auto-configure features, or pick Custom to set them yourself.</div>
+
     <label for="pdf">PDF file path</label>
     <input type="text" id="pdf" placeholder="/path/to/textbook.pdf">
     <div class="hint">Full path to the PDF you want to convert.</div>
@@ -428,12 +444,179 @@ function toggleQuizOpts() {
     document.getElementById('cb-quiz').checked ? 'block' : 'none';
 }
 
+/* ── presets ── */
+// Each preset defines which features to enable and key settings.
+// Edit these objects to customise the presets.
+const PRESETS = {
+  storybook_quiz: {
+    // Features
+    glossary_strategy:    false,
+    explanation_strategy: false,
+    easy_read_strategy:   false,
+    caption_strategy:     true,
+    crop_strategy:        false,
+    activity_strategy:    false,
+    quiz_strategy:        true,
+    speech_strategy:      true,
+    // Rendering
+    render_strategy:      'two_column_story',
+    page_grouping:        'spread',
+    // Quiz
+    sections_per_quiz:    3,
+  },
+  interactive_textbook: {
+    // Features
+    glossary_strategy:    true,
+    explanation_strategy: true,
+    easy_read_strategy:   true,
+    caption_strategy:     true,
+    crop_strategy:        true,
+    activity_strategy:    true,
+    quiz_strategy:        false,
+    speech_strategy:      true,
+    // Rendering
+    render_strategy:      'html',
+    page_grouping:        'single',
+    // Quiz
+    sections_per_quiz:    3,
+  },
+  novel_with_images: {
+    // Features
+    glossary_strategy:    false,
+    explanation_strategy: false,
+    easy_read_strategy:   false,
+    caption_strategy:     true,
+    crop_strategy:        true,
+    activity_strategy:    false,
+    quiz_strategy:        false,
+    speech_strategy:      true,
+    // Rendering
+    render_strategy:      'two_column',
+    page_grouping:        'spread',
+    // Quiz
+    sections_per_quiz:    3,
+  },
+};
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return; // "custom" — do nothing
+
+  // Set feature checkboxes
+  FEATURE_KEYS.forEach(key => {
+    const cb = document.querySelector('[data-key="' + key + '"]');
+    if (cb) cb.checked = !!p[key];
+  });
+
+  // Set render & grouping
+  document.getElementById('render-strategy').value = p.render_strategy;
+  document.getElementById('page-grouping').value = p.page_grouping;
+
+  // Set quiz sections
+  document.getElementById('quiz-per').value = p.sections_per_quiz;
+
+  // Sync quiz opts visibility
+  toggleQuizOpts();
+}
+
+/* ── localStorage save/load ── */
+const STORAGE_KEY = 'adt-press-wizard';
+
+// IDs of all text/number/select inputs to persist
+const INPUT_IDS = [
+  'preset', 'pdf', 'lbl', 'lang', 'pstart', 'pend',
+  'speech-provider', 'speech-format', 'openai-model', 'azure-model',
+  'speech-bitrate', 'speech-samplerate',
+  'render-strategy', 'page-grouping',
+  'img-max', 'img-min', 'img-blank',
+  'default-model', 'output-dir', 'custom-plate', 'quiz-per',
+];
+
+// IDs of checkbox containers with value-based checkboxes (filters)
+const CHECK_CONTAINERS = ['pruned-text-checks', 'pruned-section-checks', 'quiz-section-checks'];
+
+// IDs of tag-wrap elements
+const TAG_WRAPS = ['out-langs-wrap', 'openai-langs-wrap', 'azure-langs-wrap'];
+
+// IDs of feature checkboxes (data-key based)
+const FEATURE_KEYS = [
+  'glossary_strategy', 'explanation_strategy', 'easy_read_strategy',
+  'caption_strategy', 'crop_strategy', 'activity_strategy',
+  'quiz_strategy', 'speech_strategy',
+];
+
+function saveState() {
+  const state = {};
+  // inputs & selects
+  INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) state[id] = el.value; });
+  // feature checkboxes
+  FEATURE_KEYS.forEach(key => {
+    const cb = document.querySelector('[data-key="' + key + '"]');
+    if (cb) state['feat_' + key] = cb.checked;
+  });
+  // filter checkboxes
+  CHECK_CONTAINERS.forEach(cid => {
+    state['checks_' + cid] = [...document.querySelectorAll('#' + cid + ' input')]
+      .map(cb => ({ v: cb.value, c: cb.checked }));
+  });
+  // tags
+  TAG_WRAPS.forEach(wid => { state['tags_' + wid] = getTags(wid); });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try { var state = JSON.parse(raw); } catch(e) { return; }
+
+  // inputs & selects
+  INPUT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && state[id] !== undefined) el.value = state[id];
+  });
+  // feature checkboxes
+  FEATURE_KEYS.forEach(key => {
+    const cb = document.querySelector('[data-key="' + key + '"]');
+    if (cb && state['feat_' + key] !== undefined) cb.checked = state['feat_' + key];
+  });
+  // filter checkboxes
+  CHECK_CONTAINERS.forEach(cid => {
+    const items = state['checks_' + cid];
+    if (!items) return;
+    items.forEach(item => {
+      const cb = document.querySelector('#' + cid + ' input[value="' + item.v + '"]');
+      if (cb) cb.checked = item.c;
+    });
+  });
+  // tags: clear existing, re-add
+  TAG_WRAPS.forEach(wid => {
+    const tags = state['tags_' + wid];
+    if (!tags) return;
+    const wrap = document.getElementById(wid);
+    wrap.querySelectorAll('.tag').forEach(t => t.remove());
+    tags.forEach(v => addTag(wid, v));
+  });
+  // sync quiz opts visibility
+  toggleQuizOpts();
+}
+
+function resetDefaults() {
+  if (!confirm('Reset all settings to defaults?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// load saved state on startup
+loadState();
+
 /* ── run ── */
 let polling = null;
 
 function run() {
   const pdf = document.getElementById('pdf').value.trim();
   if (!pdf) { alert('Please enter a PDF file path on the Convert tab.'); return; }
+
+  saveState();
 
   const btn = document.getElementById('run');
   btn.disabled = true;
@@ -618,6 +801,16 @@ class Handler(BaseHTTPRequestHandler):
                 except json.JSONDecodeError:
                     pass
 
+        # Compute expected output path so we can open index.html on success
+        label = params.get("label", [""])[0]
+        if not label:
+            # replicate label_for_path: slugify(Path(pdf).stem, lowercase=True)
+            stem = Path(pdf_path).stem
+            label = re.sub(r"[^\w\s-]", "", stem).strip().lower()
+            label = re.sub(r"[-\s]+", "-", label)
+        output_dir = params.get("output_dir", ["output"])[0] or "output"
+        run_output_dir = os.path.join(SCRIPT_DIR, output_dir, label)
+
         with _lock:
             if _running:
                 self._send(409, "application/json", json.dumps({"error": "A conversion is already running."}).encode())
@@ -626,7 +819,7 @@ class Handler(BaseHTTPRequestHandler):
             _log_lines.clear()
             _log_lines.append(f"$ {' '.join(cmd)}\n\n")
 
-        threading.Thread(target=_run_process, args=(cmd,), daemon=True).start()
+        threading.Thread(target=_run_process, args=(cmd, run_output_dir), daemon=True).start()
         self._send(200, "application/json", json.dumps({"ok": True}).encode())
 
     def _send(self, code: int, content_type: str, body: bytes) -> None:
@@ -640,7 +833,7 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def _run_process(cmd: list[str]) -> None:
+def _run_process(cmd: list[str], run_output_dir: str) -> None:
     global _running
     try:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, cwd=SCRIPT_DIR)
@@ -651,6 +844,12 @@ def _run_process(cmd: list[str]) -> None:
         proc.wait()
         with _lock:
             _log_lines.append(f"\n{'=' * 40}\nProcess finished (exit code {proc.returncode}).\n")
+        if proc.returncode == 0:
+            index_path = os.path.join(run_output_dir, "index.html")
+            if os.path.isfile(index_path):
+                webbrowser.open(f"file://{index_path}")
+                with _lock:
+                    _log_lines.append(f"Opened {index_path}\n")
     except Exception as exc:
         with _lock:
             _log_lines.append(f"\nERROR: {exc}\n")
