@@ -62,8 +62,7 @@ render_strategy: dynamic
 default_render_strategy: html
 
 # styleguide to use for web generation
-# styleguides are loaded from assets/prompts/styleguides/styleguide_{name}.md
-styleguide: "default"
+styleguide: "assets/styleguides/default.md"
 
 # Speech/TTS provider configuration
 speech:
@@ -272,7 +271,7 @@ render_strategies:
     render_type: html
     config:
       model: default
-      template_path: prompts/web_generation_html_styleguides.jinja2
+      template_path: prompts/web_generation_html.jinja2
       max_retries: 25
       example_dirs: []
 

@@ -431,24 +431,18 @@ def activity_strategy_config(config: DictConfig) -> str:
 
 @cache(behavior="recompute")
 def styleguide_config(config: DictConfig) -> str:
-    """Load the styleguide content from the configured styleguide file.
+    """Load the styleguide content from the configured styleguide file."""
+    styleguide_path = str(config.get("styleguide", ""))
+    if not styleguide_path:
+        raise ValueError("No styleguide path configured. Set 'styleguide' in config (e.g., 'assets/styleguides/default.md').")
 
-    Styleguides are stored in assets/prompts/styleguides/styleguide_{name}.md.
-    Returns empty string if no styleguide is configured.
-    """
-    styleguide_name = str(config.get("styleguide", "default"))
-    if not styleguide_name:
-        return ""
-
-    styleguide_path = f"assets/prompts/styleguides/styleguide_{styleguide_name}.md"
     if not os.path.exists(styleguide_path):
-        log.warning("styleguide_not_found", path=styleguide_path, name=styleguide_name)
-        return ""
+        raise FileNotFoundError(f"Styleguide file not found: {styleguide_path}")
 
     with open(styleguide_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    log.info("loaded_styleguide", name=styleguide_name, path=styleguide_path, length=len(content))
+    log.info("loaded_styleguide", path=styleguide_path, length=len(content))
     return content
 
 
