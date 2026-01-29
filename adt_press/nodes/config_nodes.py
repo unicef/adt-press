@@ -433,6 +433,23 @@ def activity_strategy_config(config: DictConfig) -> str:
     return str(config.get("activity_strategy", "none"))
 
 
+@cache(behavior="recompute")
+def styleguide_config(config: DictConfig) -> str:
+    """Load the styleguide content from the configured styleguide file."""
+    styleguide_path = str(config.get("styleguide", ""))
+    if not styleguide_path:
+        raise ValueError("No styleguide path configured. Set 'styleguide' in config (e.g., 'assets/styleguides/default.md').")
+
+    if not os.path.exists(styleguide_path):
+        raise FileNotFoundError(f"Styleguide file not found: {styleguide_path}")
+
+    with open(styleguide_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    log.info("loaded_styleguide", path=styleguide_path, length=len(content))
+    return content
+
+
 def active_section_types_config(
     section_types_config: dict[SectionTypeName, SectionType],
     render_strategies_config: dict[RenderStrategyName, RenderStrategy],
