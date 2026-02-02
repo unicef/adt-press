@@ -362,9 +362,7 @@ def speech_instructions_config(
         Dictionary mapping locale codes to instruction strings.
         Example: {"en-tz": "Speak in a Tanzanian English accent...", ...}
     """
-    with open(
-        speech_prompt_config.instructions_path, "r", encoding="utf-8"
-    ) as f:
+    with open(speech_prompt_config.instructions_path, "r", encoding="utf-8") as f:
         return cast(dict[str, str], yaml.safe_load(f))
 
 

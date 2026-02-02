@@ -146,7 +146,8 @@ async def generate_speech_file(
 
     # Render prompt template for TTS instructions
     accent_instructions = resolve_instructions(
-        language_code, speech_instructions,
+        language_code,
+        speech_instructions,
     )
     context = dict(
         language_code=language_code,
@@ -174,14 +175,8 @@ async def generate_speech_file(
     else:
         # Azure TTS requires api_base and api_key passed explicitly
         provider_config = config.get_provider_config(language_code)
-        api_base = (
-            provider_config.api_base
-            or os.environ.get("AZURE_API_BASE", "")
-        )
-        api_key = (
-            provider_config.api_key
-            or os.environ.get("AZURE_API_KEY", "")
-        )
+        api_base = provider_config.api_base or os.environ.get("AZURE_API_BASE", "")
+        api_key = provider_config.api_key or os.environ.get("AZURE_API_KEY", "")
         if api_base:
             speech_kwargs["api_base"] = api_base
         if api_key:

@@ -96,6 +96,7 @@ class TestSpeechFilesNodes:
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
                         voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        speech_instructions_config={},
                         plate_translations=plate_translations,
                     )
 
@@ -182,6 +183,7 @@ class TestSpeechFilesNodes:
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
                         voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        speech_instructions_config={},
                         plate_translations=plate_translations,
                     )
 
@@ -243,6 +245,7 @@ class TestSpeechFilesNodes:
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
                         voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        speech_instructions_config={},
                         plate_translations=plate_translations,
                     )
 

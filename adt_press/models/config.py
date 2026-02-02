@@ -202,16 +202,13 @@ class SpeechPromptConfig(PromptConfig):
         return self.providers[provider].model
 
     def get_provider_config(
-        self, language_code: str,
+        self,
+        language_code: str,
     ) -> SpeechProviderConfig:
         """Get the full provider config for a language."""
         provider = self.get_provider_for_language(language_code)
         if provider not in self.providers:
-            raise ValueError(
-                f"Provider '{provider}' not found in "
-                f"configured providers: "
-                f"{list(self.providers.keys())}"
-            )
+            raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
         return self.providers[provider]
 
 
