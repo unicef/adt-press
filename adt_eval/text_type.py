@@ -84,7 +84,6 @@ def text_type_per_page_scorer(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
         rationale=json.dumps(matches),
     )
 
-
 class TextTypeEvaluator(MLflowEvaluatorBase):
     """Evaluator for text type accuracy."""
 
@@ -154,49 +153,6 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
                 }
             )
         return records
-
-    def _run_coro(self, coro):
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-
-        if loop and loop.is_running():
-            # If an event loop is already running (e.g., in notebooks), offload to a thread
-            # and wait for the result to avoid nested loop issues.
-            result_container: Dict[str, Any] = {}
-            error_container: Dict[str, BaseException] = {}
-
-            def _runner():
-                try:
-                    result_container["value"] = asyncio.run(coro)
-                except BaseException as exc:  # pragma: no cover - re-raise below
-                    error_container["error"] = exc
-
-            thread = threading.Thread(target=_runner, daemon=True)
-            thread.start()
-            thread.join()
-
-            if "error" in error_container:
-                raise error_container["error"]
-            return result_container.get("value")
-
-        result_container: Dict[str, Any] = {}
-        error_container: Dict[str, BaseException] = {}
-
-        def _runner():
-            try:
-                result_container["value"] = asyncio.run(coro)
-            except BaseException as exc:  # pragma: no cover - re-raise below
-                error_container["error"] = exc
-
-        thread = threading.Thread(target=_runner, daemon=True)
-        thread.start()
-        thread.join()
-
-        if "error" in error_container:
-            raise error_container["error"]
-        return result_container.get("value")
 
     def predict_fn(self, **inputs: Any) -> Dict[str, Any]:
         page_text = inputs["page_text"]

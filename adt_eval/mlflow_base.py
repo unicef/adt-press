@@ -2,14 +2,64 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
+import threading
 from abc import abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import mlflow
 
 from adt_eval.base import BaseEvaluator
+
+
+class AsyncLoopRunner:
+    """Run coroutines on a long-lived event loop in a background thread."""
+
+    def __init__(self) -> None:
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._thread: Optional[threading.Thread] = None
+        self._ready = threading.Event()
+
+    def start(self) -> None:
+        if self._thread and self._thread.is_alive():
+            return
+
+        def _runner() -> None:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            self._loop = loop
+            self._ready.set()
+            try:
+                loop.run_forever()
+            finally:
+                try:
+                    pending = asyncio.all_tasks(loop)
+                    for task in pending:
+                        task.cancel()
+                    if pending:
+                        loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+                finally:
+                    loop.close()
+
+        self._thread = threading.Thread(target=_runner, daemon=True)
+        self._thread.start()
+        self._ready.wait()
+
+    def submit(self, coro):
+        if not self._loop:
+            raise RuntimeError("AsyncLoopRunner not started")
+        future = asyncio.run_coroutine_threadsafe(coro, self._loop)
+        return future.result()
+
+    def close(self) -> None:
+        if not self._loop or not self._thread:
+            return
+        self._loop.call_soon_threadsafe(self._loop.stop)
+        self._thread.join()
+        self._loop = None
+        self._thread = None
 
 
 class MLflowEvaluatorBase(BaseEvaluator):
@@ -77,6 +127,11 @@ class MLflowEvaluatorBase(BaseEvaluator):
         if score is not None:
             mlflow.log_metric("score", score)
 
+    def _run_coro(self, coro):
+        if not hasattr(self, "_loop_runner") or self._loop_runner is None:
+            raise RuntimeError("Async loop runner not initialized")
+        return self._loop_runner.submit(coro)
+
     def get_report_results_and_metrics(self, eval_results) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """Return report-ready results and metrics from mlflow.genai.evaluate output."""
         metrics = {}
@@ -96,21 +151,26 @@ class MLflowEvaluatorBase(BaseEvaluator):
         self.configure_mlflow()
         run_name = self.get_run_name()
         nested = mlflow.active_run() is not None
+        self._loop_runner = AsyncLoopRunner()
+        self._loop_runner.start()
+        try:
+            with mlflow.start_run(run_name=run_name, nested=nested):
+                self.log_run_params()
+                cases = self.filter_cases(self.load_data())
+                eval_dataset = self.build_eval_dataset(cases)
+                eval_results = mlflow.genai.evaluate(
+                    data=eval_dataset,
+                    predict_fn=self.predict_fn,
+                    scorers=self.get_scorers(),
+                    **self._get_evaluate_kwargs(),
+                )
 
-        with mlflow.start_run(run_name=run_name, nested=nested):
-            self.log_run_params()
-            cases = self.filter_cases(self.load_data())
-            eval_dataset = self.build_eval_dataset(cases)
-            eval_results = mlflow.genai.evaluate(
-                data=eval_dataset,
-                predict_fn=self.predict_fn,
-                scorers=self.get_scorers(),
-                **self._get_evaluate_kwargs(),
-            )
+                results, metrics = self.get_report_results_and_metrics(eval_results)
 
-            results, metrics = self.get_report_results_and_metrics(eval_results)
-
-            self.log_run_metrics(metrics)
-            if results and metrics:
-                self.generate_report(results, metrics)
-            return results, metrics
+                self.log_run_metrics(metrics)
+                if results and metrics:
+                    self.generate_report(results, metrics)
+                return results, metrics
+        finally:
+            self._loop_runner.close()
+            self._loop_runner = None
