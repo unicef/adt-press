@@ -13,6 +13,7 @@ def speech_files__tts(
     run_output_dir_config: str,
     speech_prompt_config: PromptConfig,
     voice_maps_config: dict[str, dict[str, str]],
+    speech_instructions_config: dict[str, str],
     plate_translations: dict[LanguageCode, dict[TextID, str]],
 ) -> dict[LanguageCode, dict[TextID, SpeechFile]]:
     async def generate_speech_files():
@@ -25,6 +26,7 @@ def speech_files__tts(
                         run_output_dir_config,
                         speech_prompt_config,
                         voice_maps_config,
+                        speech_instructions_config,
                         language,
                         text_id,
                         text,

@@ -353,6 +353,22 @@ def voice_maps_config(speech_prompt_config: SpeechPromptConfig) -> dict[str, dic
 
 
 @cache(behavior="recompute")
+def speech_instructions_config(
+    speech_prompt_config: SpeechPromptConfig,
+) -> dict[str, str]:
+    """Load speech accent/pronunciation instructions from YAML.
+
+    Returns:
+        Dictionary mapping locale codes to instruction strings.
+        Example: {"en-tz": "Speak in a Tanzanian English accent...", ...}
+    """
+    with open(
+        speech_prompt_config.instructions_path, "r", encoding="utf-8"
+    ) as f:
+        return cast(dict[str, str], yaml.safe_load(f))
+
+
+@cache(behavior="recompute")
 def web_generation_html_prompt_config(config: DictConfig) -> HTMLPromptConfig:
     return HTMLPromptConfig.model_validate(prompt_config_with_model(config["prompts"]["web_generation_html"], config["default_model"]))
 
