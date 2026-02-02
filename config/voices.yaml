@@ -17,6 +17,7 @@ azure:
   en-ie: en-IE-EmilyNeural
   en-nz: en-NZ-MollyNeural
   en-za: en-ZA-LeahNeural
+  en-tz: en-TZ-ElimuNeural
   
   # Spanish variants
   es: es-ES-ElviraNeural
@@ -150,6 +151,8 @@ azure:
   af: af-ZA-AdriNeural
   am: am-ET-MekdesNeural
   sw: sw-KE-ZuriNeural
+  sw-tz: sw-TZ-DaudiNeural
+  sw-ke: sw-KE-ZuriNeural
   zu: zu-ZA-ThandoNeural
   
   # Hebrew

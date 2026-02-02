@@ -95,7 +95,8 @@ class TestSpeechFilesNodes:
                     result = speech_files__tts(
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
-                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        voice_maps_config=voice_maps,
+                        speech_instructions_config={"default": "Speak in a cheerful tone."},
                         plate_translations=plate_translations,
                     )
 
@@ -149,7 +150,8 @@ class TestSpeechFilesNodes:
                     result = speech_files__tts(
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
-                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        voice_maps_config=voice_maps,
+                        speech_instructions_config={"default": "Speak in a cheerful tone."},
                         plate_translations=plate_translations,
                     )
 
@@ -209,7 +211,8 @@ class TestSpeechFilesNodes:
                     result = speech_files__tts(
                         run_output_dir_config=tmpdir,
                         speech_prompt_config=mock_config,
-                        voice_maps_config=voice_maps,  # Add voice_maps_config parameter
+                        voice_maps_config=voice_maps,
+                        speech_instructions_config={"default": "Speak in a cheerful tone."},
                         plate_translations=plate_translations,
                     )
 

@@ -105,6 +105,8 @@ class SpeechProviderConfig(BaseModel):
 
     model: str
     languages: list[str] = []  # List of language codes this provider handles
+    api_base: str = ""
+    api_key: str = ""
 
 
 class SpeechPromptConfig(PromptConfig):
@@ -117,6 +119,7 @@ class SpeechPromptConfig(PromptConfig):
     bit_rate: str = "64k"
     sample_rate: int = 24000
     voices_path: str = "config/voices.yaml"
+    instructions_path: str = "config/speech_instructions.yaml"
     language_map: dict[str, str] = Field(default_factory=dict, exclude=True)
 
     @model_validator(mode="before")
@@ -197,6 +200,16 @@ class SpeechPromptConfig(PromptConfig):
             raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
 
         return self.providers[provider].model
+
+    def get_provider_config(
+        self,
+        language_code: str,
+    ) -> SpeechProviderConfig:
+        """Get the full provider config for a language."""
+        provider = self.get_provider_for_language(language_code)
+        if provider not in self.providers:
+            raise ValueError(f"Provider '{provider}' not found in configured providers: {list(self.providers.keys())}")
+        return self.providers[provider]
 
 
 class HTMLPromptConfig(PromptConfig):

@@ -67,19 +67,20 @@ styleguide: "assets/styleguides/default.md"
 # Speech/TTS provider configuration
 speech:
   # provider selection, either dynamic (selection based on language) or specific provider (openai, azure)
-  provider: openai
-  default_provider: openai  
+  provider: dynamic
+  default_provider: openai
   providers:
     openai:
       model: gpt-4o-mini-tts
       languages: [en]  # Languages that use OpenAI
     azure:
       model: azure/speech/azure-tts
-      languages: [es, ta, si]  # Languages that use Azure
+      languages: [es, ta, si, en-tz, sw-tz, sw]  # Languages that use Azure
   bit_rate: 64k
   sample_rate: 24000
   format: mp3
   voices_path: config/voices.yaml
+  instructions_path: config/speech_instructions.yaml
 
 text_types:
   book_title:

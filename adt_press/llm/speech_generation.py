@@ -52,10 +52,31 @@ def resolve_voice(provider: str, language_code: str, voice_maps: dict[str, dict[
     return default_voice
 
 
+def resolve_instructions(
+    language_code: str,
+    instructions_map: dict[str, str],
+) -> str:
+    """Resolve accent/pronunciation instructions for a language.
+
+    Resolution order: exact match → base language → default.
+    """
+    normalized = language_code.lower()
+
+    if normalized in instructions_map:
+        return instructions_map[normalized]
+
+    base_lang = normalized.split("-")[0]
+    if base_lang in instructions_map:
+        return instructions_map[base_lang]
+
+    return instructions_map.get("default", "")
+
+
 async def generate_speech_file(
     run_output_dir: str,
     config: SpeechPromptConfig,
-    voice_maps: dict[str, dict[str, str]],  # Add cached voice maps parameter
+    voice_maps: dict[str, dict[str, str]],
+    speech_instructions: dict[str, str],
     language: Language,
     text_id: TextID,
     text: str,
@@ -66,7 +87,8 @@ async def generate_speech_file(
     Args:
         run_output_dir: Output directory for audio files
         config: Speech generation configuration
-        voice_maps: Cached voice configuration maps (from Hamilton node)
+        voice_maps: Cached voice configuration maps
+        speech_instructions: Cached accent instructions map
         language: Target language for speech
         text_id: Unique identifier for the text
         text: Text content to convert to speech
@@ -123,11 +145,16 @@ async def generate_speech_file(
         )
 
     # Render prompt template for TTS instructions
+    accent_instructions = resolve_instructions(
+        language_code,
+        speech_instructions,
+    )
     context = dict(
         language_code=language_code,
         language=language.name,
         text=sanitized_text,
         examples=config.examples,
+        accent_instructions=accent_instructions,
     )
     prompt = render_template_to_string(config.template_path, context)
 
@@ -145,6 +172,15 @@ async def generate_speech_file(
     # Only add instructions for OpenAI-compatible models (not Azure Speech)
     if not model.startswith("azure/"):
         speech_kwargs["instructions"] = prompt
+    else:
+        # Azure TTS requires api_base and api_key passed explicitly
+        provider_config = config.get_provider_config(language_code)
+        api_base = provider_config.api_base or os.environ.get("AZURE_API_BASE", "")
+        api_key = provider_config.api_key or os.environ.get("AZURE_API_KEY", "")
+        if api_base:
+            speech_kwargs["api_base"] = api_base
+        if api_key:
+            speech_kwargs["api_key"] = api_key
 
     response = await litellm.aspeech(**speech_kwargs)
 
