@@ -8,10 +8,8 @@ Some notes on the scoring of matches:
     - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
 """
 
-import asyncio
 import json
 import os
-import threading
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -83,6 +81,7 @@ def text_type_per_page_scorer(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
         value=score,
         rationale=json.dumps(matches),
     )
+
 
 class TextTypeEvaluator(MLflowEvaluatorBase):
     """Evaluator for text type accuracy."""
