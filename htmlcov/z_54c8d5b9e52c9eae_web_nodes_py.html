@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_54c8d5b9e52c9eae_webpub_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-02-02 18:36 +0000
+            created at 2026-02-03 15:09 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -363,7 +363,7 @@
     <p class="pln"><span class="n"><a id="t281" href="#t281">281</a></span><span class="t">            <span class="com"># should we insert a quiz after this section?</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t282" href="#t282">282</a></span><span class="t">            <span class="nam">quiz</span> <span class="op">=</span> <span class="nam">quizzes_by_section_id</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_id</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t283" href="#t283">283</a></span><span class="t">            <span class="key">if</span> <span class="nam">quiz</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t284" href="#t284">284</a></span><span class="t">                <span class="nam">quiz_section_id</span> <span class="op">=</span> <span class="fst">f"</span><span class="op">{</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_id</span><span class="op">}</span><span class="fst">_quiz</span><span class="fst">"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t284" href="#t284">284</a></span><span class="t">                <span class="nam">quiz_section_id</span> <span class="op">=</span> <span class="nam">quiz</span><span class="op">.</span><span class="nam">quiz_id</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t285" href="#t285">285</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t286" href="#t286">286</a></span><span class="t">                <span class="com"># Check if cached quiz exists (unless we're regenerating this section)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t287" href="#t287">287</a></span><span class="t">                <span class="key">if</span> <span class="nam">quiz_section_id</span> <span class="key">in</span> <span class="nam">cached_by_section_id</span> <span class="key">and</span> <span class="nam">section</span><span class="op">.</span><span class="nam">section_id</span> <span class="key">not</span> <span class="key">in</span> <span class="nam">regenerate_section_ids</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -406,7 +406,7 @@
     <p class="run"><span class="n"><a id="t324" href="#t324">324</a></span><span class="t">        <span class="nam">page_index</span> <span class="op">+=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">        <span class="com"># Account for quiz pages that follow sections</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">        <span class="key">if</span> <span class="nam">section</span><span class="op">.</span><span class="nam">section_id</span> <span class="key">in</span> <span class="nam">quizzes_by_section_id</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">            <span class="nam">quiz_section_id</span> <span class="op">=</span> <span class="nam">SectionID</span><span class="op">(</span><span class="fst">f"</span><span class="op">{</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_id</span><span class="op">}</span><span class="fst">_quiz</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">            <span class="nam">quiz_section_id</span> <span class="op">=</span> <span class="nam">SectionID</span><span class="op">(</span><span class="nam">quizzes_by_section_id</span><span class="op">[</span><span class="nam">section</span><span class="op">.</span><span class="nam">section_id</span><span class="op">]</span><span class="op">.</span><span class="nam">quiz_id</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t">            <span class="nam">section_order</span><span class="op">[</span><span class="nam">quiz_section_id</span><span class="op">]</span> <span class="op">=</span> <span class="nam">page_index</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">            <span class="nam">page_index</span> <span class="op">+=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t330" href="#t330">330</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -635,7 +635,7 @@
             <a class="nav" href="z_54c8d5b9e52c9eae_webpub_nodes_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-02-02 18:36 +0000
+            created at 2026-02-03 15:09 +0000
         </p>
     </div>
 </footer>
