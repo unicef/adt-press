@@ -16,6 +16,10 @@ eval:
   # Tasks to run (empty list means run all available tasks)
   tasks: []
 
+  # MLflow evaluation settings
+  mlflow:
+    disable_tracing: true
+
   # Task-specific configurations
   task_configs:
     text_type:

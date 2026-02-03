@@ -2,12 +2,10 @@
 
 import os
 from abc import ABC, abstractmethod
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
 import fsspec
-import mlflow
 from label_studio_sdk import LabelStudio
 
 from adt_eval.types import AzureStorageConfig, LabelStudioConfig
@@ -128,29 +126,24 @@ class BaseEvaluator(ABC):
 
         return {"score": total_score / total_count}
 
+    async def run_core(self):
+        """Main evaluation workflow without any tracking integrations."""
+        cases = self.load_data()
+
+        # filter cases
+        cases = self.filter_cases(cases)
+
+        # process all our cases
+        results = await self.process_cases(cases)
+
+        # Calculate metrics
+        metrics = self.calculate_metrics(results)
+
+        # Generate report
+        self.generate_report(results, metrics)
+
+        return results, metrics
+
     async def run(self):
         """Main evaluation workflow."""
-        run_name = f"{self.__class__.__name__.replace('Evaluator', '').lower()} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-
-        with mlflow.start_run(run_name=run_name, nested=True):
-            # Log configuration parameters
-            for k, v in self.global_config.items():
-                if isinstance(v, (str, int, float, bool)):
-                    mlflow.log_param(k, v)
-
-            # Load and process data
-            cases = self.load_data()
-
-            # filter cases
-            cases = self.filter_cases(cases)
-
-            # process all our cases
-            results = await self.process_cases(cases)
-            # Calculate metrics
-            metrics = self.calculate_metrics(results)
-            mlflow.log_metric("score", metrics["score"])
-
-            # Generate report
-            self.generate_report(results, metrics)
-
-            return results, metrics
+        return await self.run_core()
