@@ -18,7 +18,7 @@
 | adt\_press/llm/section\_quiz.py             |       58 |       35 |     40% |25-27, 32-47, 52-55, 66-93 |
 | adt\_press/llm/speech\_generation.py        |       85 |       71 |     16% |31-52, 63-72, 103-211 |
 | adt\_press/llm/text\_easy\_read.py          |       15 |        5 |     67% |     18-34 |
-| adt\_press/llm/text\_extraction.py          |       40 |        2 |     95% |    27, 41 |
+| adt\_press/llm/text\_extraction.py          |       40 |        1 |     98% |        27 |
 | adt\_press/llm/text\_translation.py         |       37 |        4 |     89% |27, 31, 38, 40 |
 | adt\_press/llm/web\_generation\_activity.py |       66 |       50 |     24% |24-40, 64-161 |
 | adt\_press/llm/web\_generation\_edit.py     |       33 |        0 |    100% |           |
@@ -52,7 +52,7 @@
 | adt\_press/utils/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | adt\_press/utils/encoding.py                |       32 |        7 |     78% |10, 57-60, 65-68 |
 | adt\_press/utils/file.py                    |       45 |        0 |    100% |           |
-| adt\_press/utils/html.py                    |      160 |       14 |     91% |66, 88, 121-123, 224-225, 228, 237, 279, 286, 297, 303, 306 |
+| adt\_press/utils/html.py                    |      160 |       13 |     92% |66, 88, 121-123, 224-225, 228, 279, 286, 297, 303, 306 |
 | adt\_press/utils/image.py                   |       96 |       37 |     61% |25-34, 41-45, 54-60, 77-82, 85, 124-140 |
 | adt\_press/utils/languages.py               |       30 |        1 |     97% |        48 |
 | adt\_press/utils/logging.py                 |       83 |       29 |     65% |23-25, 44-51, 77, 112-114, 127-134, 142-161, 169 |
@@ -82,7 +82,7 @@
 | tools/pdf\_extractor/models.py              |       15 |        1 |     93% |        63 |
 | tools/pdf\_extractor/pdf\_extractor.py      |      183 |       52 |     72% |216-218, 230-234, 237-266, 310, 387-475, 479 |
 | tools/pdf\_extractor/utils.py               |      326 |      246 |     25% |27, 61-63, 68, 80-115, 125-140, 153-156, 168-173, 176-189, 192-209, 212-236, 245-252, 395-548, 555-586, 614, 638-640, 647, 650-654, 662, 669-687, 690, 694 |
-| **TOTAL**                                   | **4687** |  **810** | **83%** |           |
+| **TOTAL**                                   | **4687** |  **808** | **83%** |           |
 
 
 ## Setup coverage badge
