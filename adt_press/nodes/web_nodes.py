@@ -281,7 +281,7 @@ def web_pages(
             # should we insert a quiz after this section?
             quiz = quizzes_by_section_id.get(section.section_id)
             if quiz:
-                quiz_section_id = f"{section.section_id}_quiz"
+                quiz_section_id = quiz.quiz_id
 
                 # Check if cached quiz exists (unless we're regenerating this section)
                 if quiz_section_id in cached_by_section_id and section.section_id not in regenerate_section_ids:
@@ -324,7 +324,7 @@ def web_pages(
         page_index += 1
         # Account for quiz pages that follow sections
         if section.section_id in quizzes_by_section_id:
-            quiz_section_id = SectionID(f"{section.section_id}_quiz")
+            quiz_section_id = SectionID(quizzes_by_section_id[section.section_id].quiz_id)
             section_order[quiz_section_id] = page_index
             page_index += 1
 
