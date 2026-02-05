@@ -12,235 +12,96 @@ import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List
+import traceback
 
+from banks import Prompt
+from litellm import completion
 from mlflow.entities import Feedback
 from mlflow.genai import scorer
-from litellm import completion
 
+from adt_eval.async_loop_context import get_current_loop_runner
 from adt_eval.mlflow_base import MLflowEvaluatorBase
+from adt_eval.utils.file import encode_image_to_base64
+from adt_eval.utils.text_translation import build_eval_translations
 from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
-from adt_press.utils.languages import Language
+from adt_press.llm import get_instructor_client
 from adt_press.llm.text_translation import get_text_translation
 from adt_press.models.config import TextGroupType, TextType
+from adt_press.models.eval.text_translation import TranslationEvalOutputs
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageTextGroups, Text, TextGroup
-from adt_press.models.eval.text_translation import TranslationEvalOutputs
+from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
-from adt_eval.utils.file import encode_image_to_base64
-
-TRANSLATION_SCORER_SYSTEM_PROMPT = """
-You are an expert multilingual translation evaluator specializing in children’s educational textbooks.
-You evaluate translations with a strict editorial standard suitable for K–12 instructional materials.
-
-Your task is NOT to translate. Your task is to STRICTLY JUDGE whether a translation is ACCEPTABLE or NOT ACCEPTABLE.
-
-You will be provided with:
-- input_language: the source language code.
-- input_text: the exact source text extracted from the textbook.
-- output_language: the target language code.
-- output_text: the model-generated translation.
-- page_image: an image of the textbook page (base64).
-
-Use the image ONLY to understand:
-- the role of the text (heading, label, instruction, paragraph, caption)
-- the subject matter (math, science, literacy, etc.)
-- the layout context (placement on page)
-
-If the image is unclear or partially visible, do not assume or invent anything.
-Your decision must be based primarily on input_text and output_text.
-
-----------------------------------------------------
-DEFINITION OF “ACCEPTABLE TRANSLATION”
-----------------------------------------------------
-A translation is ACCEPTABLE only if ALL conditions below are fully satisfied.
-If you are unsure whether an error is minor or major, treat it as major.
-
-### 1. ADEQUACY (meaning preservation — strict)
-- The translation preserves the complete meaning.
-- No omissions, distortions, additions, or reinterpretations.
-- All quantities, names, terminology, and logical relationships are correctly preserved.
-- No ambiguity introduced.
-
-### 2. FLUENCY & NATURALNESS (strict editorial standard)
-The target-language text must:
-- Be grammatically correct.
-- Use natural, idiomatic phrasing for children’s educational materials.
-- Sound like authentic textbook language for that language and grade level.
-- Avoid literal, machine-like, or awkward phrasing even if meaning is understandable.
-- Use appropriate stylistic form for headings, labels, and instructions.
-
-For ALL languages:
-If the translation sounds unnatural, unidiomatic, or does not resemble real textbook phrasing,
-→ NOT ACCEPTABLE.
-
-### 3. TERMINOLOGY & SUBJECT ACCURACY
-- Terminology must match grade-level norms for the target language.
-- Technical and academic concepts must remain correct.
-- No mistranslation that could cause misunderstanding of a concept.
-
-### 4. CONTEXTUAL APPROPRIATENESS (image-based)
-- Headings must read like headings.
-- Labels must read like labels.
-- Instructions must read like instructions.
-- The style and tone must fit children’s textbooks.
-
-----------------------------------------------------
-ADDITIONAL LANGUAGE-PAIR GUIDELINES (ENGLISH → SPANISH)
-----------------------------------------------------
-If input_language = "en" and output_language = "es", apply the following STRICT rules:
-
-### Spanish Textbook Fluency Rules
-Translations resembling any of the following patterns are NOT ACCEPTABLE:
-- Literal English calques (e.g., “NÚMEROS IMPACTANTES”, “PROBLEMAS DE HISTORIAS SOBRE...”)
-- Machine-like verb constructions
-- Unnatural noun constructions
-- Awkward or non-standard academic phrasing
-- Any phrasing not typically found in real Spanish K–12 textbooks
-
-The translation must sound like a native-authored Spanish textbook, not a direct conversion.
-
-### Non-acceptable Spanish Indicators
-If the Spanish includes unnatural literal phrasing, incorrect register, awkward expressions, or machine-like style,
-treat as major errors, even if meaning is technically understandable.
-
-----------------------------------------------------
-ERROR SEVERITY (STRICT INTERPRETATION)
-----------------------------------------------------
-
-### MAJOR ERRORS (→ ALWAYS NOT ACCEPTABLE)
-- Any mistranslation or incorrect meaning.
-- Any omitted or added content.
-- Incorrect or misleading terminology.
-- Any unnatural, awkward, or machine-like phrasing.
-- Any grammatical error.
-- Any mismatch with the text’s function (heading/label/etc.).
-- Any stylistic issue that would not pass editorial review.
-
-### MINOR ERRORS (rare, acceptable only if meaning + fluency + context are perfect)
-- Very small stylistic differences that do NOT affect idiomaticity, clarity, tone, or naturalness.
-- Harmless formatting differences.
-
-If unsure, classify the issue as major.
-
-----------------------------------------------------
-EVALUATION PROCESS (INTERNAL — DO NOT OUTPUT)
-----------------------------------------------------
-1. Assess adequacy.
-2. Assess fluency & naturalness with strict textbook standards.
-3. Assess terminology accuracy.
-4. Assess contextual appropriateness using the image.
-5. Apply strict error classification.
-6. Decide ACCEPTABLE vs NOT ACCEPTABLE.
-
-Do NOT reveal chain-of-thought.
-
-----------------------------------------------------
-OUTPUT FORMAT
-----------------------------------------------------
-Return ONLY the following JSON object:
-
-- is_translation_acceptable: boolean
-- rationale: short English explanation (1–3 sentences) summarizing the key reasons.
-
-Do NOT output anything else.
-"""
 
 
 @scorer
 def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
 
     page_text_list = inputs.get("page_text_list", [])
-    source_language = inputs.get("base_language", "en")
+    base_language = inputs.get("base_language", "en")
     target_language = inputs.get("target_language", "es")
     page_text_translations = outputs.get("page_text_translations", [])
 
-    if isinstance(source_language, Language):
-        source_language = source_language.model_dump()
+    try:
 
-    if isinstance(target_language, Language):
+        # convert Language objects to dictionaries
+        base_language = base_language.model_dump()
         target_language = target_language.model_dump()
 
-    #get image  
-    image_path = inputs.get("image_path", "")
-    image_b64 = encode_image_to_base64(image_path)
+        # get image base64
+        image_path = inputs.get("image_path") or inputs.get("page_image_path") or ""
+        image_b64 = encode_image_to_base64(image_path)
 
-    #build eval_page_text_translations
-    eval_page_text_translations = []
-    for i, page_text_translation in enumerate(page_text_translations):
-        _, _, base_text = page_text_list[i]
-        translation_entry = {
-            "text_id": page_text_translation["text_id"],
-            "base_text": base_text,
-            "translation": page_text_translation["text"],
-        }
-        eval_page_text_translations.append(translation_entry)
-
-
-    if image_b64:
-        user_content = [
-            {
-                "type": "text",
-                "text": (
-                    "Evaluate whether the following Translation is ACCEPTABLE, "
-                    "using the criteria in the system prompt.\n\n"
-                    f"source_language: {source_language}\n"
-                    f"target_language: {target_language}\n"
-                    f"List of translations :\n\n{eval_page_text_translations}\n\n"
-                    "Below is the textbook page image in base64 format. "
-                    "Use it only to understand the context and how the text is used:\n"
-                ),
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{image_b64}"
-                },
-            },
-        ]
-    else:
-        user_content = (
-            "Evaluate whether the following Translation is ACCEPTABLE, "
-            "using the criteria in the system prompt.\n\n"
-            f"source_language: {source_language}\n"
-            f"target_language: {target_language}\n"
-            f"List of translations :\n\n{eval_page_text_translations}\n\n"
+        # build eval_page_text_translations
+        eval_page_text_translations = build_eval_translations(
+            page_text_list,
+            page_text_translations,
         )
 
-    messages = [
-        {"role": "system", "content": TRANSLATION_SCORER_SYSTEM_PROMPT},
-        {"role": "user", "content": user_content},
-    ]
+        #build context
+        context = dict(
+            base_language=base_language,
+            target_language=target_language,
+            eval_page_text_translations=eval_page_text_translations,
+            image_data_url=f"data:image/png;base64,{image_b64}" if image_b64 else None,
+        )
 
-    eval_output = completion(
-        model="gpt-5",
-        messages=messages,
-        response_format=TranslationEvalOutputs,
-    )
+        TRANSLATION_EVAL_PROMPT_PATH = "prompts/eval/text_translation_eval.jinja2" 
+        prompt = Prompt(cached_read_text_file(TRANSLATION_EVAL_PROMPT_PATH))
 
-    # Align with how you're handling other response_format=Pydantic calls
-    msg = eval_output.choices[0].message
-    translation_eval = TranslationEvalOutputs.model_validate_json(msg.content)
-    translation_output = translation_eval.model_dump()['outputs']
+        eval_output = completion(
+                model="gpt-5",
+                messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
+                response_format=TranslationEvalOutputs,
+            )
 
-    #calculating the translation eval summary
-    summary_of_translations = [translation['is_translation_acceptable'] for translation in translation_output]
-    summary_of_failed_translations = [
-        {"text_id": translation["text_id"], "rationale": translation["rationale"]}
-        for translation in translation_output
-        if not translation["is_translation_acceptable"]
-    ]
+        msg = eval_output.choices[0].message
+        translation_eval = TranslationEvalOutputs.model_validate_json(msg.content)
+        translation_output = translation_eval.model_dump()["outputs"]
 
-    
-    #calculating the translation eval metric
-    metric= round(sum(summary_of_translations) / len(summary_of_translations), 2)
-    
-    #calculating the translation eval rationale
-    if summary_of_failed_translations:
-        combined_rationale = "The folowing translations are not acceptable:\n\n"
-        for entry in summary_of_failed_translations:
-            combined_rationale += f"- text_id: {entry['text_id']}\n  reason: {entry['rationale']}\n\n" 
-    else:
-        combined_rationale = "All translations are acceptable."
+        #calculating the translation eval summary
+        summary_of_translations = [translation['is_translation_acceptable'] for translation in translation_output]
+        summary_of_failed_translations = [
+            {"text_id": translation["text_id"], "rationale": translation["rationale"]}
+            for translation in translation_output
+            if not translation["is_translation_acceptable"]
+        ]
+
+        #calculating the translation eval metric
+        metric= round(sum(summary_of_translations) / len(summary_of_translations), 2)
+        
+        #calculating the combined translation eval rationale
+        if summary_of_failed_translations:
+            combined_rationale = "The folowing translations are not acceptable:\n\n"
+            for entry in summary_of_failed_translations:
+                combined_rationale += f"- text_id: {entry['text_id']}\n  reason: {entry['rationale']}\n\n" 
+        else:
+            combined_rationale = "All translations are acceptable."
+        
+    except Exception as e:
+        print(f"Error evaluating translation: {traceback.format_exc()}")
+        metric = 0
+        combined_rationale = "Translation evaluation failed."
     
     return Feedback(
         name="text_translation_score",
@@ -329,9 +190,9 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
         page_text_translations = []
 
         use_cached_llm_results = self.global_config["eval"]["use_cached_llm_results"]
-        cache_path = f"{self.output_dir}/logs/text_extraction/text_extraction_eval_{inputs['case_id']}.json"
+        cache_path = f"{self.output_dir}/logs/text_extraction/text_translation_eval_{inputs['case_id']}.json"
         if use_cached_llm_results and os.path.exists(cache_path):
-            #page_texts = self.build_page_texts_from_log(Path(cache_path))
+            #page_texts = self.build_page_texts_from_log(Path(cache_path)) #TODO: implement
             print(f"Skipping LLM call for case {inputs['case_id']} and using cached results from the logs.")
         else:
             output_page_text_translations = self._run_coro(
