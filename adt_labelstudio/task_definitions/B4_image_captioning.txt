@@ -1,0 +1,47 @@
+<View>
+  <Style>
+    .textbox {
+      padding: 20px;
+      background-color: #ffffff;
+      color: #000000;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+    }  
+  </Style>
+  <View style="display: flex;">
+      <View style="width: 29%; margin-right: 1.99%">
+    	<Header value="Textbook page for reference:"/>
+   		 <Image name="page_image" value="$page_image"/>
+      </View>
+      <View style="width: 39%">
+        <Header value="Image:"/>
+        <Image name="image_path" value="$image_path" zoom="true" zoomControl="true"/>
+        <Header value="Image caption:"/>        
+        <View className="textbox">
+          <Text name="image_caption" toName="image_path" value="$image_caption"/>
+        </View>
+        
+          <Text name="box_title" value="Corrected text:" />
+        <TextArea name="image_caption_corrected" 
+                  toName="image_path" 
+                  showSubmitButton="false" 
+                  placeholder="Enter corrected image description here. If you don't have any changes to make, leave this blank and click submit." 
+                  rows="4" 
+                  maxSubmissions="1" 
+                  transcription="true" 
+                  editable="true" 
+                  required="false"/>
+       <Header value="Additional notes"/>
+       <TextArea name="notes"
+          toName="page_image"
+          transcription="true"
+          showSubmitButton="false"
+          placeholder="Notes or comments to flag issues about this task."
+          maxSubmissions="1"
+          editable="true"
+          required="false"
+          rows="1"/>
+    </View>
+  </View>
+</View>

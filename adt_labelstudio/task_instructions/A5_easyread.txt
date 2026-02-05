@@ -1,0 +1,9 @@
+You are provided with a line of text from the textbook page shown. Simplify the text into an easy read version for school children with cognitive and learning disabilities in the language of the source text.
+<br><br>
+IMPORTANT:
+<ul>
+<li>The output should be text that uses familiar and everyday words, avoiding jargon and technical terms wherever possible.</li>
+<li>The sentence should be in the active voice and avoid the passive voice.</li>
+<li> The sentence should be concise.</li>
+<li>If applicable for the language of the text, you should retain the gender of words.</li>
+</ul>
