@@ -10,6 +10,7 @@ class TranslationEvalOutput(BaseModel):
     is_translation_acceptable: bool
     rationale: str
 
+
 class TranslationEvalOutputs(BaseModel):
     base_language: str
     target_language: str

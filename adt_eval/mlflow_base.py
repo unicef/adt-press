@@ -156,7 +156,7 @@ class MLflowEvaluatorBase(BaseEvaluator):
     async def run(self):
         """Main evaluation workflow with MLflow run tracking."""
         self.configure_mlflow()
-        
+
         run_name = self.get_run_name()
         nested = mlflow.active_run() is not None
         self._loop_runner = AsyncLoopRunner()

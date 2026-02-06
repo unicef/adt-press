@@ -22,12 +22,7 @@ def build_eval_translations(
             missing_ids.append(text_id)
             continue
         eval_items.append(
-            {
-                "text_id": text_id,
-                "base_text": base_text,
-                "translation": translation.get("text"),
-                "reasoning": translation.get("reasoning")
-            }
+            {"text_id": text_id, "base_text": base_text, "translation": translation.get("text"), "reasoning": translation.get("reasoning")}
         )
 
     if missing_ids:
@@ -35,6 +30,7 @@ def build_eval_translations(
         raise ValueError(f"Missing base text for text_id(s): {missing_ids_display}")
 
     return eval_items
+
 
 def build_eval_translations_with_scores(
     page_text_scorer_scores_list: List[Dict[str, Any]],
@@ -46,11 +42,11 @@ def build_eval_translations_with_scores(
 
         if not text_id:
             continue
-            
+
         for entry in page_text_scorer_scores_list:
             if entry.get("text_id") == text_id:
                 translation["is_translation_acceptable"] = entry.get("is_translation_acceptable")
                 translation["rationale"] = entry.get("rationale")
                 break
-            
+
     return page_text_translations
