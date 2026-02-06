@@ -8,8 +8,8 @@ Some notes on the scoring of matches:
     - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
 """
 
-import json
 import os
+import ast
 from pathlib import Path
 from typing import Any, Dict, List
 import traceback
@@ -19,10 +19,9 @@ from litellm import completion
 from mlflow.entities import Feedback
 from mlflow.genai import scorer
 
-from adt_eval.async_loop_context import get_current_loop_runner
 from adt_eval.mlflow_base import MLflowEvaluatorBase
-from adt_eval.utils.file import encode_image_to_base64
-from adt_eval.utils.text_translation import build_eval_translations
+from adt_eval.utils.file import encode_image_to_base64, load_json, save_json
+from adt_eval.utils.text_translation import build_eval_translations, build_eval_translations_with_scores
 from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
 from adt_press.llm import get_instructor_client
 from adt_press.llm.text_translation import get_text_translation
@@ -36,14 +35,13 @@ from adt_press.utils.languages import Language
 
 @scorer
 def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
-
     page_text_list = inputs.get("page_text_list", [])
     base_language = inputs.get("base_language", "en")
     target_language = inputs.get("target_language", "es")
-    page_text_translations = outputs.get("page_text_translations", [])
+    judge_cfg = (inputs.get("scorers") or {}).get("translation_acceptability") or {}
+    eval_page_text_translations = outputs.get("eval_page_text_translations", [])
 
     try:
-
         # convert Language objects to dictionaries
         base_language = base_language.model_dump()
         target_language = target_language.model_dump()
@@ -51,12 +49,6 @@ def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
         # get image base64
         image_path = inputs.get("image_path") or inputs.get("page_image_path") or ""
         image_b64 = encode_image_to_base64(image_path)
-
-        # build eval_page_text_translations
-        eval_page_text_translations = build_eval_translations(
-            page_text_list,
-            page_text_translations,
-        )
 
         #build context
         context = dict(
@@ -66,11 +58,11 @@ def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
             image_data_url=f"data:image/png;base64,{image_b64}" if image_b64 else None,
         )
 
-        TRANSLATION_EVAL_PROMPT_PATH = "prompts/eval/text_translation_eval.jinja2" 
-        prompt = Prompt(cached_read_text_file(TRANSLATION_EVAL_PROMPT_PATH))
+        prompt_path = judge_cfg.get("prompt_path") or "prompts/eval/text_translation_eval.jinja2"
+        prompt = Prompt(cached_read_text_file(prompt_path))
 
         eval_output = completion(
-                model="gpt-5",
+                model=judge_cfg.get("llm_as_judge_model") or "gpt-5",
                 messages=[m.model_dump(exclude_none=True) for m in prompt.chat_messages(context)],
                 response_format=TranslationEvalOutputs,
             )
@@ -81,6 +73,11 @@ def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
 
         #calculating the translation eval summary
         summary_of_translations = [translation['is_translation_acceptable'] for translation in translation_output]
+        summary_of_translations_metadata = [
+            {"text_id": translation["text_id"], 
+            "is_translation_acceptable": translation["is_translation_acceptable"],
+            "rationale": translation["rationale"]} 
+            for translation in translation_output]
         summary_of_failed_translations = [
             {"text_id": translation["text_id"], "rationale": translation["rationale"]}
             for translation in translation_output
@@ -107,6 +104,9 @@ def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
         name="text_translation_score",
         value=metric,
         rationale=combined_rationale,
+        metadata={
+            "summary_of_translations": summary_of_translations_metadata,
+        }
     )
 
 
@@ -118,24 +118,6 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
 
         self.base_language = Language.from_code(global_config.get("input_language", "en"))
         self.target_language = Language.from_code("es")
-
-    def build_page_texts_from_log(self, fpath: Path) -> PageTextGroups:
-        """Build PageTextGroups object from logged JSON file, as an alternative to LLM call."""
-        with open(fpath, "r", encoding="utf8") as f:
-            page_texts = json.load(f)
-            output = page_texts["output"]
-
-        page_text_groups = []
-        for g in output["groups"]:
-            page_texts = []
-            for t in g["texts"]:
-                page_text = Text(text_id=t["text_id"], text=t["text"], text_type=t["text_type"])
-                page_texts.append(page_text)
-            page_text_group = TextGroup(group_id=g["group_id"], group_type=g["group_type"], texts=page_texts)
-            page_text_groups.append(page_text_group)
-        page_texts = PageTextGroups(page_id=output["page_id"], groups=page_text_groups, reasoning=output["reasoning"])
-
-        return page_texts
 
     async def process_case(self, step: int, test_case: Dict[str, Any], use_cached_llm_results) -> Dict[str, Any]:
         """Legacy path: TextTypeEvaluator runs via mlflow.genai.evaluate."""
@@ -174,12 +156,11 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
                         "page_text_list": page_text_list,
                         "base_language": self.base_language,
                         "target_language": self.target_language,
+                        "scorers": self.task_config.get("scorers", {}),
                     },
                     "expectations": {},
                 }
             )
-
-        
         return records
 
     def predict_fn(self, **inputs: Any) -> Dict[str, Any]:
@@ -190,10 +171,10 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
         page_text_translations = []
 
         use_cached_llm_results = self.global_config["eval"]["use_cached_llm_results"]
-        cache_path = f"{self.output_dir}/logs/text_extraction/text_translation_eval_{inputs['case_id']}.json"
+        cache_path = f"{self.output_dir}/logs/text_translation/text_translation_eval_{inputs['case_id']}.json"
         if use_cached_llm_results and os.path.exists(cache_path):
-            #page_texts = self.build_page_texts_from_log(Path(cache_path)) #TODO: implement
             print(f"Skipping LLM call for case {inputs['case_id']} and using cached results from the logs.")
+            page_text_translations = load_json(cache_path)
         else:
             output_page_text_translations = self._run_coro(
                 get_text_translation(
@@ -208,6 +189,15 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
                 page_text_translation.model_dump()
                 for page_text_translation in output_page_text_translations
             ]
+            
+            #save to cache
+            save_json(cache_path, page_text_translations)
+
+        # build eval_page_text_translations
+        eval_page_text_translations = build_eval_translations(
+            page_text_list,
+            page_text_translations,
+        )
 
         return {
             "case_id": inputs["case_id"],
@@ -219,7 +209,7 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
             ),
             "page_text_all": page_text_all,
             "page_image_path": str(Path(page_image_path).relative_to(self.output_dir)),
-            "page_text_translations": page_text_translations,
+            "eval_page_text_translations": eval_page_text_translations
         }
 
     def get_scorers(self) -> List[Any]:
@@ -227,31 +217,34 @@ class TextTranslationEvaluator(MLflowEvaluatorBase):
 
     def get_report_results_and_metrics(self, eval_results):
         result_df = eval_results.result_df.copy()
-        results: List[Dict[str, Any]] = []
-        for _, row in result_df.iterrows():
-            # inputs = row.get("request", {})
-            outputs = row.get("response", {})
+        results = []
+        combined_is_translation_acceptable_results =[]
+        for index, row in result_df.iterrows():
+            output = row.get("response", {})
             assessments = row.get("assessments", {})
-            rationale = assessments[0].get("rationale", {})
-            matches = json.loads(rationale) if rationale else []
-            score = row.get("text_type_score/value") or 0
 
-            results.append(
-                {
-                    "id": outputs.get("case_id"),
-                    "book_title": outputs.get("book_title"),
-                    "page_number": outputs.get("page_number"),
-                    "label_studio_url": outputs.get("label_studio_url"),
-                    "page_text": outputs.get("page_text"),
-                    "page_image_path": outputs.get("page_image_path"),
-                    "page_texts": outputs.get("page_texts"),
-                    "score": score,
-                    "score_count": len(matches),
-                    "step": outputs.get("step"),
-                    "matches": matches,
-                }
+            page_text_scorer_scores_list = ast.literal_eval(assessments[0]['metadata']['summary_of_translations'])
+            eval_page_text_translations = output["eval_page_text_translations"]
+
+            eval_page_text_translations_with_scores = build_eval_translations_with_scores(
+                page_text_scorer_scores_list, 
+                eval_page_text_translations
             )
 
-        metrics = {key.replace("/mean", ""): value for key, value in eval_results.metrics.items()}
-        metrics["score"] = metrics.get("text_type_score", 0.0)
+            combined_is_translation_acceptable_results = combined_is_translation_acceptable_results + [t['is_translation_acceptable'] for t in page_text_scorer_scores_list]
+
+            results.append({
+                "id": output.get("case_id"),
+                'step': index + 1,
+                'page_number': output['page_number'],
+                'book_title': output['book_title'],
+                'page_text': output['page_text_all'],
+                'page_image_path': output['page_image_path'],
+                'score': assessments[0].get("feedback")['value'],
+                'translations': eval_page_text_translations_with_scores,
+            })
+
+        #get the metrics
+        metrics ={}
+        metrics["score"] = round(sum(combined_is_translation_acceptable_results)/len(combined_is_translation_acceptable_results), 2)
         return results, metrics
