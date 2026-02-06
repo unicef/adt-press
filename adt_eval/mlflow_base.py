@@ -13,6 +13,7 @@ import mlflow
 
 from adt_eval.base import BaseEvaluator
 
+
 class AsyncLoopRunner:
     """Run coroutines on a long-lived event loop in a background thread."""
 

@@ -8,11 +8,11 @@ Some notes on the scoring of matches:
     - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
 """
 
-import os
 import ast
+import os
+import traceback
 from pathlib import Path
 from typing import Any, Dict, List
-import traceback
 
 from banks import Prompt
 from litellm import completion
@@ -22,20 +22,14 @@ from mlflow.genai import scorer
 from adt_eval.mlflow_base import MLflowEvaluatorBase
 from adt_eval.utils.file import encode_image_to_base64, load_json, save_json
 from adt_eval.utils.text_translation import build_eval_translations, build_eval_translations_with_scores
-from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
-from adt_press.llm import get_instructor_client
 from adt_press.llm.text_translation import get_text_translation
-from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.eval.text_translation import TranslationEvalOutputs
-from adt_press.models.pdf import Page
-from adt_press.models.text import PageTextGroups, Text, TextGroup
 from adt_press.utils.file import cached_read_text_file
 from adt_press.utils.languages import Language
 
 
 @scorer
 def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
-    page_text_list = inputs.get("page_text_list", [])
     base_language = inputs.get("base_language", "en")
     target_language = inputs.get("target_language", "es")
     judge_cfg = (inputs.get("scorers") or {}).get("translation_acceptability") or {}
@@ -95,7 +89,7 @@ def is_acceptable_translation(inputs: Dict[str, Any], outputs: Dict[str, Any]) -
         else:
             combined_rationale = "All translations are acceptable."
         
-    except Exception as e:
+    except Exception:
         print(f"Error evaluating translation: {traceback.format_exc()}")
         metric = 0
         combined_rationale = "Translation evaluation failed."

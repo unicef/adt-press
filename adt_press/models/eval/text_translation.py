@@ -1,5 +1,7 @@
-from typing import Any, Dict, List, Optional, Literal
-from pydantic import BaseModel, Field, ConfigDict, conint, confloat
+from typing import List
+
+from pydantic import BaseModel
+
 
 class TranslationEvalOutput(BaseModel):
     text_id: str

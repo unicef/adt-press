@@ -2,6 +2,7 @@ import base64
 import json
 from pathlib import Path
 
+
 def encode_image_to_base64(image_path: str | Path | None) -> str | None:
     if not image_path:
         return None
