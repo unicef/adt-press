@@ -42,4 +42,4 @@ eval:
           prompt_path: prompts/eval/text_translation_eval.jinja2
   
   # Whether to use cached log files instead of calling the LLM (useful for debugging)
-  use_cached_llm_results: True
+  use_cached_llm_results: False
