@@ -1,0 +1,80 @@
+{% extends "eval/base.html" %}
+{% block title %}Text Transcript Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (score * 100) | round | int }}%</span>{% endblock %}
+
+{% block content %}
+{% for result in results %}
+    <div class="bg-white rounded border mb-6 overflow-hidden">
+        <!-- Page ID header -->
+        <div class="bg-gray-600 text-white px-4 py-3 font-bold text-xl flex justify-between items-center">
+            <span>Page Test {{result.step}} ({{ result.book_title }}, Page {{ result.page_number }})</span>
+            <div class="flex gap-2">
+                <span class="px-3 py-1 bg-gray-700 text-white text-sm font-medium rounded-full"><a href="{{ result.label_studio_url }}" target="_blank">{{ result.id }}</a></span>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 pt-4 px-4">
+            <div class="min-w-0">
+                <a href="{{ result.page_image_path }}" target="_blank" class="block">
+                    <img src="{{ result.page_image_path }}" class="w-full h-auto max-h-[260px] object-contain rounded shadow-sm hover:shadow-md transition-shadow" alt="Page {{ result.page_id }}">
+                </a>
+            </div>
+            <div class="min-w-0">
+                <div class="rounded overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-700">
+                            <tr>
+                                <th class="text-left px-3 py-2 font-semibold">Metric</th>
+                                <th class="text-left px-3 py-2 font-semibold">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+
+                            {% for metric in result.metrics %}
+                            <tr>
+                                <td class="px-3 py-2">{{ metric.name }}</td>
+                                <td class="px-3 py-2">
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">{{ (metric.value * 100) | round | int }}%</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results header -->
+        <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+            <div class="grid gap-4 px-2" style="grid-template-columns: 10fr 10fr;">
+                <div class="px-2 text-left text-sm">Actual</div>
+                <div class="px-2 text-left text-sm">Expected</div>
+            </div>
+        </div>
+        
+        {% for match in result.matches %}
+        <div class="grid gap-4 px-2 hover:bg-gray-50 items-center mx-4" style="grid-template-columns: 10fr 10fr;">
+            <div class="text-left">
+                {% if match.expected == match.actual %}
+                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">{{ match.actual }}</span>
+                {% else %}
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">{{ match.actual }}</span>
+                {% endif %}
+            </div>
+            <div class="text-left">
+                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">{{ match.expected }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Reasoning section -->
+        {% if result.page_texts.reasoning %}
+        <div class="bg-blue-50 mt-4 p-4 border-t border-blue-200 text-sm text-blue-800 italic">
+            <span class="float-right ml-2 px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">reasoning</span>
+            {{ result.page_texts.reasoning }}
+            <div class="clear-both"></div>
+        </div>
+        {% endif %}
+    </div>
+{% endfor %}
+
+{% endblock %}

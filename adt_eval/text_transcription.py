@@ -186,36 +186,80 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
     def get_report_results_and_metrics(self, eval_results):
         result_df = eval_results.result_df.copy()
         results = []
-        combined_is_translation_acceptable_results = []
-        for index, row in result_df.iterrows():
+        combined_is_translation_acceptable_results =[]
+        for _, row in result_df.iterrows():
+            inputs = row.get("response", {})
             output = row.get("response", {})
             assessments = row.get("assessments", {})
 
-            page_text_scorer_scores_list = ast.literal_eval(assessments[0]["metadata"]["summary_of_translations"])
-            eval_page_text_translations = output["eval_page_text_translations"]
+            page_texts =output['page_texts']
+            llm_texts = output['llm_texts']
+            gs_texts = output['gs_texts']
 
-            eval_page_text_translations_with_scores = build_eval_translations_with_scores(
-                page_text_scorer_scores_list, eval_page_text_translations
-            )
+            ####### Align LLM transcript to Gold Standard transcript
+            matches = []
+            n_matched = 0
+            n_mismatched = 0
 
-            combined_is_translation_acceptable_results = combined_is_translation_acceptable_results + [
-                t["is_translation_acceptable"] for t in page_text_scorer_scores_list
-            ]
+            # Loop through GS texts, seeking matches in LLM texts
+            gs_texts_copy = gs_texts.copy()
+            for i in gs_texts_copy:
+                if i in llm_texts:
+                    matches.append({"expected": i, "actual": i})
+                    llm_texts.remove(i)
+                    gs_texts_copy.remove(i)
+                    n_matched+=1
 
-            results.append(
-                {
-                    "id": output.get("case_id"),
-                    "step": index + 1,
-                    "page_number": output["page_number"],
-                    "book_title": output["book_title"],
-                    "page_text": output["page_text_all"],
-                    "page_image_path": output["page_image_path"],
-                    "score": assessments[0].get("feedback")["value"],
-                    "translations": eval_page_text_translations_with_scores,
-                }
-            )
+            #Remaing set after exact match full iteration
+            for i in gs_texts_copy:
+                # Find the best match among all llm_texts
+                best_match = None
+                best_similarity = 0.0
+                for j in llm_texts:
+                    intersection = set(j).intersection(set(i))
+                    union = set(j).union(set(i))
+                    similarity_score = len(intersection) / len(union)
+                    #print(f"similarity_score: {similarity_score:.3f}")
+                    
+                    if similarity_score > best_similarity:
+                        best_similarity = similarity_score
+                        best_match = j
+                
+                # Match only if best similarity is at least 50%
+                if best_similarity >= 0.5:
+                    matches.append({"expected": i, "actual": best_match})
+                    llm_texts.remove(best_match)
+                    n_matched += 1
+                else:
+                    matches.append({"expected": i, "actual": None})
+                    n_mismatched += 1
 
-        # get the metrics
-        metrics = {}
-        metrics["score"] = round(sum(combined_is_translation_acceptable_results) / len(combined_is_translation_acceptable_results), 2)
+            # Add unmatched llm texts
+            for i in llm_texts:
+                matches.append({"expected": None, "actual": i})
+                n_mismatched+=1
+
+            #get metrics
+            eval_metrics =[]
+            for assessment in assessments:
+                eval_metrics.append({
+                    "name": assessment['assessment_name'],
+                    "value": round(assessment['feedback']['value'], 2)
+                })
+
+            results.append({
+                "id": output.get("case_id"),
+                'step': 1,
+                'page_number': output['page_number'],
+                'book_title': output['book_title'],
+                'page_image_path': output['page_image_path'],
+                'score': 0,
+                'page_texts': page_texts,
+                'matches': matches,
+                'metrics': eval_metrics,
+            })
+
+        metrics = {
+            "score": eval_metrics[0]['value'] ,
+        }
         return results, metrics

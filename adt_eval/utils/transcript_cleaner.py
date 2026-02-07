@@ -30,5 +30,6 @@ def standardize_transcript(text: str) -> str:
     text = text.replace("”", '"')
     text = text.replace("‘", "'")
     text = text.replace("“", '"')
+    text = text.strip()
 
     return text
