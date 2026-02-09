@@ -5,7 +5,7 @@ A general-purpose evaluation framework for testing various ADT Press components.
 
 Usage:
     uv run adt-eval                                    # Run all tasks
-    uv run adt-eval tasks_to_run=[text_type]     # Run specific task
+    uv run adt-eval tasks_to_run=[text_type]      # Run specific task
     uv run adt-eval tasks_to_run=[text_type] eval.limit=50 # Limit to first 50
 
 Available tasks:
@@ -25,14 +25,13 @@ from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
 os.environ["DISABLE_MLFLOW_LITELLM_AUTOLOG"] = "1"  # Disable autologging
+from adt_eval.text_transcription import TextTranscriptionEvaluator
 from adt_eval.text_type import TextTypeEvaluator
 from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
 
 # Registry of available evaluators
-EVALUATORS = {
-    "text_type": TextTypeEvaluator,
-}
+EVALUATORS = {"text_type": TextTypeEvaluator, "text_transcription": TextTranscriptionEvaluator}
 
 
 def load_config() -> Dict[str, Any]:
@@ -76,7 +75,7 @@ def load_config() -> Dict[str, Any]:
 
 def get_tasks_to_run(config: Dict[str, Any]) -> List[str]:
     """Determine which tasks to run based on configuration."""
-    tasks_to_run = config.get("tasks", [])
+    tasks_to_run = config.get("tasks_to_run", [])
 
     # If empty list, run all available tasks
     if not tasks_to_run:
