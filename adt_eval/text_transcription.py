@@ -19,7 +19,8 @@ from mlflow.genai import scorer
 
 from adt_eval.mlflow_base import MLflowEvaluatorBase
 from adt_eval.utils.file import save_json
-from adt_eval.utils.text_trancsription.metrics import jaccard
+from adt_eval.utils.text_transcription.alignment import align_transcripts
+from adt_eval.utils.text_transcription.metrics import jaccard
 from adt_eval.utils.transcript_cleaner import standardize_transcript
 from adt_press.llm.text_extraction import get_page_text
 from adt_press.models.config import TextGroupType, TextType
@@ -204,47 +205,8 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
             gs_texts = output['gs_texts']
 
             ####### Align LLM transcript to Gold Standard transcript
-            matches = []
-            n_matched = 0
-            n_mismatched = 0
-
-            # Loop through GS texts, seeking matches in LLM texts
-            gs_texts_copy = gs_texts.copy()
-            for i in gs_texts_copy:
-                if i in llm_texts:
-                    matches.append({"expected": i, "actual": i})
-                    llm_texts.remove(i)
-                    gs_texts_copy.remove(i)
-                    n_matched+=1
-
-            #Remaing set after exact match full iteration
-            for i in gs_texts_copy:
-                # Find the best match among all llm_texts
-                best_match = None
-                best_similarity = 0.0
-                for j in llm_texts:
-                    intersection = set(j).intersection(set(i))
-                    union = set(j).union(set(i))
-                    similarity_score = len(intersection) / len(union)
-                    #print(f"similarity_score: {similarity_score:.3f}")
-                    
-                    if similarity_score > best_similarity:
-                        best_similarity = similarity_score
-                        best_match = j
-                
-                # Match only if best similarity is at least 50%
-                if best_similarity >= 0.5:
-                    matches.append({"expected": i, "actual": best_match})
-                    llm_texts.remove(best_match)
-                    n_matched += 1
-                else:
-                    matches.append({"expected": i, "actual": None})
-                    n_mismatched += 1
-
-            # Add unmatched llm texts
-            for i in llm_texts:
-                matches.append({"expected": None, "actual": i})
-                n_mismatched+=1
+            alignment = align_transcripts(llm_texts=llm_texts, gs_texts=gs_texts, threshold=0.5)
+            matches = alignment["matches"]
 
             #get metrics
             eval_metrics =[]
