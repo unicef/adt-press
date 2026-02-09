@@ -31,30 +31,24 @@ from adt_press.utils.languages import Language
 
 @scorer
 def jaccard_similarity_score(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
-    llm_texts = outputs['llm_texts']
-    gs_texts = outputs['gs_texts']
+    llm_texts = outputs["llm_texts"]
+    gs_texts = outputs["gs_texts"]
     jaccard_similarity = jaccard(llm_texts, gs_texts)
 
-    return Feedback(
-        name="Jaccard similarity score",
-        value=jaccard_similarity,
-        rationale=""
-    )
+    return Feedback(name="Jaccard similarity score", value=jaccard_similarity, rationale="")
+
 
 @scorer
 def bleu_score(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
-    llm_texts = outputs['llm_texts']
-    gs_texts = outputs['gs_texts']
+    llm_texts = outputs["llm_texts"]
+    gs_texts = outputs["gs_texts"]
 
     bleu = evaluate.load("bleu")
     results = bleu.compute(predictions=[" ".join(llm_texts)], references=[" ".join(gs_texts)])
-    bleu_score = results['bleu']
+    bleu_score = results["bleu"]
 
-    return Feedback(
-        name="BLEU score",
-        value=bleu_score,
-        rationale=""
-    )
+    return Feedback(name="BLEU score", value=bleu_score, rationale="")
+
 
 class TextTranscriptionEvaluator(MLflowEvaluatorBase):
     """Evaluator for text transcription accuracy."""
@@ -163,15 +157,15 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
             save_json(cache_path, page_texts.model_dump())
 
         page_texts = page_texts.model_dump()
-    
-        #get llm transcript lines
-        llm_texts = []
-        for group in page_texts['groups']:
-            for text_item in group['texts']:
-                llm_texts.append(standardize_transcript(text_item['text']))
 
-        truth = inputs['truth']
-        #get gold strandard trancsript lines
+        # get llm transcript lines
+        llm_texts = []
+        for group in page_texts["groups"]:
+            for text_item in group["texts"]:
+                llm_texts.append(standardize_transcript(text_item["text"]))
+
+        truth = inputs["truth"]
+        # get gold strandard trancsript lines
         tt = [i for i in truth if i["from_name"] == "page_text_all_corrected"][0]
         text_content = tt["value"]["text"][0]
         gs_texts = [standardize_transcript(t) for t in text_content.split("\n\n")]
@@ -200,35 +194,34 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
             output = row.get("response", {})
             assessments = row.get("assessments", {})
 
-            page_texts =output['page_texts']
-            llm_texts = output['llm_texts']
-            gs_texts = output['gs_texts']
+            page_texts = output["page_texts"]
+            llm_texts = output["llm_texts"]
+            gs_texts = output["gs_texts"]
 
             ####### Align LLM transcript to Gold Standard transcript
             alignment = align_transcripts(llm_texts=llm_texts, gs_texts=gs_texts, threshold=0.5)
             matches = alignment["matches"]
 
-            #get metrics
-            eval_metrics =[]
+            # get metrics
+            eval_metrics = []
             for assessment in assessments:
-                eval_metrics.append({
-                    "name": assessment['assessment_name'],
-                    "value": round(assessment['feedback']['value'], 2)
-                })
+                eval_metrics.append({"name": assessment["assessment_name"], "value": round(assessment["feedback"]["value"], 2)})
 
-            results.append({
-                "id": output.get("case_id"),
-                'step': index+1,
-                'page_number': output['page_number'],
-                'book_title': output['book_title'],
-                'page_image_path': output['page_image_path'],
-                'score': 0,
-                'page_texts': page_texts,
-                'matches': matches,
-                'metrics': eval_metrics,
-            })
+            results.append(
+                {
+                    "id": output.get("case_id"),
+                    "step": index + 1,
+                    "page_number": output["page_number"],
+                    "book_title": output["book_title"],
+                    "page_image_path": output["page_image_path"],
+                    "score": 0,
+                    "page_texts": page_texts,
+                    "matches": matches,
+                    "metrics": eval_metrics,
+                }
+            )
 
         metrics = {
-            "score": eval_metrics[0]['value'] ,
+            "score": eval_metrics[0]["value"],
         }
         return results, metrics

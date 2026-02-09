@@ -1,13 +1,13 @@
 def jaccard(list1, list2):
-    '''Calculate the Jaccard similarity between two lists.
-    
+    """Calculate the Jaccard similarity between two lists.
+
     Args:
         list1 (list): First list of items.
-        list2 (list): Second list of items. 
-        
+        list2 (list): Second list of items.
+
     Returns:
         float: Jaccard similarity score.
-    '''
+    """
 
     s1 = set(list1)
     s2 = set(list2)

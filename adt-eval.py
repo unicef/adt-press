@@ -31,10 +31,7 @@ from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
 
 # Registry of available evaluators
-EVALUATORS = {
-    "text_type": TextTypeEvaluator,
-    "text_transcription" : TextTranscriptionEvaluator
-}
+EVALUATORS = {"text_type": TextTypeEvaluator, "text_transcription": TextTranscriptionEvaluator}
 
 
 def load_config() -> Dict[str, Any]:
