@@ -8,30 +8,24 @@ Some notes on the scoring of matches:
     - For each line in the Gold Standard transcript, we seek a match and, if the line matches, one text type item is 'used up' from the list.
 """
 
-import ast
+import json
 import os
-import traceback
 from pathlib import Path
 from typing import Any, Dict, List
 
-from banks import Prompt
-from litellm import completion
+import evaluate
 from mlflow.entities import Feedback
 from mlflow.genai import scorer
 
 from adt_eval.mlflow_base import MLflowEvaluatorBase
-from adt_eval.utils.file import load_json, save_json
-from adt_eval.utils.transcript_cleaner import normalize_transcript, standardize_transcript
+from adt_eval.utils.file import save_json
+from adt_eval.utils.text_trancsription.metrics import jaccard
+from adt_eval.utils.transcript_cleaner import standardize_transcript
 from adt_press.llm.text_extraction import get_page_text
-from adt_press.utils.file import cached_read_text_file
 from adt_press.models.config import TextGroupType, TextType
 from adt_press.models.pdf import Page
 from adt_press.models.text import PageTextGroups, Text, TextGroup
 from adt_press.utils.languages import Language
-from adt_eval.utils.text_trancsription.metrics import jaccard
-import evaluate
-
-
 
 
 @scorer
@@ -201,9 +195,7 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
     def get_report_results_and_metrics(self, eval_results):
         result_df = eval_results.result_df.copy()
         results = []
-        combined_is_translation_acceptable_results =[]
         for index, row in result_df.iterrows():
-            inputs = row.get("response", {})
             output = row.get("response", {})
             assessments = row.get("assessments", {})
 
