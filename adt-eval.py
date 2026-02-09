@@ -5,7 +5,7 @@ A general-purpose evaluation framework for testing various ADT Press components.
 
 Usage:
     uv run adt-eval                                    # Run all tasks
-    uv run adt-eval tasks_to_run=[text_type]     # Run specific task
+    uv run adt-eval tasks_to_run=[text_type]      # Run specific task
     uv run adt-eval tasks_to_run=[text_type] eval.limit=50 # Limit to first 50
 
 Available tasks:
@@ -78,7 +78,7 @@ def load_config() -> Dict[str, Any]:
 
 def get_tasks_to_run(config: Dict[str, Any]) -> List[str]:
     """Determine which tasks to run based on configuration."""
-    tasks_to_run = config.get("tasks", [])
+    tasks_to_run = config.get("tasks_to_run", [])
 
     # If empty list, run all available tasks
     if not tasks_to_run:

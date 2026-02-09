@@ -29,6 +29,8 @@ from adt_press.models.pdf import Page
 from adt_press.models.text import PageTextGroups, Text, TextGroup
 from adt_press.utils.languages import Language
 from adt_eval.utils.text_trancsription.metrics import jaccard
+import evaluate
+
 
 
 
@@ -44,6 +46,20 @@ def jaccard_similarity_score(inputs: Dict[str, Any], outputs: Dict[str, Any]) ->
         rationale=""
     )
 
+@scorer
+def bleu_score(inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Feedback:
+    llm_texts = outputs['llm_texts']
+    gs_texts = outputs['gs_texts']
+
+    bleu = evaluate.load("bleu")
+    results = bleu.compute(predictions=[" ".join(llm_texts)], references=[" ".join(gs_texts)])
+    bleu_score = results['bleu']
+
+    return Feedback(
+        name="BLEU score",
+        value=bleu_score,
+        rationale=""
+    )
 
 class TextTranscriptionEvaluator(MLflowEvaluatorBase):
     """Evaluator for text transcription accuracy."""
@@ -151,7 +167,6 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
             # save to cache
             save_json(cache_path, page_texts.model_dump())
 
-
         page_texts = page_texts.model_dump()
     
         #get llm transcript lines
@@ -181,13 +196,13 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
         }
 
     def get_scorers(self) -> List[Any]:
-        return [jaccard_similarity_score]
+        return [jaccard_similarity_score, bleu_score]
 
     def get_report_results_and_metrics(self, eval_results):
         result_df = eval_results.result_df.copy()
         results = []
         combined_is_translation_acceptable_results =[]
-        for _, row in result_df.iterrows():
+        for index, row in result_df.iterrows():
             inputs = row.get("response", {})
             output = row.get("response", {})
             assessments = row.get("assessments", {})
@@ -249,7 +264,7 @@ class TextTranscriptionEvaluator(MLflowEvaluatorBase):
 
             results.append({
                 "id": output.get("case_id"),
-                'step': 1,
+                'step': index+1,
                 'page_number': output['page_number'],
                 'book_title': output['book_title'],
                 'page_image_path': output['page_image_path'],

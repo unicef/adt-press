@@ -4,6 +4,9 @@ label: eval
 # input language defaults to English
 input_language: en
 
+# Tasks to run (empty list means run all available tasks)
+tasks_to_run: []
+
 # ADT Evaluation Configuration
 eval:
 
@@ -12,9 +15,6 @@ eval:
 
   # our rate limit (per minute) on calls to the LLM
   rate_limit: 300
-
-  # Tasks to run (empty list means run all available tasks)
-  tasks: []
 
   # MLflow evaluation settings
   mlflow:
@@ -31,7 +31,7 @@ eval:
       label_studio_project_name: "A1: Text Extraction"
       model: ${default_model}
       prompt: ${prompts.text_extraction}
-      report_template_path: templates/eval/text_transcript_report.html
+      report_template_path: templates/eval/text_transcription_report.html
 
   # Whether to use cached log files instead of calling the LLM (useful for debugging)
   use_cached_llm_results: False
