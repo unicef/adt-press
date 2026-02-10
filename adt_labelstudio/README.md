@@ -64,4 +64,5 @@ Thus the basic workflow is as follows:
 5. Finally, we load the list of tasks to LabelStudio and also download the JSON to disk for inspection.
 	
 ## ToDo:
-- Add task instructions for grouping
+- Add task instructions for `A3: Group Type`
+- Currently, the tasks `A0` and `A3` use the updated page numbering convention, the updated page images in Azure, and have book title in their fields. However the other tasks need to be updated.

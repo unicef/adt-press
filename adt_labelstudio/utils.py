@@ -33,7 +33,8 @@ def get_project_annotations(ls_client, project_name: str) -> pd.DataFrame:
     ls_data.sort_values(['id',"updated_at"], ascending=False, inplace=True)
     ls_data.drop_duplicates(subset=['id'], keep='first', inplace=True)
 
-    ### ADD A LINE TO KEEP ONLY ANNOTATED TASKS?
+    ### ADD A LINE TO KEEP ONLY ANNOTATED TASKS? 
+    ## --> no because we wouldn't want to duplicate ones that have been loaded already, even if unannotated
 
     ls_data.set_index('id', inplace=True)
 
