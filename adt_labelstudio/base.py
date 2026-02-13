@@ -15,13 +15,13 @@ class BaseTask(ABC):
         with open(f) as json_file:
             llm_log = json.load(json_file)
         
-        book_name = llm_log['inputs']['page']['book_name']
+        book_id = llm_log['inputs']['page']['book_id']
         page_number = llm_log['inputs']['page']['page_number']
 
-        return llm_log, book_name, page_number
+        return llm_log, book_id, page_number
     
     @abstractmethod
-    def get_single_annotation(self, gs_annotations: pd.DataFrame, book_name, page_id) -> Dict:
+    def get_single_annotation(self, gs_annotations: pd.DataFrame, book_id: str, page_id: int) -> Dict:
         '''Retrieve a single annotation from a dataframe of annotations'''
         raise NotImplementedError
 

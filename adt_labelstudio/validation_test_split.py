@@ -6,13 +6,16 @@ from adt_eval.utils.transcript_cleaner import standardize_transcript, normalize_
 
 class ValidationTestSplitTask(BaseTask):
 
-    def get_single_annotation(self, gs_annotations:pd.DataFrame, book_title:str, page_id:int) -> Dict:
-        gs_annotation = gs_annotations[(gs_annotations['book_name'] == book_title) & (gs_annotations['page_id'] == page_id)]
+    def get_single_annotation(self, gs_annotations:pd.DataFrame, book_id:str, page_id:int) -> Dict:
+        '''Retrieve a single annotation from a dataframe of annotations.
+        In this case lookup is done by book ID and page ID as this defines the annotation task.'''
+        
+        gs_annotation = gs_annotations[(gs_annotations['book_id'] == book_id) & (gs_annotations['page_id'] == page_id)]
  
         if gs_annotation.shape[0] == 0:
-            raise ValueError(f"No annotation found for book '{book_title}', page ID {page_id}")
+            raise ValueError(f"No annotation found for book '{book_id}', page ID {page_id}")
         if gs_annotation.shape[0] > 1:
-            raise ValueError(f"Multiple annotations found for book '{book_title}', page ID {page_id}")
+            raise ValueError(f"Multiple annotations found for book '{book_id}', page ID {page_id}")
         
         return gs_annotation.iloc[0].to_dict()
     

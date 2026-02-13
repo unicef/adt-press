@@ -8,16 +8,16 @@ class TextTypeTask(BaseTask):
     # Read input from log
     # Pass to next task
 
-    def get_single_annotation(self, gs_annotations:pd.DataFrame, book_name:str, page_id:int) -> Dict:
+    def get_single_annotation(self, gs_annotations:pd.DataFrame, book_id:str, page_id:int) -> Dict:
         '''Retrieve a single annotation from a dataframe of annotations.
-        In this case lookup is done by book name and page ID as this defines the annotation task.'''
+        In this case lookup is done by book ID and page ID as this defines the annotation task.'''
 
-        gs_annotation = gs_annotations[(gs_annotations['book_name'] == book_name) & (gs_annotations['page_id'] == page_id)]
+        gs_annotation = gs_annotations[(gs_annotations['book_id'] == book_id) & (gs_annotations['page_id'] == page_id)]
     
         if gs_annotation.shape[0] == 0:
-            raise ValueError(f"No annotation found for book '{book_name}', page ID {page_id}")
+            raise ValueError(f"No annotation found for book '{book_id}', page ID {page_id}")
         if gs_annotation.shape[0] > 1:
-            raise ValueError(f"Multiple annotations found for book '{book_name}', page ID {page_id}")
+            raise ValueError(f"Multiple annotations found for book '{book_id}', page ID {page_id}")
         
         return gs_annotation.iloc[0].to_dict()
 
@@ -27,9 +27,9 @@ class TextTypeTask(BaseTask):
         text = "\n\n".join([i.strip() for i in gs_annotation['page_text_all_corrected'].split("\n\n")])
 
         data = {
-                    "book_id": gs_annotation['book_name'],
+                    "book_id": gs_annotation['book_id'],
                     "page_id": gs_annotation['page_id'],
-                    "page_image": f"azure-blob://adt-pipeline/evaluation/gold_standard/pages/{gs_annotation['book_name']}__page_{gs_annotation['page_id']+1}.png",
+                    "page_image": f"azure-blob://adt-pipeline/evaluation/gold_standard/pages/{gs_annotation['book_id']}__page_{gs_annotation['page_id']+1}.png",
                     "page_text_all": text,
                 }
         
@@ -40,12 +40,12 @@ class TextTypeTask(BaseTask):
         ''' Converts json log from an LLM run to a dataframe that can be used'''
 
         # Construct dataframe
-        llm_data = pd.DataFrame(columns=["text_id", "book_name", "page_number", "page_id", "reasoning", "group_id", "group_type", "llm_text", "text_type", "is_pruned"])
+        llm_data = pd.DataFrame(columns=["text_id", "book_id", "page_number", "page_id", "reasoning", "group_id", "group_type", "llm_text", "text_type", "is_pruned"])
 
         ##############
         # Add columns from input data
         page_id = llm_log['inputs']['page']['page_id']
-        book_name = llm_log['inputs']['page']['book_name']
+        book_id = llm_log['inputs']['page']['book_id']
         page_number = llm_log['inputs']['page']['page_number']
 
         ##############
@@ -64,7 +64,7 @@ class TextTypeTask(BaseTask):
                 text_type = t['text_type']
                 is_pruned = t['is_pruned']
                     
-                llm_data.loc[text_id] = [text_id, book_name, page_number, page_id, reasoning, group_id, group_type, text, text_type, is_pruned]
+                llm_data.loc[text_id] = [text_id, book_id, page_number, page_id, reasoning, group_id, group_type, text, text_type, is_pruned]
 
         return llm_data
     

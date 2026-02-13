@@ -38,4 +38,6 @@ def get_project_annotations(ls_client, project_name: str) -> pd.DataFrame:
 
     ls_data.set_index('id', inplace=True)
 
+    ls_data.rename(columns={'book_name': 'book_id'}, inplace=True)
+
     return ls_data
