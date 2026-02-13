@@ -6,13 +6,13 @@ This folder describes how to add projects and tasks to LabelStudio for human ann
 
 ID | Name | Description
 ---|---|---
-AO | Validation-test split |
+AO | Validation-test split | Assign each page to a train-test split and flag pages that should be excluded from eval
 A1 | Text transcription | Ensure all text properly extracted from PDF
 A2 | Text type | Assign each line of text to a `text_type`
 A3 | Group type | Assign lines of text to groups with `group_type`
 A4 | Section type | Assign lines of text to sections with `section_type`
-A5 | ELI5 | Explain a paragraph like I'm 5.
-A6 | Easy Read | Convert a paragraph of text to easy read style.
+A5 | ELI5 | Explain text like I'm 5
+A6 | Easy Read | Convert text to easy read style
 B2 | Image relevance | Determine if an image is relevant or not
 B4 | Image captioning | Write a caption for the image
 
@@ -20,9 +20,9 @@ B1 was reserved for image extraction and B3 was reserved for image cropping. How
 
 ## Defining LabelStudio project structure
 
-`task_instructions` refer the instructions that pop up to annotators when they first open a task in the project. They align with the prompts that are given to the LLM in the pipeline (as the annotator is doing the same task we are assigning to the LLM). In the GUI for each LabelStudio project, they should be entered under `Settings > Annotation > Labeling Instructions`.
+- `task_instructions` refer the instructions that pop up to annotators when they first open a task in the project. They align with the prompts that are given to the LLM in the pipeline (as the annotator is doing the same task we are assigning to the LLM). In the GUI for each LabelStudio project, they should be entered under `Settings > Annotation > Labeling Instructions`.
 
-`task_definitions` refers to the HTML code that defines the labeling interface for the tasks in a project. In the GUI for each LabelStudio project, they should be entered under `Settings > Labeling Interface > Code`.
+- `task_definitions` refers to the HTML code that defines the labeling interface for the tasks in a project. In the GUI for each LabelStudio project, they should be entered under `Settings > Labeling Interface > Code`.
 
 To get page images to render in LabelStudio you must set up cloud storage. The steps are as follows.
 
@@ -43,7 +43,7 @@ LabelStudio tasks are passed to projects as a list of dictionaries, with one dic
   - Often it contains fields that are used in rendering the task (for example, for the `text_type` task, it would include the text that needs to be categorized by type)
   - It can also include additional metatada for the task (such as `book_id` or `page_id`).
 - `predictions`: These are pre-annotations that can be loaded to help speed up the work of the annotator. In our case, we use the LLM to predict the annotation, and have the user correct the candidate annotation.
-  - These predictions have a field called `value` that defines what the predicted annotation is. Depending on the task, this must be structured in a specific way.
+  - These predictions have a field called `value` that defines what the predicted annotation is. Depending on the task, this must be structured in a specific way which is described in the LabelStudio docs.
   - The `from_name` has the name of the field where the annotation will be stored.
   - The `to_name` is the field with the content being annotated.
   - The `type` field refers to the task type.
@@ -51,18 +51,22 @@ LabelStudio tasks are passed to projects as a list of dictionaries, with one dic
 Tasks can be loaded to LabelStudio via the Python API, or uploaded in the Labelstudio GUI as a JSON file.
 
 ## Code structure
-The notebooks `add_to_ls_...` implement the workflow for pushing tasks from the LLM logs to LabelStudio. They rely on a `BaseTask` class implemented in `base.py` and then task-specific subclasses (`GroupTypeTask`, `TextTypeTask`, etc.) which inherit from it. There is also a `utils.py` file with LabelStudio specific functions.
+The notebooks `add_to_ls_...` implement the workflow for pushing tasks from the LLM logs to LabelStudio. They rely on a `BaseTask` class implemented in `base.py` and then task-specific subclasses (`GroupTypeTask`, `TextTypeTask`, etc.) which inherit from it in `group_type.py`, `text_type.py`, etc. There is also a `utils.py` file with LabelStudio specific functions.
 
 **Big picture:** Some tasks (the first in their respective workflow -- e.g. `validation_test_split`, `text_transcription`, `image_relevance`) pull directly from the LLM log output _only_ to create the new task. However tasks at later steps in the workflow also need to pull from Gold Standard, human-created annotations completed in the _previous_ task. For example, the `text_type` task needs to draw on the Gold Standard, human-corrected _text transcripts_, and create candidate annotations for text type from the LLM log output. Thus the Gold Standard transcripts need to be matched with the candidate annotations from the LLM to define the task.
 
 Thus the basic workflow is as follows:
 
-1. We define the source project for Gold Standard annotations, and the target project we're trying to annotate. 
+1. We define the source project for Gold Standard annotations (where applicable), and the target project we're trying to annotate. 
 2. We get existing annotations for the target project and test if the task we're trying to create already exists in LabelStudio. If so, we don't create the task again (so as not to overwrite annotations that have already been entered).
 3. If not, we get the Gold Standard annotations (where applicable) as well as the LLM logs, and merge the two together.
 4. Then, we structure the data and predictions needed to populate the task dictionary.
-5. Finally, we load the list of tasks to LabelStudio and also download the JSON to disk for inspection.
+5. Finally, we load the list of tasks to LabelStudio and also download the JSON to disk for inspection in the folder `tasks_to_upload`.
 	
 ## ToDo:
 - Add task instructions for `A3: Group Type`
-- Currently, the tasks `A0` and `A3` use the updated page numbering convention, the updated page images in Azure, and have book title in their fields. However the other tasks need to be updated.
+- Currently, the tasks `A0` and `A3` use the updated page numbering convention, the updated page image paths in Azure, and have `book_id` in their fields (currently stored as `book_name` in the LabelStudio text extraction task). 
+  - However the other tasks need to be updated for page numbering, the updated page image paths, and the inclusion of `book_id` (currently referred to as `book_name`). This would need to be done by downloading all data/predictions/annotations associated with the task, renaming/restructuring the JSON contents as appropriate, and then uploading this to a "new" task.
+  - Also, we may need to add `book_title` if it is desirable that this field be included with every task.
+  - We discussed initially including the validation-test `split` variable with each task, but this feels redundant -- I suggest instead pulling this from the `A0: Validation Test Split` project and merging it on to any other project-specific dataframe, so that if we decide to change the splits at some point using this project, it will percolate through to all other projects.
+- Also, the labelstudio `A1: Text extraction` task should be renamed `A1: Text transcription` for clarity, since technically the text extraction prompt covers 3 tasks in one: `transcription`, `text_type`, and `group_type`.
