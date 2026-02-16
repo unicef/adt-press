@@ -27,6 +27,19 @@ eval:
       model: ${default_model}
       prompt: ${prompts.text_extraction}
       report_template_path: templates/eval/text_type_report.html
-
+      experiments_config:
+        experiment_name: "text_type"
+    text_translation:
+      label_studio_project_name: "A2: Text Type"
+      model: ${default_model}
+      prompt: ${prompts.text_translation}
+      report_template_path: templates/eval/text_translation_report.html
+      experiments_config:
+        experiment_name: "text-translation-dev-01"
+      scorers:
+        translation_acceptability:
+          llm_as_judge_model: gpt-5
+          prompt_path: prompts/eval/text_translation_eval.jinja2
+  
   # Whether to use cached log files instead of calling the LLM (useful for debugging)
   use_cached_llm_results: False

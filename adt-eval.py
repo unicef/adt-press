@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
 os.environ["DISABLE_MLFLOW_LITELLM_AUTOLOG"] = "1"  # Disable autologging
+from adt_eval.text_translation import TextTranslationEvaluator
 from adt_eval.text_type import TextTypeEvaluator
 from adt_press.models.config import TemplateConfig
 from adt_press.utils.html import render_template
@@ -32,6 +33,7 @@ from adt_press.utils.html import render_template
 # Registry of available evaluators
 EVALUATORS = {
     "text_type": TextTypeEvaluator,
+    "text_translation": TextTranslationEvaluator,
 }
 
 

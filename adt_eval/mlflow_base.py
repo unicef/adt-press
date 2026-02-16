@@ -89,10 +89,17 @@ class MLflowEvaluatorBase(BaseEvaluator):
         eval_cfg = self.global_config.get("eval", {})
         return eval_cfg.get("mlflow", {}) if isinstance(eval_cfg, dict) else {}
 
+    def _get_experiment_name(self) -> Optional[str]:
+        task_cfg = self.task_config.get("experiments_config", {})
+        task_experiment = task_cfg.get("experiment_name") if isinstance(task_cfg, dict) else None
+        if task_experiment:
+            return task_experiment
+        return self._get_mlflow_config().get("experiment_name")
+
     def configure_mlflow(self) -> None:
         mlflow_cfg = self._get_mlflow_config()
         tracking_uri = mlflow_cfg.get("tracking_uri")
-        experiment_name = mlflow_cfg.get("experiment_name")
+        experiment_name = self._get_experiment_name()
 
         mlflow.autolog(disable=True)
 
@@ -149,6 +156,7 @@ class MLflowEvaluatorBase(BaseEvaluator):
     async def run(self):
         """Main evaluation workflow with MLflow run tracking."""
         self.configure_mlflow()
+
         run_name = self.get_run_name()
         nested = mlflow.active_run() is not None
         self._loop_runner = AsyncLoopRunner()
@@ -171,6 +179,7 @@ class MLflowEvaluatorBase(BaseEvaluator):
                 if results and metrics:
                     self.generate_report(results, metrics)
                 return results, metrics
+
         finally:
             self._loop_runner.close()
             self._loop_runner = None

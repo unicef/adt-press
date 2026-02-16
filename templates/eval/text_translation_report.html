@@ -1,0 +1,51 @@
+{% extends "eval/base.html" %}
+{% block title %}Translation Evaluation Report <span class="float-right ml-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (score * 100) | round | int }}%</span>{% endblock %}
+
+{% block content %}
+{% for result in results %}
+    <div class="bg-white rounded border mb-6 overflow-hidden">
+        <!-- Page ID header -->
+        <div class="bg-gray-600 text-white px-4 py-3 font-bold text-xl flex justify-between items-center">
+            <span>Eval # {{result.step}} ({{ result.book_title }}, Page {{ result.page_number }})</span>
+            <div class="flex gap-2">
+                <span class="px-3 py-1 bg-gray-700 text-white text-sm font-medium rounded-full"><a href="{{ result.label_studio_url }}" target="_blank">{{ result.id }}</a></span>
+                <span class="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">{{ (result.score * 100) | round | int}}%</span>
+            </div>
+        </div>
+        
+        <div class="flex gap-4 mb-6 pt-4 px-4">
+            <div class="flex-shrink-0">
+                <a href="{{ result.page_image_path }}" target="_blank" class="block">
+                    <img src="{{ result.page_image_path }}" class="h-auto max-h-[150px] border rounded shadow-sm hover:shadow-md transition-shadow" alt="Page {{ result.page_id }}">
+                </a>
+            </div>
+        </div>
+
+        <!-- Results header -->
+        <div class="bg-gray-700 text-white px-4 py-2 font-medium">
+            <div class="grid gap-4 px-2" style="grid-template-columns: 11fr 11fr 2fr;">
+                <div>Original Text</div>
+                <div>Translated Text</div>
+                <div class="px-2 text-center text-sm">Is Acceptable?</div>
+            </div>
+        </div>
+        
+        {% for translation in result.translations %}
+        <div class="grid gap-4 px-2 hover:bg-gray-50 items-center mx-4" style="grid-template-columns: 11fr 11fr 2fr;">
+            <div class="text-sm text-gray-700 py-1">{{ translation.base_text }}</div>
+            <div class="text-sm text-gray-700 py-1">{{ translation.translation }}</div>
+            <div class="text-center" title="{{ translation.rationale }}">
+                {% if translation.is_translation_acceptable %}
+                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">YES</span>
+                {% else %}
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">NO</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Reasoning section -->
+    </div>
+{% endfor %}
+
+{% endblock %}
