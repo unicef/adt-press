@@ -1,0 +1,10 @@
+Given the textbook page shown, transcribe all text on the page.
+<br><br> 
+IMPORTANT:
+<ul>
+  <li>Extract all text on the page that should appear in the ADT. You may ignore page numbers.</li>
+  <li>Break up the text into individual logical phrases or sentences of text. Separate these phrases/sentences by a blank line. Do not give an entire paragraph as a single entry.</li>
+  <li>Arrange the entries in the order that you think they should be logically read by a person.</li>
+  <li>Math must be extracted into a separate array. This entry must only be the math expression, no text. Math equations should be transcribed using LaTeX expressions with commonly used special characters. Do not include any rendering characters like \( \) OR \[ \] OR $$.</li>
+  <li>If there is no text on the page, submit a blank annotation.</li>
+</ul>

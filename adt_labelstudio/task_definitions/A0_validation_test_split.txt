@@ -1,0 +1,46 @@
+<View>
+
+  <Style>
+    .italictext {
+      color:  #D3D3D3;
+      font-style: italic; 
+    } 
+  </Style>
+  
+  <View style="display: flex;">
+     <View style="width: 29%; margin-right: 1.99%">
+        <Header value="Textbook page for reference:"/>
+        <Image name="page_image" 
+               value="$page_image"/>
+     </View>
+  
+     <View style="width: 59%">
+        <Text name="split-instructions" value="To which split does this example belong?" />
+        <Choices name="split" toName="page_image" choice="single-radio" layout="inline">
+          <Choice alias="Validation"  value="Validation"/>        
+          <Choice alias="Test" value="Test"/>  
+          <Choice alias="Fewshot" value="Fewshot"/>
+        </Choices>
+  
+        <Text name="include-instructions" value="Include in automated scoring of the pipeline?" />
+        <View className="italictext">
+          <Text name="include-details" value="(This allows us to temporarily ignore hard cases.)" />
+        </View>
+        <Choices name="include" toName="page_image" choice="single-radio" layout="inline">
+          <Choice value="Yes" />
+          <Choice value="No" />
+        </Choices>
+       
+       <Text name="notes-instructions" value="Additional notes" />
+       <TextArea name="notes"
+          toName="page_image"
+          transcription="true"
+          showSubmitButton="false"
+          placeholder="Notes or comments to flag issues about this page."
+          maxSubmissions="1"
+          editable="true"
+          required="false"
+          rows="1"/>
+    </View>
+ </View>
+</View>

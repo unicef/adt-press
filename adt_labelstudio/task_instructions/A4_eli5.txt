@@ -1,0 +1,9 @@
+You are provided with a paragraph of text from the textbook page shown, which represents one section of that textbook. 
+Simplify the section text into an ELI5 (Explain like I'm five) explanation for young schoolchildren so they can understand its contents.
+<br><br>
+IMPORTANT:
+<ul>
+<li>You should try to use relatable analogies or metaphors to make the information easier to understand.</li>
+<li>Break down complex ideas into simpler parts but without oversimplification.</li>
+<li>However, you must retain key words and concepts from the original text that are pedagogically important for them to learn.</li>
+</ul>

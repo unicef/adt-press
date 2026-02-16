@@ -136,6 +136,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
                 f"text_extraction_page_{tc['id']}.png",
             )
 
+            print(test)
             records.append(
                 {
                     "inputs": {
@@ -143,7 +144,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
                         "step": step,
                         "page_text": test["page_text_all"],
                         "page_image_path": str(page_image_path),
-                        "book_title": test["book_name"],
+                        "book_id": test["book_name"], # Correct this later once LS dataset is fixed
                         "page_number": test["page_id"],
                         "label_studio_project": tc["project"],
                         "truth": truth,
@@ -159,6 +160,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
 
         page = Page(
             page_id=f"p{inputs['page_number']}",
+            book_id=inputs["book_id"],
             page_number=inputs["page_number"],
             text=page_text,
             page_image_path=str(page_image_path),
@@ -189,7 +191,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
         return {
             "case_id": inputs["case_id"],
             "step": inputs["step"],
-            "book_title": inputs["book_title"],
+            "book_id": inputs["book_id"],
             "page_number": inputs["page_number"],
             "label_studio_url": (
                 f"https://{self.label_studio_config.host}/projects/{inputs['label_studio_project']}/data?task={inputs['case_id']}"
@@ -216,7 +218,7 @@ class TextTypeEvaluator(MLflowEvaluatorBase):
             results.append(
                 {
                     "id": outputs.get("case_id"),
-                    "book_title": outputs.get("book_title"),
+                    "book_id": outputs.get("book_id"),
                     "page_number": outputs.get("page_number"),
                     "label_studio_url": outputs.get("label_studio_url"),
                     "page_text": outputs.get("page_text"),

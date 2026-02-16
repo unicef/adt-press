@@ -1,0 +1,2 @@
+You are provided with an image extracted from the textbook page shown. 
+Please provide a caption for the image for the visually impaired, in the language of the textbook.

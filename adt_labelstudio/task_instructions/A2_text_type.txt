@@ -1,0 +1,25 @@
+Given the textbook page shown and the corresponding transcription, label each phrase/sentence of text with its type. 
+<br><br> "Type" must  be one of:
+<ul>
+    <li> <b>"book_title"</b> For the title of the book. There can only be one book title for the entire book.</li>
+    <li> <b>"book_subtitle"</b> For the subtitle of the book. There can only be one subtitle for the entire book.</li>
+    <li> <b>"book_author"</b> For the author of the book.</li>
+    <li> <b>"chapter_title"</b> For a chapter title that seems to be the title of a entirely new topic with sections within it. </li>
+    <li> <b>"section_heading"</b> For section headings under a chapter. </li>
+    <li> <b>"section_text"</b> For the main body of text within the section heading.</li>
+    <li> <b>"boxed_text"</b> For text that stands alone from the regular material and is surrounded in a colored box.</li>
+    <li> <b>"hint"</b> For hints that are provided to help the reader answer questions or solve problems.</li>
+    <li> <b>"instruction_text"</b> For instructions that direct the reader to do something or complete an activity.</li>
+    <li> <b>"activity_number"</b> For text that specifically denotes numbers (alphanumeric) that are used to organize or label different activities, questions, or sections.</li>
+    <li> <b>"activity_option"</b> For text that provides options for an activity like a multiple choice or matching activity.</li>
+    <li> <b>"fill_in_the_blank"</b> For text that includes blanks that the reader must fill in for a fill in the blank activity.</li>
+    <li> <b>"image_label"</b> For text that definitely accompanies an image to augment it as a label.</li>
+    <li> <b>"image_caption"</b> For captions that only describe the image.</li>
+    <li> <b>"image_overlay"</b> For text that is overlaid on an image at a specific location.</li>
+    <li> <b>"math"</b> For math.</li>
+    <li> <b>"standalone_text"</b> For text that does not fall within a section.</li>
+    <li> <b>"page_number"</b> For text that indicates the page number of the page.</li>
+    <li> <b>"activity_input_placeholder_text"</b> For any text that will be used as a placeholder in an input field for a fill in the blank activity, e.g. "replace the word".</li>
+    <li> <b>"footer_text"</b> For text that appears in the footer of the page.</li>
+    <li> <b>"other"</b> For any other text that does not fit the above categories.</li>
+</ul>

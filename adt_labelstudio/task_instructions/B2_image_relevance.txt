@@ -1,0 +1,19 @@
+You are provided with an image extracted from the textbook page shown. Identify whether the image is meaningful or not. A meaningful image is detailed, contains distinct and complete elements or characters, and appears to have meaningful content.
+<br><br>
+Not meaningful:
+<ul>
+    <li>Awkwardly cropped with no meaningful content</li>
+    <li>Primarily consists of background shadows</li>
+    <li>Only shows small decorative elements</li>
+    <li>Is purely decorative with no educational meaning</li>
+    <li>Is just an empty table that is meant to be in the background</li>
+    <li>Is just a word shadow or word, not attached to any other image or diagram</li>
+    <li>Is just a bunch of dense text not attached to any other image or diagram</li>
+</ul>
+<br><br>
+Meaningful:
+<ul>
+    <li>A mathematical diagram with equations and symbols</li>
+    <li>A whiteboard drawing image</li>
+    <li>A beautiful and complex decorative element meant to convey some meaning or concept</li>
+</ul>
