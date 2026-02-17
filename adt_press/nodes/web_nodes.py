@@ -237,9 +237,9 @@ def web_pages(
                 if not existing_page:
                     raise ValueError(f"Cannot edit section {section_id} - not found in cached pages")
 
-                edit_instruction = edits_to_apply[section_id]
+                edit_image_path = edits_to_apply[section_id]
                 log.info(
-                    "editing_web_page", section_id=section_id, instruction=edit_instruction, original_strategy=existing_page.render_strategy
+                    "editing_web_page", section_id=section_id, image_path=edit_image_path, original_strategy=existing_page.render_strategy
                 )
 
                 # Edit with LLM (works for any HTML content regardless of how it was originally generated)
@@ -247,7 +247,7 @@ def web_pages(
                     edit_web_page_with_llm(
                         section_id=section_id,
                         existing_page=existing_page,
-                        edit_instruction=edit_instruction,
+                        edit_image_path=edit_image_path,
                         section=section,
                         config=web_edit_prompt_config,
                         language=plate_language,

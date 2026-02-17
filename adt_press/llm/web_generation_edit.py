@@ -51,18 +51,18 @@ class WebEditResponse(CleanTextBaseModel):
 async def edit_web_page_with_llm(
     section_id: SectionID,
     existing_page: WebPage,
-    edit_instruction: str,
+    edit_image_path: str,
     section: PlateSection,
     config: HTMLPromptConfig,
     language: Language,
 ) -> WebPage:
     """
-    Edit an existing web page using LLM based on user instruction.
+    Edit an existing web page using LLM based on annotated image.
 
     Args:
         section_id: The section ID being edited
         existing_page: The current WebPage object
-        edit_instruction: User's instruction for how to modify the page (e.g., "make the title bigger")
+        edit_image_path: Path to annotated screenshot with red boxes and white text showing desired edits
         section: The PlateSection metadata
         config: Configuration for the LLM call
         language: Language for the page
@@ -75,7 +75,7 @@ async def edit_web_page_with_llm(
     context = dict(
         section_id=section_id,
         existing_html=existing_page.content,
-        edit_instruction=edit_instruction,
+        edit_image_path=edit_image_path,
         section_type=section.section_type,
         page_number=section.page_number,
         language=language.name,
@@ -110,7 +110,7 @@ async def edit_web_page_with_llm(
         image_ids=existing_page.image_ids,
         generated_texts=existing_page.generated_texts,
         content=response.html,
-        reasoning=f"EDIT: {edit_instruction} | {response.reasoning}",
+        reasoning=f"EDIT: {edit_image_path} | {response.reasoning}",
         render_strategy=existing_page.render_strategy,
         activity_answers=existing_page.activity_answers,
         activity_reasoning=existing_page.activity_reasoning,

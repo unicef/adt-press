@@ -123,7 +123,7 @@ class PipelineTest(unittest.TestCase):
 
             # now rerun the pipeline with a regeneration and an edit
             test_config["edit_sections"] = {}
-            test_config["edit_sections"]["sec_p1_s0"] = "Remove the image from this page"
+            test_config["edit_sections"]["sec_p1_s0"] = "tests/assets/edited_sec_p1_s0.jpg"
 
             test_config["regenerate_sections"] = ["sec_p2_s0"]
             config = DictConfig(OmegaConf.merge(file_config, test_config))

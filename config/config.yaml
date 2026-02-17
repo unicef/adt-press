@@ -47,9 +47,9 @@ custom_plate_path: ""
 # Usage: uv run python adt-press.py label=momo regenerate_sections=[sec_page_5_s0,sec_page_7_s1]
 regenerate_sections: []
 
-# REGENERATION/EDITING: Edit existing pages with LLM-based instructions
-# Format: dict mapping section_id to edit instruction
-# Usage: uv run python adt-press.py label=momo "edit_sections={sec_page_5_s0:'make the title bigger'}"
+# REGENERATION/EDITING: Edit existing pages with vision-based annotations
+# Format: dict mapping section_id to annotated image path (red boxes with white text showing edits)
+# Usage: uv run python adt-press.py label=momo "edit_sections.sec_page_5_s0='/path/to/annotated.png'"
 edit_sections: {}
 
 # the default model used for all prompts, unless overridden in a specific prompt config
