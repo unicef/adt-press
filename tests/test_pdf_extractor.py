@@ -14,8 +14,9 @@ sys.path.insert(0, str(pdf_extractor_path))
 
 from pdf_extractor import extract_pages_from_pdf  # type: ignore[import-not-found]
 
-# Test PDF path
+# Test PDF paths
 TEST_PDF = Path(__file__).parent.parent / "assets" / "raven.pdf"
+CHEF_PDF = Path(__file__).parent.parent / "assets" / "chef.pdf"
 
 
 @pytest.mark.skipif(not TEST_PDF.exists(), reason="Test PDF (raven.pdf) not available")
@@ -273,3 +274,53 @@ class TestPDFExtractionIntegration:
         total_pages = result.extract_metadata.total_pages
         assert len(result.pages) == total_pages
         assert result.extract_metadata.end_page == total_pages
+
+    @pytest.mark.skipif(not CHEF_PDF.exists(), reason="Test PDF (chef.pdf) not available")
+    def test_chef_pdf_image_extraction(self, tmp_path):
+        """Test extraction of raster and vector images from chef.pdf.
+
+        Expected:
+        - Page 1: 1 raster image
+        - Page 2: 2 vector images
+        """
+        output_dir = str(tmp_path / "chef")
+
+        result = extract_pages_from_pdf(
+            output_dir=output_dir,
+            pdf_path=str(CHEF_PDF),
+            start_page=1,
+            end_page=2,
+            spread_mode=False,
+            quiet=True,
+        )
+
+        # Validate basic extraction
+        assert len(result.pages) == 2
+        assert result.extract_metadata.filename == "chef.pdf"
+
+        # Page 1 should have 1 raster image
+        page1 = result.pages[0]
+        assert page1.page_number == 1
+        assert len(page1.images) == 1
+        assert page1.images[0].image_type == "raster"
+        assert page1.images[0].image_id == "img_p1_r0"
+        assert page1.images[0].width > 0 and page1.images[0].height > 0
+        assert os.path.exists(os.path.join(output_dir, page1.images[0].image_path))
+
+        # Page 2 should have 2 vector images
+        page2 = result.pages[1]
+        assert page2.page_number == 2
+        assert len(page2.images) == 2
+
+        # Both images should be vector type
+        for img in page2.images:
+            assert img.image_type == "vector"
+            assert img.image_id.startswith("img_p2_v")
+            assert img.width > 0 and img.height > 0
+            assert os.path.exists(os.path.join(output_dir, img.image_path))
+            assert os.path.exists(os.path.join(output_dir, img.chart_path))
+
+        # Verify the specific image IDs
+        image_ids = [img.image_id for img in page2.images]
+        assert "img_p2_v0" in image_ids
+        assert "img_p2_v1" in image_ids
