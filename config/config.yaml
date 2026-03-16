@@ -344,7 +344,7 @@ prompts:
 
   page_sectioning:
     model: default
-    template_path: prompts/page_sectioning_by_page.jinja2
+    template_path: prompts/page_sectioning.jinja2
 
   section_explanation:
     model: default

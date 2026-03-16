@@ -27,6 +27,7 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 - Contains reference text with highlighted annotations
 - Annotations use: `bg-amber-600 text-white py-1 px-2 rounded-full`
 - All spans must have data-id
+- **CRITICAL: Remove any dotted lines (........), underscores (______), or visual blank indicators from the text**
 
 **4. Text Input Area**
 - Use `<textarea>` for multi-line input
@@ -34,8 +35,10 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
   - `class="w-full p-2 border border-gray-400 rounded min-h-32 resize-none"`
   - `data-aria-id="aria-X-Y-Z"` (sequential numbering)
   - `aria-label="Descriptive label in {{ language }}"`
-  - `placeholder="Escribe aquí tu texto"`
+  - `placeholder=""` (LEAVE EMPTY - do not provide hints or example answers)
   - `tabindex="0"`
+- **NEVER include answers, hints, or example text in placeholder or value attributes**
+- **The textarea itself IS the writing space - do not add visual indicators for where to write**
 
 **5. Hints/Tips Box (optional)**
 - Use: `bg-amber-50 p-4 rounded-lg -mr-6 pr-8 rounded-lg font-semibold`
@@ -48,6 +51,17 @@ You are an expert frontend engineer creating beautiful, kid-friendly HTML pages 
 3. NO stray text directly in `<section>` - wrap everything in tagged elements
 4. Textarea must have `data-aria-id` for accessibility
 5. Use provided text IDs in exact order when possible
+6. **REMOVE all dotted lines (......), underscores (_____), dashes (-----), or similar visual blank indicators from text**
+7. **NEVER add answers, example responses, or hints in placeholder attributes - leave them empty**
+8. **Do not add value="" attributes with pre-filled text**
+
+### Text Processing Rules
+When you encounter text like:
+- "Write your answer here: ___________" → Use only "Write your answer here:" (remove underscores)
+- "Explain in the space below ......." → Use only "Explain in the space below" (remove dots)
+- "Your response: _______" → Use only "Your response:" (remove underscores)
+
+The textarea itself serves as the writing space. Do not preserve the original blank indicators or add example answers.
 
 ### Response Format (STRICT)
 Return JSON object:
